@@ -747,6 +747,27 @@ const GeoService = {
     };
   },
 
+  _countryName(code) {
+    const names = {
+      IR: 'ایران',
+      AZ: 'آذربایجان',
+      TR: 'ترکیه',
+      AE: 'امارات متحده عربی',
+      US: 'ایالات متحده',
+      GB: 'بریتانیا',
+      DE: 'آلمان',
+      FR: 'فرانسه',
+      CA: 'کانادا',
+      RU: 'روسیه',
+      AF: 'افغانستان',
+      IQ: 'عراق',
+      AM: 'ارمنستان',
+      TM: 'ترکمنستان',
+      PK: 'پاکستان'
+    };
+    return names[code] || code || 'نامشخص';
+  },
+
   _isLikelyVpn(primary, secondary) {
     if (!primary) return false;
     if (primary.isProxy || primary.isVpn || primary.isTor) return true;
@@ -808,7 +829,7 @@ const GeoService = {
     const country = {
       version: 5,
       code: topCode,
-      name: this._countryName(topCode),
+      name: this._countryName(topCode) || primary?.name || secondary?.name || topCode || 'نامشخص',
       isIran,
       isVpn: !!(primary?.isProxy || primary?.isVpn || primary?.isTor),
       isNeighbor: this.NEIGHBOR_COUNTRIES.includes(topCode),
