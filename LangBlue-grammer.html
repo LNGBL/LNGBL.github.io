@@ -2089,9 +2089,26 @@ const UsageLimiter = {
 
   _save(s) { const key=this._key(); if(key) Store.set(key,s); },
 
+  _commitCurrent(s) {
+    if (!s.currentStartedAt) return;
+    s.currentUsedMs += Math.max(0, Date.now() - s.currentStartedAt);
+    s.currentStartedAt = null;
+
+    if (s.currentUsedMs >= this.MAX_WINDOW_MS) {
+      s.windows = Math.min(this.MAX_WINDOWS, s.windows + 1);
+      s.currentUsedMs = 0;
+      if (s.windows >= this.MAX_WINDOWS) s.blockedUntil = Date.now() + this.STOP_MS;
+    }
+  },
+
   canEnter() {
     const s=this._state(); if(!s) return false;
     if(s.blockedUntil && Date.now() < s.blockedUntil) return false;
+    if(s.windows >= this.MAX_WINDOWS) return false;
+    if(s.currentUsedMs >= this.MAX_WINDOW_MS) {
+      this._commitCurrent(s);
+      this._save(s);
+    }
     return s.windows < this.MAX_WINDOWS;
   },
 
@@ -2099,6 +2116,7 @@ const UsageLimiter = {
     this.stop();
     const s=this._state();
     if(!s || !this.canEnter()) return;
+
     if(!s.currentStartedAt) s.currentStartedAt=Date.now();
     this._save(s);
     this.timer=setInterval(()=>this.tick(),1000);
@@ -2107,15 +2125,10 @@ const UsageLimiter = {
   tick() {
     const s=this._state(); if(!s || !s.currentStartedAt) return;
     const elapsed=Date.now()-s.currentStartedAt;
-    if(elapsed < this.MAX_WINDOW_MS) return;
 
-    s.windows += 1;
-    s.currentStartedAt = null;
-    s.currentUsedMs = 0;
+    if(s.currentUsedMs + elapsed < this.MAX_WINDOW_MS) return;
 
-    if(s.windows >= this.MAX_WINDOWS) {
-      s.blockedUntil=Date.now()+this.STOP_MS;
-    }
+    this._commitCurrent(s);
     this._save(s);
     this.stop();
 
@@ -2131,13 +2144,7 @@ const UsageLimiter = {
     if(this.timer){ clearInterval(this.timer); this.timer=null; }
     const s=this._state();
     if(s && s.currentStartedAt){
-      s.currentUsedMs=Date.now()-s.currentStartedAt;
-      if(s.currentUsedMs>=this.MAX_WINDOW_MS){
-        s.windows=Math.min(this.MAX_WINDOWS,s.windows+1);
-        s.currentStartedAt=null;
-        s.currentUsedMs=0;
-        if(s.windows>=this.MAX_WINDOWS) s.blockedUntil=Date.now()+this.STOP_MS;
-      }
+      this._commitCurrent(s);
       this._save(s);
     }
   },
