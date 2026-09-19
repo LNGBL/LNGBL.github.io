@@ -529,6 +529,8 @@ const SUPABASE_URL = 'https://ocxeyponzzcvlrvwndji.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ciwi3i81I-1_h-rtFF5Djw_ZPthKnRg';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
+let authRedirectHandling = false;
+
 const Auth = {
   current() { return Store.get('user', null); },
   isLoggedIn() { return !!this.current(); },
@@ -2464,6 +2466,24 @@ window.__resetGeo = () => {
   localStorage.removeItem('lb:geo:country');
   location.reload();
 };
+
+/* ============================================================
+   SUPABASE AUTH STATE
+   ============================================================ */
+// Email confirmation links can establish the Supabase session after
+// returning to GitHub Pages. React to that event and open the app.
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session?.user && !authRedirectHandling) {
+    authRedirectHandling = true;
+    setTimeout(async () => {
+      try {
+        await checkAuth();
+      } finally {
+        authRedirectHandling = false;
+      }
+    }, 0);
+  }
+});
 
 /* ============================================================
    INIT
