@@ -236,16 +236,12 @@
           <option value="other">Other</option>
         </select>
       </div>
-      <div style="margin-bottom:12px;">
-        <label>Email</label>
-        <input id="regEmail" type="email" autocomplete="off" placeholder="example@gmail.com">
-        <div class="hint">
-          هر ایمیل معتبر قابل استفاده است. پس از ثبت‌نام، ایمیل خود را برای تأیید حساب بررسی کنید.
-        </div>
+      <div class="hint" style="margin-bottom:12px;">
+        🔐 حساب LangBlue بدون ایمیل ساخته می‌شود. نام کاربری و رمز عبور برای ورود بعدی استفاده می‌شوند.
       </div>
       <div style="margin-bottom:12px;"><label>Username</label><input id="regUsername" autocomplete="off"></div>
       <div style="margin-bottom:12px;"><label>Password</label><input id="regPassword" type="password" autocomplete="new-password" minlength="6" placeholder="حداقل ۶ کاراکتر"></div>
-      <button id="btnRegister" style="width:100%;">✅ ثبت‌نام و ورود</button>
+      <button id="btnRegister" style="width:100%;">🔐 ثبت‌نام / ورود</button>
       <div id="registerStatus" style="margin-top:16px; color: var(--muted); font-size: 13px; text-align:center;"></div>
     </div>
   </div>
@@ -535,65 +531,64 @@ const Auth = {
   current() { return Store.get('user', null); },
   isLoggedIn() { return !!this.current(); },
 
+  async hashPassword(password, saltBytes) {
+    const enc = new TextEncoder();
+    const salt = saltBytes || crypto.getRandomValues(new Uint8Array(16));
+    const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' }, key, 256
+    );
+    return {
+      hash: Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join(''),
+      salt: Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('')
+    };
+  },
+
+  async verifyPassword(password, account) {
+    const salt = new Uint8Array(account.salt.match(/.{2}/g).map(h => parseInt(h, 16)));
+    const result = await this.hashPassword(password, salt);
+    return result.hash === account.passwordHash;
+  },
+
   async init() {
-    const { data, error } = await supabaseClient.auth.getSession();
-    if (error) {
-      console.error('Supabase session error:', error);
+    const session = Store.get('session', null);
+    const accounts = Store.get('accounts', {});
+    if (!session?.userId || !accounts[session.userId]) {
       Store.set('user', null);
       return null;
     }
-    const sessionUser = data.session?.user || null;
-    if (!sessionUser) {
-      Store.set('user', null);
-      return null;
-    }
-    const meta = sessionUser.user_metadata || {};
+    const a = accounts[session.userId];
     const user = {
-      id: sessionUser.id,
-      name: meta.name || '',
-      sex: meta.sex || '',
-      email: sessionUser.email || meta.email || '',
-      username: meta.username || '',
-      country: meta.country || null,
-      countryName: meta.countryName || '',
-      currency: meta.currency || null,
-      at: meta.at || new Date(sessionUser.created_at).getTime()
+      id: a.id, name: a.name, sex: a.sex || '', username: a.username,
+      country: a.country || null, countryName: a.countryName || '',
+      currency: a.currency || null, at: a.at
     };
     Store.set('user', user);
     return user;
   },
 
   async register(data) {
-    const { data: result, error } = await supabaseClient.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        emailRedirectTo: 'https://lngbl.github.io/LangBlue-grammer.html',
-        data: {
-          name: data.name,
-          sex: data.sex,
-          username: data.username,
-          country: data.country,
-          countryName: data.countryName,
-          currency: data.currency,
-          at: Date.now()
-        }
+    const accounts = Store.get('accounts', {});
+    const key = data.username.toLowerCase();
+
+    if (accounts[key]) {
+      if (!(await this.verifyPassword(data.password, accounts[key]))) {
+        return { ok: false, error: 'نام کاربری قبلاً ثبت شده است یا رمز عبور نادرست است.' };
       }
-    });
-
-    if (error) {
-      Audit.log('user_register_failed', { message: error.message });
-      return { ok: false, error: error.message };
+      Store.set('session', { userId: accounts[key].id, createdAt: Date.now() });
+      await this.init();
+      return { ok: true, user: this.current(), existing: true };
     }
 
-    if (!result.session) {
-      return {
-        ok: true,
-        needsConfirmation: true,
-        message: 'ثبت‌نام انجام شد. ایمیل خود را برای تأیید حساب بررسی کن.'
-      };
-    }
-
+    const hashed = await this.hashPassword(data.password);
+    const id = crypto.randomUUID();
+    accounts[key] = {
+      id, name: data.name, sex: data.sex, username: data.username,
+      country: data.country, countryName: data.countryName, currency: data.currency,
+      passwordHash: hashed.hash, salt: hashed.salt, at: Date.now()
+    };
+    Store.set('accounts', accounts);
+    Store.set('session', { userId: id, createdAt: Date.now() });
     await this.init();
     Audit.log('user_register', { username: data.username, country: data.country });
     return { ok: true, user: this.current() };
@@ -601,19 +596,14 @@ const Auth = {
 
   async logout() {
     Audit.log('user_logout');
-    await supabaseClient.auth.signOut();
+    Store.set('session', null);
     Store.set('user', null);
   }
 };
 
 /* ============================================================
-   اعتبارسنجی ایمیل
-   ============================================================ */
-function isValidEmail(email) {
-  if (!email) return false;
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
+   AUTH — بدون ایمیل
+   ============================================================
 /* ============================================================
    GEO SERVICE — تشخیص کشور و VPN
    ============================================================
@@ -1609,22 +1599,29 @@ function formatDate(ts) {
 /* ============================================================
    AUTH GATE
    ============================================================ */
-async function checkAuth() {
+async async function checkAuth() {
   await Auth.init();
   await GeoService.detect();
 
   if (Auth.isLoggedIn()) {
-    // چک کن نیاز به تایید کاربر داره
     const geo = Store.get('geo:country', {});
-    if (geo.needsUserInput || !geo.currency) {
-      showCurrencyPrompt();
+    if (geo.needsUserInput || !geo.currency) { showCurrencyPrompt(); return; }
+
+    if (!UsageLimiter.canEnter()) {
+      document.getElementById('authGate').classList.add('hidden');
+      document.getElementById('mainApp').classList.add('hidden');
+      UsageLimiter.showBlocked();
       return;
     }
 
+    UsageLimiter.hideBlocked();
     document.getElementById('authGate').classList.add('hidden');
     document.getElementById('mainApp').classList.remove('hidden');
     boot();
+    UsageLimiter.start();
   } else {
+    UsageLimiter.stop();
+    UsageLimiter.hideBlocked();
     document.getElementById('authGate').classList.remove('hidden');
     document.getElementById('mainApp').classList.add('hidden');
     renderRegisterStatus();
@@ -1696,43 +1693,27 @@ function showCurrencyPrompt() {
 document.getElementById('btnRegister').onclick = async () => {
   const name = document.getElementById('regName').value.trim();
   const sex = document.getElementById('regSex').value;
-  const email = document.getElementById('regEmail').value.trim().toLowerCase();
   const username = document.getElementById('regUsername').value.trim();
   const password = document.getElementById('regPassword').value;
-  const emailInput = document.getElementById('regEmail');
-  emailInput.classList.remove('error');
 
   if (!name || !username) { toast('نام و نام کاربری الزامی است', 'error'); return; }
-  if (!email) { toast('ایمیل الزامی است', 'error'); emailInput.classList.add('error'); return; }
-  if (!isValidEmail(email)) {
-    toast('فرمت ایمیل معتبر نیست', 'error');
-    emailInput.classList.add('error');
+  if (!/^[A-Za-z0-9_.-]{3,32}$/.test(username)) {
+    toast('نام کاربری باید ۳ تا ۳۲ کاراکتر و فقط شامل حروف انگلیسی، عدد، _، - یا . باشد', 'error');
     return;
   }
+  if (password.length < 6) { toast('رمز عبور باید حداقل ۶ کاراکتر باشد', 'error'); return; }
 
-  const geo = Store.get('geo:country', { code: null, name: 'Unknown', currency: null });
+  const geo = Store.get('geo:country', { code:null, name:'Unknown', currency:null });
   const result = await Auth.register({
-    name, sex, email, username, password,
+    name, sex, username, password,
     country: geo.code, countryName: geo.name, currency: geo.currency
   });
 
-  if (!result.ok) {
-    toast(result.error || 'ثبت‌نام ناموفق بود', 'error');
-    return;
-  }
+  if (!result.ok) { toast(result.error || 'ورود ناموفق بود', 'error'); return; }
 
-  if (result.needsConfirmation) {
-    document.getElementById('registerStatus').innerHTML =
-      '<span style="color:var(--success);">✅ ثبت‌نام انجام شد. ایمیل خود را برای تأیید حساب بررسی کن.</span>';
-    toast('ایمیل تأیید ارسال شد', 'success');
-    return;
-  }
-
-  toast('خوش آمدی ' + name, 'success');
+  toast(result.existing ? 'خوش آمدی ' + name : 'حساب ساخته شد؛ خوش آمدی ' + name, 'success');
   await checkAuth();
-  setTimeout(() => {
-    document.querySelector('.tab[data-tab="sitemap"]')?.click();
-  }, 400);
+  setTimeout(() => document.querySelector('.tab[data-tab="sitemap"]')?.click(), 400);
 };
 
 /* ============================================================
@@ -2076,6 +2057,113 @@ function renderFlashcard(q, session) {
 }
 
 /* ============================================================
+   INTERNAL ACCESS LIMITER
+   Two hidden 130-minute windows, then a 4-hour stop.
+   No counters or A/B labels are shown to the user.
+   ============================================================ */
+const UsageLimiter = {
+  MAX_WINDOW_MS: 130 * 60 * 1000,
+  MAX_WINDOWS: 2,
+  STOP_MS: 4 * 60 * 60 * 1000,
+  timer: null,
+
+  _key() {
+    const u = Auth.current();
+    return u ? 'usage:' + u.id : null;
+  },
+
+  _day() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  },
+
+  _state() {
+    const key=this._key(); if(!key) return null;
+    const today=this._day(), old=Store.get(key,null);
+    if (!old || old.date !== today) {
+      const fresh={date:today, windows:0, currentStartedAt:null, currentUsedMs:0, blockedUntil:0};
+      Store.set(key,fresh); return fresh;
+    }
+    return old;
+  },
+
+  _save(s) { const key=this._key(); if(key) Store.set(key,s); },
+
+  canEnter() {
+    const s=this._state(); if(!s) return false;
+    if(s.blockedUntil && Date.now() < s.blockedUntil) return false;
+    return s.windows < this.MAX_WINDOWS;
+  },
+
+  start() {
+    this.stop();
+    const s=this._state();
+    if(!s || !this.canEnter()) return;
+    if(!s.currentStartedAt) s.currentStartedAt=Date.now();
+    this._save(s);
+    this.timer=setInterval(()=>this.tick(),1000);
+  },
+
+  tick() {
+    const s=this._state(); if(!s || !s.currentStartedAt) return;
+    const elapsed=Date.now()-s.currentStartedAt;
+    if(elapsed < this.MAX_WINDOW_MS) return;
+
+    s.windows += 1;
+    s.currentStartedAt = null;
+    s.currentUsedMs = 0;
+
+    if(s.windows >= this.MAX_WINDOWS) {
+      s.blockedUntil=Date.now()+this.STOP_MS;
+    }
+    this._save(s);
+    this.stop();
+
+    if(s.blockedUntil) {
+      document.getElementById('mainApp').classList.add('hidden');
+      this.showBlocked();
+    } else {
+      toast('دسترسی این نوبت به پایان رسید.', 'warn');
+    }
+  },
+
+  stop() {
+    if(this.timer){ clearInterval(this.timer); this.timer=null; }
+    const s=this._state();
+    if(s && s.currentStartedAt){
+      s.currentUsedMs=Date.now()-s.currentStartedAt;
+      if(s.currentUsedMs>=this.MAX_WINDOW_MS){
+        s.windows=Math.min(this.MAX_WINDOWS,s.windows+1);
+        s.currentStartedAt=null;
+        s.currentUsedMs=0;
+        if(s.windows>=this.MAX_WINDOWS) s.blockedUntil=Date.now()+this.STOP_MS;
+      }
+      this._save(s);
+    }
+  },
+
+  showBlocked() {
+    let box=document.getElementById('usageBlocked');
+    if(!box){
+      box=document.createElement('div');
+      box.id='usageBlocked';
+      box.className='currency-modal';
+      box.innerHTML=`<div class="card" style="max-width:520px;text-align:center;">
+        <h2 style="color:var(--warn);">⏳ دسترسی موقتاً محدود شده</h2>
+        <p style="color:var(--muted);line-height:1.9;">زمان استفاده فعلی به پایان رسیده است. لطفاً بعداً دوباره تلاش کنید.</p>
+      </div>`;
+      document.body.appendChild(box);
+    }
+    box.classList.remove('hidden');
+  },
+
+  hideBlocked() {
+    const box=document.getElementById('usageBlocked');
+    if(box) box.classList.add('hidden');
+  }
+};
+
+/* ============================================================
    HOME
    ============================================================ */
 function renderHome() {
@@ -2381,7 +2469,6 @@ function renderProfile() {
     <div style="display:grid; gap:12px; max-width:520px;">
       <div><strong>نام:</strong> ${escapeHtml(u.name)}</div>
       <div><strong>نام کاربری:</strong> @${escapeHtml(u.username)}</div>
-      <div><strong>ایمیل:</strong> ${escapeHtml(u.email || '—')}</div>
       <div><strong>جنسیت:</strong> ${escapeHtml(u.sex || '—')}</div>
       <div><strong>🌍 کشور:</strong> ${countryDisplay}
         ${geo.isVpn ? '<span style="color:var(--danger); font-size:11px;">(VPN)</span>' : ''}
@@ -2462,22 +2549,10 @@ window.__resetGeo = () => {
 };
 
 /* ============================================================
-   SUPABASE AUTH STATE
+   AUTH STATE
    ============================================================ */
-// Email confirmation links can establish the Supabase session after
-// returning to GitHub Pages. React to that event and open the app.
-supabaseClient.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN' && session?.user && !authRedirectHandling) {
-    authRedirectHandling = true;
-    setTimeout(async () => {
-      try {
-        await checkAuth();
-      } finally {
-        authRedirectHandling = false;
-      }
-    }, 0);
-  }
-});
+// Internal username/password authentication. No email or SMTP.
+
 
 /* ============================================================
    INIT
