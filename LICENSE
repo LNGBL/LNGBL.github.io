@@ -1,126 +1,320 @@
-LANGBLUE SOFTWARE AND CONTENT LICENSE
+LANGBLUE PROPRIETARY SOFTWARE AND CONTENT LICENSE
+Pragmatic Private-Property License
 Copyright (c) 2026 LNGBL
 All Rights Reserved.
 
-1. COPYRIGHT AND OWNERSHIP
+ENGLISH VERSION
 
-LangBlue, including its original source code, software architecture, user
-interface, original documentation, original educational materials, original
-textual content, and other original creative materials contained in this
-repository, is protected by applicable copyright and other intellectual
-property laws.
+1. PURPOSE AND OWNERSHIP
 
-Unless a particular file or component expressly states otherwise, the
-copyright holder is LNGBL ("Copyright Holder").
+LangBlue is privately owned intellectual property. This license is intended
+to make the practical terms of use clear: the owner keeps ownership of
+LangBlue, while granting users limited permissions to use the publicly
+available project under the conditions stated below.
 
-The name "LangBlue" and associated branding, logos, names, and visual identity
-are not granted for use under this license.
+"LangBlue" includes the original software, source code, interface, original
+documentation, original educational materials, original text, and other
+original creative materials created by or for the Copyright Holder, except
+where a separate license or third-party right applies.
 
-2. PERMITTED USE
+Unless a file expressly states otherwise, the Copyright Holder is LNGBL.
 
-You may access and use the publicly available LangBlue website for ordinary
-personal, educational, and non-commercial purposes.
+2. LIMITED LICENSE TO USE
 
-You may inspect the publicly available source code for personal learning,
-research, security review, and interoperability purposes, provided that such
-inspection does not result in unauthorized redistribution or publication of
-the protected materials.
+Subject to this license, you may:
 
-3. RESTRICTIONS
+- use the public LangBlue website for personal, educational, and
+  non-commercial purposes;
+- inspect the public source code for learning, research, security review, and
+  interoperability;
+- make reasonable private backup copies for your own use.
 
-Unless you have prior written permission from the Copyright Holder, you may
-not:
+These permissions are licenses, not transfers of ownership.
 
-a) copy, reproduce, or redistribute substantial portions of the LangBlue
-   source code or original content;
+3. COMMERCIAL USE
 
-b) publish, mirror, or host a substantially similar copy of LangBlue or its
-   protected materials;
+Commercial use is not included in the free license.
 
-c) sell, sublicense, lease, rent, or otherwise commercially distribute the
-   LangBlue source code or protected content;
+If you want to use LangBlue commercially, including in a paid product,
+service, company, course, SaaS product, application, template, distribution,
+or other revenue-generating activity, you must obtain a separate commercial
+license or written permission from the Copyright Holder.
 
-d) create and distribute a derivative software product based substantially
-   on LangBlue's protected source code, interface, documentation, or original
-   content;
+Commercial licenses may be negotiated separately and may specify price,
+duration, territory, permitted uses, attribution, distribution rights,
+modification rights, support, and other terms.
 
-e) remove or alter copyright, attribution, license, or proprietary notices;
+4. REDISTRIBUTION AND DERIVATIVE WORKS
 
-f) use the LangBlue name, logo, branding, or other distinctive identifiers in
-   a manner that suggests sponsorship, affiliation, endorsement, or official
-   status;
+Without prior written permission, you may not:
 
-g) package or redistribute LangBlue's protected materials as part of another
-   product, service, template, repository, course, or commercial offering.
+- redistribute substantial portions of LangBlue's source code or original
+  content;
+- publish or mirror a substantially complete copy of LangBlue;
+- sell, sublicense, rent, lease, or repackage LangBlue's protected materials;
+- distribute a modified or derivative version of LangBlue;
+- incorporate substantial portions of LangBlue into another product or
+  service;
+- remove copyright, license, or proprietary notices.
 
-4. LIMITED PERSONAL COPYING
+Independent software that merely interoperates with LangBlue is not, by that
+fact alone, considered a derivative work of LangBlue.
 
-A user may make reasonable private copies of LangBlue materials solely for
-personal backup or archival purposes, provided that such copies are not
-distributed, published, sold, or made publicly accessible.
+5. BRAND AND NAME
 
-5. THIRD-PARTY MATERIALS
+The name "LangBlue", its logos, visual identity, and associated branding
+remain the property of the Copyright Holder.
 
-This license applies only to materials owned or controlled by the Copyright
-Holder. Third-party libraries, fonts, services, APIs, images, trademarks,
-and other materials included in or used by LangBlue may be subject to their
-own licenses and terms.
+You may refer to LangBlue factually, for example when discussing or reviewing
+the project, but you may not use its branding in a way that falsely suggests
+official sponsorship, partnership, endorsement, or ownership.
 
-Nothing in this license grants rights to third-party materials.
+6. USER'S OWN WORK
 
-6. TRADEMARKS AND BRANDING
+This license does not claim ownership of software, text, data, or other
+material that you independently create.
 
-"LangBlue", its logos, visual identity, and other associated branding may not
-be used to imply official affiliation, sponsorship, endorsement, or
-authorization without prior written permission from the Copyright Holder.
+If you create an independent work without copying protected LangBlue material,
+you retain ownership of that independent work.
 
-7. NO TRANSFER OF OWNERSHIP
+Nothing in this license grants you ownership of LangBlue itself.
 
-Access to the LangBlue website or source repository does not transfer
-ownership of any intellectual property to the user.
+7. THIRD-PARTY MATERIALS
+
+Third-party libraries, fonts, APIs, services, images, trademarks, and other
+materials may be governed by their own licenses or terms.
+
+This license does not replace or override those licenses.
 
 8. CONTRIBUTIONS
 
-Unless a separate written agreement states otherwise, submitting a contribution
-to this repository does not automatically grant the contributor ownership of
-the Copyright Holder's pre-existing materials. Contributors retain rights in
-their own original contributions to the extent permitted by applicable law.
+Unless a separate written agreement says otherwise, a contribution to the
+repository does not transfer ownership of the contributor's pre-existing
+independent work.
 
-9. NO WARRANTY
+By submitting a contribution intended for inclusion in LangBlue, the
+contributor grants the Copyright Holder the permissions reasonably necessary
+to use, modify, reproduce, distribute, and maintain that contribution as part
+of LangBlue, subject to applicable law and any separately agreed terms.
 
-LangBlue is provided on an "AS IS" and "AS AVAILABLE" basis, to the maximum
-extent permitted by applicable law. The Copyright Holder makes no warranties,
-express or implied, regarding the software, content, availability, accuracy,
-or suitability of LangBlue for any particular purpose.
+9. TERMINATION
 
-10. LIMITATION OF LIABILITY
+If you materially violate this license, the permissions granted to you under
+this license terminate to the extent permitted by applicable law.
 
-To the maximum extent permitted by applicable law, the Copyright Holder shall
-not be liable for indirect, incidental, special, consequential, or other
-damages arising from or related to the use of LangBlue.
+Termination does not affect rights or obligations that cannot legally be
+terminated, nor does it remove any rights that arose independently under
+applicable law.
 
-11. RESERVATION OF RIGHTS
+10. NO WARRANTY
+
+LangBlue is provided "AS IS" and "AS AVAILABLE", to the maximum extent
+permitted by applicable law.
+
+The Copyright Holder does not guarantee that LangBlue will always be
+available, error-free, secure, or suitable for a particular purpose.
+
+11. LIMITATION OF LIABILITY
+
+To the maximum extent permitted by applicable law, the Copyright Holder is
+not liable for indirect, incidental, special, consequential, or other damages
+arising from use of, inability to use, or reliance on LangBlue.
+
+12. RESERVATION OF RIGHTS
 
 All rights not expressly granted by this license are reserved by the
 Copyright Holder.
 
-12. PERMISSION REQUESTS
+Nothing in this license limits rights that cannot legally be limited or
+waived.
 
-Requests for permission to reproduce, redistribute, modify, commercially use,
-or otherwise use protected LangBlue materials outside the permissions granted
-above should be directed to the Copyright Holder.
+13. PERMISSION AND LICENSING
 
-13. GOVERNING LAW
+For uses outside this license, permission may be requested from the Copyright
+Holder.
 
-This license is intended to operate subject to the mandatory provisions of
-applicable law. If any provision of this license is found to be unenforceable,
-the remaining provisions shall remain in effect to the extent permitted by
-law.
+The Copyright Holder may offer different licenses to different users or
+organizations and may set different commercial terms by agreement.
 
-14. EFFECTIVE DATE
+No user is entitled to a commercial license merely because another user has
+received one.
 
-This license is effective for the protected materials in this repository from
-the date of publication in the repository, subject to applicable copyright
-law and any separate license notices contained in individual files.
+14. PRACTICAL INTERPRETATION
 
-END OF LICENSE
+This license is intended to be clear and commercially practical rather than
+to prohibit ordinary discussion, learning, criticism, interoperability, or
+independent creation.
+
+If a use does not involve copying protected LangBlue material, commercial
+distribution of protected material, or misuse of the LangBlue identity, this
+license should not be interpreted more broadly than necessary to protect the
+Copyright Holder's legitimate intellectual-property rights.
+
+15. APPLICABLE LAW
+
+This license operates subject to applicable law. If a provision is found
+unenforceable, the remaining provisions remain effective to the extent
+permitted by law.
+
+16. EFFECTIVE DATE
+
+This license applies to the protected materials covered by it from the date
+it is published with the relevant LangBlue materials, subject to applicable
+law and any separate license notice attached to a particular component.
+
+END OF ENGLISH VERSION
+
+
+نسخه فارسی
+
+مجوز اختصاصی نرم‌افزار و محتوای LANGBLUE
+مجوز مالکیت خصوصی و استفاده محدود
+© ۲۰۲۶ LNGBL
+تمامی حقوق محفوظ است.
+
+۱. هدف و مالکیت
+
+LangBlue یک دارایی فکری با مالکیت خصوصی است. هدف این مجوز آن است که شرایط
+استفاده را به‌صورت روشن و عملی مشخص کند: مالکیت LangBlue نزد مالک باقی
+می‌ماند و کاربر صرفاً مجوزهای محدودی برای استفاده از پروژه عمومی، مطابق
+شرایط این مجوز، دریافت می‌کند.
+
+منظور از LangBlue شامل نرم‌افزار اصلی، کد منبع، رابط کاربری، مستندات اصلی،
+مطالب آموزشی اصلی، متون اصلی و سایر آثار خلاقانه‌ای است که توسط مالک حقوق
+ایجاد شده‌اند یا برای او ایجاد شده‌اند؛ مگر آنکه برای بخشی از آن‌ها مجوز یا
+حق شخص ثالث جداگانه‌ای وجود داشته باشد.
+
+مگر اینکه در فایل مشخصی خلاف آن ذکر شده باشد، مالک حقوق LNGBL است.
+
+۲. مجوز محدود استفاده
+
+با رعایت این مجوز، کاربر می‌تواند:
+
+- از وب‌سایت عمومی LangBlue برای استفاده شخصی، آموزشی و غیرتجاری استفاده کند؛
+- کد منبع عمومی را برای یادگیری، پژوهش، بررسی امنیتی و تعامل‌پذیری مشاهده کند؛
+- برای استفاده شخصی خود نسخه پشتیبان خصوصی و معقول تهیه کند.
+
+این مجوزها به معنی انتقال مالکیت نیستند.
+
+۳. استفاده تجاری
+
+استفاده تجاری در مجوز رایگان گنجانده نشده است.
+
+برای استفاده تجاری از LangBlue، از جمله در محصول پولی، خدمات، شرکت، دوره،
+SaaS، برنامه، قالب، توزیع، یا هر فعالیت درآمدزا، باید مجوز تجاری جداگانه یا
+اجازه کتبی از مالک حقوق دریافت شود.
+
+مجوزهای تجاری می‌توانند به‌صورت جداگانه مذاکره شوند و شامل قیمت، مدت، قلمرو،
+نوع استفاده مجاز، نحوه انتساب، حقوق توزیع، حقوق تغییر، پشتیبانی و سایر شرایط
+باشند.
+
+۴. بازتوزیع و آثار مشتق
+
+بدون اجازه کتبی قبلی، موارد زیر مجاز نیست:
+
+- بازتوزیع بخش قابل‌توجهی از کد منبع یا محتوای اصلی LangBlue؛
+- انتشار یا mirror کردن نسخه‌ای که عملاً بخش عمده LangBlue را بازتولید کند؛
+- فروش، اعطای مجوز فرعی، اجاره، واگذاری یا بسته‌بندی مجدد مواد محافظت‌شده؛
+- توزیع نسخه تغییر‌یافته یا مشتق‌شده از LangBlue؛
+- وارد کردن بخش قابل‌توجهی از LangBlue در محصول یا خدمت دیگر؛
+- حذف اعلان‌های کپی‌رایت، مجوز یا مالکیت.
+
+نرم‌افزار مستقلی که صرفاً با LangBlue تعامل یا سازگاری دارد، صرفاً به دلیل
+این تعامل، اثر مشتق‌شده از LangBlue محسوب نمی‌شود.
+
+۵. نام و برند
+
+نام «LangBlue»، لوگوها، هویت بصری و برند مرتبط با آن متعلق به مالک حقوق است.
+
+اشاره واقعی و توصیفی به LangBlue، برای مثال در نقد، بررسی یا معرفی پروژه،
+مجاز است؛ اما استفاده از برند نباید به‌گونه‌ای باشد که حمایت، شراکت،
+تأیید، وابستگی یا مالکیت رسمی و غیرواقعی را القا کند.
+
+۶. آثار متعلق به کاربر
+
+این مجوز مالکیت نرم‌افزار، متن، داده یا اثر دیگری را که کاربر مستقلاً ایجاد
+کرده است، به نام LangBlue مطالبه نمی‌کند.
+
+اگر اثری مستقل ایجاد کنید و برای ایجاد آن از مواد محافظت‌شده LangBlue کپی
+نکرده باشید، مالکیت آن اثر مستقل متعلق به خود شما باقی می‌ماند.
+
+هیچ بخش این مجوز مالکیت خود LangBlue را به کاربر منتقل نمی‌کند.
+
+۷. مواد متعلق به اشخاص ثالث
+
+کتابخانه‌ها، فونت‌ها، APIها، سرویس‌ها، تصاویر، علائم تجاری و سایر مواد متعلق
+به اشخاص ثالث ممکن است تابع مجوز یا شرایط مستقل خود باشند.
+
+این مجوز جایگزین یا ناقض مجوزهای اشخاص ثالث نیست.
+
+۸. مشارکت‌ها
+
+مگر اینکه توافق کتبی جداگانه‌ای وجود داشته باشد، ارسال مشارکت به repository
+مالکیت آثار مستقل و پیشین مشارکت‌کننده را منتقل نمی‌کند.
+
+با ارسال مشارکتی که برای استفاده در LangBlue ارائه شده است، مشارکت‌کننده تا
+حد لازم و مطابق قانون، اجازه استفاده، تغییر، تکثیر، توزیع و نگهداری آن
+مشارکت را به‌عنوان بخشی از LangBlue به مالک حقوق اعطا می‌کند؛ مگر اینکه
+شرایط جداگانه‌ای توافق شده باشد.
+
+۹. خاتمه مجوز
+
+در صورت نقض اساسی این مجوز، مجوزهای اعطاشده تحت آن، تا حدی که قانون اجازه
+دهد، خاتمه می‌یابند.
+
+خاتمه مجوز حقوق یا تعهداتی را که قانوناً قابل خاتمه نیستند از بین نمی‌برد و
+حقوقی را که مستقل از این مجوز و بر اساس قانون ایجاد شده‌اند نیز حذف نمی‌کند.
+
+۱۰. عدم تضمین
+
+LangBlue تا حداکثر میزان مجاز قانون، به صورت «همان‌گونه که هست» و
+«همان‌گونه که در دسترس است» ارائه می‌شود.
+
+مالک حقوق تضمین نمی‌کند که LangBlue همیشه در دسترس، بدون خطا، امن یا مناسب
+برای هدف خاصی باشد.
+
+۱۱. محدودیت مسئولیت
+
+تا حداکثر میزان مجاز قانون، مالک حقوق در قبال خسارات غیرمستقیم، اتفاقی،
+خاص، تبعی یا سایر خسارات ناشی از استفاده، عدم امکان استفاده یا اتکا به
+LangBlue مسئولیتی نخواهد داشت.
+
+۱۲. حفظ حقوق
+
+تمام حقوقی که صراحتاً در این مجوز اعطا نشده‌اند نزد مالک حقوق محفوظ هستند.
+
+هیچ بخش این مجوز حقوقی را که طبق قانون قابل محدود یا اسقاط نیستند محدود
+نمی‌کند.
+
+۱۳. اجازه و مجوزهای تجاری
+
+برای استفاده‌هایی که خارج از این مجوز هستند، می‌توان از مالک حقوق درخواست
+اجازه کرد.
+
+مالک حقوق می‌تواند به کاربران یا سازمان‌های مختلف مجوزهای متفاوت ارائه کند
+و شرایط تجاری متفاوتی را از طریق توافق تعیین کند.
+
+هیچ کاربری صرفاً به دلیل دریافت مجوز توسط کاربر دیگر، مستحق دریافت همان
+مجوز تجاری نیست.
+
+۱۴. تفسیر عملی
+
+هدف این مجوز ایجاد شرایط روشن و عملی برای مالکیت و استفاده تجاری است، نه
+ممنوع کردن بحث، یادگیری، نقد، تعامل‌پذیری یا ایجاد مستقل آثار.
+
+اگر یک استفاده شامل کپی از مواد محافظت‌شده LangBlue، توزیع تجاری مواد
+محافظت‌شده یا سوءاستفاده از هویت LangBlue نباشد، این مجوز نباید بیش از حد
+لازم برای حفاظت از حقوق مشروع مالک تفسیر شود.
+
+۱۵. قانون حاکم
+
+این مجوز تابع قوانین لازم‌الاجرا است. اگر بخشی از آن غیرقابل اجرا تشخیص
+داده شود، سایر مفاد تا حد مجاز قانون معتبر باقی می‌مانند.
+
+۱۶. تاریخ اجرا
+
+این مجوز از تاریخ انتشار آن همراه با مواد مربوط به LangBlue، نسبت به مواد
+محافظت‌شده مشمول آن اعمال می‌شود؛ مشروط به قوانین لازم‌الاجرا و هر اعلان
+مجوز جداگانه‌ای که برای یک جزء خاص وجود داشته باشد.
+
+پایان مجوز
