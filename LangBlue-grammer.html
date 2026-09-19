@@ -681,12 +681,12 @@ const Auth = {
 };
 
 /* ============================================================
-   GEO SERVICE — تشخیص کشور و VPN
+   GEO SERVICE — تشخیص کشور از IP و تعیین خودکار ارز
    ============================================================
-   مکانیزم:
-   - IP ایران → تومان قفل
-   - IP خارجی غیر-VPN → تتر قفل
-   - کشور همسایه (AZ/TR/AE/...) یا VPN یا خطا → از کاربر می‌پرسه
+   قانون پرداخت:
+   - IP ایران → تومان (IRT)
+   - هر IP خارج از ایران → تتر (USDT)
+   - کاربر هیچ انتخاب دستی برای ارز ندارد.
    ============================================================ */
 const SUPPORTED_COUNTRIES_USD = [
   'GB','US','CA','NZ','AU','TR','UA','SE','FI','FR','TJ','KR'
@@ -761,13 +761,7 @@ const GeoService = {
   },
 
   async detect() {
-    if (this._cache) return this._cache;
-    const cached = Store.get('geo:country', null);
-    if (cached && cached.version === 4 && !cached.manualOverride) {
-      this._cache = cached;
-      return cached;
-    }
-
+    // تشخیص بر اساس IP فعلی انجام می‌شود؛ انتخاب دستی ارز مجاز نیست.
     const [primary, secondary, tertiary] = await Promise.all([
       this._detectPrimary(),
       this._detectSecondary(),
@@ -776,61 +770,51 @@ const GeoService = {
 
     const codes = [primary?.code, secondary?.code, tertiary?.code].filter(Boolean);
 
-    // اگه هیچ منبعی جواب نداد → از کاربر بپرس
+    // اگر یک سرویس شکست خورد، از دو سرویس دیگر استفاده می‌کنیم.
+    // اگر همه شکست خوردند، برای جلوگیری از انتخاب دستی، پرداخت خارجی/USDT
+    // به‌عنوان حالت پیش‌فرض در نظر گرفته می‌شود.
     if (codes.length === 0) {
       const unknown = {
-        version: 4,
+        version: 5,
         code: null,
         name: 'Unknown',
-        currency: null,
-        isIran: null,
+        currency: 'USD',
+        isIran: false,
         isVpn: false,
-        reason: 'all_sources_failed_need_user_input',
-        needsUserInput: true,
+        reason: 'all_sources_failed_default_usdt',
+        needsUserInput: false,
         manualOverride: false,
         detectedAt: Date.now()
       };
       Store.set('geo:country', unknown);
       this._cache = unknown;
-      Audit.log('geo_unknown_all_failed');
+      Audit.log('geo_unknown_default_usdt');
       return unknown;
     }
 
-    // رای‌گیری بین منابع
+    // رای‌گیری بین منابع تشخیص IP
     const codeCounts = {};
     codes.forEach(c => codeCounts[c] = (codeCounts[c] || 0) + 1);
-    const topCode = Object.entries(codeCounts).sort((a, b) => b[1] - a[1])[0][0];
+    const topCode = Object.entries(codeCounts)
+      .sort((a, b) => b[1] - a[1])[0][0];
 
-    const likelyVpn = this._isLikelyVpn(primary, secondary);
     const isIran = topCode === 'IR';
-    const isNeighbor = this.NEIGHBOR_COUNTRIES.includes(topCode);
 
-    let currency, reason;
-
-    if (isIran) {
-      // ایران → تومان قفل
-      currency = 'IRT';
-      reason = 'iranian_ip';
-    } else if (likelyVpn || isNeighbor) {
-      // VPN یا کشور همسایه → از کاربر بپرس
-      currency = null;
-      reason = isNeighbor ? 'neighbor_country_needs_confirmation' : 'vpn_needs_confirmation';
-    } else {
-      // خارجی غیر-VPN → تتر قفل
-      currency = 'USD';
-      reason = 'foreign_ip';
-    }
+    // فقط کشور IP تعیین‌کننده ارز است؛ VPN/Proxy یا همسایه بودن
+    // دیگر باعث نمایش انتخاب دستی نمی‌شود.
+    const currency = isIran ? 'IRT' : 'USD';
+    const reason = isIran ? 'iranian_ip' : 'foreign_ip';
 
     const country = {
-      version: 4,
+      version: 5,
       code: topCode,
       name: this._countryName(topCode),
       isIran,
-      isVpn: likelyVpn,
-      isNeighbor,
+      isVpn: !!(primary?.isProxy || primary?.isVpn || primary?.isTor),
+      isNeighbor: this.NEIGHBOR_COUNTRIES.includes(topCode),
       currency,
       reason,
-      needsUserInput: currency === null,
+      needsUserInput: false,
       votes: codeCounts,
       isp: primary?.isp || '',
       manualOverride: false,
@@ -849,20 +833,6 @@ const GeoService = {
     return country;
   },
 
-  _countryName(code) {
-    const names = {
-      'IR': 'ایران', 'AZ': 'آذربایجان', 'TR': 'ترکیه',
-      'AE': 'امارات', 'AF': 'افغانستان', 'IQ': 'عراق',
-      'AM': 'ارمنستان', 'TM': 'ترکمنستان', 'PK': 'پاکستان',
-      'US': 'آمریکا', 'GB': 'انگلستان', 'CA': 'کانادا',
-      'NZ': 'نیوزیلند', 'AU': 'استرالیا', 'UA': 'اوکراین',
-      'SE': 'سوئد', 'FI': 'فنلاند', 'FR': 'فرانسه',
-      'TJ': 'تاجیکستان', 'KR': 'کره جنوبی'
-    };
-    return names[code] || code;
-  },
-
-  // کاربر یک بار انتخاب نهایی می‌کنه
   confirmCurrency(currency) {
     if (currency !== 'IRT' && currency !== 'USD') return false;
     const current = Store.get('geo:country', {});
@@ -1702,9 +1672,9 @@ async function checkAuth() {
   }
 
   const geo = Store.get('geo:country', {});
-  if (geo.needsUserInput || !geo.currency) {
-    showCurrencyPrompt();
-    return;
+  // ارز از IP تعیین شده و کاربر امکان تغییر آن را ندارد.
+  if (!geo.currency) {
+    await GeoService.detect();
   }
 
   if (!UsageLimiter.canEnter()) {
