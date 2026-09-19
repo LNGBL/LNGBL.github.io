@@ -244,6 +244,7 @@
         </div>
       </div>
       <div style="margin-bottom:12px;"><label>Username</label><input id="regUsername" autocomplete="off"></div>
+      <div style="margin-bottom:12px;"><label>Password</label><input id="regPassword" type="password" autocomplete="new-password" minlength="6" placeholder="حداقل ۶ کاراکتر"></div>
       <button id="btnRegister" style="width:100%;">✅ ثبت‌نام و ورود</button>
       <div id="registerStatus" style="margin-top:16px; color: var(--muted); font-size: 13px; text-align:center;"></div>
     </div>
@@ -453,6 +454,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
 /* ============================================================
    SECURITY LAYER 0: غیرفعال‌سازی DevTools
@@ -523,16 +525,81 @@ const Audit = {
 /* ============================================================
    AUTH
    ============================================================ */
+const SUPABASE_URL = 'https://ocxeyponzzcvlrvwndji.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ciwi3i81I-1_h-rtFF5Djw_ZPthKnRg';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
 const Auth = {
   current() { return Store.get('user', null); },
   isLoggedIn() { return !!this.current(); },
-  register(data) {
-    Store.set('user', { ...data, at: Date.now() });
-    Audit.log('user_register', { username: data.username, country: data.country });
+
+  async init() {
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) {
+      console.error('Supabase session error:', error);
+      Store.set('user', null);
+      return null;
+    }
+    const sessionUser = data.session?.user || null;
+    if (!sessionUser) {
+      Store.set('user', null);
+      return null;
+    }
+    const meta = sessionUser.user_metadata || {};
+    const user = {
+      id: sessionUser.id,
+      name: meta.name || '',
+      sex: meta.sex || '',
+      email: sessionUser.email || meta.email || '',
+      username: meta.username || '',
+      country: meta.country || null,
+      countryName: meta.countryName || '',
+      currency: meta.currency || null,
+      at: meta.at || new Date(sessionUser.created_at).getTime()
+    };
+    Store.set('user', user);
+    return user;
   },
-  logout() {
+
+  async register(data) {
+    const { data: result, error } = await supabaseClient.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: {
+          name: data.name,
+          sex: data.sex,
+          username: data.username,
+          country: data.country,
+          countryName: data.countryName,
+          currency: data.currency,
+          at: Date.now()
+        }
+      }
+    });
+
+    if (error) {
+      Audit.log('user_register_failed', { message: error.message });
+      return { ok: false, error: error.message };
+    }
+
+    if (!result.session) {
+      return {
+        ok: true,
+        needsConfirmation: true,
+        message: 'ثبت‌نام انجام شد. ایمیل خود را برای تأیید حساب بررسی کن.'
+      };
+    }
+
+    await this.init();
+    Audit.log('user_register', { username: data.username, country: data.country });
+    return { ok: true, user: this.current() };
+  },
+
+  async logout() {
     Audit.log('user_logout');
-    localStorage.removeItem('lb:user');
+    await supabaseClient.auth.signOut();
+    Store.set('user', null);
   }
 };
 
@@ -1547,6 +1614,7 @@ function formatDate(ts) {
    AUTH GATE
    ============================================================ */
 async function checkAuth() {
+  await Auth.init();
   await GeoService.detect();
 
   if (Auth.isLoggedIn()) {
@@ -1629,11 +1697,12 @@ function showCurrencyPrompt() {
   };
 }
 
-document.getElementById('btnRegister').onclick = () => {
+document.getElementById('btnRegister').onclick = async () => {
   const name = document.getElementById('regName').value.trim();
   const sex = document.getElementById('regSex').value;
   const email = document.getElementById('regEmail').value.trim().toLowerCase();
   const username = document.getElementById('regUsername').value.trim();
+  const password = document.getElementById('regPassword').value;
   const emailInput = document.getElementById('regEmail');
   emailInput.classList.remove('error');
 
@@ -1646,12 +1715,25 @@ document.getElementById('btnRegister').onclick = () => {
   }
 
   const geo = Store.get('geo:country', { code: null, name: 'Unknown', currency: null });
-  Auth.register({
-    name, sex, email, username,
+  const result = await Auth.register({
+    name, sex, email, username, password,
     country: geo.code, countryName: geo.name, currency: geo.currency
   });
+
+  if (!result.ok) {
+    toast(result.error || 'ثبت‌نام ناموفق بود', 'error');
+    return;
+  }
+
+  if (result.needsConfirmation) {
+    document.getElementById('registerStatus').innerHTML =
+      '<span style="color:var(--success);">✅ ثبت‌نام انجام شد. ایمیل خود را برای تأیید حساب بررسی کن.</span>';
+    toast('ایمیل تأیید ارسال شد', 'success');
+    return;
+  }
+
   toast('خوش آمدی ' + name, 'success');
-  checkAuth();
+  await checkAuth();
   setTimeout(() => {
     document.querySelector('.tab[data-tab="sitemap"]')?.click();
   }, 400);
@@ -2316,9 +2398,9 @@ function renderProfile() {
   `;
 }
 
-document.getElementById('btnLogout').onclick = () => {
+document.getElementById('btnLogout').onclick = async () => {
   if (!confirm('خروج از حساب؟')) return;
-  Auth.logout();
+  await Auth.logout();
   location.reload();
 };
 
