@@ -449,10 +449,22 @@
       <div class="card">
         <h2>⚙️ پروفایل</h2>
         <div id="profileInfo"></div>
+        <div class="card" style="margin-top:20px; padding:16px;">
+          <h3>✏️ اطلاعات حساب</h3>
+          <div style="margin-bottom:12px;"><label>نام</label><input id="profileName" autocomplete="off"></div>
+          <div style="margin-bottom:12px;"><label>نام کاربری</label><input id="profileUsername" autocomplete="off"></div>
+          <button id="btnSaveProfile">ذخیره تغییرات</button>
+        </div>
+        <div class="card" style="margin-top:16px; padding:16px;">
+          <h3>🔑 تغییر رمز عبور</h3>
+          <div style="margin-bottom:12px;"><label>رمز فعلی</label><input id="oldPassword" type="password"></div>
+          <div style="margin-bottom:12px;"><label>رمز جدید</label><input id="newPassword" type="password" minlength="6"></div>
+          <button id="btnChangePassword">تغییر رمز</button>
+        </div>
         <div class="row" style="margin-top:20px;">
           <button class="ghost" id="btnExport">💾 خروجی JSON</button>
-          <button class="danger" id="btnLogout">🚪 خروج از حساب</button>
           <button class="ghost" id="btnImport">📥 ورود از فایل</button>
+          <button class="danger" id="btnLogout">🚪 خروج از حساب</button>
         </div>
         <input type="file" id="fileImport" accept=".json" class="hidden">
       </div>
@@ -2486,32 +2498,74 @@ function renderProfile() {
   const sub = Store.get('subscription', null);
   const isActive = sub && Date.now() < sub.expiresAt;
   const nodes = Object.keys(Graph.nodes).length;
-  const geo = Store.get('geo:country', { name: '—', currency: null });
-
+  const geo = Store.get('geo:country', { name:'—', currency:null });
   const curLabel = geo.currency === 'USD' ? 'تتر (USDT)' :
                    geo.currency === 'IRT' ? 'تومان (T)' : 'نامشخص';
-
   const subStatus = isActive
-    ? `<span style="color:var(--success);">فعال (${sub.currency === 'USDT' ? 'تتر' : 'تومان'}) — ${Subscription.daysLeft()} روز باقی‌مونده</span>`
-    : `<span style="color:var(--warn);">نداری — نسخه رایگان (${nodes}/${FREE_LIMIT})</span>`;
-
+    ? `<span style="color:var(--success);">فعال — ${Subscription.daysLeft()} روز باقی‌مونده</span>`
+    : `<span style="color:var(--warn);">نسخه رایگان (${nodes}/${FREE_LIMIT})</span>`;
   const countryDisplay = geo.code ? `${escapeHtml(geo.name)} (${escapeHtml(geo.code)})` : 'نامشخص';
 
   document.getElementById('profileInfo').innerHTML = `
-    <div style="display:grid; gap:12px; max-width:520px;">
+    <div style="display:grid;gap:12px;max-width:520px;">
+      <div><strong>شناسه حساب:</strong> <code>${escapeHtml(u.id)}</code></div>
       <div><strong>نام:</strong> ${escapeHtml(u.name)}</div>
       <div><strong>نام کاربری:</strong> @${escapeHtml(u.username)}</div>
       <div><strong>جنسیت:</strong> ${escapeHtml(u.sex || '—')}</div>
-      <div><strong>🌍 کشور:</strong> ${countryDisplay}
-        ${geo.isVpn ? '<span style="color:var(--danger); font-size:11px;">(VPN)</span>' : ''}
-      </div>
+      <div><strong>🌍 کشور:</strong> ${countryDisplay}</div>
       <div><strong>💱 ارز:</strong> ${curLabel}</div>
       <div><strong>تاریخ عضویت:</strong> ${formatDate(u.at)}</div>
       <div><strong>تعداد گرامر:</strong> ${nodes}</div>
       <div><strong>وضعیت اشتراک:</strong> ${subStatus}</div>
-    </div>
-  `;
+    </div>`;
+  document.getElementById('profileName').value = u.name || '';
+  document.getElementById('profileUsername').value = u.username || '';
 }
+
+document.getElementById('btnSaveProfile').onclick = () => {
+  const u=Auth.current();
+  const name=document.getElementById('profileName').value.trim();
+  const username=document.getElementById('profileUsername').value.trim();
+  if(!name){ toast('نام الزامی است','error'); return; }
+  if(!/^[A-Za-z0-9_.-]{3,32}$/.test(username)){ toast('نام کاربری معتبر نیست','error'); return; }
+
+  const accounts=Store.get('accounts',{});
+  const oldKey=u.username.toLowerCase();
+  const newKey=username.toLowerCase();
+  if(newKey!==oldKey && accounts[newKey]){ toast('این نام کاربری قبلاً استفاده شده است','error'); return; }
+
+  const account=accounts[oldKey];
+  if(!account){ toast('حساب پیدا نشد','error'); return; }
+  account.name=name;
+  account.username=username;
+  delete accounts[oldKey];
+  accounts[newKey]=account;
+  Store.set('accounts',accounts);
+  u.name=name;
+  u.username=username;
+  Store.set('user',u);
+  renderProfile();
+  toast('اطلاعات حساب ذخیره شد','success');
+};
+
+document.getElementById('btnChangePassword').onclick = async () => {
+  const u=Auth.current();
+  const accounts=Store.get('accounts',{});
+  const account=accounts[u.username.toLowerCase()];
+  if(!account){ toast('حساب پیدا نشد','error'); return; }
+  const oldP=document.getElementById('oldPassword').value;
+  const newP=document.getElementById('newPassword').value;
+  if(newP.length<6){ toast('رمز جدید باید حداقل ۶ کاراکتر باشد','error'); return; }
+  if(!(await Auth.verifyPassword(oldP,account))){ toast('رمز فعلی نادرست است','error'); return; }
+  const hashed=await Auth.hashPassword(newP);
+  account.passwordHash=hashed.hash;
+  account.salt=hashed.salt;
+  accounts[u.username.toLowerCase()]=account;
+  Store.set('accounts',accounts);
+  document.getElementById('oldPassword').value='';
+  document.getElementById('newPassword').value='';
+  toast('رمز عبور تغییر کرد','success');
+};
 
 document.getElementById('btnExport').onclick = () => {
   const data = {};
