@@ -1,0 +1,2392 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LangBlue - Grammar Platform</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --panel: #121829;
+    --panel-2: #1a2238;
+    --border: #2a3550;
+    --text: #e6ecff;
+    --muted: #8a96b8;
+    --accent: #4a9eff;
+    --accent-2: #6c5ce7;
+    --success: #00d68f;
+    --danger: #ff4757;
+    --warn: #ffb800;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: 'Segoe UI', Tahoma, system-ui, sans-serif;
+    min-height: 100vh;
+    user-select: none; -webkit-user-select: none;
+  }
+  input, textarea { user-select: text; -webkit-user-select: text; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+  h1, h2, h3 { margin: 0 0 12px; }
+  h1 { color: var(--accent); font-size: 28px; }
+  h2 { color: var(--accent-2); font-size: 20px; padding-bottom: 8px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+  }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .row > * { flex: 1; min-width: 200px; }
+  input, select, textarea {
+    background: var(--panel-2); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 12px; border-radius: 8px;
+    font-family: inherit; font-size: 14px; width: 100%;
+    transition: border-color .2s;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  input.error { border-color: var(--danger); }
+  textarea { min-height: 80px; resize: vertical; }
+  label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 13px; }
+  button {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: white; border: none; padding: 10px 20px; border-radius: 8px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: transform .15s, opacity .2s;
+  }
+  button:hover { transform: translateY(-1px); }
+  button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  button.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  button.small { padding: 6px 12px; font-size: 12px; }
+  button.danger { background: var(--danger); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table th, table td {
+    padding: 10px; text-align: right;
+    border-bottom: 1px solid var(--border); vertical-align: top;
+  }
+  table th { color: var(--muted); font-weight: 600; background: var(--panel-2); }
+  table tr:hover { background: rgba(74,158,255,.05); }
+  .progress {
+    background: var(--panel-2); border-radius: 20px;
+    height: 8px; overflow: hidden; margin-top: 8px;
+  }
+  .progress > div {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transition: width .4s;
+  }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .tab {
+    padding: 10px 16px; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: var(--muted); font-size: 14px;
+    background: none; border-radius: 0; transform: none;
+  }
+  .tab:hover { color: var(--text); transform: none; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .hidden { display: none !important; }
+  .flashcard {
+    background: linear-gradient(135deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 40px 24px; text-align: center; min-height: 200px;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center; margin: 16px 0;
+  }
+  .flashcard .question { font-size: 20px; margin-bottom: 24px; line-height: 1.8; white-space: pre-line; }
+  .flashcard .type-badge {
+    background: var(--panel); padding: 4px 14px; border-radius: 20px;
+    font-size: 11px; color: var(--accent); margin-bottom: 16px;
+    display: inline-block; border: 1px solid var(--border);
+  }
+  .options { display: grid; gap: 10px; width: 100%; max-width: 600px; }
+  .option {
+    background: var(--panel); border: 2px solid var(--border);
+    padding: 12px 16px; border-radius: 8px;
+    cursor: pointer; text-align: right;
+    transition: all .2s; color: var(--text); font-size: 14px;
+  }
+  .option:hover { border-color: var(--accent); background: var(--panel-2); }
+  .option.correct { border-color: var(--success); background: rgba(0,214,143,.1); }
+  .option.wrong { border-color: var(--danger); background: rgba(255,71,87,.1); }
+  .option:disabled { cursor: default; }
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--panel-2); border: 1px solid var(--accent);
+    padding: 12px 24px; border-radius: 8px;
+    transition: transform .3s; z-index: 1000;
+    font-size: 14px; max-width: 90vw;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { border-color: var(--danger); }
+  .toast.success { border-color: var(--success); }
+  .toast.warn { border-color: var(--warn); }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat {
+    background: var(--panel-2); padding: 14px;
+    border-radius: 8px; text-align: center;
+    border: 1px solid var(--border);
+  }
+  .stat .num { font-size: 24px; font-weight: 700; color: var(--accent); }
+  .stat .lbl { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .sitemap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .sitemap-item {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px;
+    transition: transform .2s, border-color .2s; cursor: pointer;
+  }
+  .sitemap-item:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .sitemap-item .icon { font-size: 32px; margin-bottom: 8px; }
+  .sitemap-item h3 { color: var(--accent); font-size: 16px; margin-bottom: 6px; }
+  .sitemap-item p { color: var(--muted); font-size: 13px; margin: 0; line-height: 1.6; }
+  .sub-banner {
+    background: linear-gradient(135deg, #ff4757, #c0392b);
+    color: white; padding: 16px 20px; border-radius: 10px;
+    margin-bottom: 16px; display: flex;
+    justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .sub-banner.warn { background: linear-gradient(135deg, #ffb800, #e67e22); }
+  .sub-banner.ok { background: linear-gradient(135deg, #00d68f, #00926b); }
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
+  .price-card {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px; text-align: center;
+    transition: transform .2s, border-color .2s;
+  }
+  .price-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .price-card .duration { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .price-card .price { font-size: 22px; font-weight: 700; margin: 8px 0; }
+  .price-card .price small { font-size: 12px; color: var(--muted); }
+  .price-card .features { font-size: 12px; color: var(--muted); margin: 10px 0; line-height: 1.7; min-height: 40px; }
+  .price-card button { width: 100%; margin-top: 10px; }
+  .verify-box {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px; margin-top: 16px;
+  }
+  .how-to-box {
+    background: rgba(74,158,255,.06);
+    border-right: 3px solid var(--accent);
+    padding: 14px 16px; border-radius: 6px;
+    margin-top: 16px; font-size: 13px;
+    line-height: 2; color: var(--muted);
+  }
+  .how-to-box strong { color: var(--text); }
+  .how-to-box ol { margin: 8px 0; padding-right: 20px; }
+  .tg-link {
+    color: var(--accent); text-decoration: none;
+    font-weight: 600; direction: ltr; display: inline-block;
+  }
+  .tg-link:hover { text-decoration: underline; }
+  .hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .security-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(0,214,143,.1); color: var(--success);
+    padding: 4px 10px; border-radius: 20px; font-size: 11px;
+    border: 1px solid rgba(0,214,143,.2);
+  }
+  .lock-warn {
+    background: rgba(255,71,87,.08);
+    border-right: 3px solid var(--danger);
+    padding: 10px 14px; border-radius: 6px;
+    margin-top: 10px; font-size: 13px;
+    color: var(--danger);
+  }
+  .currency-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,.85); z-index: 5000;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .currency-modal .card { max-width: 500px; width: 100%; }
+  .currency-modal button {
+    padding: 16px; font-size: 14px; text-align: right;
+  }
+  @media (max-width: 640px) {
+    .row > * { min-width: 100%; }
+    table { font-size: 12px; }
+    table th, table td { padding: 8px 6px; }
+    .sitemap-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🔷 LangBlue <span style="font-size: 14px; color: var(--muted); font-weight: 400;">Grammar Platform</span></h1>
+
+  <!-- AUTH GATE -->
+  <div id="authGate">
+    <div class="card" style="max-width: 500px; margin: 60px auto;">
+      <h2>👤 ثبت‌نام / ورود</h2>
+      <p style="color: var(--muted); font-size: 13px; margin-bottom: 20px;">
+        برای استفاده از LangBlue ابتدا ثبت‌نام کنید.
+      </p>
+      <div style="margin-bottom:12px;"><label>Name</label><input id="regName" autocomplete="off"></div>
+      <div style="margin-bottom:12px;">
+        <label>Sex</label>
+        <select id="regSex">
+          <option value="">-- انتخاب --</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label>Email</label>
+        <input id="regEmail" type="email" autocomplete="off" placeholder="example@gmail.com">
+        <div class="hint">
+          دامنه‌های مجاز: gmail.com — outlook.com — hotmail.com — yahoo.com — proton.me
+        </div>
+      </div>
+      <div style="margin-bottom:12px;"><label>Username</label><input id="regUsername" autocomplete="off"></div>
+      <button id="btnRegister" style="width:100%;">✅ ثبت‌نام و ورود</button>
+      <div id="registerStatus" style="margin-top:16px; color: var(--muted); font-size: 13px; text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="mainApp" class="hidden">
+    <div id="subBanner"></div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="home">🏠 خانه</button>
+      <button class="tab" data-tab="sitemap">🗺️ نقشه سایت</button>
+      <button class="tab" data-tab="add">➕ افزودن گرامر</button>
+      <button class="tab" data-tab="table">📊 جدول</button>
+      <button class="tab" data-tab="flashcard">🎴 فلش‌کارت</button>
+      <button class="tab" data-tab="pricing">💳 اشتراک</button>
+      <button class="tab" data-tab="profile">⚙️ پروفایل</button>
+    </div>
+
+    <!-- HOME -->
+    <div id="tab-home" class="tab-content">
+      <div class="stat-grid" id="stats"></div>
+      <div class="card"><div id="homeOverview"></div></div>
+    </div>
+
+    <!-- SITEMAP -->
+    <div id="tab-sitemap" class="tab-content hidden">
+      <div class="card">
+        <h2>🗺️ نقشه سایت — راهنمای امکانات</h2>
+        <p style="color: var(--muted); font-size: 13px; margin-bottom: 20px;">
+          روی هر بخش کلیک کن تا مستقیم بری بهش.
+        </p>
+        <div class="sitemap-grid">
+          <div class="sitemap-item" data-goto="home">
+            <div class="icon">🏠</div>
+            <h3>خانه</h3>
+            <p>نمای کلی از گرامرها، آمار و وضعیت یادگیری تو.</p>
+          </div>
+          <div class="sitemap-item" data-goto="add">
+            <div class="icon">➕</div>
+            <h3>افزودن گرامر</h3>
+            <p>یک گرامر جدید با کاربرد، فرمول، مثال و نکته اضافه کن.</p>
+          </div>
+          <div class="sitemap-item" data-goto="table">
+            <div class="icon">📊</div>
+            <h3>جدول گرامرها</h3>
+            <p>همه‌ی گرامرها در یک جدول با امکان تمرین، ویرایش و حذف.</p>
+          </div>
+          <div class="sitemap-item" data-goto="flashcard">
+            <div class="icon">🎴</div>
+            <h3>فلش‌کارت کنکوری</h3>
+            <p>سوالات ۴ گزینه‌ای با ۴ نوع مختلف. شرط فعال: ۳ گرامر به عمق ۴.</p>
+          </div>
+          <div class="sitemap-item" data-goto="pricing">
+            <div class="icon">💳</div>
+            <h3>اشتراک</h3>
+            <p>LangBlue تا ۴۵ گرامر رایگانه. برای بیشتر، اشتراک تهیه کن.</p>
+          </div>
+          <div class="sitemap-item" data-goto="profile">
+            <div class="icon">⚙️</div>
+            <h3>پروفایل</h3>
+            <p>اطلاعات حساب، وضعیت اشتراک و دکمه‌ی خروج.</p>
+          </div>
+          <div class="sitemap-item" data-goto="practice">
+            <div class="icon">🎯</div>
+            <h3>تمرین گرامر</h3>
+            <p>از توی جدول، روی 🎯 هر گرامر بزن تا عمق مارپیچ بالا بره.</p>
+          </div>
+          <div class="sitemap-item" data-goto="backup">
+            <div class="icon">💾</div>
+            <h3>پشتیبان‌گیری</h3>
+            <p>از پروفایل می‌تونی خروجی JSON بگیری یا وارد کنی.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD -->
+    <div id="tab-add" class="tab-content hidden">
+      <div class="card">
+        <h2 id="formTitle">➕ افزودن گرامر جدید</h2>
+        <input type="hidden" id="editId">
+        <div style="margin-bottom:12px;">
+          <label>نام گرامر</label>
+          <input id="inName" placeholder="مثال: Present Perfect" autocomplete="off">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label>کاربرد — به چه دردی می‌خوره؟</label>
+          <input id="inHow" placeholder="مثال: بیان تجربه‌ی گذشته بدون زمان مشخص" autocomplete="off">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label>فرمول</label>
+          <input id="inFormula" placeholder="مثال: Subject + have/has + past participle" autocomplete="off">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label>۳ مثال — هر خط یک مثال</label>
+          <textarea id="inExamples" placeholder="I have visited Paris.&#10;She has finished her homework.&#10;They have been to Japan."></textarea>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label>یادداشت نکات</label>
+          <textarea id="inNote" placeholder="مثال: با زمان مشخص (yesterday) به کار نمی‌ره"></textarea>
+        </div>
+        <div class="row" style="margin-bottom:12px;">
+          <div>
+            <label>سطح (اختیاری)</label>
+            <select id="inLayer">
+              <option value="sensory">مقدماتی</option>
+              <option value="logical">منطقی</option>
+              <option value="philosophical">پیشرفته</option>
+              <option value="applied">کاربردی</option>
+            </select>
+          </div>
+          <div>
+            <label>تناقض با (اختیاری)</label>
+            <input id="inPoleA" placeholder="مثال: تجربه‌ی گذشته" autocomplete="off">
+          </div>
+          <div>
+            <label>در برابر (اختیاری)</label>
+            <input id="inPoleB" placeholder="مثال: زمان مشخص" autocomplete="off">
+          </div>
+        </div>
+        <div class="row">
+          <button id="btnSave">💾 ذخیره</button>
+          <button id="btnCancel" class="ghost hidden">لغو ویرایش</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div id="tab-table" class="tab-content hidden">
+      <div class="card">
+        <h2>📊 جدول گرامرها</h2>
+        <div style="overflow-x:auto;">
+          <table id="grammarTable">
+            <thead>
+              <tr>
+                <th>نام</th>
+                <th>کاربرد</th>
+                <th>فرمول</th>
+                <th>مثال‌ها</th>
+                <th>یادداشت</th>
+                <th>سطح</th>
+                <th>پیشرفت</th>
+                <th>عملیات</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="tableEmpty" class="empty hidden">هنوز گرامری اضافه نکردی</div>
+      </div>
+    </div>
+
+    <!-- FLASHCARD -->
+    <div id="tab-flashcard" class="tab-content hidden">
+      <div class="card">
+        <h2>🎴 فلش‌کارت کنکوری (۴ گزینه‌ای — ۴ نوع سوال)</h2>
+        <p style="color: var(--muted); font-size: 13px;">
+          شرط فعال شدن: حداقل <strong>۳ گرامر</strong> به عمق <strong>۴</strong> برسن. اگه گرامری ویرایش بشه، عمقش ریست می‌شه.
+        </p>
+        <div id="flashcardArea"></div>
+      </div>
+    </div>
+
+    <!-- PRICING -->
+    <div id="tab-pricing" class="tab-content hidden">
+      <div class="card">
+        <h2>💳 اشتراک LangBlue <span class="security-badge">🔒 امن</span></h2>
+        <div id="pricingIntro"></div>
+        <div class="pricing-grid" id="pricingGrid"></div>
+        <div class="how-to-box" id="howToBox"></div>
+        <div class="verify-box" id="verifyBox">
+          <h3 style="color: var(--accent);" id="verifyTitle">🔑 فعال‌سازی اشتراک</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.8;" id="verifyDesc">
+            کد تاییدی که از ادمین دریافت کردی رو اینجا وارد کن:
+          </p>
+          <div class="row" style="margin-top:12px;">
+            <div style="flex: 2;">
+              <input id="verifyCode" placeholder="Verify_XXXXX" autocomplete="off"
+                     style="direction:ltr; text-align:left; font-family:monospace;">
+            </div>
+            <div style="flex: 1;">
+              <button id="btnVerify" style="width:100%;">✅ فعال‌سازی</button>
+            </div>
+          </div>
+          <div id="verifyStatus" style="margin-top:12px; font-size: 13px;"></div>
+          <div id="lockWarning" class="lock-warn hidden"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="tab-profile" class="tab-content hidden">
+      <div class="card">
+        <h2>⚙️ پروفایل</h2>
+        <div id="profileInfo"></div>
+        <div class="row" style="margin-top:20px;">
+          <button class="ghost" id="btnExport">💾 خروجی JSON</button>
+          <button class="ghost" id="btnImport">📥 ورود از فایل</button>
+          <button class="danger" id="btnLogout">🚪 خروج</button>
+        </div>
+        <input type="file" id="fileImport" accept=".json" class="hidden">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+/* ============================================================
+   SECURITY LAYER 0: غیرفعال‌سازی DevTools
+   ============================================================ */
+(function protectDevTools() {
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    if (e.key === 'F12') { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.shiftKey && ['I','J','C','i','j','c'].includes(e.key)) { e.preventDefault(); return false; }
+    if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) { e.preventDefault(); return false; }
+    if (e.metaKey && e.altKey && ['I','J','C','i','j','c'].includes(e.key)) { e.preventDefault(); return false; }
+    if (e.metaKey && e.shiftKey && ['C','c'].includes(e.key)) { e.preventDefault(); return false; }
+  }, true);
+
+  let devtoolsOpen = false;
+  setInterval(() => {
+    const wDiff = window.outerWidth - window.innerWidth;
+    const hDiff = window.outerHeight - window.innerHeight;
+    const open = wDiff > 160 || hDiff > 160;
+    if (open && !devtoolsOpen) {
+      devtoolsOpen = true;
+      document.body.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:center; min-height:100vh;
+                    background:#0a0e1a; color:#ff4757; font-family:sans-serif; text-align:center; padding:20px; direction:rtl;">
+          <div>
+            <div style="font-size:72px;">⛔</div>
+            <h1 style="color:#ff4757;">دسترسی مسدود شد</h1>
+            <p style="color:#8a96b8;">DevTools شناسایی شد. لطفاً آن را ببندید و صفحه را رفرش کنید.</p>
+          </div>
+        </div>`;
+    } else if (!open && devtoolsOpen) {
+      devtoolsOpen = false;
+      location.reload();
+    }
+  }, 1000);
+})();
+
+/* ============================================================
+   CORE: Store
+   ============================================================ */
+const Store = {
+  get(key, fallback = null) {
+    try { const v = localStorage.getItem('lb:' + key); return v ? JSON.parse(v) : fallback; }
+    catch { return fallback; }
+  },
+  set(key, val) { localStorage.setItem('lb:' + key, JSON.stringify(val)); },
+  update(key, fn, fallback) {
+    const cur = this.get(key, fallback);
+    const next = fn(cur);
+    this.set(key, next);
+    return next;
+  }
+};
+
+/* ============================================================
+   AUDIT LOG
+   ============================================================ */
+const Audit = {
+  log(event, meta = {}) {
+    const entry = {
+      event, meta, at: Date.now(),
+      ua: navigator.userAgent.slice(0, 80)
+    };
+    Store.update('audit:log', (log = []) => [...log, entry].slice(-500), []);
+  }
+};
+
+/* ============================================================
+   AUTH
+   ============================================================ */
+const Auth = {
+  current() { return Store.get('user', null); },
+  isLoggedIn() { return !!this.current(); },
+  register(data) {
+    Store.set('user', { ...data, at: Date.now() });
+    Audit.log('user_register', { username: data.username, country: data.country });
+  },
+  logout() {
+    Audit.log('user_logout');
+    localStorage.removeItem('lb:user');
+  }
+};
+
+/* ============================================================
+   اعتبارسنجی ایمیل
+   ============================================================ */
+const ALLOWED_EMAIL_DOMAINS = [
+  'gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com', 'proton.me'
+];
+
+function isValidEmail(email) {
+  if (!email) return false;
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!re.test(email)) return false;
+  const domain = email.split('@')[1].toLowerCase();
+  return ALLOWED_EMAIL_DOMAINS.includes(domain);
+}
+
+/* ============================================================
+   GEO SERVICE — تشخیص کشور و VPN
+   ============================================================
+   مکانیزم:
+   - IP ایران → تومان قفل
+   - IP خارجی غیر-VPN → تتر قفل
+   - کشور همسایه (AZ/TR/AE/...) یا VPN یا خطا → از کاربر می‌پرسه
+   ============================================================ */
+const SUPPORTED_COUNTRIES_USD = [
+  'GB','US','CA','NZ','AU','TR','UA','SE','FI','FR','TJ','KR'
+];
+
+const GeoService = {
+  _cache: null,
+  NEIGHBOR_COUNTRIES: ['AZ', 'TR', 'AE', 'AF', 'IQ', 'AM', 'TM', 'PK'],
+
+  async _fetchFrom(apiUrl) {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 6000);
+    try {
+      const res = await fetch(apiUrl, { signal: controller.signal });
+      clearTimeout(t);
+      return await res.json();
+    } catch (e) {
+      clearTimeout(t);
+      return null;
+    }
+  },
+
+  async _detectPrimary() {
+    const data = await this._fetchFrom('https://ipwho.is/');
+    if (!data || !data.success) return null;
+    return {
+      ip: data.ip,
+      code: data.country_code || null,
+      name: data.country || null,
+      isp: data.connection?.isp || '',
+      isProxy: data.security?.proxy || false,
+      isVpn: data.security?.vpn || false,
+      isTor: data.security?.tor || false,
+      source: 'ipwho.is'
+    };
+  },
+
+  async _detectSecondary() {
+    const data = await this._fetchFrom('https://ipapi.co/json/');
+    if (!data || !data.country_code) return null;
+    return {
+      ip: data.ip,
+      code: data.country_code,
+      name: data.country_name || null,
+      isp: data.org || '',
+      source: 'ipapi.co'
+    };
+  },
+
+  async _detectTertiary() {
+    const data = await this._fetchFrom('https://api.country.is/');
+    if (!data || !data.country) return null;
+    return {
+      ip: data.ip || null,
+      code: data.country,
+      name: null,
+      source: 'country.is'
+    };
+  },
+
+  _isLikelyVpn(primary, secondary) {
+    if (!primary) return false;
+    if (primary.isProxy || primary.isVpn || primary.isTor) return true;
+    const isp = (primary.isp || '').toUpperCase();
+    if (isp.includes('VPN') || isp.includes('HOST') ||
+        isp.includes('CLOUD') || isp.includes('DIGITALOCEAN') ||
+        isp.includes('AMAZON') || isp.includes('GOOGLE')) {
+      return true;
+    }
+    if (secondary && primary.code !== secondary.code) return true;
+    return false;
+  },
+
+  async detect() {
+    if (this._cache) return this._cache;
+    const cached = Store.get('geo:country', null);
+    if (cached && cached.version === 4 && !cached.manualOverride) {
+      this._cache = cached;
+      return cached;
+    }
+
+    const [primary, secondary, tertiary] = await Promise.all([
+      this._detectPrimary(),
+      this._detectSecondary(),
+      this._detectTertiary()
+    ]);
+
+    const codes = [primary?.code, secondary?.code, tertiary?.code].filter(Boolean);
+
+    // اگه هیچ منبعی جواب نداد → از کاربر بپرس
+    if (codes.length === 0) {
+      const unknown = {
+        version: 4,
+        code: null,
+        name: 'Unknown',
+        currency: null,
+        isIran: null,
+        isVpn: false,
+        reason: 'all_sources_failed_need_user_input',
+        needsUserInput: true,
+        manualOverride: false,
+        detectedAt: Date.now()
+      };
+      Store.set('geo:country', unknown);
+      this._cache = unknown;
+      Audit.log('geo_unknown_all_failed');
+      return unknown;
+    }
+
+    // رای‌گیری بین منابع
+    const codeCounts = {};
+    codes.forEach(c => codeCounts[c] = (codeCounts[c] || 0) + 1);
+    const topCode = Object.entries(codeCounts).sort((a, b) => b[1] - a[1])[0][0];
+
+    const likelyVpn = this._isLikelyVpn(primary, secondary);
+    const isIran = topCode === 'IR';
+    const isNeighbor = this.NEIGHBOR_COUNTRIES.includes(topCode);
+
+    let currency, reason;
+
+    if (isIran) {
+      // ایران → تومان قفل
+      currency = 'IRT';
+      reason = 'iranian_ip';
+    } else if (likelyVpn || isNeighbor) {
+      // VPN یا کشور همسایه → از کاربر بپرس
+      currency = null;
+      reason = isNeighbor ? 'neighbor_country_needs_confirmation' : 'vpn_needs_confirmation';
+    } else {
+      // خارجی غیر-VPN → تتر قفل
+      currency = 'USD';
+      reason = 'foreign_ip';
+    }
+
+    const country = {
+      version: 4,
+      code: topCode,
+      name: this._countryName(topCode),
+      isIran,
+      isVpn: likelyVpn,
+      isNeighbor,
+      currency,
+      reason,
+      needsUserInput: currency === null,
+      votes: codeCounts,
+      isp: primary?.isp || '',
+      manualOverride: false,
+      detectedAt: Date.now()
+    };
+
+    Store.set('geo:country', country);
+    this._cache = country;
+    Audit.log('geo_detected', {
+      code: country.code,
+      currency: country.currency,
+      vpn: country.isVpn,
+      neighbor: country.isNeighbor,
+      reason: country.reason
+    });
+    return country;
+  },
+
+  _countryName(code) {
+    const names = {
+      'IR': 'ایران', 'AZ': 'آذربایجان', 'TR': 'ترکیه',
+      'AE': 'امارات', 'AF': 'افغانستان', 'IQ': 'عراق',
+      'AM': 'ارمنستان', 'TM': 'ترکمنستان', 'PK': 'پاکستان',
+      'US': 'آمریکا', 'GB': 'انگلستان', 'CA': 'کانادا',
+      'NZ': 'نیوزیلند', 'AU': 'استرالیا', 'UA': 'اوکراین',
+      'SE': 'سوئد', 'FI': 'فنلاند', 'FR': 'فرانسه',
+      'TJ': 'تاجیکستان', 'KR': 'کره جنوبی'
+    };
+    return names[code] || code;
+  },
+
+  // کاربر یک بار انتخاب نهایی می‌کنه
+  confirmCurrency(currency) {
+    if (currency !== 'IRT' && currency !== 'USD') return false;
+    const current = Store.get('geo:country', {});
+    Store.set('geo:country', {
+      ...current,
+      currency,
+      isIran: currency === 'IRT',
+      manualOverride: true,
+      confirmedByUser: true,
+      needsUserInput: false,
+      manualAt: Date.now()
+    });
+    this._cache = null;
+    Audit.log('user_confirmed_currency', { currency });
+    return true;
+  }
+};
+
+/* ============================================================
+   PLANS (IRT — Iran)
+   ============================================================ */
+const PLANS_IRT = [
+  { id: 'irt_7d',   days: 7,   price: '66,890 T',
+    features: 'دسترسی کامل به همه امکانات' },
+  { id: 'irt_14d',  days: 14,  price: '123,890 T',
+    features: 'دسترسی کامل به همه امکانات' },
+  { id: 'irt_21d',  days: 21,  price: '256,890 T',
+    features: 'دسترسی کامل به همه امکانات' },
+  { id: 'irt_3m',   days: 90,  price: '570,999 T',
+    features: 'دسترسی کامل + بدون محدودیت' },
+  { id: 'irt_6m',   days: 180, price: '665,999 T',
+    features: 'دسترسی کامل + بدون محدودیت' },
+  { id: 'irt_12m',  days: 365, price: '780,999 T',
+    features: 'دسترسی کامل + امکان پرینت از اطلاعات' }
+];
+
+/* ============================================================
+   PLANS (USDT — تتر روی شبکه TON)
+   ============================================================ */
+const PLANS_USD = [
+  { id: 'usd_7d',   days: 7,   priceUSDT: 4,
+    features: 'دسترسی کامل به همه امکانات' },
+  { id: 'usd_14d',  days: 14,  priceUSDT: 8,
+    features: 'دسترسی کامل به همه امکانات' },
+  { id: 'usd_21d',  days: 21,  priceUSDT: 13,
+    features: 'دسترسی کامل به همه امکانات' },
+  { id: 'usd_3m',   days: 90,  priceUSDT: 20,
+    features: 'دسترسی کامل + بدون محدودیت' },
+  { id: 'usd_6m',   days: 180, priceUSDT: 25,
+    features: 'دسترسی کامل + بدون محدودیت' },
+  { id: 'usd_12m',  days: 365, priceUSDT: 37,
+    features: 'دسترسی کامل + امکان پرینت از اطلاعات' }
+];
+
+/* ============================================================
+   VALID CODES — کدهای مجاز (فقط ادمین می‌دونه)
+   ============================================================
+   per 7 days (IRT)   = 66,890 T   → Verify_mU#2292
+   per 14 days (IRT)  = 123,890 T  → Verify_m!!2992
+   per 21 days (IRT)  = 256,890 T  → Verify_I@112
+   per 3 month (IRT)  = 570,999 T  → Verify_MIR_ss1
+   per 6 month (IRT)  = 665,999 T  → Verify_ll39332
+   per 12 month (IRT) = 780,999 T  → Verify_311012   (+ پرینت)
+
+   per 7 days (USDT)   = 4 USDT    → Verify_US$4X729
+   per 14 days (USDT)  = 8 USDT    → Verify_US$8B!441
+   per 21 days (USDT)  = 13 USDT   → Verify_US$13K@770
+   per 3 month (USDT)  = 20 USDT   → Verify_USD20_MR9
+   per 6 month (USDT)  = 25 USDT   → Verify_USD25_FF51
+   per 12 month (USDT) = 37 USDT   → Verify_USD37_AX!_99  (+ پرینت)
+   ============================================================ */
+const VALID_CODES = {
+  // 🇮🇷 تومانی
+  'Verify_mU#2292':      { planId: 'irt_7d' },
+  'Verify_m!!2992':      { planId: 'irt_14d' },
+  'Verify_I@112':        { planId: 'irt_21d' },
+  'Verify_MIR_ss1':      { planId: 'irt_3m' },
+  'Verify_ll39332':      { planId: 'irt_6m' },
+  'Verify_311012':       { planId: 'irt_12m' },
+  // 💎 تتر
+  'Verify_US$4X729':     { planId: 'usd_7d' },
+  'Verify_US$8B!441':    { planId: 'usd_14d' },
+  'Verify_US$13K@770':   { planId: 'usd_21d' },
+  'Verify_USD20_MR9':    { planId: 'usd_3m' },
+  'Verify_USD25_FF51':   { planId: 'usd_6m' },
+  'Verify_USD37_AX!_99': { planId: 'usd_12m' }
+};
+
+const FREE_LIMIT = 45;
+
+/* ============================================================
+   RATE LIMITING
+   ============================================================ */
+const RateLimit = {
+  MAX_ATTEMPTS: 5,
+  WINDOW_MS: 15 * 60 * 1000,
+  LOCK_MS: 30 * 60 * 1000,
+
+  key(action) { return 'ratelimit:' + action; },
+
+  recordFailure(action) {
+    const k = this.key(action);
+    const now = Date.now();
+    const data = Store.get(k, { attempts: [], lockedUntil: 0 });
+    data.attempts = (data.attempts || []).filter(t => now - t < this.WINDOW_MS);
+    data.attempts.push(now);
+    if (data.attempts.length >= this.MAX_ATTEMPTS) {
+      data.lockedUntil = now + this.LOCK_MS;
+    }
+    Store.set(k, data);
+    return data;
+  },
+
+  isLocked(action) {
+    const data = Store.get(this.key(action), null);
+    if (!data || !data.lockedUntil) return 0;
+    if (Date.now() > data.lockedUntil) return 0;
+    return Math.ceil((data.lockedUntil - Date.now()) / 1000 / 60);
+  },
+
+  reset(action) {
+    localStorage.removeItem('lb:' + this.key(action));
+  }
+};
+
+/* ============================================================
+   SUBSCRIPTION
+   ============================================================ */
+const Subscription = {
+  validateCode(code) {
+    const trimmed = String(code || '').trim();
+    if (!trimmed) return { ok: false, error: 'کد تایید را وارد کن' };
+
+    const entry = VALID_CODES[trimmed];
+    if (!entry) {
+      Audit.log('invalid_code_attempt', { code: trimmed.slice(0, 10) + '...' });
+      return { ok: false, error: 'کد تایید نامعتبر است' };
+    }
+
+    const used = Store.get('used_codes', {});
+    if (used[trimmed]) {
+      Audit.log('reused_code_attempt', { code: trimmed.slice(0, 10) + '...' });
+      return { ok: false, error: 'این کد قبلاً استفاده شده است' };
+    }
+
+    const allPlans = [...PLANS_IRT, ...PLANS_USD];
+    const plan = allPlans.find(p => p.id === entry.planId);
+    if (!plan) return { ok: false, error: 'پلن نامعتبر است' };
+
+    return { ok: true, plan, code: trimmed };
+  },
+
+  activate(code) {
+    const lockedMin = RateLimit.isLocked('verify_code');
+    if (lockedMin > 0) {
+      return {
+        ok: false,
+        error: `به دلیل تلاش‌های ناموفق، ${lockedMin} دقیقه‌ی دیگه دوباره امتحان کن`,
+        locked: true, lockedMin
+      };
+    }
+
+    const result = this.validateCode(code);
+    if (!result.ok) {
+      RateLimit.recordFailure('verify_code');
+      Audit.log('verify_failed', { reason: result.error });
+      return result;
+    }
+
+    // کد رو به عنوان سوخته ثبت کن
+    Store.update('used_codes', (used = {}) => {
+      used[result.code] = { at: Date.now(), planId: result.plan.id };
+      return used;
+    }, {});
+
+    // محاسبه‌ی انقضا
+    const now = Date.now();
+    const existing = Store.get('subscription', null);
+    const base = (existing && existing.expiresAt > now) ? existing.expiresAt : now;
+    const expiresAt = base + result.plan.days * 24 * 60 * 60 * 1000;
+
+    Store.set('subscription', {
+      planId: result.plan.id,
+      planDays: result.plan.days,
+      currency: result.plan.id.startsWith('usd_') ? 'USDT' : 'IRT',
+      startedAt: now,
+      expiresAt
+    });
+
+    RateLimit.reset('verify_code');
+    Audit.log('subscription_activated', { planId: result.plan.id, expiresAt });
+
+    return { ok: true, expiresAt, plan: result.plan };
+  },
+
+  current() {
+    const sub = Store.get('subscription', null);
+    if (!sub) return null;
+    if (Date.now() > sub.expiresAt) return { ...sub, expired: true };
+    return sub;
+  },
+
+  isActive() {
+    const s = this.current();
+    return s && !s.expired;
+  },
+
+  canAddGrammar(currentCount) {
+    if (currentCount < FREE_LIMIT) return true;
+    return this.isActive();
+  },
+
+  daysLeft() {
+    const s = this.current();
+    if (!s || s.expired) return 0;
+    return Math.ceil((s.expiresAt - Date.now()) / (24 * 60 * 60 * 1000));
+  },
+
+  needsRenewalWarning() {
+    const s = this.current();
+    if (!s || s.expired) return false;
+    const days = this.daysLeft();
+    return days <= 1 && days > 0;
+  },
+
+  shouldShowRenewalWarning() {
+    if (!this.needsRenewalWarning()) return false;
+    const s = Store.get('subscription', null);
+    const lastWarned = s?.lastWarnedAt || 0;
+    return Date.now() - lastWarned > 6 * 60 * 60 * 1000;
+  },
+
+  markRenewalWarned() {
+    const s = Store.get('subscription', null);
+    if (s) { s.lastWarnedAt = Date.now(); Store.set('subscription', s); }
+  }
+};
+
+/* ============================================================
+   GRAPH
+   ============================================================ */
+const Graph = {
+  nodes: Store.get('graph:nodes', {}),
+  edges: Store.get('graph:edges', {}),
+  addNode(node) { this.nodes[node.id] = node; this.save(); },
+  removeNode(id) {
+    delete this.nodes[id];
+    Object.keys(this.edges).forEach(k => {
+      if (this.edges[k].from === id || this.edges[k].to === id) delete this.edges[k];
+    });
+    this.save();
+  },
+  addEdge(from, to, type = 'related', weight = 1) {
+    const id = `${from}->${to}:${type}`;
+    this.edges[id] = { id, from, to, type, weight };
+    this.save();
+  },
+  reposition(conceptId, { layer, role, phase, contradictionId }) {
+    const n = this.nodes[conceptId];
+    if (!n) return;
+    if (typeof n.contentVersion !== 'number') n.contentVersion = 1;
+
+    n.spiralState.history.push({
+      layer, role, phase, contradictionId,
+      at: Date.now(),
+      version: n.contentVersion
+    });
+    n.spiralState.depth++;
+    n.spiralState.currentPhase = phase;
+    if (layer) n.layer = layer;
+    this.save();
+  },
+  bumpVersion(id) {
+    const n = this.nodes[id];
+    if (!n) return;
+    n.contentVersion = (n.contentVersion || 1) + 1;
+    n.spiralState = {
+      depth: 0,
+      history: [],
+      currentPhase: 'exposure'
+    };
+    this.save();
+    Audit.log('grammar_content_edited', { id, newVersion: n.contentVersion });
+  },
+  validDepth(id) {
+    const n = this.nodes[id];
+    if (!n) return 0;
+    const cv = n.contentVersion || 1;
+    return n.spiralState.history.filter(h => h.version === cv).length;
+  },
+  save() {
+    Store.set('graph:nodes', this.nodes);
+    Store.set('graph:edges', this.edges);
+  }
+};
+
+/* ============================================================
+   DIALECTIC
+   ============================================================ */
+const PHASES = ['exposure','analysis','contradiction','reconstruction','synthesis','fixation','transcendence'];
+
+const SpiralEngine = {
+  phases: PHASES,
+  planNextCycle(conceptId) {
+    const node = Graph.nodes[conceptId];
+    if (!node) throw new Error('concept not found');
+    const depth = node.spiralState.depth;
+    const history = node.spiralState.history;
+    return {
+      conceptId,
+      cycleNumber: depth + 1,
+      phases: this.selectPhases(depth),
+      targetLayer: this.nextLayer(node.layer),
+      role: this.nextRole(history),
+      contradiction: this.pickContradiction(conceptId, history)
+    };
+  },
+  selectPhases(depth) {
+    if (depth === 0) return PHASES;
+    if (depth === 1) return ['contradiction','reconstruction','synthesis'];
+    return ['contradiction','synthesis','transcendence'];
+  },
+  nextLayer(current) {
+    const order = ['sensory','logical','philosophical','applied'];
+    const idx = order.indexOf(current);
+    return order[Math.min(idx + 1, order.length - 1)];
+  },
+  nextRole(history) {
+    const roles = ['producer','critic','synthesizer','teacher'];
+    const lastRole = history[history.length - 1]?.role;
+    const idx = lastRole ? (roles.indexOf(lastRole) + 1) % roles.length : 0;
+    return roles[idx];
+  },
+  pickContradiction(conceptId, history) {
+    const used = new Set(history.map(h => h.contradictionId).filter(Boolean));
+    const node = Graph.nodes[conceptId];
+    if (!node.contradictions || !node.contradictions.length) return null;
+    return node.contradictions.find(c => !used.has(c)) || node.contradictions[0];
+  },
+  commitCycle(conceptId, { role, phase, contradictionId, layer }) {
+    Graph.reposition(conceptId, { layer, role, phase, contradictionId });
+    Store.update('dialectic:log', (log = []) => [
+      ...log, { conceptId, role, phase, contradictionId, layer, at: Date.now() }
+    ], []);
+  }
+};
+
+const Contradiction = {
+  register(c) { Store.update('contradictions', (all = {}) => ({ ...all, [c.id]: c }), {}); },
+  get(id) { return Store.get('contradictions', {})[id]; },
+  toPrompt(contradiction, mode = 'paradox') {
+    if (!contradiction) return null;
+    const templates = {
+      question: `اگر «${contradiction.poleA}» و «${contradiction.poleB}» هم‌زمان درست باشند، چه می‌شود؟`,
+      paradox: `آیا ممکنه هم ${contradiction.poleA} باشه هم ${contradiction.poleB}؟ مثال بزن.`,
+      inversion: `اگر ${contradiction.poleB} رو جای ${contradiction.poleA} بذاریم، چه چیزی فرو می‌ریزه؟`
+    };
+    return {
+      contradictionId: contradiction.id,
+      text: templates[mode],
+      tension: contradiction.tension,
+      poles: [contradiction.poleA, contradiction.poleB]
+    };
+  },
+  recordResolution(contradictionId, { resolved, synthesisText }) {
+    Store.update('dialectic:resolutions', (all = []) => [
+      ...all, { contradictionId, resolved, synthesisText, at: Date.now() }
+    ], []);
+  }
+};
+
+const Aufhebung = {
+  apply(conceptId, { oldThesis, antithesis, synthesis }) {
+    const node = Graph.nodes[conceptId];
+    const record = {
+      conceptId, at: Date.now(),
+      negated: oldThesis,
+      preserved: this.extractPreserved(oldThesis, synthesis),
+      elevated: synthesis,
+      previousLayer: node?.layer
+    };
+    Store.update('aufhebung:log', (log = []) => [...log, record], []);
+    if (node) { node.layer = this.nextLayer(node.layer); Graph.save(); }
+    return record;
+  },
+  extractPreserved(thesis, synthesis) {
+    const t = new Set(String(thesis || '').split(/\s+/));
+    return String(synthesis || '').split(/\s+/).filter(w => t.has(w));
+  },
+  nextLayer(current) {
+    const order = ['sensory','logical','philosophical','applied'];
+    const i = order.indexOf(current);
+    return order[Math.min(i + 1, order.length - 1)];
+  },
+  isTranscendent(record) {
+    return record.negated && record.preserved?.length > 0 && record.elevated;
+  }
+};
+
+const KnowledgePool = {
+  contribute({ conceptId, artifact, authorId }) {
+    Store.update('pool:items', (items = []) => [
+      ...items, {
+        id: crypto.randomUUID(), conceptId, artifact, authorId,
+        consumedBy: [], consumedCount: 0, at: Date.now()
+      }
+    ], []);
+  },
+  consume({ conceptId, learnerId }) {
+    const items = Store.get('pool:items', []);
+    const candidates = items.filter(i => i.conceptId === conceptId && !i.consumedBy.includes(learnerId));
+    if (!candidates.length) return null;
+    const pick = candidates[Math.floor(Math.random() * candidates.length)];
+    pick.consumedBy.push(learnerId);
+    pick.consumedCount++;
+    Store.set('pool:items', items);
+    return { artifact: pick.artifact, authorId: pick.authorId, obligationToProduce: true };
+  }
+};
+
+const Roles = {
+  cycle: ['producer','critic','synthesizer','teacher'],
+  next(current) {
+    const i = this.cycle.indexOf(current);
+    return this.cycle[(i + 1) % this.cycle.length];
+  },
+  taskFor(role, concept) {
+    return {
+      producer:     `یک مثال تازه برای «${concept.label}» بساز.`,
+      critic:       `یک ضعف در تعریف رایج «${concept.label}» پیدا کن.`,
+      synthesizer:  `دو تعریف متناقض از «${concept.label}» را در یک تعریف ترکیب کن.`,
+      teacher:      `«${concept.label}» را طوری به یک مبتدی توضیح بده که خودش کشف کند.`
+    }[role];
+  }
+};
+
+const Triadic = {
+  modes: ['instrumental','problematized','methodological'],
+  planFor(conceptId) {
+    const history = Store.get('repetition:triadic', {})[conceptId] || [];
+    const used = new Set(history.map(h => h.mode));
+    const next = this.modes.find(m => !used.has(m)) || 'methodological';
+    return { conceptId, mode: next };
+  },
+  commit(conceptId, mode) {
+    Store.update('repetition:triadic', (all = {}) => {
+      all[conceptId] = [...(all[conceptId] || []), { mode, at: Date.now() }];
+      return all;
+    }, {});
+  }
+};
+
+const Stratified = {
+  layers: ['sensory','logical','philosophical','applied'],
+  plan(conceptId, currentLayer) {
+    const i = this.layers.indexOf(currentLayer);
+    return this.layers[Math.min(i + 1, this.layers.length - 1)];
+  }
+};
+
+const Inverted = {
+  plan(concept) {
+    return {
+      direction: 'result→ground',
+      prompt: `از یک نتیجه‌ی «${concept.label}» شروع کن و بگرد عقب: چه مبانی‌ای لازم است؟`
+    };
+  }
+};
+
+/* ============================================================
+   ORCHESTRATOR
+   ============================================================ */
+const Orchestrator = {
+  nextActivity(conceptId, learnerId) {
+    const concept = Graph.nodes[conceptId];
+    if (!concept) throw new Error('concept not found');
+    const cycle = SpiralEngine.planNextCycle(conceptId);
+    const contradiction = cycle.contradiction
+      ? Contradiction.toPrompt(Contradiction.get(cycle.contradiction), 'paradox')
+      : null;
+    return {
+      conceptId, learnerId,
+      conceptLabel: concept.label,
+      cycle: { number: cycle.cycleNumber, phases: cycle.phases, targetLayer: cycle.targetLayer },
+      role: cycle.role,
+      roleTask: Roles.taskFor(cycle.role, concept),
+      contradiction,
+      repetition: {
+        triadic: Triadic.planFor(conceptId),
+        stratified: Stratified.plan(conceptId, concept.layer),
+        inverted: Inverted.plan(concept)
+      }
+    };
+  },
+  completeCycle({ conceptId, learnerId, payload }) {
+    const { role, phase, contradictionId, layer, reflection, artifact, synthesisText, triadicMode } = payload;
+    SpiralEngine.commitCycle(conceptId, { role, phase, contradictionId, layer });
+    if (contradictionId) Contradiction.recordResolution(contradictionId, { resolved: !!synthesisText, synthesisText });
+    if (synthesisText) {
+      Aufhebung.apply(conceptId, {
+        oldThesis: payload.oldThesis || '',
+        antithesis: payload.antithesis || '',
+        synthesis: synthesisText
+      });
+    }
+    if (artifact) KnowledgePool.contribute({ conceptId, artifact, authorId: learnerId });
+    KnowledgePool.consume({ conceptId, learnerId });
+    if (triadicMode) Triadic.commit(conceptId, triadicMode);
+    return { ok: true, nextDepth: Graph.nodes[conceptId].spiralState.depth };
+  },
+  trajectory(conceptId) {
+    const node = Graph.nodes[conceptId];
+    if (!node) return null;
+    const auf = Store.get('aufhebung:log', []).filter(a => a.conceptId === conceptId);
+    return {
+      depth: node.spiralState.depth,
+      layersVisited: [...new Set(node.spiralState.history.map(h => h.layer))],
+      rolesPlayed: [...new Set(node.spiralState.history.map(h => h.role))],
+      contradictionsResolved: auf.length,
+      transcendentFixations: auf.filter(Aufhebung.isTranscendent).length
+    };
+  }
+};
+
+/* ============================================================
+   GRAMMAR CONCEPT
+   ============================================================ */
+function createGrammarConcept(data) {
+  const id = 'concept:' + data.name.toLowerCase().replace(/\s+/g, '-') + ':' + Date.now().toString(36);
+  const contradictionId = (data.poleA && data.poleB)
+    ? 'contradiction:' + id.split(':')[1] + '-tension'
+    : null;
+  const node = {
+    id, label: data.name,
+    layer: data.layer || 'sensory',
+    aspects: [data.how, data.formula].filter(Boolean),
+    contradictions: contradictionId ? [contradictionId] : [],
+    relatedTo: [],
+    grammar: {
+      how: data.how || '',
+      formula: data.formula || '',
+      examples: data.examples || [],
+      note: data.note || ''
+    },
+    contentVersion: 1,
+    spiralState: { depth: 0, history: [], currentPhase: 'exposure' }
+  };
+  Graph.addNode(node);
+  if (contradictionId) {
+    Contradiction.register({
+      id: contradictionId,
+      poleA: data.poleA, poleB: data.poleB,
+      tension: `آیا «${data.name}» بیشتر به ${data.poleA} مربوطه یا ${data.poleB}؟`,
+      concepts: [id], difficulty: 0.6
+    });
+  }
+  return id;
+}
+
+/* ============================================================
+   FLASHCARD ENGINE — قفل ۳ مبحث × عمق ۴
+   ============================================================ */
+const FlashcardEngine = {
+  REQUIRED_DEPTH: 4,
+  REQUIRED_TOPICS: 3,
+  current: null,
+  session: { correct: 0, wrong: 0, total: 0 },
+
+  validDepth(id) {
+    return Graph.validDepth(id);
+  },
+
+  isEligible(concept) {
+    return this.validDepth(concept.id) >= this.REQUIRED_DEPTH;
+  },
+
+  eligibleConcepts() {
+    return Object.values(Graph.nodes).filter(n => this.isEligible(n));
+  },
+
+  isUnlocked() {
+    return this.eligibleConcepts().length >= this.REQUIRED_TOPICS;
+  },
+
+  getLockStatus() {
+    const all = Object.values(Graph.nodes);
+    const eligible = this.eligibleConcepts();
+    const eligibleCount = eligible.length;
+    const total = all.length;
+
+    if (total < this.REQUIRED_TOPICS) {
+      return {
+        unlocked: false,
+        message: `حداقل به <strong>${this.REQUIRED_TOPICS} گرامر</strong> نیاز داری (الان: ${total})`
+      };
+    }
+    if (eligibleCount < this.REQUIRED_TOPICS) {
+      return {
+        unlocked: false,
+        message: `${this.REQUIRED_TOPICS} گرامر باید به عمق ${this.REQUIRED_DEPTH} برسن. الان ${eligibleCount} گرامر واجد شرط داره.`
+      };
+    }
+    return { unlocked: true };
+  },
+
+  validConcepts() {
+    return Object.values(Graph.nodes).filter(n =>
+      n.grammar &&
+      (n.grammar.formula || n.grammar.how || n.grammar.note) &&
+      n.grammar.examples && n.grammar.examples.length > 0
+    );
+  },
+
+  pickDistractors(correctValue, pool, count = 3) {
+    const candidates = pool
+      .filter(v => v && v !== correctValue)
+      .filter((v, i, arr) => arr.indexOf(v) === i);
+    return candidates.sort(() => Math.random() - 0.5).slice(0, count);
+  },
+
+  questionByUsage(target, all) {
+    if (!target.grammar.how) return null;
+    const others = all.filter(n => n.id !== target.id && n.grammar.how);
+    if (others.length < 3) return null;
+    const distractors = this.pickDistractors(target.label, others.map(n => n.label));
+    if (distractors.length < 3) return null;
+    const options = [target.label, ...distractors].sort(() => Math.random() - 0.5);
+    return {
+      type: 'usage', conceptId: target.id,
+      question: `کدوم گرامر برای این کاربرد مناسبه؟\n\n« ${target.grammar.how} »`,
+      correct: target.label, options
+    };
+  },
+
+  questionByExample(target, all) {
+    if (!target.grammar.formula || !target.grammar.examples.length) return null;
+    const others = all.filter(n => n.id !== target.id && n.grammar.formula);
+    if (others.length < 3) return null;
+    const example = target.grammar.examples[Math.floor(Math.random() * target.grammar.examples.length)];
+    const distractors = this.pickDistractors(target.grammar.formula, others.map(n => n.grammar.formula));
+    if (distractors.length < 3) return null;
+    const options = [target.grammar.formula, ...distractors].sort(() => Math.random() - 0.5);
+    return {
+      type: 'formula', conceptId: target.id,
+      question: `کدوم فرمول با این مثال مطابقت داره؟\n\n« ${example} »`,
+      correct: target.grammar.formula, options
+    };
+  },
+
+  questionByNote(target, all) {
+    if (!target.grammar.note) return null;
+    const others = all.filter(n => n.id !== target.id && n.grammar.note);
+    if (others.length < 3) return null;
+    const distractors = this.pickDistractors(target.label, others.map(n => n.label));
+    if (distractors.length < 3) return null;
+    const options = [target.label, ...distractors].sort(() => Math.random() - 0.5);
+    return {
+      type: 'note', conceptId: target.id,
+      question: `کدوم گرامر این ویژگی رو داره؟\n\n« ${target.grammar.note} »`,
+      correct: target.label, options
+    };
+  },
+
+  questionByGrammarToUsage(target, all) {
+    if (!target.grammar.how) return null;
+    const others = all.filter(n => n.id !== target.id && n.grammar.how);
+    if (others.length < 3) return null;
+    const distractors = this.pickDistractors(target.grammar.how, others.map(n => n.grammar.how));
+    if (distractors.length < 3) return null;
+    const options = [target.grammar.how, ...distractors].sort(() => Math.random() - 0.5);
+    return {
+      type: 'grammar-to-usage', conceptId: target.id,
+      question: `گرامر «${target.label}» به چه دردی می‌خوره؟`,
+      correct: target.grammar.how, options
+    };
+  },
+
+  generateQuestion() {
+    if (!this.isUnlocked()) return null;
+
+    const eligible = this.eligibleConcepts();
+    if (!eligible.length) return null;
+    const all = this.validConcepts();
+    if (all.length < 4) return null;
+
+    const target = eligible[Math.floor(Math.random() * eligible.length)];
+    const generators = [
+      () => this.questionByUsage(target, all),
+      () => this.questionByExample(target, all),
+      () => this.questionByNote(target, all),
+      () => this.questionByGrammarToUsage(target, all)
+    ];
+    const shuffled = generators.sort(() => Math.random() - 0.5);
+    for (const gen of shuffled) {
+      const q = gen();
+      if (q) return q;
+    }
+    return null;
+  },
+
+  answer(option, btnEl) {
+    if (!this.current) return;
+    const isCorrect = option === this.current.correct;
+    document.querySelectorAll('.option').forEach(el => {
+      el.disabled = true;
+      if (el.textContent.includes(this.current.correct)) el.classList.add('correct');
+    });
+    if (!isCorrect) btnEl.classList.add('wrong');
+    this.session.total++;
+    if (isCorrect) this.session.correct++; else this.session.wrong++;
+
+    const activity = Orchestrator.nextActivity(this.current.conceptId, getLearnerId());
+    Orchestrator.completeCycle({
+      conceptId: this.current.conceptId,
+      learnerId: getLearnerId(),
+      payload: {
+        role: activity.role, phase: 'fixation',
+        contradictionId: activity.contradiction?.contradictionId,
+        layer: activity.cycle.targetLayer,
+        synthesisText: isCorrect ? 'پاسخ صحیح' : 'نیاز به مرور',
+        oldThesis: 'پاسخ غلط', antithesis: 'پاسخ درست',
+        triadicMode: activity.repetition.triadic.mode
+      }
+    });
+    setTimeout(() => this.next(), 1600);
+  },
+
+  next() {
+    const q = this.generateQuestion();
+    if (!q) { this.renderEmpty(); return; }
+    this.current = q;
+    renderFlashcard(q, this.session);
+  },
+
+  renderEmpty() {
+    const status = this.getLockStatus();
+    const eligible = this.eligibleConcepts().length;
+    const total = Object.keys(Graph.nodes).length;
+
+    const allNodes = Object.values(Graph.nodes);
+    const listHtml = allNodes.length ? `
+      <div style="margin-top:24px; text-align:right; max-width:600px; margin-left:auto; margin-right:auto;">
+        <div style="font-size:13px; color:var(--muted); margin-bottom:12px;">
+          📋 وضعیت گرامرها (نسخه‌ی فعلی):
+        </div>
+        ${allNodes.map(n => {
+          const d = this.validDepth(n.id);
+          const ok = d >= this.REQUIRED_DEPTH;
+          const bar = Math.min(d / this.REQUIRED_DEPTH * 100, 100);
+          const isEdited = (n.contentVersion || 1) > 1;
+          return `
+            <div style="background:var(--panel-2); padding:10px 12px; border-radius:8px; margin-bottom:8px;
+                        border-right:3px solid ${ok ? 'var(--success)' : 'var(--warn)'};">
+              <div style="display:flex; justify-content:space-between; font-size:13px;">
+                <span>${ok ? '✅' : '⏳'} ${escapeHtml(n.label)}
+                  ${isEdited ? '<span style="font-size:10px; color:var(--accent);">(ویرایش‌شده)</span>' : ''}
+                </span>
+                <span style="color:${ok ? 'var(--success)' : 'var(--muted)'}; font-size:12px;">
+                  ${d}/${this.REQUIRED_DEPTH}
+                </span>
+              </div>
+              <div class="progress" style="margin-top:6px;">
+                <div style="width:${bar}%; background:${ok ? 'var(--success)' : 'linear-gradient(90deg, var(--warn), var(--accent-2))'};"></div>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>` : '';
+
+    document.getElementById('flashcardArea').innerHTML = `
+      <div class="empty">
+        <div style="font-size: 48px; margin-bottom: 16px;">🔒</div>
+        <h3 style="color: var(--warn); margin-bottom: 12px;">فلش‌کارت قفله!</h3>
+        <p style="line-height: 1.9;">
+          برای باز شدن قفل، باید حداقل <strong>${this.REQUIRED_TOPICS} گرامر</strong> رو
+          به عمق <strong>${this.REQUIRED_DEPTH}</strong> برسونی.
+        </p>
+        <p style="margin-top: 12px; color: var(--accent);">${status.message || ''}</p>
+        <p style="margin-top: 16px; font-size: 12px;">
+          📊 واجد شرط: <strong>${eligible}</strong> از <strong>${total}</strong> گرامر
+        </p>
+        ${listHtml}
+        <div style="margin-top:20px; font-size:12px; color:var(--muted); max-width:500px; margin-left:auto; margin-right:auto; line-height:1.8;">
+          💡 اگه گرامری رو ویرایش کنی، عمقش ریست می‌شه و باید دوباره تمرین کنی تا قفل باز بمونه.
+        </div>
+      </div>
+    `;
+  }
+};
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast ' + type, 2800);
+}
+function getLearnerId() { return Auth.current()?.username || 'guest'; }
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[m]);
+}
+function formatDate(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('fa-IR') + ' ' + d.toLocaleTimeString('fa-IR', { hour:'2-digit', minute:'2-digit' });
+}
+
+/* ============================================================
+   AUTH GATE
+   ============================================================ */
+async function checkAuth() {
+  await GeoService.detect();
+
+  if (Auth.isLoggedIn()) {
+    // چک کن نیاز به تایید کاربر داره
+    const geo = Store.get('geo:country', {});
+    if (geo.needsUserInput || !geo.currency) {
+      showCurrencyPrompt();
+      return;
+    }
+
+    document.getElementById('authGate').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    boot();
+  } else {
+    document.getElementById('authGate').classList.remove('hidden');
+    document.getElementById('mainApp').classList.add('hidden');
+    renderRegisterStatus();
+  }
+}
+
+function renderRegisterStatus() {
+  const geo = Store.get('geo:country', null);
+  const status = document.getElementById('registerStatus');
+  if (!geo) { status.textContent = ''; return; }
+
+  if (geo.needsUserInput || !geo.currency) {
+    status.innerHTML = `
+      🌍 کشور شما به‌درستی تشخیص داده نشد.
+      <div style="margin-top:8px; font-size:12px;">بعد از ثبت‌نام، کشور خود را تایید کنید.</div>
+    `;
+  } else if (geo.currency === 'USD') {
+    status.innerHTML = `🌍 کشور تشخیص‌داده‌شده: <strong>${escapeHtml(geo.name)}</strong> — پرداخت با تتر (USDT)`;
+  } else {
+    status.innerHTML = `🌍 کشور تشخیص‌داده‌شده: <strong>${escapeHtml(geo.name)}</strong> — پرداخت با تومان`;
+  }
+}
+
+function showCurrencyPrompt() {
+  // حذف مودال قدیمی اگه هست
+  const old = document.getElementById('currencyModal');
+  if (old) old.remove();
+
+  document.getElementById('authGate').classList.add('hidden');
+  document.getElementById('mainApp').classList.add('hidden');
+
+  const modal = document.createElement('div');
+  modal.id = 'currencyModal';
+  modal.className = 'currency-modal';
+  modal.innerHTML = `
+    <div class="card">
+      <h2 style="color: var(--accent);">🌍 انتخاب نوع پرداخت</h2>
+      <p style="color: var(--muted); font-size: 13px; line-height: 1.9;">
+        کشور شما به‌درستی تشخیص داده نشد.
+        لطفاً بگو در کدام منطقه هستی تا پلن مناسب نشون داده بشه:
+      </p>
+      <div style="display: grid; gap: 12px; margin-top: 20px;">
+        <button id="chooseIRT">
+          🇮🇷 داخل ایران هستم — پرداخت با تومان
+        </button>
+        <button id="chooseUSD">
+          🌍 خارج از ایران هستم — پرداخت با تتر (USDT)
+        </button>
+      </div>
+      <div style="margin-top: 16px; font-size: 11px; color: var(--muted); text-align: center;">
+        این انتخاب فقط یک بار پرسیده می‌شه و قابل تغییر نیست.
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById('chooseIRT').onclick = () => {
+    GeoService.confirmCurrency('IRT');
+    modal.remove();
+    checkAuth();
+  };
+  document.getElementById('chooseUSD').onclick = () => {
+    GeoService.confirmCurrency('USD');
+    modal.remove();
+    checkAuth();
+  };
+}
+
+document.getElementById('btnRegister').onclick = () => {
+  const name = document.getElementById('regName').value.trim();
+  const sex = document.getElementById('regSex').value;
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const username = document.getElementById('regUsername').value.trim();
+  const emailInput = document.getElementById('regEmail');
+  emailInput.classList.remove('error');
+
+  if (!name || !username) { toast('نام و نام کاربری الزامی است', 'error'); return; }
+  if (!email) { toast('ایمیل الزامی است', 'error'); emailInput.classList.add('error'); return; }
+  if (!isValidEmail(email)) {
+    toast('فقط ایمیل‌های Gmail، Outlook، Hotmail، Yahoo و Proton پذیرفته می‌شن', 'error');
+    emailInput.classList.add('error');
+    return;
+  }
+
+  const geo = Store.get('geo:country', { code: null, name: 'Unknown', currency: null });
+  Auth.register({
+    name, sex, email, username,
+    country: geo.code, countryName: geo.name, currency: geo.currency
+  });
+  toast('خوش آمدی ' + name, 'success');
+  checkAuth();
+  setTimeout(() => {
+    document.querySelector('.tab[data-tab="sitemap"]')?.click();
+  }, 400);
+};
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+function boot() {
+  renderSubscriptionBanner();
+  renderHome();
+  renderTable();
+  renderProfile();
+  renderPricing();
+  checkRenewalWarning();
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.remove('hidden');
+    if (tab.dataset.tab === 'table') renderTable();
+    if (tab.dataset.tab === 'home') renderHome();
+    if (tab.dataset.tab === 'flashcard') FlashcardEngine.next();
+    if (tab.dataset.tab === 'profile') renderProfile();
+    if (tab.dataset.tab === 'pricing') renderPricing();
+  };
+});
+
+/* ============================================================
+   SITEMAP
+   ============================================================ */
+document.querySelectorAll('.sitemap-item').forEach(item => {
+  item.onclick = () => {
+    const target = item.dataset.goto;
+    if (target === 'practice') {
+      document.querySelector('.tab[data-tab="table"]').click();
+      toast('از ستون عملیات، روی 🎯 تمرین بزن', '');
+      return;
+    }
+    if (target === 'backup') {
+      document.querySelector('.tab[data-tab="profile"]').click();
+      return;
+    }
+    const tab = document.querySelector(`.tab[data-tab="${target}"]`);
+    if (tab) tab.click();
+  };
+});
+
+/* ============================================================
+   SUBSCRIPTION BANNER
+   ============================================================ */
+function renderSubscriptionBanner() {
+  const banner = document.getElementById('subBanner');
+  const sub = Store.get('subscription', null);
+  const isActive = sub && Date.now() < sub.expiresAt;
+  const count = Object.keys(Graph.nodes).length;
+
+  if (isActive) {
+    const days = Subscription.daysLeft();
+    const cls = days <= 1 ? 'warn' : 'ok';
+    const curLabel = sub.currency === 'USDT' ? 'تتر' : 'تومان';
+    banner.innerHTML = `
+      <div class="sub-banner ${cls}">
+        <div>
+          <strong>✅ اشتراک فعال (${curLabel})</strong>
+          <div style="font-size: 12px; opacity: .9; margin-top: 4px;">
+            ${days} روز باقی‌مونده — تا ${formatDate(sub.expiresAt)}
+          </div>
+        </div>
+        <button class="ghost small" onclick="document.querySelector('.tab[data-tab=\\'pricing\\']').click()">
+          تمدید
+        </button>
+      </div>`;
+  } else if (count >= FREE_LIMIT) {
+    banner.innerHTML = `
+      <div class="sub-banner">
+        <div>
+          <strong>⛔ به سقف رایگان رسیدی (${count}/${FREE_LIMIT})</strong>
+          <div style="font-size: 12px; opacity: .9; margin-top: 4px;">
+            برای افزودن بیشتر، اشتراک تهیه کن
+          </div>
+        </div>
+        <button class="ghost small" style="background:white; color:#c0392b;"
+                onclick="document.querySelector('.tab[data-tab=\\'pricing\\']').click()">
+          💳 تهیه اشتراک
+        </button>
+      </div>`;
+  } else {
+    banner.innerHTML = `
+      <div class="sub-banner ok">
+        <div>
+          <strong>🎁 نسخه رایگان</strong>
+          <div style="font-size: 12px; opacity: .9; margin-top: 4px;">
+            ${count} از ${FREE_LIMIT} گرامر استفاده شده
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+function checkRenewalWarning() {
+  if (Subscription.shouldShowRenewalWarning()) {
+    Subscription.markRenewalWarned();
+    setTimeout(() => {
+      toast('⏰ کمتر از ۲۴ ساعت به پایان اشتراکت مونده.', 'warn');
+    }, 1500);
+  }
+}
+
+/* ============================================================
+   FORM
+   ============================================================ */
+const form = {
+  editId: null,
+  reset() {
+    ['inName','inHow','inFormula','inExamples','inNote','inPoleA','inPoleB'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('inLayer').value = 'sensory';
+    document.getElementById('editId').value = '';
+    document.getElementById('formTitle').textContent = '➕ افزودن گرامر جدید';
+    document.getElementById('btnCancel').classList.add('hidden');
+    this.editId = null;
+  },
+  fill(node) {
+    document.getElementById('inName').value = node.label;
+    document.getElementById('inHow').value = node.grammar.how;
+    document.getElementById('inFormula').value = node.grammar.formula;
+    document.getElementById('inExamples').value = node.grammar.examples.join('\n');
+    document.getElementById('inNote').value = node.grammar.note;
+    document.getElementById('inLayer').value = node.layer;
+    if (node.contradictions?.length) {
+      const c = Contradiction.get(node.contradictions[0]);
+      if (c) {
+        document.getElementById('inPoleA').value = c.poleA;
+        document.getElementById('inPoleB').value = c.poleB;
+      }
+    }
+    document.getElementById('editId').value = node.id;
+    document.getElementById('formTitle').textContent = '✏️ ویرایش گرامر';
+    document.getElementById('btnCancel').classList.remove('hidden');
+    this.editId = node.id;
+  }
+};
+
+document.getElementById('btnSave').onclick = () => {
+  const name = document.getElementById('inName').value.trim();
+  if (!name) { toast('نام گرامر را وارد کن', 'error'); return; }
+
+  const data = {
+    name,
+    how: document.getElementById('inHow').value.trim(),
+    formula: document.getElementById('inFormula').value.trim(),
+    examples: document.getElementById('inExamples').value.split('\n').map(s => s.trim()).filter(Boolean),
+    note: document.getElementById('inNote').value.trim(),
+    layer: document.getElementById('inLayer').value,
+    poleA: document.getElementById('inPoleA').value.trim(),
+    poleB: document.getElementById('inPoleB').value.trim()
+  };
+
+  if (form.editId) {
+    const node = Graph.nodes[form.editId];
+    if (!node) return;
+
+    const oldData = JSON.stringify({
+      label: node.label,
+      grammar: node.grammar,
+      layer: node.layer
+    });
+    const newData = JSON.stringify({
+      label: data.name,
+      grammar: {
+        how: data.how, formula: data.formula,
+        examples: data.examples, note: data.note
+      },
+      layer: data.layer
+    });
+
+    const contentChanged = oldData !== newData;
+
+    node.label = data.name;
+    node.layer = data.layer;
+    node.grammar = {
+      how: data.how, formula: data.formula,
+      examples: data.examples, note: data.note
+    };
+
+    if (contentChanged) {
+      Graph.bumpVersion(node.id);
+      toast('گرامر ویرایش شد. عمقش ریست شد.', 'warn');
+    } else {
+      Graph.save();
+      toast('گرامر ذخیره شد ✅', 'success');
+    }
+    form.reset();
+  } else {
+    const count = Object.keys(Graph.nodes).length;
+    if (!Subscription.canAddGrammar(count)) {
+      toast(`به سقف رایگان (${FREE_LIMIT}) رسیدی.`, 'error');
+      document.querySelector('.tab[data-tab="pricing"]').click();
+      return;
+    }
+    createGrammarConcept(data);
+    toast('گرامر اضافه شد ✅', 'success');
+    form.reset();
+  }
+  renderTable();
+  renderHome();
+  renderSubscriptionBanner();
+};
+
+document.getElementById('btnCancel').onclick = () => form.reset();
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+function renderTable() {
+  const tbody = document.querySelector('#grammarTable tbody');
+  const nodes = Object.values(Graph.nodes);
+  const empty = document.getElementById('tableEmpty');
+  if (!nodes.length) {
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  tbody.innerHTML = nodes.map(n => {
+    const validD = Graph.validDepth(n.id);
+    const bar = Math.min(validD / 4 * 100, 100);
+    const vBadge = (n.contentVersion || 1) > 1
+      ? '<span style="font-size:10px; color:var(--accent); margin-right:4px;">v' + n.contentVersion + '</span>'
+      : '';
+    return `
+      <tr>
+        <td><strong>${escapeHtml(n.label)}</strong> ${vBadge}</td>
+        <td>${escapeHtml(n.grammar.how || '—')}</td>
+        <td><code style="font-size:11px; color: var(--accent);">${escapeHtml(n.grammar.formula || '—')}</code></td>
+        <td style="max-width:180px;">
+          ${n.grammar.examples.slice(0,3).map(e => `<div style="font-size:11px;color:var(--muted);">• ${escapeHtml(e)}</div>`).join('') || '—'}
+        </td>
+        <td style="max-width:160px; font-size:12px;">${escapeHtml(n.grammar.note || '—')}</td>
+        <td><span style="background:var(--panel-2); padding:3px 8px; border-radius:6px; font-size:11px;">${escapeHtml(n.layer)}</span></td>
+        <td>
+          <div style="min-width:60px;">
+            <div style="font-size:11px;">${validD}/4</div>
+            <div class="progress"><div style="width:${bar}%"></div></div>
+          </div>
+        </td>
+        <td style="white-space:nowrap;">
+          <button class="ghost small" onclick="window.__practice('${n.id}')">🎯</button>
+          <button class="ghost small" onclick="window.__edit('${n.id}')">✏️</button>
+          <button class="ghost small danger" onclick="window.__del('${n.id}')">🗑</button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+window.__practice = (id) => {
+  const activity = Orchestrator.nextActivity(id, getLearnerId());
+  const c = Graph.nodes[id];
+  alert(`
+🎯 تمرین «${c.label}»
+
+نقش: ${activity.role}
+${activity.roleTask}
+
+📐 فرمول: ${c.grammar.formula || '—'}
+💡 کاربرد: ${c.grammar.how || '—'}
+📝 مثال: ${c.grammar.examples[0] || '—'}
+
+پیشرفت فعلی: ${Graph.validDepth(id)}/4
+  `);
+  Orchestrator.completeCycle({
+    conceptId: id, learnerId: getLearnerId(),
+    payload: {
+      role: activity.role, phase: activity.cycle.phases[0],
+      contradictionId: activity.contradiction?.contradictionId,
+      layer: activity.cycle.targetLayer,
+      synthesisText: '', oldThesis: c.grammar.note || '',
+      antithesis: activity.roleTask || '',
+      triadicMode: activity.repetition.triadic.mode,
+      reflection: 'تمرین تعاملی'
+    }
+  });
+  toast(`تمرین ثبت شد — پیشرفت: ${Graph.validDepth(id)}/4`, 'success');
+  renderTable();
+  renderHome();
+};
+
+window.__edit = (id) => {
+  const node = Graph.nodes[id];
+  if (!node) return;
+  form.fill(node);
+  document.querySelector('.tab[data-tab="add"]').click();
+};
+
+window.__del = (id) => {
+  if (!confirm('حذف این گرامر؟')) return;
+  Graph.removeNode(id);
+  renderTable();
+  renderHome();
+  renderSubscriptionBanner();
+  toast('حذف شد', 'success');
+};
+
+/* ============================================================
+   FLASHCARD render
+   ============================================================ */
+function renderFlashcard(q, session) {
+  const typeLabels = {
+    usage: '📖 کاربرد → گرامر',
+    formula: '📐 مثال → فرمول',
+    note: '💡 نکته → گرامر',
+    'grammar-to-usage': '🎯 گرامر → کاربرد'
+  };
+  const typeLabel = typeLabels[q.type] || 'سوال';
+
+  document.getElementById('flashcardArea').innerHTML = `
+    <div class="stat-grid">
+      <div class="stat"><div class="num">${session.correct}</div><div class="lbl">صحیح</div></div>
+      <div class="stat"><div class="num">${session.wrong}</div><div class="lbl">غلط</div></div>
+      <div class="stat"><div class="num">${session.total}</div><div class="lbl">کل</div></div>
+    </div>
+    <div class="flashcard">
+      <div class="type-badge">${typeLabel}</div>
+      <div class="question">${escapeHtml(q.question)}</div>
+      <div class="options">
+        ${q.options.map((opt, i) => `
+          <button class="option" data-opt="${escapeHtml(opt)}">
+            <strong>${['الف','ب','ج','د'][i]})</strong> ${escapeHtml(opt)}
+          </button>
+        `).join('')}
+      </div>
+    </div>`;
+  document.querySelectorAll('.option').forEach(el => {
+    el.onclick = () => FlashcardEngine.answer(el.dataset.opt, el);
+  });
+}
+
+/* ============================================================
+   HOME
+   ============================================================ */
+function renderHome() {
+  const nodes = Object.values(Graph.nodes);
+  const totalDepth = nodes.reduce((s, n) => s + Graph.validDepth(n.id), 0);
+  const eligible = nodes.filter(n => Graph.validDepth(n.id) >= 4).length;
+  const auf = Store.get('aufhebung:log', []).length;
+  const contradictions = Object.values(Store.get('contradictions', {}));
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="num">${nodes.length}</div><div class="lbl">گرامر کل</div></div>
+    <div class="stat"><div class="num">${eligible}</div><div class="lbl">واجد فلش‌کارت</div></div>
+    <div class="stat"><div class="num">${totalDepth}</div><div class="lbl">عمق کل</div></div>
+    <div class="stat"><div class="num">${auf}</div><div class="lbl">تثبیت‌ها</div></div>
+    <div class="stat"><div class="num">${contradictions.length}</div><div class="lbl">تناقض‌ها</div></div>
+  `;
+
+  const lockStatus = FlashcardEngine.getLockStatus();
+  const lockBanner = lockStatus.unlocked
+    ? `<div style="background:rgba(0,214,143,.08); border-right:3px solid var(--success); padding:12px 16px; border-radius:6px; margin-bottom:16px;">
+         <strong style="color:var(--success);">✅ فلش‌کارت فعاله!</strong>
+         <div style="font-size:12px; color:var(--muted); margin-top:4px;">
+           ${FlashcardEngine.eligibleConcepts().length} گرامر واجد شرط دارن
+         </div>
+       </div>`
+    : `<div style="background:rgba(255,184,0,.08); border-right:3px solid var(--warn); padding:12px 16px; border-radius:6px; margin-bottom:16px;">
+         <strong style="color:var(--warn);">🔒 فلش‌کارت قفله</strong>
+         <div style="font-size:12px; color:var(--muted); margin-top:4px;">
+           ${lockStatus.message || ''}
+         </div>
+       </div>`;
+
+  if (!nodes.length) {
+    document.getElementById('homeOverview').innerHTML = `
+      ${lockBanner}
+      <div class="empty">هنوز گرامری ثبت نشده. از تب «افزودن گرامر» شروع کن 🌱</div>`;
+    return;
+  }
+
+  document.getElementById('homeOverview').innerHTML = lockBanner + nodes.map(n => {
+    const t = Orchestrator.trajectory(n.id);
+    return `
+      <div style="margin-bottom:16px; padding:12px; background:var(--panel-2); border-radius:8px;">
+        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+          <strong>${escapeHtml(n.label)}</strong>
+          <span style="color:var(--muted); font-size:12px;">
+            عمق ${Graph.validDepth(n.id)} • ${t.contradictionsResolved} تناقض • ${t.transcendentFixations} فرارفت
+          </span>
+        </div>
+        <div style="margin-top:8px; font-size:12px; color:var(--muted);">
+          ${t.layersVisited.length ? 'لایه‌ها: ' + t.layersVisited.join(' → ') : ''}
+          ${t.rolesPlayed.length ? ' • نقش‌ها: ' + t.rolesPlayed.join(' → ') : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   PRICING — فقط دو حالت (IRT یا USD)
+   ============================================================ */
+function renderPricing() {
+  const geo = Store.get('geo:country', {});
+  const currency = geo.currency;
+  const grid = document.getElementById('pricingGrid');
+  const intro = document.getElementById('pricingIntro');
+  const howToBox = document.getElementById('howToBox');
+  const verifyBox = document.getElementById('verifyBox');
+
+  const lockWarning = document.getElementById('lockWarning');
+  const lockedMin = RateLimit.isLocked('verify_code');
+  if (lockedMin > 0) {
+    lockWarning.classList.remove('hidden');
+    lockWarning.textContent = `🔒 به دلیل تلاش‌های ناموفق، ${lockedMin} دقیقه‌ی دیگه دوباره امتحان کن.`;
+  } else {
+    lockWarning.classList.add('hidden');
+  }
+
+  // اگه ارز مشخص نیست
+  if (!currency) {
+    intro.innerHTML = `
+      <p style="color: var(--warn); font-size: 14px; line-height: 1.9;">
+        ⚠️ ارز شما هنوز مشخص نشده. لطفاً صفحه رو رفرش کنید تا کشور شما تشخیص داده بشه.
+      </p>`;
+    grid.innerHTML = '';
+    howToBox.innerHTML = '';
+    verifyBox.classList.add('hidden');
+    return;
+  }
+
+  if (currency === 'USD') {
+    renderPricingUSD(grid, intro, howToBox, verifyBox, geo);
+  } else {
+    renderPricingIRT(grid, intro, howToBox, verifyBox, geo);
+  }
+}
+
+function renderPricingIRT(grid, intro, howToBox, verifyBox, geo) {
+  intro.innerHTML = `
+    <p style="color: var(--muted); font-size: 13px; line-height: 1.8;">
+      LangBlue تا <strong>${FREE_LIMIT} گرامر</strong> رایگان در اختیارت می‌ذاره.
+      برای افزودن بیشتر، یکی از پلن‌های زیر رو تهیه کن.
+    </p>`;
+
+  grid.innerHTML = PLANS_IRT.map(p => {
+    let daysLabel;
+    if (p.id === 'irt_3m') daysLabel = '۳ ماه';
+    else if (p.id === 'irt_6m') daysLabel = '۶ ماه';
+    else if (p.id === 'irt_12m') daysLabel = '۱۲ ماه';
+    else daysLabel = `${p.days} روز`;
+    return `
+      <div class="price-card">
+        <div class="duration">${daysLabel}</div>
+        <div class="price">${p.price} <small>تومان</small></div>
+        <div class="features">${p.features}</div>
+        <button onclick="window.__requestPlanIRT('${p.id}')">💳 درخواست این پلن</button>
+      </div>`;
+  }).join('');
+
+  howToBox.innerHTML = `
+    <strong>📖 مراحل تهیه اشتراک (تومانی):</strong>
+    <ol>
+      <li>به کانال تلگرام <a href="https://t.me/langBlue" class="tg-link" target="_blank">@langBlue</a> مراجعه کن</li>
+      <li>به ادمین دایرکت پیام بده و بگو کدوم پلن رو می‌خوای</li>
+      <li>ادمین شماره کارت بانکی رو برات می‌فرسته</li>
+      <li>بعد از پرداخت، از رسید عکس بگیر و برای ادمین بفرست</li>
+      <li>پس از تایید، ادمین <strong>کد تایید</strong> رو برات می‌فرسته</li>
+      <li>کد رو در بخش «فعال‌سازی اشتراک» وارد کن</li>
+    </ol>
+    <div style="margin-top:10px; color:var(--warn);">
+      ⚠️ کد تایید <strong>فقط از طریق ادمین @langBlue</strong> صادر می‌شه.
+    </div>`;
+
+  verifyBox.classList.remove('hidden');
+  document.getElementById('verifyTitle').textContent = '🔑 فعال‌سازی اشتراک (تومانی)';
+  document.getElementById('verifyDesc').textContent =
+    'کد تاییدی که از ادمین دریافت کردی رو اینجا وارد کن:';
+  const input = document.getElementById('verifyCode');
+  input.placeholder = 'Verify_XXXXX';
+  input.value = '';
+
+  document.getElementById('btnVerify').onclick = () => {
+    const code = document.getElementById('verifyCode').value;
+    const status = document.getElementById('verifyStatus');
+    const res = Subscription.activate(code);
+    if (!res.ok) {
+      status.innerHTML = `<span style="color:var(--danger);">❌ ${res.error}</span>`;
+      toast(res.error, 'error');
+      renderPricing();
+      return;
+    }
+    status.innerHTML = `<span style="color:var(--success);">✅ اشتراک فعال شد تا ${formatDate(res.expiresAt)}</span>`;
+    toast('اشتراک فعال شد ✅', 'success');
+    document.getElementById('verifyCode').value = '';
+    renderSubscriptionBanner();
+    renderPricing();
+    renderProfile();
+  };
+}
+
+function renderPricingUSD(grid, intro, howToBox, verifyBox, geo) {
+  intro.innerHTML = `
+    <p style="color: var(--muted); font-size: 13px; line-height: 1.8;">
+      LangBlue تا <strong>${FREE_LIMIT} گرامر</strong> رایگان در اختیارت می‌ذاره.
+      برای افزودن بیشتر، یکی از پلن‌های زیر رو تهیه کن.
+      <br>
+      <span style="color: var(--accent);">
+        🌍 کشور تشخیص‌داده‌شده: <strong>${escapeHtml(geo.name)}</strong>
+        — پرداخت با <strong>تتر (USDT)</strong> روی شبکه TON
+      </span>
+    </p>`;
+
+  grid.innerHTML = PLANS_USD.map(p => {
+    let daysLabel;
+    if (p.id === 'usd_3m') daysLabel = '۳ ماه';
+    else if (p.id === 'usd_6m') daysLabel = '۶ ماه';
+    else if (p.id === 'usd_12m') daysLabel = '۱۲ ماه';
+    else daysLabel = `${p.days} روز`;
+    return `
+      <div class="price-card">
+        <div class="duration">${daysLabel}</div>
+        <div class="price">${p.priceUSDT} <small>USDT</small></div>
+        <div class="features">${p.features}</div>
+        <button onclick="window.__requestPlanUSD('${p.id}')">💎 درخواست این پلن</button>
+      </div>`;
+  }).join('');
+
+  howToBox.innerHTML = `
+    <strong>📖 مراحل تهیه اشتراک (تتر USDT):</strong>
+    <ol>
+      <li>به کانال تلگرام <a href="https://t.me/langBlue" class="tg-link" target="_blank">@langBlue</a> مراجعه کن</li>
+      <li>به ادمین دایرکت پیام بده و بگو پلن موردنظرت رو می‌خوای</li>
+      <li>ادمین <strong>آدرس ولت Tonkeeper</strong> رو برات می‌فرسته</li>
+      <li>مبلغ <strong>تتر (USDT)</strong> رو روی شبکه <strong>TON</strong> واریز کن</li>
+      <li>از واریز <strong>عکس رسید (Screenshot)</strong> بگیر و برای ادمین بفرست</li>
+      <li>پس از تایید، ادمین <strong>کد تایید</strong> رو برات می‌فرسته</li>
+      <li>کد رو در بخش «فعال‌سازی اشتراک» پایین وارد کن</li>
+    </ol>
+    <div style="margin-top:10px; color:var(--warn); line-height:1.9;">
+      ⚠️ <strong>مهم:</strong> فقط از شبکه <strong>TON</strong> استفاده کن.
+      <br>
+      ⚠️ کد تایید <strong>فقط از طریق ادمین @langBlue</strong> صادر می‌شه.
+    </div>`;
+
+  verifyBox.classList.remove('hidden');
+  document.getElementById('verifyTitle').textContent = '🔑 فعال‌سازی اشتراک (تتر)';
+  document.getElementById('verifyDesc').textContent =
+    'کد تاییدی که از ادمین دریافت کردی رو اینجا وارد کن:';
+  const input = document.getElementById('verifyCode');
+  input.placeholder = 'Verify_XXXXX';
+  input.value = '';
+
+  document.getElementById('btnVerify').onclick = () => {
+    const code = document.getElementById('verifyCode').value;
+    const status = document.getElementById('verifyStatus');
+    const res = Subscription.activate(code);
+    if (!res.ok) {
+      status.innerHTML = `<span style="color:var(--danger);">❌ ${res.error}</span>`;
+      toast(res.error, 'error');
+      renderPricing();
+      return;
+    }
+    status.innerHTML = `<span style="color:var(--success);">✅ اشتراک فعال شد تا ${formatDate(res.expiresAt)}</span>`;
+    toast('اشتراک فعال شد ✅', 'success');
+    document.getElementById('verifyCode').value = '';
+    renderSubscriptionBanner();
+    renderPricing();
+    renderProfile();
+  };
+}
+
+window.__requestPlanIRT = (planId) => {
+  const plan = PLANS_IRT.find(p => p.id === planId);
+  if (!plan) return;
+  let daysLabel;
+  if (plan.id === 'irt_3m') daysLabel = '۳ ماه';
+  else if (plan.id === 'irt_6m') daysLabel = '۶ ماه';
+  else if (plan.id === 'irt_12m') daysLabel = '۱۲ ماه';
+  else daysLabel = `${plan.days} روز`;
+
+  alert(`
+📋 درخواست پلن «${daysLabel}» — ${plan.price}
+
+مراحل تهیه:
+1) به کانال تلگرام @langBlue مراجعه کن
+2) به ادمین دایرکت پیام بده و بگو این پلن رو می‌خوای
+3) ادمین شماره کارت بانکی رو برات می‌فرسته
+4) بعد از پرداخت، از رسید عکس بگیر و برای ادمین بفرست
+5) پس از تایید، ادمین کد تایید رو برات می‌فرسته
+6) کد رو در بخش «فعال‌سازی اشتراک» وارد کن
+
+⚠️ کد تایید فقط از طریق ادمین @langBlue صادر می‌شه.
+  `);
+};
+
+window.__requestPlanUSD = (planId) => {
+  const plan = PLANS_USD.find(p => p.id === planId);
+  if (!plan) return;
+  let daysLabel;
+  if (plan.id === 'usd_3m') daysLabel = '۳ ماه';
+  else if (plan.id === 'usd_6m') daysLabel = '۶ ماه';
+  else if (plan.id === 'usd_12m') daysLabel = '۱۲ ماه';
+  else daysLabel = `${plan.days} روز`;
+
+  alert(`
+💎 درخواست پلن «${daysLabel}» — ${plan.priceUSDT} USDT
+
+📋 مراحل تهیه:
+
+1) به کانال تلگرام @langBlue مراجعه کن
+2) به ادمین دایرکت پیام بده و بگو این پلن رو می‌خوای
+3) ادمین آدرس ولت Tonkeeper رو برات می‌فرسته
+4) مبلغ ${plan.priceUSDT} USDT رو روی شبکه TON واریز کن
+5) از رسید واریز Screenshot بگیر و برای ادمین بفرست
+6) پس از تایید، ادمین کد تایید رو برات می‌فرسته
+7) کد رو در بخش «فعال‌سازی اشتراک» وارد کن
+
+⚠️ فقط از شبکه TON استفاده کن.
+⚠️ کد تایید فقط از طریق ادمین @langBlue صادر می‌شه.
+  `);
+};
+
+/* ============================================================
+   PROFILE
+   ============================================================ */
+function renderProfile() {
+  const u = Auth.current();
+  if (!u) return;
+  const sub = Store.get('subscription', null);
+  const isActive = sub && Date.now() < sub.expiresAt;
+  const nodes = Object.keys(Graph.nodes).length;
+  const geo = Store.get('geo:country', { name: '—', currency: null });
+
+  const curLabel = geo.currency === 'USD' ? 'تتر (USDT)' :
+                   geo.currency === 'IRT' ? 'تومان (T)' : 'نامشخص';
+
+  const subStatus = isActive
+    ? `<span style="color:var(--success);">فعال (${sub.currency === 'USDT' ? 'تتر' : 'تومان'}) — ${Subscription.daysLeft()} روز باقی‌مونده</span>`
+    : `<span style="color:var(--warn);">نداری — نسخه رایگان (${nodes}/${FREE_LIMIT})</span>`;
+
+  const countryDisplay = geo.code ? `${escapeHtml(geo.name)} (${escapeHtml(geo.code)})` : 'نامشخص';
+
+  document.getElementById('profileInfo').innerHTML = `
+    <div style="display:grid; gap:12px; max-width:520px;">
+      <div><strong>نام:</strong> ${escapeHtml(u.name)}</div>
+      <div><strong>نام کاربری:</strong> @${escapeHtml(u.username)}</div>
+      <div><strong>ایمیل:</strong> ${escapeHtml(u.email || '—')}</div>
+      <div><strong>جنسیت:</strong> ${escapeHtml(u.sex || '—')}</div>
+      <div><strong>🌍 کشور:</strong> ${countryDisplay}
+        ${geo.isVpn ? '<span style="color:var(--danger); font-size:11px;">(VPN)</span>' : ''}
+      </div>
+      <div><strong>💱 ارز:</strong> ${curLabel}</div>
+      <div><strong>تاریخ عضویت:</strong> ${formatDate(u.at)}</div>
+      <div><strong>تعداد گرامر:</strong> ${nodes}</div>
+      <div><strong>وضعیت اشتراک:</strong> ${subStatus}</div>
+    </div>
+  `;
+}
+
+document.getElementById('btnLogout').onclick = () => {
+  if (!confirm('خروج از حساب؟')) return;
+  Auth.logout();
+  location.reload();
+};
+
+document.getElementById('btnExport').onclick = () => {
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k.startsWith('lb:')) data[k] = localStorage.getItem(k);
+  }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'langblue-backup-' + Date.now() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('خروجی گرفته شد', 'success');
+};
+
+document.getElementById('btnImport').onclick = () => {
+  document.getElementById('fileImport').click();
+};
+
+document.getElementById('fileImport').onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      Object.keys(data).forEach(k => {
+        if (k.startsWith('lb:')) localStorage.setItem(k, data[k]);
+      });
+      toast('ورود داده‌ها موفق — صفحه رفرش می‌شه', 'success');
+      setTimeout(() => location.reload(), 1000);
+    } catch {
+      toast('فایل نامعتبر', 'error');
+    }
+  };
+  reader.readAsText(file);
+};
+
+/* ============================================================
+   ADMIN PANEL — از Console
+   ============================================================ */
+window.__viewAuditLog = () => {
+  const log = Store.get('audit:log', []);
+  console.table(log.slice(-50));
+  return log;
+};
+
+window.__resetUser = () => {
+  if (!confirm('پاک کردن همه‌ی داده‌های کاربر؟')) return;
+  Object.keys(localStorage)
+    .filter(k => k.startsWith('lb:'))
+    .forEach(k => localStorage.removeItem(k));
+  location.reload();
+};
+
+window.__resetGeo = () => {
+  localStorage.removeItem('lb:geo:country');
+  location.reload();
+};
+
+/* ============================================================
+   INIT
+   ============================================================ */
+checkAuth();
+</script>
+</body>
+</html>
