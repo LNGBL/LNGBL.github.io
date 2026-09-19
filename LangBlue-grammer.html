@@ -476,9 +476,47 @@
 
 <script type="module">
 /* ============================================================
-   SECURITY LAYER 0: غیرفعال‌سازی DevTools
+   DEVICE / TABLET VERIFICATION
+   ============================================================
+   تبلت‌ها، مخصوصاً Samsung Galaxy Tab، نباید به‌خاطر تفاوت
+   outerWidth/innerWidth یا پنل‌های مرورگر به‌اشتباه مسدود شوند.
+   حساب کاربر همچنان همان حساب محلی LangBlue است.
    ============================================================ */
+const DeviceGuard = {
+  isTablet() {
+    const ua = navigator.userAgent || '';
+    const platform = navigator.platform || '';
+    const touch = navigator.maxTouchPoints || 0;
+    const w = Math.max(window.screen?.width || 0, window.screen?.height || 0);
+    const h = Math.min(window.screen?.width || 0, window.screen?.height || 0);
+
+    const androidTablet = /Android/i.test(ua) &&
+      (/(SM-T|SM-X|GT-P|GT-N|SCH-I|SGH-I)/i.test(ua) || touch >= 2) &&
+      Math.min(w, h) >= 600;
+
+    const ipadTablet = /iPad/i.test(ua) ||
+      (/Macintosh/i.test(ua) && touch >= 2 && Math.min(w, h) >= 600);
+
+    const genericTablet = touch >= 2 && Math.min(w, h) >= 600 &&
+      !/Mobile/i.test(ua);
+
+    return androidTablet || ipadTablet || genericTablet || /Tablet/i.test(platform);
+  },
+
+  verified() {
+    return this.isTablet();
+  }
+};
+
+window.__isLangBlueTablet = () => DeviceGuard.isTablet();
+
 (function protectDevTools() {
+  const tablet = DeviceGuard.isTablet();
+
+  // روی تبلت هیچ تشخیص DevTools/مسدودی اجرا نمی‌شود؛
+  // این کار جلوی خطای کاذب روی Samsung Galaxy Tab و سایر تبلت‌ها را می‌گیرد.
+  if (tablet) return;
+
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', e => {
     if (e.key === 'F12') { e.preventDefault(); return false; }
