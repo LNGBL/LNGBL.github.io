@@ -219,6 +219,45 @@
 <div class="container">
   <h1>🔷 LangBlue <span style="font-size: 14px; color: var(--muted); font-weight: 400;">Grammar Platform</span></h1>
 
+  <!-- ACCOUNT GATE -->
+  <div id="accountGate">
+    <div class="card" style="max-width:500px; margin:60px auto;">
+      <h2 id="accountTitle">👤 حساب LangBlue</h2>
+      <p id="accountDesc" style="color:var(--muted);font-size:13px;margin-bottom:20px;">
+        برای استفاده از LangBlue یک حساب محلی بسازید. ایمیل لازم نیست.
+      </p>
+
+      <div id="registerFields">
+        <div style="margin-bottom:12px;">
+          <label>نام</label><input id="regName" autocomplete="off">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label>جنسیت</label>
+          <select id="regSex">
+            <option value="">-- انتخاب --</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label>نام کاربری</label><input id="accountUsername" autocomplete="username">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label>رمز عبور</label><input id="accountPassword" type="password" autocomplete="new-password" minlength="6">
+      </div>
+
+      <button id="btnAccount" style="width:100%;">ثبت حساب</button>
+      <button id="btnSwitchAccount" class="ghost" style="width:100%;margin-top:10px;">ورود به حساب موجود</button>
+      <div id="accountStatus" style="margin-top:16px;color:var(--muted);font-size:13px;text-align:center;"></div>
+      <div class="hint" style="margin-top:12px;text-align:center;">
+        حساب بدون ایمیل ساخته می‌شود و اطلاعات هر حساب از حساب‌های دیگر جدا نگه داشته می‌شود.
+      </div>
+    </div>
+  </div>
+
   <!-- MAIN APP -->
   <div id="mainApp" class="hidden">
     <div id="subBanner"></div>
@@ -412,6 +451,7 @@
         <div id="profileInfo"></div>
         <div class="row" style="margin-top:20px;">
           <button class="ghost" id="btnExport">💾 خروجی JSON</button>
+          <button class="danger" id="btnLogout">🚪 خروج از حساب</button>
           <button class="ghost" id="btnImport">📥 ورود از فایل</button>
         </div>
         <input type="file" id="fileImport" accept=".json" class="hidden">
@@ -463,11 +503,22 @@
    CORE: Store
    ============================================================ */
 const Store = {
-  get(key, fallback = null) {
-    try { const v = localStorage.getItem('lb:' + key); return v ? JSON.parse(v) : fallback; }
-    catch { return fallback; }
+  _globalKeys: new Set(['accounts', 'session']),
+  _storageKey(key) {
+    if (this._globalKeys.has(key)) return 'lb:' + key;
+    const session = (() => {
+      try { return JSON.parse(localStorage.getItem('lb:session') || 'null'); } catch { return null; }
+    })();
+    const uid = session?.userId || 'anonymous';
+    return 'lb:user:' + uid + ':' + key;
   },
-  set(key, val) { localStorage.setItem('lb:' + key, JSON.stringify(val)); },
+  get(key, fallback = null) {
+    try {
+      const v = localStorage.getItem(this._storageKey(key));
+      return v ? JSON.parse(v) : fallback;
+    } catch { return fallback; }
+  },
+  set(key, val) { localStorage.setItem(this._storageKey(key), JSON.stringify(val)); },
   update(key, fn, fallback) {
     const cur = this.get(key, fallback);
     const next = fn(cur);
@@ -490,39 +541,92 @@ const Audit = {
 };
 
 /* ============================================================
-   LOCAL IDENTITY
+   LOCAL ACCOUNT SYSTEM — بدون ایمیل
    ============================================================ */
 const Auth = {
   current() { return Store.get('user', null); },
   isLoggedIn() { return !!this.current(); },
 
+  async hashPassword(password, saltBytes) {
+    const enc = new TextEncoder();
+    const salt = saltBytes || crypto.getRandomValues(new Uint8Array(16));
+    const key = await crypto.subtle.importKey(
+      'raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']
+    );
+    const bits = await crypto.subtle.deriveBits(
+      { name:'PBKDF2', salt, iterations:120000, hash:'SHA-256' },
+      key, 256
+    );
+    return {
+      hash: Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,'0')).join(''),
+      salt: Array.from(salt).map(b=>b.toString(16).padStart(2,'0')).join('')
+    };
+  },
+
+  async verifyPassword(password, account) {
+    const salt = new Uint8Array((account.salt.match(/.{2}/g)||[]).map(h=>parseInt(h,16)));
+    const result = await this.hashPassword(password, salt);
+    return result.hash === account.passwordHash;
+  },
+
   async init() {
-    let user = Store.get('user', null);
-
-    if (!user) {
-      const id = Store.get('local:visitor_id', null) || crypto.randomUUID();
-      Store.set('local:visitor_id', id);
-
-      user = {
-        id,
-        name: 'Guest',
-        sex: '',
-        username: 'guest_' + id.replace(/-/g, '').slice(0, 8),
-        country: null,
-        countryName: '',
-        currency: null,
-        at: Date.now()
-      };
-
-      Store.set('user', user);
+    const session = Store.get('session', null);
+    if (!session?.userId) {
+      Store.set('user', null);
+      return null;
     }
-
+    const accounts = Store.get('accounts', {});
+    const a = Object.values(accounts).find(x => x.id === session.userId);
+    if (!a) {
+      Store.set('session', null);
+      Store.set('user', null);
+      return null;
+    }
+    const user = {
+      id:a.id, name:a.name, sex:a.sex || '', username:a.username,
+      country:a.country || null, countryName:a.countryName || '',
+      currency:a.currency || null, at:a.at
+    };
+    Store.set('user', user);
     return user;
   },
 
+  async register(data) {
+    const accounts = Store.get('accounts', {});
+    const key = data.username.toLowerCase();
+    if (accounts[key]) return {ok:false,error:'این نام کاربری قبلاً ثبت شده است.'};
+
+    const hashed = await this.hashPassword(data.password);
+    const id = crypto.randomUUID();
+    accounts[key] = {
+      id, name:data.name, sex:data.sex || '', username:data.username,
+      country:data.country || null, countryName:data.countryName || '',
+      currency:data.currency || null,
+      passwordHash:hashed.hash, salt:hashed.salt, at:Date.now()
+    };
+    Store.set('accounts', accounts);
+    Store.set('session', {userId:id, createdAt:Date.now()});
+    await this.init();
+    Audit.log('user_register', {username:data.username});
+    return {ok:true,user:this.current()};
+  },
+
+  async login(username, password) {
+    const accounts = Store.get('accounts', {});
+    const a = accounts[username.trim().toLowerCase()];
+    if (!a || !(await this.verifyPassword(password, a))) {
+      return {ok:false,error:'نام کاربری یا رمز عبور نادرست است.'};
+    }
+    Store.set('session', {userId:a.id, createdAt:Date.now()});
+    await this.init();
+    Audit.log('user_login', {username:a.username});
+    return {ok:true,user:this.current()};
+  },
+
   async logout() {
-    // LangBlue has no account/login system.
-    return true;
+    Audit.log('user_logout');
+    Store.set('session', null);
+    Store.set('user', null);
   }
 };
 
@@ -1519,11 +1623,33 @@ function formatDate(ts) {
 }
 
 /* ============================================================
-   DIRECT ENTRY
+   ACCOUNT ENTRY
    ============================================================ */
+let accountMode = 'register';
+
+function renderAccountMode() {
+  const register = accountMode === 'register';
+  document.getElementById('accountTitle').textContent = register ? '👤 ساخت حساب LangBlue' : '🔐 ورود به حساب';
+  document.getElementById('accountDesc').textContent = register
+    ? 'یک حساب محلی بساز. ایمیل لازم نیست.'
+    : 'نام کاربری و رمز عبور حساب خود را وارد کن.';
+  document.getElementById('registerFields').classList.toggle('hidden', !register);
+  document.getElementById('btnAccount').textContent = register ? 'ثبت حساب' : 'ورود';
+  document.getElementById('btnSwitchAccount').textContent = register ? 'ورود به حساب موجود' : 'ساخت حساب جدید';
+  document.getElementById('accountPassword').autocomplete = register ? 'new-password' : 'current-password';
+}
+
 async function checkAuth() {
   await Auth.init();
   await GeoService.detect();
+
+  if (!Auth.isLoggedIn()) {
+    UsageLimiter.stop();
+    document.getElementById('mainApp').classList.add('hidden');
+    document.getElementById('accountGate').classList.remove('hidden');
+    renderAccountMode();
+    return;
+  }
 
   const geo = Store.get('geo:country', {});
   if (geo.needsUserInput || !geo.currency) {
@@ -1537,6 +1663,7 @@ async function checkAuth() {
     return;
   }
 
+  document.getElementById('accountGate').classList.add('hidden');
   UsageLimiter.hideBlocked();
   document.getElementById('mainApp').classList.remove('hidden');
   boot();
@@ -1546,42 +1673,73 @@ async function checkAuth() {
 function showCurrencyPrompt() {
   const old = document.getElementById('currencyModal');
   if (old) old.remove();
-
   document.getElementById('mainApp').classList.add('hidden');
 
   const modal = document.createElement('div');
-  modal.id = 'currencyModal';
-  modal.className = 'currency-modal';
-  modal.innerHTML = `
+  modal.id='currencyModal';
+  modal.className='currency-modal';
+  modal.innerHTML=`
     <div class="card">
-      <h2 style="color: var(--accent);">🌍 انتخاب نوع پرداخت</h2>
-      <p style="color: var(--muted); font-size: 13px; line-height: 1.9;">
-        کشور شما به‌درستی تشخیص داده نشد.
-        لطفاً بگو در کدام منطقه هستی تا پلن مناسب نشون داده بشه:
+      <h2 style="color:var(--accent);">🌍 انتخاب نوع پرداخت</h2>
+      <p style="color:var(--muted);font-size:13px;line-height:1.9;">
+        کشور شما به‌درستی تشخیص داده نشد. لطفاً منطقه پرداخت را انتخاب کن:
       </p>
-      <div style="display: grid; gap: 12px; margin-top: 20px;">
-        <button id="chooseIRT">🇮🇷 داخل ایران هستم — پرداخت با تومان</button>
-        <button id="chooseUSD">🌍 خارج از ایران هستم — پرداخت با تتر (USDT)</button>
-      </div>
-      <div style="margin-top: 16px; font-size: 11px; color: var(--muted); text-align: center;">
-        این انتخاب فقط یک بار پرسیده می‌شه و قابل تغییر نیست.
+      <div style="display:grid;gap:12px;margin-top:20px;">
+        <button id="chooseIRT">🇮🇷 داخل ایران — تومان</button>
+        <button id="chooseUSD">🌍 خارج از ایران — تتر (USDT)</button>
       </div>
     </div>
   `;
   document.body.appendChild(modal);
-
-  document.getElementById('chooseIRT').onclick = () => {
-    GeoService.confirmCurrency('IRT');
-    modal.remove();
-    checkAuth();
-  };
-
-  document.getElementById('chooseUSD').onclick = () => {
-    GeoService.confirmCurrency('USD');
-    modal.remove();
-    checkAuth();
-  };
+  document.getElementById('chooseIRT').onclick=()=>{GeoService.confirmCurrency('IRT');modal.remove();checkAuth();};
+  document.getElementById('chooseUSD').onclick=()=>{GeoService.confirmCurrency('USD');modal.remove();checkAuth();};
 }
+
+document.getElementById('btnAccount').onclick = async () => {
+  const username=document.getElementById('accountUsername').value.trim();
+  const password=document.getElementById('accountPassword').value;
+
+  if (!/^[A-Za-z0-9_.-]{3,32}$/.test(username)) {
+    toast('نام کاربری باید ۳ تا ۳۲ کاراکتر و فقط شامل حروف انگلیسی، عدد، _، - یا . باشد','error');
+    return;
+  }
+  if (password.length < 6) {
+    toast('رمز عبور باید حداقل ۶ کاراکتر باشد','error');
+    return;
+  }
+
+  if (accountMode === 'register') {
+    const name=document.getElementById('regName').value.trim();
+    const sex=document.getElementById('regSex').value;
+    if (!name) { toast('نام الزامی است','error'); return; }
+
+    const geo=Store.get('geo:country',{code:null,name:'Unknown',currency:null});
+    const res=await Auth.register({
+      name,sex,username,password,
+      country:geo.code,countryName:geo.name,currency:geo.currency
+    });
+    if (!res.ok) { toast(res.error,'error'); return; }
+    toast('حساب ساخته شد؛ خوش آمدی '+name,'success');
+  } else {
+    const res=await Auth.login(username,password);
+    if (!res.ok) { toast(res.error,'error'); return; }
+    toast('خوش آمدی '+res.user.name,'success');
+  }
+
+  await checkAuth();
+};
+
+document.getElementById('btnSwitchAccount').onclick=()=>{
+  accountMode = accountMode === 'register' ? 'login' : 'register';
+  renderAccountMode();
+};
+
+document.getElementById('btnLogout').onclick=async()=>{
+  if(!confirm('از حساب خارج می‌شوی؟')) return;
+  UsageLimiter.stop();
+  await Auth.logout();
+  location.reload();
+};
 
 /* ============================================================
    BOOT
@@ -2405,9 +2563,12 @@ window.__viewAuditLog = () => {
 
 window.__resetUser = () => {
   if (!confirm('پاک کردن همه‌ی داده‌های کاربر؟')) return;
-  Object.keys(localStorage)
-    .filter(k => k.startsWith('lb:'))
-    .forEach(k => localStorage.removeItem(k));
+  const uid = Auth.current()?.id;
+  if (uid) {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('lb:user:' + uid + ':'))
+      .forEach(k => localStorage.removeItem(k));
+  }
   location.reload();
 };
 
