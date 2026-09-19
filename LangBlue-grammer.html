@@ -240,7 +240,7 @@
         <label>Email</label>
         <input id="regEmail" type="email" autocomplete="off" placeholder="example@gmail.com">
         <div class="hint">
-          دامنه‌های مجاز: gmail.com — outlook.com — hotmail.com — yahoo.com — proton.me
+          هر ایمیل معتبر قابل استفاده است. پس از ثبت‌نام، ایمیل خود را برای تأیید حساب بررسی کنید.
         </div>
       </div>
       <div style="margin-bottom:12px;"><label>Username</label><input id="regUsername" autocomplete="off"></div>
@@ -609,16 +609,9 @@ const Auth = {
 /* ============================================================
    اعتبارسنجی ایمیل
    ============================================================ */
-const ALLOWED_EMAIL_DOMAINS = [
-  'gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com', 'proton.me'
-];
-
 function isValidEmail(email) {
   if (!email) return false;
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!re.test(email)) return false;
-  const domain = email.split('@')[1].toLowerCase();
-  return ALLOWED_EMAIL_DOMAINS.includes(domain);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 /* ============================================================
@@ -1712,7 +1705,7 @@ document.getElementById('btnRegister').onclick = async () => {
   if (!name || !username) { toast('نام و نام کاربری الزامی است', 'error'); return; }
   if (!email) { toast('ایمیل الزامی است', 'error'); emailInput.classList.add('error'); return; }
   if (!isValidEmail(email)) {
-    toast('فقط ایمیل‌های Gmail، Outlook، Hotmail، Yahoo و Proton پذیرفته می‌شن', 'error');
+    toast('فرمت ایمیل معتبر نیست', 'error');
     emailInput.classList.add('error');
     return;
   }
