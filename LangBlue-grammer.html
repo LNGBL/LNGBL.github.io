@@ -1661,7 +1661,15 @@ function renderAccountMode() {
 
 async function checkAuth() {
   await Auth.init();
-  await GeoService.detect();
+
+  // تشخیص IP نباید جلوی ورود کاربر به برنامه را بگیرد.
+  // اگر سرویس‌های تشخیص کشور در دسترس نباشند، برنامه همچنان باز می‌شود
+  // و بخش اشتراک بعداً می‌تواند دوباره تلاش کند.
+  try {
+    await GeoService.detect();
+  } catch (e) {
+    Audit.log('geo_detect_failed', {message: String(e?.message || e)});
+  }
 
   if (!Auth.isLoggedIn()) {
     UsageLimiter.stop();
@@ -1674,7 +1682,11 @@ async function checkAuth() {
   const geo = Store.get('geo:country', {});
   // ارز از IP تعیین شده و کاربر امکان تغییر آن را ندارد.
   if (!geo.currency) {
-    await GeoService.detect();
+    try {
+      await GeoService.detect();
+    } catch (e) {
+      Audit.log('geo_retry_failed', {message: String(e?.message || e)});
+    }
   }
 
   if (!UsageLimiter.canEnter()) {
@@ -1683,10 +1695,18 @@ async function checkAuth() {
     return;
   }
 
+  // ورود موفق: بلافاصله صفحه اصلی را نمایش بده.
   document.getElementById('accountGate').classList.add('hidden');
   UsageLimiter.hideBlocked();
   document.getElementById('mainApp').classList.remove('hidden');
-  boot();
+
+  try {
+    boot();
+  } catch (e) {
+    console.error('LangBlue boot error:', e);
+    Audit.log('boot_error', {message: String(e?.message || e)});
+  }
+
   UsageLimiter.start();
 }
 
