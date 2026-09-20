@@ -1426,7 +1426,7 @@ function _showInvoice(planKey){
   E.invDate.textContent=dateStr;
   E.invTotal.textContent=shownPrice;
   E.invTracking.textContent=tracking;
-  E.invMessage.textContent="سلام، می‌خواهم پلن "+plan.label+" ("+plan.priceStr+") را فعال کنم. شمارهٔ پیگیری: "+tracking;
+  E.invMessage.textContent="سلام، می‌خواهم پلن "+plan.label+" ("+shownPrice+")"+(shownPlan&&shownPlan.discount?" با تخفیف جشنواره‌ای "+shownPlan.discount+"٪":"")+" را فعال کنم. شمارهٔ پیگیری: "+tracking;
   _openInvoice();
 }
 
