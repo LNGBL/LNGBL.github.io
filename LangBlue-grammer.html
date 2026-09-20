@@ -632,9 +632,16 @@ const Auth = {
       return null;
     }
     const user = {
-      id:a.id, name:a.name, sex:a.sex || '', username:a.username,
-      country:a.country || null, countryName:a.countryName || '',
-      currency:a.currency || null, at:a.at
+      id:a.id,
+      name:a.name || a.fullName || '',
+      fullName:a.fullName || a.name || '',
+      sex:a.sex || a.gender || '',
+      gender:a.gender || a.sex || '',
+      username:a.username,
+      country:a.country || null,
+      countryName:a.countryName || '',
+      currency:a.currency || null,
+      at:a.at || a.createdAt
     };
     Store.set('user', user);
     return user;
@@ -647,11 +654,13 @@ const Auth = {
 
     const hashed = await this.hashPassword(data.password);
     const id = crypto.randomUUID();
+    const createdAt = new Date().toISOString();
     accounts[key] = {
-      id, name:data.name, sex:data.sex || '', username:data.username,
+      id, name:data.name, fullName:data.name, sex:data.sex || '', gender:data.sex || '',
+      username:data.username, age:data.age || '',
       country:data.country || null, countryName:data.countryName || '',
       currency:data.currency || null,
-      passwordHash:hashed.hash, salt:hashed.salt, at:Date.now()
+      passwordHash:hashed.hash, salt:hashed.salt, at:createdAt, createdAt:createdAt
     };
     Store.set('accounts', accounts);
     Store.set('session', {userId:id, createdAt:Date.now()});
