@@ -4066,17 +4066,17 @@
                         if(password!==confirm){document.getElementById('confirmError').textContent='رمزها مطابقت ندارند';return;}
                         var res=await Auth.register({fullName:fullName,age:age,gender:gender,username:username,password:password});
                         if(!res.ok){document.getElementById('usernameError').textContent=res.error;return;}
-                        LegacyBridge.migrateForCurrentUser();document.getElementById('userModal').classList.remove('active');self.showToast('✅ حساب ساخته شد. حالا اشتراک Vocabulary را فعال کن.','success');renderVocabularyGate();PaidAccess.continuePending();
+                        LegacyBridge.migrateForCurrentUser();document.getElementById('userModal').classList.remove('active');self.showToast('✅ حساب ساخته شد. ۳۵ واژه اول Vocabulary رایگان است.','success');Core.load();renderVocabularyGate();if(Auth.isLoggedIn()) self.renderAll();PaidAccess.continuePending();
                     });
 
                     document.getElementById('loginBtn').addEventListener('click',async function(){
                         var username=document.getElementById('loginUsername').value.trim(),password=document.getElementById('loginPassword').value,res=await Auth.login(username,password);
                         if(!res.ok){document.getElementById('loginError').textContent=res.error;return;}
-                        LegacyBridge.migrateForCurrentUser();document.getElementById('userModal').classList.remove('active');self.showToast('✅ ورود موفق بود. حالا اشتراک Vocabulary را فعال کن.','success');renderVocabularyGate();PaidAccess.continuePending();
+                        LegacyBridge.migrateForCurrentUser();document.getElementById('userModal').classList.remove('active');self.showToast('✅ ورود موفق بود. می‌توانید تا ۳۵ واژه را رایگان ثبت کنید.','success');Core.load();renderVocabularyGate();if(Auth.isLoggedIn()) self.renderAll();PaidAccess.continuePending();
                     });
                     document.getElementById('logoutBtn').addEventListener('click',async function(){
                         if(!confirm('آیا از خروج مطمئن هستید؟'))return;
-                        await Auth.logout();document.getElementById('userModal').classList.remove('active');Core.load();self.renderAll();self.showToast('🚪 از حساب خارج شدید. داده‌های حساب قبلی باقی ماند.','info');
+                        await Auth.logout();document.getElementById('userModal').classList.remove('active');renderVocabularyGate();self.showToast('🚪 از حساب خارج شدید. امکانات Vocabulary دوباره مخفی شد.','info');
                     });
 
                     // Backup reminder modal
