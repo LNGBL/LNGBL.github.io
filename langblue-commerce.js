@@ -62,7 +62,7 @@
   function displayPlan(plan,date){
     var p=typeof plan==='string'?PLANS[plan]:plan, f=activeFestival(date);
     if(!p)return null;
-    var discount=f?f.discount:0, finalPrice=discountedPrice(p.price,discount);
+    var discount=f?(p.id==='irt_12m'?f.discount/2:f.discount):0, finalPrice=discountedPrice(p.price,discount);
     return Object.assign({},p,{
       festival:f,
       discount:discount,
