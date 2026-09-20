@@ -1841,7 +1841,7 @@
                     for (var i = 0; i < forgotten.length; i++) {
                         var w = forgotten[i];
                         var lastReviewDate = w.lastReview ? new Date(w.lastReview).toLocaleDateString('fa-IR') : '—';
-                        csv += w.word + ',' + w.persian + ',' + (w.type || 'other') + ',' + (w.status || '—') + ',' + lastReviewDate + ',' + (w.reviewCount || 0) + '\n';
+                        csv += [w.word, w.persian, w.type || 'other', w.status || '—', lastReviewDate, w.reviewCount || 0].map(csvCell).join(',') + '\n';
                     }
                     return csv;
                 },
@@ -3427,9 +3427,8 @@
                             var srsData = srs[key] || {};
                             var lastReview = srsData.lastReview ? new Date(srsData.lastReview).toLocaleDateString(
                                 'fa-IR') : '—';
-                            csv += w.word + ',' + w.persian + ',' + (w.type || 'other') + ',' + (w.stickers || [])
-                                .join(';') + ',' + (srsData.status || 'none') + ',' + (srsData.reviewCount || 0) +
-                                ',' + lastReview + '\n';
+                            csv += [w.word, w.persian, w.type || 'other', (w.stickers || []).join(';'),
+                                srsData.status || 'none', srsData.reviewCount || 0, lastReview].map(csvCell).join(',') + '\n';
                         }
                         var blob = new Blob([csv], { type: 'text/csv' });
                         var url = URL.createObjectURL(blob);
