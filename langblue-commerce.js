@@ -2,12 +2,12 @@
   'use strict';
 
   var PLANS = {
-    irt_7d:  {id:'irt_7d',  days:7,   label:'۷ روز',  price:100999, priceStr:'100,999 T'},
-    irt_14d: {id:'irt_14d', days:14,  label:'۱۴ روز', price:263999, priceStr:'263,999 T'},
-    irt_21d: {id:'irt_21d', days:21,  label:'۲۱ روز', price:456999, priceStr:'456,999 T'},
-    irt_3m:  {id:'irt_3m',  days:90,  label:'۳ ماه',  price:734999, priceStr:'734,999 T'},
-    irt_6m:  {id:'irt_6m',  days:180, label:'۶ ماه',  price:830999, priceStr:'830,999 T'},
-    irt_12m: {id:'irt_12m', days:365, label:'۱۲ ماه', price:950999, priceStr:'950,999 T'}
+    irt_7d:  {id:'irt_7d',  days:7,   label:'۷ روز',  price:201998, priceStr:'201,998 T'},
+    irt_14d: {id:'irt_14d', days:14,  label:'۱۴ روز', price:527998, priceStr:'527,998 T'},
+    irt_21d: {id:'irt_21d', days:21,  label:'۲۱ روز', price:913998, priceStr:'913,998 T'},
+    irt_3m:  {id:'irt_3m',  days:90,  label:'۳ ماه',  price:1469998, priceStr:'1,469,998 T'},
+    irt_6m:  {id:'irt_6m',  days:180, label:'۶ ماه',  price:1661998, priceStr:'1,661,998 T'},
+    irt_12m: {id:'irt_12m', days:365, label:'۱۲ ماه', price:1901998, priceStr:'1,901,998 T'}
   };
 
   var FESTIVALS = [
@@ -71,8 +71,34 @@
     });
   }
 
+  var PRODUCTS = {
+    grammar:{id:'grammar',label:'LangBlue Grammar',icon:'📐',url:'LangBlue-grammer.html'},
+    vocabulary:{id:'vocabulary',label:'LangBlue Vocabulary',icon:'📚',url:'vocab.html'},
+    deutsch:{id:'deutsch',label:'LangBlue Deutsch',icon:'🇩🇪',url:'LangBlue-De.html'}
+  };
+
+  function buildOrder(productIds,planId,date){
+    var ids=Array.isArray(productIds)?productIds:[productIds];
+    var plan=displayPlan(planId,date);
+    var products=ids.map(function(id){return PRODUCTS[id];}).filter(Boolean);
+    if(!plan||!products.length)return null;
+    var total=Math.round(plan.finalPrice*products.length);
+    return {
+      id:'LB-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,7).toUpperCase(),
+      createdAt:Date.now(),
+      plan:plan,
+      products:products,
+      quantity:products.length,
+      subtotal:total,
+      total:total,
+      totalStr:comma(total)+' T'
+    };
+  }
+
   window.LangBlueCommerce={
     PLANS:PLANS,
+    PRODUCTS:PRODUCTS,
+    buildOrder:buildOrder,
     FESTIVALS:FESTIVALS,
     activeFestival:activeFestival,
     discountedPrice:discountedPrice,
