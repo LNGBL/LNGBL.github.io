@@ -1210,6 +1210,7 @@
         }
 
     </style>
+<script src="langblue-commerce.js"></script>
 </head>
 <body>
 
@@ -3012,18 +3013,8 @@
             // ================================================================
             var PaidAccess = {
                 FREE_LIMIT:35,
-                PLANS:[
-                    {id:'irt_7d',days:7,label:'۷ روز',price:'100,999 T',feature:'دسترسی کامل به Grammar + Vocabulary'},
-                    {id:'irt_14d',days:14,label:'۱۴ روز',price:'263,999 T',feature:'دسترسی کامل به Grammar + Vocabulary'},
-                    {id:'irt_21d',days:21,label:'۲۱ روز',price:'456,999 T',feature:'دسترسی کامل به Grammar + Vocabulary'},
-                    {id:'irt_3m',days:90,label:'۳ ماه',price:'734,999 T',feature:'دسترسی کامل به Grammar + Vocabulary + بدون محدودیت'},
-                    {id:'irt_6m',days:180,label:'۶ ماه',price:'830,999 T',feature:'دسترسی کامل به Grammar + Vocabulary + بدون محدودیت'},
-                    {id:'irt_12m',days:365,label:'۱۲ ماه',price:'950,999 T',feature:'دسترسی کامل به Grammar + Vocabulary + امکان پرینت از اطلاعات'}
-                ],
-                CODES:{
-                    'Verify_mU#2292':'irt_7d','Verify_m!!2992':'irt_14d','Verify_I@112':'irt_21d',
-                    'Verify_MIR_ss1':'irt_3m','Verify_ll39332':'irt_6m','Verify_311012':'irt_12m'
-                },
+                get PLANS(){ return Object.values(window.LangBlueCommerce.PLANS).map(function(p){ return {id:p.id,days:p.days,label:p.label,price:p.priceStr,feature:p.feature}; }); },
+                get CODES(){ return window.LangBlueCommerce.CODES; },
                 pending:null,
                 current:function(){
                     var s=Storage.get('subscription',null);
