@@ -394,7 +394,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
         <h2 class="section-title">ساخت فیش خرید LangBlue</h2>
         <p class="section-lead">
           لازم نیست همه محصولات را با هم انتخاب کنی. یک محصول یا چند محصول را انتخاب کن،
-          مدت اشتراک ماهانه را مشخص کن و فیش درخواست خودت را بساز؛ سپس شناسه فیش را برای ادمین بفرست تا کد وریفای متناسب با مدت اشتراک را دریافت کنی.
+          مدت اشتراک روزانه یا ماهانه را مشخص کن و فیش درخواست خودت را بساز؛ سپس شناسه فیش را برای ادمین بفرست تا کد وریفای متناسب با مدت اشتراک را دریافت کنی.
         </p>
         <div class="receipt-builder">
           <div class="receipt-grid">
@@ -407,11 +407,18 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
               </div>
             </div>
             <div class="receipt-panel">
-              <h3>۲. مدت اشتراک ماهانه</h3>
+              <h3>۲. مدت اشتراک روزانه / ماهانه</h3>
               <select id="receiptPlan" class="receipt-select" aria-label="مدت اشتراک">
-                <option value="irt_3m">۳ ماه</option>
-                <option value="irt_6m">۶ ماه</option>
-                <option value="irt_12m">۱۲ ماه</option>
+                <optgroup label="اشتراک روزانه">
+                  <option value="irt_7d">۷ روز</option>
+                  <option value="irt_14d">۱۴ روز</option>
+                  <option value="irt_21d">۲۱ روز</option>
+                </optgroup>
+                <optgroup label="اشتراک ماهانه">
+                  <option value="irt_3m">۳ ماه</option>
+                  <option value="irt_6m">۶ ماه</option>
+                  <option value="irt_12m">۱۲ ماه</option>
+                </optgroup>
               </select>
               <div class="receipt-summary" id="receiptSummary" aria-live="polite"></div>
               <div class="receipt-actions">
@@ -818,7 +825,6 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
       '<div class="receipt-line"><span>پلن</span><strong>'+order.plan.label+'</strong></div>'+
       (order.plan.festival?'<div class="receipt-line"><span>تخفیف '+order.plan.festival.title+'</span><strong>'+order.plan.discount+'٪</strong></div>':'')+
       (order.bundleDiscount?'<div class="receipt-line"><span>تخفیف بسته کامل ۱۲ ماهه</span><strong>'+order.bundleDiscount+'٪</strong></div>':'')+
-      ((order.plan.days===7||order.plan.days===14||order.plan.days===21)&&order.verificationCode?'<div class="receipt-line"><span>کد وریفای</span><strong>'+order.verificationCode+'</strong></div>':'')+
       '<div class="receipt-total"><span>مبلغ نهایی</span><span>'+order.totalStr+'</span></div>'+
       '<div class="receipt-note">'+((order.plan.days===7||order.plan.days===14||order.plan.days===21)?'کد وریفای پلن‌های روزانه در فیش نمایش داده می‌شود.':'کد وریفای پلن‌های ماهانه برای کاربر نمایش داده نمی‌شود و پس از بررسی سفارش توسط مدیریت صادر می‌شود.')+'</div>'+
       '<div class="receipt-actions"><button id="sendReceiptTelegram" class="btn btn-primary" type="button">📨 ارسال سفارش به تلگرام</button></div>';
