@@ -854,129 +854,70 @@ const RateLimit = {
    ============================================================ */
 const Subscription = {
   validateCode(code) {
-    const trimmed = String(code || '').trim();
-    if (!trimmed) return { ok: false, error: 'کد تایید را وارد کن' };
-
-    const entryPlanId = window.LangBlueCommerce.CODES[trimmed];
-    const entry = entryPlanId ? {planId: entryPlanId} : null;
-    if (!entry) {
-      Audit.log('invalid_code_attempt', { code: trimmed.slice(0, 10) + '...' });
-      return { ok: false, error: 'کد تایید نامعتبر است' };
+    const result = window.LangBlueCore.subscription.validateCode(code);
+    if (!result.ok) {
+      Audit.log('invalid_code_attempt', { code: String(code || '').trim().slice(0, 10) + '...' });
+      return result;
     }
-
-    const used = Store.get('used_codes', {});
-    if (used[trimmed]) {
-      Audit.log('reused_code_attempt', { code: trimmed.slice(0, 10) + '...' });
-      return { ok: false, error: 'این کد قبلاً استفاده شده است' };
-    }
-
-    const shared = window.LangBlueCommerce.displayPlan(entry.planId);
-    const plan = shared ? { ...shared, features: 'دسترسی کامل به Grammar + Vocabulary' } : null;
-    if (!plan) return { ok: false, error: 'پلن نامعتبر است' };
-
-    return { ok: true, plan, code: trimmed };
+    const plan = { ...result.plan, features: 'دسترسی کامل به Grammar + Vocabulary' };
+    return { ...result, plan };
   },
-
   activate(code) {
     const lockedMin = RateLimit.isLocked('verify_code');
-    if (lockedMin > 0) {
-      return {
-        ok: false,
-        error: `به دلیل تلاش‌های ناموفق، ${lockedMin} دقیقه‌ی دیگه دوباره امتحان کن`,
-        locked: true, lockedMin
-      };
-    }
-
+    if (lockedMin > 0) return { ok:false, error:`به دلیل تلاش‌های ناموفق، ${lockedMin} دقیقه‌ی دیگه دوباره امتحان کن`, locked:true, lockedMin };
     const result = this.validateCode(code);
     if (!result.ok) {
       RateLimit.recordFailure('verify_code');
       Audit.log('verify_failed', { reason: result.error });
       return result;
     }
-
-    // کد رو به عنوان سوخته ثبت کن
-    Store.update('used_codes', (used = {}) => {
-      used[result.code] = { at: Date.now(), planId: result.plan.id };
-      return used;
-    }, {});
-
-    // محاسبه‌ی انقضا
-    const now = Date.now();
-    const existing = Store.get('subscription', null);
-    const base = (existing && existing.expiresAt > now) ? existing.expiresAt : now;
-    const expiresAt = base + result.plan.days * 24 * 60 * 60 * 1000;
-
-    Store.set('subscription', {
-      planId: result.plan.id,
-      planDays: result.plan.days,
-      currency: 'IRT',
-      startedAt: now,
-      expiresAt,
-      verifiedAt: now,
-      verifiedByCode: true
-    });
-
+    const activated = window.LangBlueCore.subscription.activate(result.code);
+    if (!activated.ok) return activated;
     RateLimit.reset('verify_code');
-    Audit.log('subscription_activated', { planId: result.plan.id, expiresAt });
-
-    return { ok: true, expiresAt, plan: result.plan };
+    Audit.log('subscription_activated', { planId: activated.plan.id, expiresAt: activated.expiresAt });
+    return activated;
   },
-
   current() {
-    const sub = Store.get('subscription', null);
-    if (!sub) return null;
-    if (Date.now() > sub.expiresAt) return { ...sub, expired: true };
-
-    // مهاجرت اشتراک‌های قدیمی: اگر کد قبلاً مصرف شده و planId آن با
-    // اشتراک فعلی یکی است، اشتراک را به‌عنوان وریفای‌شده تشخیص بده.
+    const sub = window.LangBlueCore.subscription.current();
+    if (!sub) {
+      const raw = window.LangBlueCore.storage.get('subscription', null);
+      if (raw) return { ...raw, expired: true };
+      return null;
+    }
     if (!sub.verifiedByCode || !sub.verifiedAt) {
-      const used = Store.get('used_codes', {});
-      const matched = Object.keys(used).some(code =>
-        used[code] && used[code].planId === sub.planId
-      );
+      const used = window.LangBlueCore.storage.get('used_codes', {});
+      const matched = Object.keys(used).some(code => used[code] && used[code].planId === sub.planId);
       if (matched) {
         sub.verifiedByCode = true;
         sub.verifiedAt = sub.verifiedAt || Date.now();
-        Store.set('subscription', sub);
+        window.LangBlueCore.storage.set('subscription', sub);
       }
     }
     return sub;
   },
-
-  isActive() {
-    const s = this.current();
-    return s && !s.expired;
-  },
-
+  isActive() { const s=this.current(); return s && !s.expired; },
   canAddGrammar(currentCount) {
     if (currentCount < FREE_LIMIT) return true;
     if (ForeignAccess.isForeign()) return ForeignAccess.isUnlocked();
     return this.isActive();
   },
-
   daysLeft() {
-    const s = this.current();
-    if (!s || s.expired) return 0;
-    return Math.ceil((s.expiresAt - Date.now()) / (24 * 60 * 60 * 1000));
+    const s=this.current(); if (!s || s.expired) return 0;
+    return Math.ceil((s.expiresAt-Date.now())/86400000);
   },
-
   needsRenewalWarning() {
-    const s = this.current();
-    if (!s || s.expired) return false;
-    const days = this.daysLeft();
-    return days <= 1 && days > 0;
+    const s=this.current(); if (!s || s.expired) return false;
+    const days=this.daysLeft(); return days<=1 && days>0;
   },
-
   shouldShowRenewalWarning() {
     if (!this.needsRenewalWarning()) return false;
-    const s = Store.get('subscription', null);
-    const lastWarned = s?.lastWarnedAt || 0;
-    return Date.now() - lastWarned > 6 * 60 * 60 * 1000;
+    const s=window.LangBlueCore.storage.get('subscription',null);
+    const lastWarned=s?.lastWarnedAt||0;
+    return Date.now()-lastWarned>6*60*60*1000;
   },
-
   markRenewalWarned() {
-    const s = Store.get('subscription', null);
-    if (s) { s.lastWarnedAt = Date.now(); Store.set('subscription', s); }
+    const s=window.LangBlueCore.storage.get('subscription',null);
+    if(s){s.lastWarnedAt=Date.now();window.LangBlueCore.storage.set('subscription',s);}
   }
 };
 
