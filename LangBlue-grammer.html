@@ -948,6 +948,20 @@ const Subscription = {
     const sub = Store.get('subscription', null);
     if (!sub) return null;
     if (Date.now() > sub.expiresAt) return { ...sub, expired: true };
+
+    // مهاجرت اشتراک‌های قدیمی: اگر کد قبلاً مصرف شده و planId آن با
+    // اشتراک فعلی یکی است، اشتراک را به‌عنوان وریفای‌شده تشخیص بده.
+    if (!sub.verifiedByCode || !sub.verifiedAt) {
+      const used = Store.get('used_codes', {});
+      const matched = Object.keys(used).some(code =>
+        used[code] && used[code].planId === sub.planId
+      );
+      if (matched) {
+        sub.verifiedByCode = true;
+        sub.verifiedAt = sub.verifiedAt || Date.now();
+        Store.set('subscription', sub);
+      }
+    }
     return sub;
   },
 
