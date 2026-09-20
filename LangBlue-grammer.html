@@ -2497,6 +2497,17 @@ window.__resetGeo = () => {
    INIT
    ============================================================ */
 checkAuth();
+
+// Keep Account + subscription state synchronized when Vocabulary and Grammar are
+// open in different tabs of the same browser.
+window.addEventListener('storage', (event) => {
+  if (event.key === 'lb:session' || event.key === 'lb:accounts' ||
+      (event.key && event.key.indexOf(':subscription') !== -1) ||
+      (event.key && event.key.indexOf(':used_codes') !== -1)) {
+    location.reload();
+  }
+});
+
 setTimeout(async()=>{try{await ForeignAccess.sync();renderSubscriptionBanner();renderPricing();renderProfile();}catch(e){console.warn("[LangBlue] Supabase sync skipped:",e);}},1200);
 </script>
 </body>
