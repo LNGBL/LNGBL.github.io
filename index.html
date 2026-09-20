@@ -111,6 +111,13 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 @media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.workflow{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.hero{padding-top:54px}.hero-lead{font-size:16px}.grid,.audience,.workflow{grid-template-columns:1fr}.brand-sub{display:none}.nav-link{font-size:12px}.hero:after{width:280px;height:280px}section{padding:42px 0}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+    .eyebrow-cloud{position:relative;display:inline-block;width:25px;height:14px;margin-left:8px;vertical-align:-2px;filter:drop-shadow(0 2px 7px rgba(22,138,173,.2));}
+    .eyebrow-cloud span{position:absolute;display:block;border-radius:50%;background:var(--blue3);}
+    .eyebrow-cloud span:nth-child(1){width:10px;height:10px;left:1px;bottom:1px;}
+    .eyebrow-cloud span:nth-child(2){width:14px;height:14px;left:7px;bottom:1px;}
+    .eyebrow-cloud span:nth-child(3){width:10px;height:10px;left:16px;bottom:1px;}
+    .eyebrow-cloud:after{content:"";position:absolute;left:2px;right:2px;bottom:0;height:7px;border-radius:7px;background:var(--blue3);}
+    .eyebrow-cloud,.eyebrow-cloud span,.eyebrow-cloud:after{animation:none!important;}
     .research{padding:78px 0}
     .section-lead{max-width:820px;margin:-8px auto 24px;text-align:center;color:var(--muted);line-height:1.9}
     .research-levels{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:24px auto 34px;max-width:900px}
@@ -148,7 +155,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   <main>
     <section class="hero">
       <div class="wrap">
-        <div class="eyebrow">Language Grammar Platform</div>
+        <div class="eyebrow"><span class="eyebrow-cloud" aria-hidden="true"><span></span><span></span><span></span></span>Language Grammar Platform</div>
 <div id="occasionBanner" class="occasion" aria-live="polite">
   <div class="occasion-title">LangBlue</div>
   <div class="occasion-note">در حال بررسی مناسبت امروز…</div>
@@ -294,7 +301,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 
     <section class="research">
       <div class="wrap">
-        <div class="eyebrow">ENGLISH LEARNING · RESEARCH &amp; REFERENCES</div>
+        <div class="eyebrow"><span class="eyebrow-cloud" aria-hidden="true"><span></span><span></span><span></span></span>ENGLISH LEARNING · RESEARCH &amp; REFERENCES</div>
         <h2 class="section-title">آخرین پژوهش‌ها و منابع معتبر یادگیری انگلیسی</h2>
         <p class="section-lead">
           LangBlue برای یادگیری گرامر انگلیسی در همه سطوح، از منابع آموزشی و پژوهشی معتبر استفاده می‌کند؛
