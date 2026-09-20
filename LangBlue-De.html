@@ -531,6 +531,20 @@ var Auth={
   login:function(u){LS.set(K.S,{userId:u.id,loginAt:Date.now()});},
   logout:function(){LS.del(K.S);},
   current:function(){
+    try{
+      var sharedSession=JSON.parse(localStorage.getItem('lb:session')||'null');
+      if(sharedSession&&sharedSession.userId){
+        var accounts=JSON.parse(localStorage.getItem('lb:accounts')||'{}');
+        var account=Object.values(accounts).find(function(x){return x.id===sharedSession.userId;});
+        if(account){
+          return {
+            id:account.id,name:account.name||account.fullName||'',email:account.email||'',
+            gender:account.gender||account.sex||'',age:account.age||'',
+            createdAt:account.createdAt||account.at
+          };
+        }
+      }
+    }catch(e){}
     var s=LS.get(K.S,null);if(!s)return null;
     return this.users().find(function(u){return u.id===s.userId;})||null;
   }
@@ -540,35 +554,93 @@ var Auth={
    License
    ============================================================ */
 var License={
+  CODES:{
+    "Verify_mU#2292":{planId:"irt_7d",days:7},
+    "Verify_m!!2992":{planId:"irt_14d",days:14},
+    "Verify_I@112":{planId:"irt_21d",days:21},
+    "Verify_MIR_ss1":{planId:"irt_3m",days:90},
+    "Verify_ll39332":{planId:"irt_6m",days:180},
+    "Verify_311012":{planId:"irt_12m",days:365}
+  },
+  _sharedSession:function(){
+    try{var s=JSON.parse(localStorage.getItem("lb:session")||"null");return s&&s.userId?s:null;}
+    catch(e){return null;}
+  },
+  _sharedKey:function(key){
+    var s=this._sharedSession();return s?"lb:user:"+s.userId+":"+key:null;
+  },
+  _sharedGet:function(key,fallback){
+    try{var k=this._sharedKey(key);if(!k)return fallback;var v=localStorage.getItem(k);return v===null?fallback:JSON.parse(v);}
+    catch(e){return fallback;}
+  },
+  _sharedSet:function(key,value){
+    var k=this._sharedKey(key);if(!k)return false;
+    try{localStorage.setItem(k,JSON.stringify(value));return true;}catch(e){return false;}
+  },
+  _hasSharedAccount:function(){
+    try{
+      var s=this._sharedSession();if(!s)return false;
+      var accounts=JSON.parse(localStorage.getItem("lb:accounts")||"{}");
+      return !!Object.values(accounts).find(function(x){return x.id===s.userId;});
+    }catch(e){return false;}
+  },
   load:function(){
+    if(this._hasSharedAccount()){
+      var sub=this._sharedGet("subscription",null);
+      if(sub&&sub.expiresAt&&Date.now()<sub.expiresAt)return {pro:true,subscription:sub};
+      return sub||{pro:false};
+    }
     var s=LS.get(K.S,null);if(!s)return {pro:false};
     var all=LS.get(K.L,{});
-    return all[s.userId]||{pro:false};
+    var legacy=all[s.userId]||{pro:false};
+    if(legacy.expiresAt&&Date.now()>=legacy.expiresAt)return {pro:false,expired:true};
+    return legacy;
   },
   save:function(d){
+    if(this._hasSharedAccount()){this._sharedSet("subscription",d);return;}
     var s=LS.get(K.S,null);if(!s)return;
-    var all=LS.get(K.L,{});
-    all[s.userId]=d;LS.set(K.L,all);
+    var all=LS.get(K.L,{});all[s.userId]=d;LS.set(K.L,all);
   },
   activate:function(code){
-    if(!_checkCode(code))return {ok:false,message:"کد نامعتبر است"};
+    var value=String(code||"").trim(),plan=this.CODES[value];
+    if(!plan)return {ok:false,message:"کد نامعتبر است"};
     var c=this.load();
-    if(c.pro)return {ok:false,message:"قبلاً فعال شده است"};
-    this.save({pro:true,code:String(code).trim(),activatedAt:Date.now()});
-    return {ok:true};
+    if(c.pro)return {ok:false,message:"اشتراک شما از قبل فعال است"};
+
+    if(this._hasSharedAccount()){
+      var used=this._sharedGet("used_codes",{});
+      if(used[value])return {ok:false,message:"این کد قبلاً استفاده شده است"};
+      var now=Date.now(),existing=this._sharedGet("subscription",null);
+      var base=(existing&&existing.expiresAt>now)?existing.expiresAt:now;
+      var expiresAt=base+plan.days*24*60*60*1000;
+      used[value]={at:now,planId:plan.planId};
+      this._sharedSet("used_codes",used);
+      this._sharedSet("subscription",{
+        planId:plan.planId,planDays:plan.days,currency:"IRT",
+        startedAt:now,expiresAt:expiresAt,verifiedAt:now,verifiedByCode:true
+      });
+      return {ok:true,expiresAt:expiresAt,plan:plan};
+    }
+
+    var now2=Date.now(),expires2=now2+plan.days*24*60*60*1000;
+    this.save({pro:true,code:value,planId:plan.planId,planDays:plan.days,activatedAt:now2,expiresAt:expires2});
+    return {ok:true,expiresAt:expires2,plan:plan};
   },
-  isPro:function(){return !!this.load().pro;}
+  isPro:function(){
+    var c=this.load();return !!(c.pro&&(!c.expiresAt||Date.now()<c.expiresAt));
+  }
 };
 
 /* ============================================================
    Plans
    ============================================================ */
 var PLANS={
-  "4d":  {label:"4 Days",   days:4,   price:10450,  priceStr:"10,450 T"},
-  "8d":  {label:"8 Days",   days:8,   price:15450,  priceStr:"15,450 T"},
-  "3m":  {label:"3 Months", days:90,  price:385540, priceStr:"385,540 T"},
-  "6m":  {label:"6 Months", days:180, price:466560, priceStr:"466,560 T"},
-  "12m": {label:"12 Months",days:365, price:499210, priceStr:"499,210 T"}
+  "irt_7d":  {label:"۷ روز",  days:7,   price:100999, priceStr:"100,999 T"},
+  "irt_14d": {label:"۱۴ روز", days:14,  price:263999, priceStr:"263,999 T"},
+  "irt_21d": {label:"۲۱ روز", days:21,  price:456999, priceStr:"456,999 T"},
+  "irt_3m":  {label:"۳ ماه",  days:90,  price:734999, priceStr:"734,999 T"},
+  "irt_6m":  {label:"۶ ماه",  days:180, price:830999, priceStr:"830,999 T"},
+  "irt_12m": {label:"۱۲ ماه", days:365, price:950999, priceStr:"950,999 T"}
 };
 
 /* ============================================================
