@@ -2142,7 +2142,9 @@ function renderForeignAccess(grid, intro, howToBox, verifyBox) {
 }
 
 const ForeignAccessUI = {
+  lastPlatform: '',
   async share(platform) {
+    this.lastPlatform = platform;
     const url = 'https://lngbl.github.io/';
     const text = 'LangBlue — پلتفرم ساخت و یادگیری گرامر زبان';
     let target = '';
@@ -2188,7 +2190,7 @@ const ForeignAccessUI = {
 
   async confirmShare(checked, platform='manual') {
     if (!checked) return;
-    const res=await ForeignAccess.markShare(platform);
+    const res=await ForeignAccess.markShare(this.lastPlatform || platform);
     if(!res.ok){const box=document.getElementById('shareConfirm');if(box)box.checked=false;toast(res.error,'error');return;}
     renderPricing(); renderSubscriptionBanner();
   },
@@ -2210,7 +2212,12 @@ function renderPricing() {
   const verifyBox = document.getElementById('verifyBox');
   if (!grid || !intro || !howToBox || !verifyBox) return;
 
-  if (geo.isIran === true) {
+  if (geo.unknown === true) {
+    intro.innerHTML = '<p style="color:var(--warn);line-height:1.9;">تشخیص کشور در حال حاضر در دسترس نیست. لطفاً اتصال اینترنت را بررسی و صفحه را دوباره بارگذاری کن.</p>';
+    grid.innerHTML = '';
+    howToBox.innerHTML = '<strong>⚠️ دسترسی موقتاً متوقف است</strong><div style="margin-top:8px;color:var(--muted);">تا زمانی که کشور IP تشخیص داده نشود، قوانین پرداخت یا دسترسی اجتماعی اعمال نمی‌شود.</div>';
+    verifyBox.classList.add('hidden');
+  } else if (geo.isIran === true) {
     renderPricingIRT(grid, intro, howToBox, verifyBox, geo);
   } else {
     renderForeignAccess(grid, intro, howToBox, verifyBox);
