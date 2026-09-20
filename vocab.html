@@ -39,6 +39,9 @@
             --review-alert: #ff6b6b;
             --phrasal-color: #9b59b6;
             --sentence-color: #1abc9c;
+            --user-bg: #eef5ff;
+            --focus-ring: 0 0 0 4px rgba(26, 79, 139, 0.12);
+            --glass: rgba(255,255,255,0.72);
         }
         [data-theme="dark"] {
             --bg-primary: #0f1724;
@@ -52,6 +55,8 @@
             --table-border: #2a3a52;
             --grammar-bg: #1a1a2a;
             --review-alert: #ff4757;
+            --user-bg: #202d40;
+            --glass: rgba(26,35,50,0.78);
         }
         body {
             background: var(--bg-primary);
@@ -69,6 +74,87 @@
             box-shadow: var(--shadow);
             padding: 2rem;
             transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        /* ===== UX POLISH / ACCESSIBILITY ===== */
+        html { scroll-behavior: smooth; }
+        ::selection { background: rgba(31,107,192,.18); color: var(--text-primary); }
+        button, input, select { font-family: inherit; }
+        button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+        .container {
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
+        }
+        h1 {
+            position: relative;
+            background: linear-gradient(135deg, var(--bg-card), var(--table-header));
+            border: 1px solid var(--border-color);
+            border-radius: 1.6rem;
+            padding: 1rem 1.2rem;
+            box-shadow: 0 10px 30px rgba(0,20,50,.05);
+        }
+        h1 small { color: var(--text-secondary); font-size: .95rem; }
+        .main-tabs {
+            position: sticky;
+            top: .7rem;
+            z-index: 20;
+            padding: .65rem;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 1.2rem;
+            box-shadow: 0 10px 25px rgba(0,20,50,.06);
+        }
+        .main-tab {
+            min-height: 42px;
+            border-radius: 14px;
+        }
+        .main-tab.active {
+            box-shadow: 0 7px 18px rgba(26,79,139,.18);
+        }
+        .input-panel, .search-section, .srs-section {
+            box-shadow: 0 10px 25px rgba(0,20,50,.04);
+        }
+        .field input:hover, .field select:hover, .search-section input:hover {
+            border-color: #9eb6d4;
+        }
+        .btn:hover, .theme-toggle:hover, .user-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0,20,50,.08);
+        }
+        .btn { background: var(--bg-card); }
+        .quick-guide {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0,1fr));
+            gap: .75rem;
+            margin: 0 0 1.2rem;
+        }
+        .quick-guide-card {
+            padding: .85rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 1.25rem;
+            background: linear-gradient(135deg, var(--bg-card), var(--table-header));
+            color: var(--text-secondary);
+            font-size: .82rem;
+        }
+        .quick-guide-card strong {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: .25rem;
+            font-size: .9rem;
+        }
+        @media (max-width: 760px) {
+            body { padding: .65rem; }
+            .container { padding: .8rem; border-radius: 1.5rem; }
+            h1 { font-size: 1.55rem; padding: .8rem; border-radius: 1.2rem; }
+            .main-tabs { top: .35rem; overflow-x: auto; flex-wrap: nowrap; }
+            .main-tab { white-space: nowrap; padding: .5rem .9rem; }
+            .quick-guide { grid-template-columns: 1fr; }
+            .search-section { padding: .75rem; }
+            .input-panel { padding: 1rem; }
         }
 
         /* ===== HEADER ===== */
@@ -780,20 +866,6 @@
             <div class="lock-local-time" id="lockLocalTime" style="font-size:0.8rem;opacity:0.6;">منطقه زمانی: — · ساعت دستگاه: —</div>
         </div>
     </div>
-
-    <!-- ===== ADMIN MODAL ===== -->
-    <div class="modal-overlay" id="adminModal">
-        <div class="modal">
-            <h3>🔐 ورود ادمین</h3>
-            <p>رمز عبور را وارد کنید.</p>
-            <input type="password" id="adminPassword" placeholder="رمز عبور ادمین" style="width:100%;padding:0.7rem 1rem;border-radius:40px;border:2px solid var(--border-color);font-size:1rem;text-align:center;background:var(--input-bg);color:var(--text-primary);margin-bottom:1rem;">
-            <div class="modal-actions">
-                <button class="btn btn-outline" id="adminCancelBtn">لغو</button>
-                <button class="btn btn-primary" id="adminConfirmBtn">تایید</button>
-            </div>
-        </div>
-    </div>
-
     <!-- ===== USER MODAL ===== -->
     <div class="modal-overlay" id="userModal">
         <div class="modal">
@@ -976,7 +1048,6 @@
             <span class="review-alert" id="reviewAlert" style="display:none;">🔔 کلمات فراموش شده!</span>
             <button class="theme-toggle" id="themeToggle">🌙 دارک</button>
             <button class="user-btn" id="userBtn">👤 <span id="userBtnText">حساب کاربری</span><span class="user-badge" id="userBadge">?</span></button>
-            <button class="btn btn-outline btn-sm" id="adminTriggerBtn">🔐 ادمین</button>
         </h1>
 
         <!-- MAIN TABS -->
@@ -989,6 +1060,12 @@
             <button class="main-tab" data-tab="phrasal">🔗 فریزال ورب <span class="tab-badge" id="phrasalBadge">0</span></button>
             <button class="main-tab" data-tab="sentences">📝 جملات <span class="tab-badge" id="sentencesBadge">0</span></button>
             <button class="main-tab" data-tab="grammar">📖 گرامر <span class="tab-badge" id="grammarBadge">0</span></button>
+        </div>
+
+        <div class="quick-guide" aria-label="راهنمای سریع">
+            <div class="quick-guide-card"><strong>📚 واژه اضافه کن</strong>واژه، ترجمه و نوع کلمه را وارد کن؛ بقیه اطلاعات را بعداً هم می‌توانی تکمیل کنی.</div>
+            <div class="quick-guide-card"><strong>🔎 سریع پیدا کن</strong>از جست‌وجو و تب‌های بالا برای رسیدن سریع به واژه، فریزال ورب، جمله یا گرامر استفاده کن.</div>
+            <div class="quick-guide-card"><strong>🧠 مرور هوشمند</strong>مرورهای پیشنهادی را انجام بده تا سیستم تکرار فاصله‌دار وضعیت یادگیری را به‌روز کند.</div>
         </div>
 
         <!-- ===== TAB: WORDS ===== -->
@@ -1210,7 +1287,6 @@
                 WEAKNESS: 'LangBlue_weakness_tracker'
             };
 
-            const ADMIN_PASSWORD = 'admin123';
             const FORGOTTEN_DAYS = 2;
             const DETAIL_THRESHOLD = 50;
             const FLASHCARD_TIME = 10;
@@ -3180,40 +3256,6 @@
                         await Auth.logout();document.getElementById('userModal').classList.remove('active');Core.load();self.renderAll();self.showToast('🚪 از حساب خارج شدید. داده‌های حساب قبلی باقی ماند.','info');
                     });
 
-                    // Admin
-                    document.getElementById('adminTriggerBtn').addEventListener('click', function() {
-                        if (Core.isLockedNow()) {
-                            self.showToast('🔒 سیستم قفل است!', 'error');
-                            return;
-                        }
-                        document.getElementById('adminModal').classList.add('active');
-                        document.getElementById('adminPassword').value = '';
-                        document.getElementById('adminPassword').focus();
-                    });
-                    document.getElementById('adminConfirmBtn').addEventListener('click', function() {
-                        var pass = document.getElementById('adminPassword').value;
-                        if (pass === ADMIN_PASSWORD) {
-                            document.getElementById('adminModal').classList.remove('active');
-                            self.showToast('✅ دسترسی ادمین تایید شد!', 'success');
-                        } else {
-                            if (!window._adminAttempts) window._adminAttempts = 0;
-                            window._adminAttempts++;
-                            if (window._adminAttempts >= 3) {
-                                Core.lockSystem();
-                                document.getElementById('adminModal').classList.remove('active');
-                                self.showToast('❌ سه بار اشتباه! سیستم قفل شد.', 'error');
-                                self.showLock();
-                            } else {
-                                self.showToast('❌ رمز اشتباه! (' + window._adminAttempts + '/3)', 'error');
-                                document.getElementById('adminPassword').value = '';
-                                document.getElementById('adminPassword').focus();
-                            }
-                        }
-                    });
-                    document.getElementById('adminCancelBtn').addEventListener('click', function() {
-                        document.getElementById('adminModal').classList.remove('active');
-                    });
-
                     // Backup
                     document.getElementById('backupNowBtn').addEventListener('click', function() {
                         try {
@@ -3348,7 +3390,7 @@
                     // Keyboard shortcuts
                     document.addEventListener('keydown', function(e) {
                         if (e.key === 'Escape') {
-                            var modals = ['flashcardModal', 'weaknessModal', 'editModal', 'userModal', 'adminModal'];
+                            var modals = ['flashcardModal', 'weaknessModal', 'editModal', 'userModal'];
                             for (var i = 0; i < modals.length; i++) {
                                 var el = document.getElementById(modals[i]);
                                 if (el && el.classList.contains('active')) {
@@ -3408,7 +3450,6 @@
                 await Auth.init();
                 Core.load();
                 Security.apply();
-                if(Core.isLockedNow()) UI.showLock();
                 UI.renderAll();
                 UI.bindEvents();
                 if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
