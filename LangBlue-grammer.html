@@ -1829,7 +1829,7 @@ function renderSubscriptionBanner() {
               : count + ' از ' + FREE_LIMIT + ' گرامر رایگان استفاده شده — برای ادامه، دو مرحله دسترسی خارجی را تکمیل کن.'}
           </div>
         </div>
-        <button class="ghost small" onclick="document.querySelector('.tab[data-tab=\\'pricing\\']').click()">
+        <button class="ghost small" onclick="document.querySelector('.tab[data-tab="pricing"]').click()">
           ${unlocked ? 'وضعیت دسترسی' : 'تکمیل دو مرحله'}
         </button>
       </div>`;
@@ -1845,7 +1845,7 @@ function renderSubscriptionBanner() {
           <strong>✅ اشتراک فعال (تومان)</strong>
           <div style="font-size:12px;opacity:.9;margin-top:4px;">${days} روز باقی‌مونده — تا ${formatDate(sub.expiresAt)}</div>
         </div>
-        <button class="ghost small" onclick="document.querySelector('.tab[data-tab=\\'pricing\\']').click()">تمدید</button>
+        <button class="ghost small" onclick="document.querySelector('.tab[data-tab="pricing"]').click()">تمدید</button>
       </div>`;
   } else if (count >= FREE_LIMIT) {
     banner.innerHTML = `
@@ -1855,7 +1855,7 @@ function renderSubscriptionBanner() {
           <div style="font-size:12px;opacity:.9;margin-top:4px;">برای افزودن بیشتر، اشتراک تومانی تهیه کن</div>
         </div>
         <button class="ghost small" style="background:white;color:#c0392b;"
-                onclick="document.querySelector('.tab[data-tab=\\'pricing\\']').click()">💳 تهیه اشتراک</button>
+                onclick="document.querySelector('.tab[data-tab="pricing"]').click()">💳 تهیه اشتراک</button>
       </div>`;
   } else {
     banner.innerHTML = `
