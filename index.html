@@ -804,7 +804,8 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     var discount=p.discount?p.discount+'٪ تخفیف جشنواره‌ای':''; 
     box.innerHTML='<div class="receipt-summary-row"><span>تعداد محصولات</span><strong>'+ids.length+'</strong></div>'+
       '<div class="receipt-summary-row"><span>قیمت پایه هر محصول</span><strong>'+money(p.finalPrice)+'</strong></div>'+
-      (discount?'<div class="receipt-summary-row"><span>تخفیف</span><strong>'+discount+'</strong></div>':'')+
+      (discount?'<div class="receipt-summary-row"><span>تخفیف جشنواره</span><strong>'+discount+'</strong></div>':'')+
+      (bundleDiscount?'<div class="receipt-summary-row"><span>تخفیف بسته کامل ۱۲ ماهه</span><strong>'+bundleDiscount+'٪</strong></div>':'')+
       '<div class="receipt-summary-row receipt-summary-total"><span>مبلغ نهایی</span><strong>'+money(total)+'</strong></div>';
   }
   function build(){
@@ -816,8 +817,10 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
       order.products.map(function(p){return '<div class="receipt-line"><span>'+p.icon+' '+p.label+'</span><strong>'+money(order.plan.finalPrice)+'</strong></div>';}).join('')+
       '<div class="receipt-line"><span>پلن</span><strong>'+order.plan.label+'</strong></div>'+
       (order.plan.festival?'<div class="receipt-line"><span>تخفیف '+order.plan.festival.title+'</span><strong>'+order.plan.discount+'٪</strong></div>':'')+
+      (order.bundleDiscount?'<div class="receipt-line"><span>تخفیف بسته کامل ۱۲ ماهه</span><strong>'+order.bundleDiscount+'٪</strong></div>':'')+
+      (order.verificationCode?'<div class="receipt-line"><span>کد وریفای بسته</span><strong>'+order.verificationCode+'</strong></div>':'')+
       '<div class="receipt-total"><span>مبلغ نهایی</span><span>'+order.totalStr+'</span></div>'+
-      '<div class="receipt-note">این فیش سفارش بر اساس انتخاب فعلی شما ساخته شده است. یک محصول یا چند محصول را می‌توان انتخاب کرد؛ قیمت و تخفیف از سیستم مرکزی LangBlueCommerce محاسبه می‌شود.</div>';
+      '<div class="receipt-note">این فیش سفارش بر اساس انتخاب فعلی شما ساخته شده است. یک محصول یا چند محصول را می‌توان انتخاب کرد؛ برای بسته کامل ۱۲ ماهه، هر سه محصول با ۱۵٪ تخفیف بسته‌ای محاسبه می‌شوند و کد وریفای بر پایه اشتراک ۱۲ ماهه است. قیمت و تخفیف از سیستم مرکزی LangBlueCommerce محاسبه می‌شود.</div>';
     out.classList.add('show');
     document.getElementById('printReceipt').style.display='inline-flex';
     out.scrollIntoView({behavior:'smooth',block:'nearest'});
