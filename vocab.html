@@ -1567,7 +1567,7 @@
         <div class="footer-actions" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:1.8rem;gap:0.5rem;">
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
                 <button class="btn btn-primary btn-sm" id="openFlashcardBtn">📇 فلش‌کارت</button>
-                <button class="btn btn-outline btn-sm" id="openWeaknessBtn">🎯 نقاط ضعف</button>
+                <button class="btn btn-outline btn-sm" id="openWeaknessBtn">🔒 بررسی نقاط ضعف</button>
                 <button class="btn btn-outline btn-sm" id="clearAllBtn">🗑️ پاک کردن</button>
             </div>
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
@@ -1575,7 +1575,7 @@
                 <button class="btn btn-outline btn-sm" id="exportJsonBtn">📤 JSON</button>
                 <button class="btn btn-outline btn-sm" id="exportCsvBtn">📊 CSV</button>
                 <button class="btn btn-outline btn-sm" id="importBtn">📥 بازیابی JSON</button>
-                <button class="btn btn-outline btn-sm" id="downloadPdfBtn">📄 PDF</button>
+                <button class="btn btn-outline btn-sm" id="downloadPdfBtn">🔒 PDF</button>
             </div>
         </div>
 
@@ -2946,6 +2946,12 @@
                     return s&&s.expiresAt>Date.now()?s:null;
                 },
                 isActive:function(){return !!this.current();},
+                refreshButtons:function(){
+                    var active=this.isActive();
+                    var weak=document.getElementById('openWeaknessBtn'), pdf=document.getElementById('downloadPdfBtn');
+                    if(weak) weak.textContent=active?'🎯 بررسی نقاط ضعف':'🔒 بررسی نقاط ضعف';
+                    if(pdf) pdf.textContent=active?'📄 PDF':'🔒 PDF';
+                },
                 open:function(pending){
                     this.pending=pending||null;
                     var modal=document.getElementById('paidAccessModal');
@@ -3033,6 +3039,7 @@
                     this.renderPractice();
                     this.renderUser();
                     this.renderTheme();
+                    if (typeof PaidAccess !== 'undefined') PaidAccess.refreshButtons();
                     this.updateBadges();
                     this.checkForgottenAlert();
                     this.updateDetailButtons();
