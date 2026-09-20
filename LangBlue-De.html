@@ -1413,8 +1413,10 @@ function _showInvoice(planKey){
   var tracking=Invoice.generate(planKey,u.id);
   var now=new Date();
   var dateStr=now.toLocaleDateString("fa-IR")+" — "+now.toLocaleTimeString("fa-IR");
+  var shownPlan=LangBlueCommerce.displayPlan(planKey);
+  var shownPrice=shownPlan&&shownPlan.discount?shownPlan.finalPriceStr:plan.priceStr;
   var inv={tracking:tracking,planKey:planKey,planLabel:plan.label,
-           price:plan.priceStr,user:u.name,email:u.email,createdAt:now.getTime()};
+           price:shownPrice,user:u.name,email:u.email,createdAt:now.getTime(),discount:shownPlan?shownPlan.discount:0};
   Invoice.save(inv);
   _state.currentInvoice=inv;
   E.invUser.textContent=u.name;
