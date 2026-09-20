@@ -110,6 +110,20 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 @media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.workflow{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.hero{padding-top:54px}.hero-lead{font-size:16px}.grid,.audience,.workflow{grid-template-columns:1fr}.brand-sub{display:none}.nav-link{font-size:12px}.hero:after{width:280px;height:280px}section{padding:42px 0}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+    .research{padding:78px 0}
+    .section-lead{max-width:820px;margin:-8px auto 24px;text-align:center;color:var(--muted);line-height:1.9}
+    .research-levels{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:24px auto 34px;max-width:900px}
+    .research-levels span{padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(34,158,217,.08);color:#dff4ff;font-size:12px}
+    .research-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+    .research-card{display:flex;flex-direction:column;min-height:250px}
+    .research-source{font-size:11px;letter-spacing:.04em;color:var(--blue3);font-weight:700;margin-bottom:10px}
+    .research-card h3{margin:0 0 10px}
+    .research-card p{color:var(--muted);line-height:1.85;font-size:14px;margin:0 0 18px}
+    .research-card a{margin-top:auto;color:#dff4ff;text-decoration:none;font-weight:700;font-size:13px}
+    .research-card a:hover{text-decoration:underline}
+    .research-note{margin:22px auto 0;max-width:900px;padding:15px 18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035);color:var(--muted);font-size:12px;line-height:1.9}
+    @media (max-width:900px){.research-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:620px){.research{padding:58px 0}.research-grid{grid-template-columns:1fr}.research-levels{justify-content:flex-start}}
 </style>
 </head>
 
@@ -291,7 +305,96 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
       </div>
     </section>
 
-    <section class="cta">
+        <section class="research">
+      <div class="wrap">
+        <div class="eyebrow">ENGLISH LEARNING · RESEARCH &amp; REFERENCES</div>
+        <h2 class="section-title">آخرین پژوهش‌ها و منابع معتبر یادگیری انگلیسی</h2>
+        <p class="section-lead">
+          LangBlue برای یادگیری گرامر انگلیسی در همه سطوح، از منابع آموزشی و پژوهشی معتبر استفاده می‌کند؛
+          از مباحث پایه A1 تا مباحث پیشرفته C1/C2، همراه با گرامر، واژگان، نوشتار و کاربرد واقعی زبان.
+        </p>
+
+        <div class="research-levels" aria-label="سطوح زبان">
+          <span>A1 · مقدماتی</span>
+          <span>A2 · پایه</span>
+          <span>B1 · متوسط</span>
+          <span>B2 · متوسط رو به بالا</span>
+          <span>C1 · پیشرفته</span>
+          <span>C2 · تسلط بالا</span>
+        </div>
+
+        <div class="research-grid">
+          <article class="card research-card">
+            <div class="research-source">Cambridge University Press</div>
+            <h3>پژوهش‌های نوین آموزش زبان</h3>
+            <p>
+              پژوهش‌های جدید کمبریج در یادگیری زبان دوم، نوشتار، بازخورد، واژگان و روش‌های
+              نوین آموزش؛ برای تبدیل یافته‌های پژوهشی به یادگیری عملی.
+            </p>
+            <a href="https://www.cambridge.org/core/journals/language-teaching/firstview" target="_blank" rel="noopener">مشاهده مقالات جدید ←</a>
+          </article>
+
+          <article class="card research-card">
+            <div class="research-source">Oxford Learner’s Dictionaries</div>
+            <h3>Grammar در سطح‌های مختلف</h3>
+            <p>
+              توضیح‌های روشن گرامری و تمرین‌های تعاملی که با CEFR هماهنگ شده‌اند؛
+              از مباحث A1 تا موضوعات پیشرفته‌تر، همراه با Practical English Usage.
+            </p>
+            <a href="https://www.oxfordlearnersdictionaries.com/grammar/online-grammar/" target="_blank" rel="noopener">یادگیری و تمرین گرامر ←</a>
+          </article>
+
+          <article class="card research-card">
+            <div class="research-source">Harvard University</div>
+            <h3>Grammar، نوشتار و کاربرد دانشگاهی</h3>
+            <p>
+              منابع هاروارد برای تقویت ساختار جمله، گرامر، انتخاب واژه و نوشتار روشن و دقیق؛
+              به‌ویژه برای زبان‌آموزانی که می‌خواهند از انگلیسی عمومی به نوشتار دانشگاهی برسند.
+            </p>
+            <a href="https://writingcenter.fas.harvard.edu/pages/egl-tutor" target="_blank" rel="noopener">منابع Grammar &amp; Language ←</a>
+          </article>
+
+          <article class="card research-card">
+            <div class="research-source">Longman · Pearson</div>
+            <h3>انگلیسی طبیعی و کاربردی</h3>
+            <p>
+              دیکشنری‌ها و منابع Longman با مثال‌های واقعی، پشتیبانی گرامری، الگوهای کاربردی
+              و collocation برای کمک به استفاده دقیق‌تر و طبیعی‌تر از انگلیسی.
+            </p>
+            <a href="https://www.pearson.com/languages/educators/connected-english-learning-program/longman-english-dictionaries.html" target="_blank" rel="noopener">منابع Longman ←</a>
+          </article>
+
+          <article class="card research-card">
+            <div class="research-source">Merriam-Webster</div>
+            <h3>Grammar و Usage</h3>
+            <p>
+              توضیح اصطلاحات و کاربردهای گرامری، نکات مربوط به ساختار جمله و تفاوت‌های
+              کاربردی در زبان انگلیسی؛ مناسب برای رفع ابهام‌های رایج.
+            </p>
+            <a href="https://www.merriam-webster.com/grammar" target="_blank" rel="noopener">Grammar &amp; Usage ←</a>
+          </article>
+
+          <article class="card research-card">
+            <div class="research-source">Oxford · Cambridge · Harvard · Longman · Merriam-Webster</div>
+            <h3>از A1 تا C2</h3>
+            <p>
+              LangBlue می‌تواند این منابع را به ساختار قابل‌مدیریت تبدیل کند:
+              قاعده، توضیح، مثال، یادداشت، فلش‌کارت و تمرین؛ تا یادگیری گرامر فقط خواندن یک مقاله نباشد،
+              بلکه به مرور و تمرین تبدیل شود.
+            </p>
+          </article>
+        </div>
+
+        <div class="research-note">
+          <strong>یادداشت منابع:</strong>
+          این بخش به منابع عمومی و پژوهشی معتبر لینک می‌دهد و ادعا نمی‌کند که LangBlue وابسته،
+          تأییدشده یا شریک رسمی Cambridge، Oxford، Harvard، Longman یا Merriam-Webster است.
+          محتوای هر منبع توسط ناشر یا دانشگاه مربوطه منتشر و به‌روزرسانی می‌شود.
+        </div>
+      </div>
+    </section>
+
+<section class="cta">
       <div class="wrap">
         <h2>می‌خواهی LangBlue را امتحان کنی؟</h2>
         <p>
