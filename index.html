@@ -33,305 +33,92 @@
   </script>
 
   <style>
-    :root {
-      --bg: #0a0e1a;
-      --panel: #121829;
-      --panel-2: #1a2238;
-      --border: #2a3550;
-      --text: #e6ecff;
-      --muted: #aab4d0;
-      --accent: #4a9eff;
-      --accent-2: #6c5ce7;
-      --success: #00d68f;
-    }
-
-    * { box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at top right, rgba(74,158,255,.13), transparent 34%),
-        radial-gradient(circle at bottom left, rgba(108,92,231,.10), transparent 30%),
-        var(--bg);
-      color: var(--text);
-      font-family: "Segoe UI", Tahoma, system-ui, sans-serif;
-      line-height: 1.9;
-    }
-
-    a { color: inherit; }
-
-    .wrap {
-      width: min(1120px, calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    header {
-      padding: 22px 0;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .brand {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    .brand span {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 500;
-      margin-right: 8px;
-    }
-
-    .nav-link {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 14px;
-    }
-
-    .nav-link:hover { color: var(--text); }
-
-    .hero {
-      padding: 78px 0 64px;
-      text-align: center;
-    }
-
-    .eyebrow {
-      display: inline-block;
-      padding: 5px 13px;
-      border: 1px solid rgba(74,158,255,.28);
-      border-radius: 999px;
-      color: var(--accent);
-      background: rgba(74,158,255,.07);
-      font-size: 13px;
-      margin-bottom: 18px;
-    }
-
-    h1 {
-      max-width: 900px;
-      margin: 0 auto 18px;
-      font-size: clamp(34px, 6vw, 58px);
-      line-height: 1.25;
-      letter-spacing: -.5px;
-    }
-
-    .hero h1 strong { color: var(--accent); }
-
-    .hero-lead {
-      max-width: 820px;
-      margin: 0 auto;
-      color: var(--muted);
-      font-size: 18px;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 28px;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 12px 24px;
-      border-radius: 9px;
-      text-decoration: none;
-      font-weight: 700;
-      border: 1px solid var(--border);
-      transition: transform .15s, border-color .15s;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      border-color: var(--accent);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      border-color: transparent;
-      color: white;
-    }
-
-    .btn-secondary {
-      background: var(--panel);
-      color: var(--text);
-    }
-
-    section { padding: 54px 0; }
-
-    .section-title {
-      text-align: center;
-      margin: 0 0 12px;
-      font-size: 30px;
-    }
-
-    .section-lead {
-      max-width: 760px;
-      margin: 0 auto 28px;
-      text-align: center;
-      color: var(--muted);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .card {
-      background: rgba(18,24,41,.86);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px;
-    }
-
-    .card-icon {
-      font-size: 30px;
-      margin-bottom: 8px;
-    }
-
-    .card h3 {
-      margin: 0 0 8px;
-      font-size: 18px;
-      color: var(--accent);
-    }
-
-    .card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .workflow {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      margin-top: 30px;
-    }
-
-    .step {
-      position: relative;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px 14px;
-      text-align: center;
-    }
-
-    .step-number {
-      display: inline-flex;
-      width: 32px;
-      height: 32px;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: var(--panel-2);
-      color: var(--accent);
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-
-    .step strong {
-      display: block;
-      font-size: 14px;
-    }
-
-    .step small {
-      display: block;
-      color: var(--muted);
-      margin-top: 4px;
-      font-size: 11px;
-    }
-
-    .audience {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .audience ul {
-      margin: 0;
-      padding-right: 22px;
-      color: var(--muted);
-    }
-
-    .audience li { margin: 7px 0; }
-
-    .about-box {
-      max-width: 900px;
-      margin: 0 auto;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 26px;
-    }
-
-    .about-box p {
-      margin: 0 0 14px;
-      color: var(--muted);
-    }
-
-    .about-box p:last-child { margin-bottom: 0; }
-
-    .cta {
-      margin: 24px auto 70px;
-      max-width: 900px;
-      text-align: center;
-      padding: 42px 24px;
-      border: 1px solid rgba(74,158,255,.25);
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(74,158,255,.09), rgba(108,92,231,.09));
-    }
-
-    .cta h2 { margin: 0 0 10px; }
-
-    .cta p {
-      color: var(--muted);
-      margin: 0 auto 22px;
-      max-width: 650px;
-    }
-
-    footer {
-      border-top: 1px solid rgba(255,255,255,.06);
-      padding: 24px 0 34px;
-      color: var(--muted);
-      font-size: 12px;
-      text-align: center;
-    }
-
-    @media (max-width: 850px) {
-      .grid { grid-template-columns: repeat(2, 1fr); }
-      .workflow { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 600px) {
-      .hero { padding-top: 54px; }
-      .hero-lead { font-size: 16px; }
-      .grid, .audience, .workflow { grid-template-columns: 1fr; }
-      .nav-link { display: none; }
-      section { padding: 42px 0; }
-    }
-  </style>
+:root{
+  --blue:#229ed9;--blue2:#1688d4;--blue3:#5bc0ff;--deep:#071521;
+  --text:#f7fbff;--muted:#b8c9d8;--line:rgba(255,255,255,.12);
+  --glass:rgba(8,24,38,.58);--shadow:0 24px 80px rgba(0,0,0,.28)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;color:var(--text);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 50% 10%,rgba(91,192,255,.25),transparent 30%),
+    radial-gradient(circle at 10% 80%,rgba(34,158,217,.20),transparent 28%),
+    linear-gradient(145deg,#06121e 0%,#0b2740 45%,#071827 100%);
+  line-height:1.9;overflow-x:hidden;transition:background .6s ease
+}
+body:before{content:"";position:fixed;inset:-30%;pointer-events:none;opacity:.22;background:linear-gradient(115deg,transparent 40%,rgba(91,192,255,.12) 50%,transparent 60%);animation:ambient 12s linear infinite}
+a{color:inherit}
+.wrap{width:min(1120px,calc(100% - 32px));margin:0 auto}
+header{padding:22px 0;border-bottom:1px solid var(--line);position:relative;z-index:5;background:rgba(5,17,28,.34);backdrop-filter:blur(16px)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:inline-flex;align-items:center;gap:10px;font-size:25px;font-weight:850;text-decoration:none;letter-spacing:-.5px;position:relative}
+.brand-mark{width:32px;height:24px;border-radius:9px;background:linear-gradient(135deg,#fff,#8dd8ff);display:inline-flex;align-items:center;justify-content:center;color:#1688d4;font-size:14px;box-shadow:0 0 22px rgba(91,192,255,.65);animation:markPulse 2.8s ease-in-out infinite}
+.logo-word{display:inline-flex;overflow:hidden}
+.logo-letter{display:inline-block;opacity:0;transform:translateY(18px) scale(.82);animation:logoIn .55s cubic-bezier(.2,.8,.2,1) forwards}
+.brand-sub{color:#b9d8eb;font-size:11px;font-weight:500;margin-right:4px}
+.nav-link{color:#d8edf9;text-decoration:none;font-size:14px;padding:8px 14px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.05);transition:.2s}
+.nav-link:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}
+.hero{padding:72px 0 76px;text-align:center;position:relative}
+.hero:after{content:"";position:absolute;width:420px;height:420px;border:1px solid rgba(91,192,255,.12);border-radius:50%;left:50%;top:80px;transform:translateX(-50%);box-shadow:0 0 80px rgba(34,158,217,.12);pointer-events:none}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border:1px solid rgba(91,192,255,.30);border-radius:999px;color:#bdeaff;background:rgba(34,158,217,.10);font-size:12px;margin-bottom:18px;backdrop-filter:blur(12px)}
+.eyebrow:before{content:"";width:6px;height:6px;border-radius:50%;background:#5bc0ff;box-shadow:0 0 12px #5bc0ff;animation:blink 1.5s infinite}
+h1{max-width:900px;margin:0 auto 18px;font-size:clamp(36px,7vw,72px);line-height:1.18;letter-spacing:-2px;position:relative;z-index:1}
+.hero h1 strong{background:linear-gradient(90deg,#fff,#73d0ff,#fff);background-size:220% auto;color:transparent;background-clip:text;-webkit-background-clip:text;animation:shine 4s linear infinite}
+.hero-lead{max-width:760px;margin:0 auto;color:var(--muted);font-size:17px;position:relative;z-index:1}
+.actions{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:28px;position:relative;z-index:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 23px;border-radius:12px;text-decoration:none;font-weight:750;border:1px solid var(--line);transition:transform .2s,box-shadow .2s,background .2s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.18)}
+.btn-primary{background:linear-gradient(135deg,#229ed9,#1688d4);border-color:rgba(255,255,255,.18);color:#fff;box-shadow:0 10px 35px rgba(34,158,217,.28)}
+.btn-secondary{background:rgba(255,255,255,.06);color:var(--text);backdrop-filter:blur(12px)}
+.occasion{max-width:760px;margin:28px auto 0;min-height:88px;padding:16px 20px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(4,17,29,.52);backdrop-filter:blur(18px);box-shadow:var(--shadow);position:relative;z-index:2;overflow:hidden}
+.occasion:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);transform:translateX(-100%);animation:eventSweep 4s ease-in-out infinite}
+.occasion-title{font-size:20px;font-weight:800;color:#fff}
+.occasion-title a{text-decoration:none}
+.occasion-title a:hover{text-decoration:underline}
+.occasion-note{font-size:12px;color:#c6d8e6;margin-top:2px}
+.occasion-discount{display:inline-flex;margin-top:8px;padding:3px 10px;border-radius:999px;background:rgba(34,158,217,.18);border:1px solid rgba(91,192,255,.28);color:#8edaff;font-weight:800;font-size:12px}
+.type-cursor{display:inline-block;width:2px;height:1em;background:#72d2ff;margin-right:3px;vertical-align:-2px;animation:cursor .75s steps(1) infinite}
+section{padding:54px 0}
+.section-title{text-align:center;margin:0 0 12px;font-size:30px}
+.section-lead{max-width:760px;margin:0 auto 28px;text-align:center;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 35px rgba(0,0,0,.12);backdrop-filter:blur(14px);transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-4px);border-color:rgba(91,192,255,.32)}
+.card-icon{font-size:28px;margin-bottom:8px}.card h3{margin:0 0 8px;font-size:18px;color:#75d1ff}.card p{margin:0;color:var(--muted);font-size:14px}
+.workflow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:30px}.step{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:18px 14px;text-align:center;backdrop-filter:blur(12px)}
+.step-number{display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:rgba(34,158,217,.15);color:#79d5ff;font-weight:800;margin-bottom:8px}.step strong{display:block;font-size:14px}.step small{display:block;color:var(--muted);margin-top:4px;font-size:11px}
+.audience{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px;margin:0 auto}.audience ul{margin:0;padding-right:22px;color:var(--muted)}.audience li{margin:7px 0}
+.about-box{max-width:900px;margin:0 auto;background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:26px;backdrop-filter:blur(14px)}.about-box p{margin:0 0 14px;color:var(--muted)}.about-box p:last-child{margin-bottom:0}
+.cta{margin:24px auto 70px;max-width:900px;text-align:center;padding:42px 24px;border:1px solid rgba(91,192,255,.25);border-radius:20px;background:linear-gradient(135deg,rgba(34,158,217,.12),rgba(91,192,255,.05));box-shadow:var(--shadow)}.cta h2{margin:0 0 10px}.cta p{color:var(--muted);margin:0 auto 22px;max-width:650px}
+footer{border-top:1px solid var(--line);padding:24px 0 34px;color:var(--muted);font-size:12px;text-align:center}
+body.theme-halloween{background:radial-gradient(circle at 50% 10%,rgba(255,93,0,.25),transparent 30%),linear-gradient(145deg,#070309,#190914 50%,#050307 100%)}
+body.theme-halloween .brand-mark{background:linear-gradient(135deg,#ff8a00,#7b19ff);color:#fff;box-shadow:0 0 24px rgba(255,99,0,.7)}
+body.theme-halloween .occasion-discount{background:rgba(255,93,0,.18);border-color:rgba(255,140,0,.35);color:#ffb45e}
+body.theme-yalda{background:radial-gradient(circle at 50% 15%,rgba(220,40,55,.18),transparent 32%),linear-gradient(145deg,#071521,#101d2b 50%,#06131d)}
+body.theme-yalda .occasion-discount{background:rgba(220,40,55,.16);border-color:rgba(255,80,90,.35);color:#ff9aa1}
+body.theme-christmas{background:radial-gradient(circle at 50% 10%,rgba(255,255,255,.18),transparent 22%),linear-gradient(145deg,#06131d,#0a3150 50%,#06121d)}
+body.theme-valentine{background:radial-gradient(circle at 50% 10%,rgba(255,90,150,.18),transparent 30%),linear-gradient(145deg,#071521,#241020 55%,#071521)}
+body.theme-women{background:radial-gradient(circle at 50% 10%,rgba(255,120,190,.16),transparent 30%),linear-gradient(145deg,#071521,#17213a 55%,#071521)}
+body.theme-men{background:radial-gradient(circle at 50% 10%,rgba(74,158,255,.20),transparent 30%),linear-gradient(145deg,#06131d,#102e47 55%,#061521)}
+body.theme-nowruz{background:radial-gradient(circle at 50% 10%,rgba(89,210,155,.18),transparent 30%),linear-gradient(145deg,#061a1a,#0b3240 55%,#061521)}
+body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,.16),transparent 30%),linear-gradient(145deg,#071521,#342515 55%,#071521)}
+@keyframes logoIn{to{opacity:1;transform:translateY(0) scale(1)}}@keyframes markPulse{0%,100%{transform:scale(1);box-shadow:0 0 18px rgba(91,192,255,.45)}50%{transform:scale(1.08);box-shadow:0 0 30px rgba(91,192,255,.85)}}@keyframes ambient{to{transform:rotate(360deg)}}@keyframes blink{50%{opacity:.35}}@keyframes shine{to{background-position:220% center}}@keyframes eventSweep{50%,100%{transform:translateX(100%)}}@keyframes cursor{50%{opacity:0}}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.workflow{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.hero{padding-top:54px}.hero-lead{font-size:16px}.grid,.audience,.workflow{grid-template-columns:1fr}.brand-sub{display:none}.nav-link{font-size:12px}.hero:after{width:280px;height:280px}section{padding:42px 0}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+</style>
 </head>
 
 <body>
   <header>
     <div class="wrap nav">
-      <a class="brand" href="/">🔷 LangBlue <span>Language Grammar Platform</span></a>
+      <a class="brand" href="/" aria-label="LangBlue Language Grammar Platform">
+  <span class="brand-mark">▶</span>
+  <span class="logo-word" aria-label="LangBlue">LangBlue</span>
+  <span class="brand-sub">Language Grammar Platform</span>
+</a>
       <a class="nav-link" href="LangBlue-grammer.html">ورود به پلتفرم</a>
     </div>
   </header>
@@ -340,6 +127,10 @@
     <section class="hero">
       <div class="wrap">
         <div class="eyebrow">Language Grammar Platform</div>
+<div id="occasionBanner" class="occasion" aria-live="polite">
+  <div class="occasion-title">LangBlue</div>
+  <div class="occasion-note">در حال بررسی مناسبت امروز…</div>
+</div>
         <h1>ساختار زبانت را با <strong>LangBlue</strong> بساز، سازمان‌دهی کن و یاد بگیر.</h1>
         <p class="hero-lead">
           LangBlue یک پلتفرم برای ساخت، ثبت، سازمان‌دهی، تمرین و مرور قواعد گرامری و ساختارهای زبان است.
@@ -507,6 +298,66 @@
       </div>
     </section>
   </main>
+
+<script>
+(function(){
+  const WIKI={
+    christmas:'https://en.wikipedia.org/wiki/Christmas',
+    blackfriday:'https://en.wikipedia.org/wiki/Black_Friday_(shopping)',
+    halloween:'https://en.wikipedia.org/wiki/Halloween',
+    women:'https://en.wikipedia.org/wiki/International_Women%27s_Day',
+    men:'https://en.wikipedia.org/wiki/International_Men%27s_Day',
+    valentine:'https://en.wikipedia.org/wiki/Valentine%27s_Day',
+    yalda:'https://en.wikipedia.org/wiki/Yalda_Night',
+    mehrgan:'https://en.wikipedia.org/wiki/Mehregan',
+    nowruz:'https://en.wikipedia.org/wiki/Nowruz'
+  };
+  const events=[
+    {key:'christmas',start:'2026-12-25',end:'2026-12-25',title:'🎄 Christmas',note:'Merry Christmas — جشن کریسمس',theme:'christmas',wiki:WIKI.christmas},
+    {key:'blackfriday',start:'2026-11-20',end:'2026-11-27',title:'🛍️ Black Friday',note:'هفته تخفیف LangBlue',discount:'۱۰٪ تخفیف اشتراک‌ها',theme:'',wiki:WIKI.blackfriday},
+    {key:'halloween',start:'2026-10-31',end:'2026-10-31',title:'🎃 Halloween',note:'شب هالووین — حالت ترسناک فعال شد',theme:'halloween',wiki:WIKI.halloween},
+    {key:'women',start:'2027-03-08',end:'2027-03-08',title:'♀️ International Women’s Day',note:'روز جهانی زنان',theme:'women',wiki:WIKI.women},
+    {key:'men',start:'2026-11-19',end:'2026-11-19',title:'♂️ International Men’s Day',note:'روز جهانی مردان',theme:'men',wiki:WIKI.men},
+    {key:'valentine',start:'2027-02-14',end:'2027-02-14',title:'♥️ Valentine’s Day',note:'روز عشق و محبت',theme:'valentine',wiki:WIKI.valentine}
+  ];
+  function iso(d){return d.toISOString().slice(0,10)}
+  function jalali(d){
+    const p=new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(d);
+    const get=t=>Number(p.find(x=>x.type===t)?.value||0);
+    return {year:get('year'),month:get('month'),day:get('day')};
+  }
+  function getEvent(now){
+    const today=iso(now);
+    for(const e of events) if(today>=e.start&&today<=e.end)return e;
+    const j=jalali(now);
+    if(j.month===9&&j.day===30)return {key:'yalda',title:'🍉 Yalda Night',note:'یلدا مبارک! شبی برای نور، خانواده و انار و هندوانه',theme:'yalda',wiki:WIKI.yalda};
+    if(j.month===7&&j.day===10)return {key:'mehrgan',title:'🍂 Mehregan',note:'مهرگان خجسته — جشن مهر و دوستی',theme:'mehrgan',wiki:WIKI.mehrgan};
+    if(j.month===1&&j.day>=1&&j.day<=4)return {key:'nowruz',title:'🌱 Nowruz',note:'نوروز مبارک! سال نو و آغاز بهار',theme:'nowruz',wiki:WIKI.nowruz};
+    if(j.month===1&&j.day>=1&&j.day<=7)return {key:'school',title:'📚 سال تحصیلی جدید',note:'شروع سال تحصیلی — ۱۰٪ تخفیف اشتراک‌ها',discount:'۱۰٪ تخفیف اشتراک‌ها',theme:'',wiki:null};
+    return null;
+  }
+  function typeText(el,text){
+    el.innerHTML='';
+    [...text].forEach((ch,i)=>{const s=document.createElement('span');s.textContent=ch;s.style.opacity='0';s.style.display='inline-block';s.style.transform='translateY(8px)';s.style.transition='opacity .28s ease,transform .28s ease';s.style.transitionDelay=(i*28)+'ms';el.appendChild(s);requestAnimationFrame(()=>{s.style.opacity='1';s.style.transform='translateY(0)'})});
+  }
+  function renderEvent(){
+    const box=document.getElementById('occasionBanner');if(!box)return;
+    const e=getEvent(new Date());
+    document.body.classList.remove('theme-halloween','theme-yalda','theme-christmas','theme-valentine','theme-women','theme-men','theme-nowruz','theme-mehrgan');
+    if(!e){box.innerHTML='<div class="occasion-title">LangBlue</div><div class="occasion-note">زبانت را بساز. ساختارت را منظم کن.</div>';return}
+    if(e.theme)document.body.classList.add('theme-'+e.theme);
+    box.innerHTML='<div class="occasion-title"><a target="_blank" rel="noopener noreferrer" href="'+(e.wiki||'#')+'"></a><span class="type-cursor"></span></div><div class="occasion-note"></div>'+(e.discount?'<div class="occasion-discount">'+e.discount+'</div>':'');
+    const a=box.querySelector('.occasion-title a'), n=box.querySelector('.occasion-note');
+    typeText(a,e.title);n.textContent=e.note;
+  }
+  function animateLogo(){
+    const word=document.querySelector('.logo-word');if(!word)return;
+    const text=word.textContent.trim();word.textContent='';
+    [...text].forEach((ch,i)=>{const s=document.createElement('span');s.className='logo-letter';s.textContent=ch;s.style.animationDelay=(i*70)+'ms';word.appendChild(s)});
+  }
+  animateLogo();renderEvent();
+})();
+</script>
 
   <footer>
     <div class="wrap">
