@@ -174,6 +174,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     @media(max-width:720px){.receipt-grid{grid-template-columns:1fr}.receipt-builder{padding:16px}}
     @media print{body *{visibility:hidden!important}.receipt-output,.receipt-output *{visibility:visible!important}.receipt-output{display:block!important;position:absolute;left:0;top:0;width:100%;margin:0;box-shadow:none;border-radius:0}}
 </style>
+<script src="langblue-core.js"></script>
 </head>
 
 <body>
@@ -837,28 +838,20 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     });
     document.getElementById('activateReceiptPlan').addEventListener('click',function(){
       var ids=selected();
-      var session=null;
-      try{session=JSON.parse(localStorage.getItem('lb:session')||'null');}catch(e){}
-      if(!session||!session.userId){
+      if(!window.LangBlueCore.session()){
         var go=confirm('برای فعال‌سازی باید حساب LangBlue داشته باشی. اگر حساب نداری، ثبت‌نام کن و بعد به این صفحه برگرد.\n\nرفتن به صفحه حساب؟');
         if(go) window.location.href='LangBlue-grammer.html#accountGate';
         return;
       }
       var code=window.prompt('کد فعال‌سازی را وارد کن:');
       if(!code)return;
-      var planId=window.LangBlueCommerce.CODES[String(code).trim()];
-      if(!planId){alert('❌ کد فعال‌سازی نامعتبر است.');return;}
-      var uid=session.userId,key='lb:user:'+uid+':subscription',usedKey='lb:user:'+uid+':used_codes',now=Date.now(),existing=null,used={};
-      try{existing=JSON.parse(localStorage.getItem(key)||'null');used=JSON.parse(localStorage.getItem(usedKey)||'{}');}catch(e){}
-      if(used[String(code).trim()]){alert('❌ این کد قبلاً استفاده شده است.');return;}
-      var plan=window.LangBlueCommerce.PLANS[planId];
-      var base=existing&&existing.expiresAt>now?existing.expiresAt:now;
-      var sub={planId:plan.id,planDays:plan.days,currency:'IRT',startedAt:base,expiresAt:base+plan.days*86400000,verifiedAt:now,verifiedByCode:true,activatedProducts:ids.slice()};
-      localStorage.setItem(key,JSON.stringify(sub));
-      used[String(code).trim()]={at:now,planId:plan.id,products:ids.slice()};
-      localStorage.setItem(usedKey,JSON.stringify(used));
-      alert('✅ پلن «'+plan.label+'» برای '+ids.length+' محصول انتخاب‌شده فعال شد.\n\nمحصولات: '+ids.map(function(id){return window.LangBlueCommerce.PRODUCTS[id].label;}).join('، '));
-      window.dispatchEvent(new StorageEvent('storage',{key:key,newValue:JSON.stringify(sub)}));
+      var result=window.LangBlueCore.subscription.activate(code);
+      if(!result.ok){alert('❌ '+result.error);return;}
+      var sub=window.LangBlueCore.subscription.current();
+      sub.activatedProducts=ids.slice();
+      window.LangBlueCore.storage.set('subscription',sub);
+      alert('✅ پلن «'+result.plan.label+'» برای '+ids.length+' محصول انتخاب‌شده فعال شد.\n\nمحصولات: '+ids.map(function(id){return window.LangBlueCommerce.PRODUCTS[id].label;}).join('، '));
+      window.dispatchEvent(new StorageEvent('storage',{key:'lb:user:'+window.LangBlueCore.userId()+':subscription',newValue:JSON.stringify(sub)}));
     });
     out.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
