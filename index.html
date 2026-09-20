@@ -78,20 +78,8 @@ h1{max-width:900px;margin:0 auto 18px;font-size:clamp(36px,7vw,72px);line-height
 .occasion-title a{text-decoration:none}
 .occasion-title a:hover{text-decoration:underline}
 .occasion-note{font-size:12px;color:#c6d8e6;margin-top:2px}
+.ceremony-control{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px;position:relative;z-index:3}.ceremony-control #ceremonyStatus{font-size:11px;color:var(--muted)}
 .occasion-discount{display:inline-flex;margin-top:8px;padding:3px 10px;border-radius:999px;background:rgba(34,158,217,.18);border:1px solid rgba(91,192,255,.28);color:#8edaff;font-weight:800;font-size:12px}
-.occasion-pack{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:980px;margin:22px auto 0;position:relative;z-index:2}
-.occasion-group{padding:20px;border:1px solid var(--line);border-radius:20px;background:rgba(4,17,29,.48);backdrop-filter:blur(16px);box-shadow:0 16px 50px rgba(0,0,0,.16);text-align:right}
-.iran-group{border-color:rgba(91,192,255,.20)}.global-group{border-color:rgba(255,255,255,.12)}
-.group-head{display:flex;align-items:center;gap:12px;padding-bottom:14px;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
-.group-symbol{font-size:30px}.group-head h2{margin:0;font-size:22px}.group-head p{margin:2px 0 0;color:var(--muted);font-size:11px}
-.occasion-list{display:grid;gap:7px}
-.event-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 11px;border-radius:11px;background:rgba(255,255,255,.035);border:1px solid transparent;transition:.2s}
-.event-row:hover{background:rgba(255,255,255,.07);border-color:rgba(91,192,255,.18);transform:translateX(-2px)}
-.event-main{min-width:0}.event-name{display:block;font-size:13px;font-weight:750}.event-date{display:block;color:var(--muted);font-size:10px;margin-top:1px}.event-row a{text-decoration:none}.event-row a:hover{text-decoration:underline}
-.event-badge{flex:none;font-size:10px;padding:2px 7px;border-radius:999px;color:#8edaff;background:rgba(34,158,217,.12);border:1px solid rgba(91,192,255,.20)}
-.event-row.active{background:rgba(34,158,217,.12);border-color:rgba(91,192,255,.30);box-shadow:0 0 24px rgba(34,158,217,.10)}
-.event-row.active .event-name{color:#8edaff}
-@media(max-width:850px){.occasion-pack{grid-template-columns:1fr}}
 @media(max-width:600px){.occasion-group{padding:15px}.group-head h2{font-size:19px}.event-row{padding:8px}.event-name{font-size:12px}}
 .type-cursor{display:inline-block;width:2px;height:1em;background:#72d2ff;margin-right:3px;vertical-align:-2px;animation:cursor .75s steps(1) infinite}
 section{padding:54px 0}
@@ -146,29 +134,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   <div class="occasion-note">در حال بررسی مناسبت امروز…</div>
 </div>
 
-<div class="occasion-pack">
-  <article class="occasion-group iran-group">
-    <div class="group-head">
-      <span class="group-symbol">🇮🇷</span>
-      <div>
-        <h2>Lovely Iran</h2>
-        <p>مناسبت‌های ایران · تقویم شمسی + مناسبت‌های اسلامی</p>
-      </div>
-    </div>
-    <div id="iranOccasions" class="occasion-list"></div>
-  </article>
-
-  <article class="occasion-group global-group">
-    <div class="group-head">
-      <span class="group-symbol">🌍</span>
-      <div>
-        <h2>Lovely Global</h2>
-        <p>مناسبت‌های جهانی · تقویم میلادی (Gregorian)</p>
-      </div>
-    </div>
-    <div id="globalOccasions" class="occasion-list"></div>
-  </article>
-</div>
+<div class="ceremony-control" id="ceremonyControl" aria-live="polite"><button id="enableCeremonies" class="btn btn-secondary" type="button">🔔 فعال‌سازی اعلان مناسبت‌ها</button><span id="ceremonyStatus"></span></div>
         <h1>ساختار زبانت را با <strong>LangBlue</strong> بساز، سازمان‌دهی کن و یاد بگیر.</h1>
         <p class="hero-lead">
           LangBlue یک پلتفرم برای ساخت، ثبت، سازمان‌دهی، تمرین و مرور قواعد گرامری و ساختارهای زبان است.
@@ -355,26 +321,28 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     valentine:'https://en.wikipedia.org/wiki/Valentine%27s_Day'
   };
 
+  // Ceremony data is intentionally hidden from the landing page.
+  // The system announces a ceremony only when its date arrives.
   const iranSolar=[
-    {key:'cyrus',title:'👑 روز کوروش بزرگ',date:'۷ آبان',wiki:WIKI.cyrus,when:j=>j.month===8&&j.day===7},
-    {key:'amordadgan',title:'🌿 امردادگان',date:'۷ امرداد',wiki:WIKI.amordadgan,when:j=>j.month===5&&j.day===7},
-    {key:'deygan',title:'☀️ دیگان (خرم‌روز)',date:'۱ دی',wiki:'https://en.wikipedia.org/wiki/List_of_festivals_in_Iran',when:j=>j.month===10&&j.day===1},
-    {key:'yalda',title:'🍉 یلدا',date:'۳۰ آذر',wiki:WIKI.yalda,when:j=>j.month===9&&j.day===30}
+    {key:'cyrus',title:'👑 روز کوروش بزرگ',when:j=>j.month===8&&j.day===7},
+    {key:'amordadgan',title:'🌿 امردادگان',when:j=>j.month===5&&j.day===7},
+    {key:'deygan',title:'☀️ دیگان (خرم‌روز)',when:j=>j.month===10&&j.day===1},
+    {key:'yalda',title:'🍉 یلدا',when:j=>j.month===9&&j.day===30}
   ];
 
   const iranIslamic=[
-    {key:'fitr',title:'🌙 عید فطر',date:'۱ شوال',wiki:WIKI.fitr,when:i=>i.month===10&&i.day===1},
-    {key:'adha',title:'🐑 عید قربان',date:'۱۰ ذی‌الحجه',wiki:WIKI.adha,when:i=>i.month===12&&i.day===10},
-    {key:'ghadir',title:'🕊️ عید غدیر',date:'۱۸ ذی‌الحجه',wiki:WIKI.ghadir,when:i=>i.month===12&&i.day===18}
+    {key:'fitr',title:'🌙 عید فطر',when:i=>i.month===10&&i.day===1},
+    {key:'adha',title:'🐑 عید قربان',when:i=>i.month===12&&i.day===10},
+    {key:'ghadir',title:'🕊️ عید غدیر',when:i=>i.month===12&&i.day===18}
   ];
 
   const global=[
-    {key:'christmas',title:'🎄 Christmas',date:'25 Dec',wiki:WIKI.christmas,when:d=>d.getMonth()===11&&d.getDate()===25},
-    {key:'blackfriday',title:'🛍️ Black Friday',date:'20–27 Nov',wiki:WIKI.blackfriday,discount:'۱۰٪',when:d=>d.getMonth()===10&&d.getDate()>=20&&d.getDate()<=27},
-    {key:'halloween',title:'🎃 Halloween',date:'31 Oct',wiki:WIKI.halloween,when:d=>d.getMonth()===9&&d.getDate()===31},
-    {key:'men',title:'♂️ International Men’s Day',date:'19 Nov',wiki:WIKI.men,when:d=>d.getMonth()===10&&d.getDate()===19},
-    {key:'women',title:'♀️ International Women’s Day',date:'8 Mar',wiki:WIKI.women,when:d=>d.getMonth()===2&&d.getDate()===8},
-    {key:'valentine',title:'❤️ Valentine’s Day',date:'14 Feb',wiki:WIKI.valentine,when:d=>d.getMonth()===1&&d.getDate()===14}
+    {key:'christmas',title:'🎄 Christmas',when:d=>d.getMonth()===11&&d.getDate()===25},
+    {key:'blackfriday',title:'🛍️ Black Friday',when:d=>d.getMonth()===10&&d.getDate()===20},
+    {key:'halloween',title:'🎃 Halloween',when:d=>d.getMonth()===9&&d.getDate()===31},
+    {key:'men',title:'♂️ International Men’s Day',when:d=>d.getMonth()===10&&d.getDate()===19},
+    {key:'women',title:'♀️ International Women’s Day',when:d=>d.getMonth()===2&&d.getDate()===8},
+    {key:'valentine',title:'❤️ Valentine’s Day',when:d=>d.getMonth()===1&&d.getDate()===14}
   ];
 
   function jalali(d){
@@ -391,6 +359,89 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
       if(month&&day)return {month,day};
     }catch(e){}
     return null;
+  }
+
+  function ceremonyKey(e,d){
+    const j=jalali(d),i=islamic(d);
+    return e.key+':'+j.year+':'+j.month+':'+j.day+':'+(i?i.month+'-'+i.day:'-');
+  }
+
+  async function requestCeremonyPermission(){
+    if(!('Notification' in window)){
+      setCeremonyStatus('این مرورگر اعلان سیستمی را پشتیبانی نمی‌کند.');
+      return false;
+    }
+    if(Notification.permission==='granted') return true;
+    if(Notification.permission==='denied'){
+      setCeremonyStatus('اعلان‌ها در مرورگر مسدود شده‌اند.');
+      return false;
+    }
+    const permission=await Notification.requestPermission();
+    setCeremonyStatus(permission==='granted'?'🔔 اعلان مناسبت‌ها فعال شد.':'اعلان مناسبت‌ها فعال نشد.');
+    return permission==='granted';
+  }
+
+  function setCeremonyStatus(text){
+    const el=document.getElementById('ceremonyStatus');
+    if(el)el.textContent=text;
+  }
+
+  async function playCeremony(e,d,force=false){
+    if(!('Notification' in window) || Notification.permission!=='granted') return;
+    const key=ceremonyKey(e,d);
+    const storeKey='lb:ceremony:last';
+    if(!force && localStorage.getItem(storeKey)===key)return;
+    localStorage.setItem(storeKey,key);
+
+    const options={
+      body:'امروز زمان این مناسبت در LangBlue است.',
+      tag:'langblue-ceremony-'+e.key,
+      renotify:true,
+      icon:'/favicon.ico',
+      dir:'rtl',
+      lang:'fa'
+    };
+
+    try{
+      if(navigator.serviceWorker?.controller){
+        const reg=await navigator.serviceWorker.getRegistration();
+        if(reg) return await reg.showNotification('🔷 LangBlue · '+e.title,options);
+      }
+    }catch(err){}
+
+    try{
+      new Notification('🔷 LangBlue · '+e.title,options);
+    }catch(err){}
+  }
+
+  async function checkCeremonies(now=new Date(),force=false){
+    const j=jalali(now),i=islamic(now);
+    const found=[
+      ...iranSolar.filter(e=>e.when(j)),
+      ...(i?iranIslamic.filter(e=>e.when(i)):[]),
+      ...global.filter(e=>e.when(now))
+    ];
+    for(const e of found) await playCeremony(e,now,force);
+  }
+
+  function setupCeremonies(){
+    const btn=document.getElementById('enableCeremonies');
+    if(!btn)return;
+    if('Notification' in window && Notification.permission==='granted'){
+      btn.textContent='🔔 اعلان مناسبت‌ها فعال است';
+      setCeremonyStatus('هر مناسبت در زمان خودش اعلام می‌شود.');
+    }
+    btn.addEventListener('click',async()=>{
+      const ok=await requestCeremonyPermission();
+      if(ok){
+        btn.textContent='🔔 اعلان مناسبت‌ها فعال است';
+        await checkCeremonies(new Date());
+      }
+    });
+
+    // Check at load and at every minute while the page is open.
+    checkCeremonies(new Date());
+    setInterval(()=>checkCeremonies(new Date()),60000);
   }
 
   function typeText(el,text){
@@ -418,10 +469,10 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   function renderCurrent(now){
     const box=document.getElementById('occasionBanner');if(!box)return;
     const j=jalali(now),i=islamic(now);
-    let e=iranSolar.find(x=>x.when(j)) || (i&&iranIslamic.find(x=>x.when(i))) || global.find(x=>x.when(now));
+    const e=iranSolar.find(x=>x.when(j)) || (i&&iranIslamic.find(x=>x.when(i))) || global.find(x=>x.when(now));
     document.body.classList.remove('theme-halloween','theme-yalda','theme-christmas','theme-valentine','theme-women','theme-men');
     if(!e){
-      box.innerHTML='<div class="occasion-title">🔷 LangBlue</div><div class="occasion-note">زبانت را بساز. ساختارت را منظم کن.</div>';
+      box.innerHTML='<div class="occasion-title">🔷 LangBlue</div><div class="occasion-note">مناسبت‌ها به‌صورت خودکار و در زمان خودشان اعلام می‌شوند.</div>';
       return;
     }
     if(e.key==='halloween')document.body.classList.add('theme-halloween');
@@ -430,9 +481,9 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     if(e.key==='valentine')document.body.classList.add('theme-valentine');
     if(e.key==='women')document.body.classList.add('theme-women');
     if(e.key==='men')document.body.classList.add('theme-men');
-    box.innerHTML='<div class="occasion-title"><a target="_blank" rel="noopener noreferrer" href="'+e.wiki+'"></a><span class="type-cursor"></span></div><div class="occasion-note"></div>'+(e.discount?'<div class="occasion-discount">۱۰٪ تخفیف اشتراک‌ها</div>':'');
-    typeText(box.querySelector('.occasion-title a'),e.title);
-    box.querySelector('.occasion-note').textContent=e.key==='yalda'?'یلدا مبارک! 🍉 شبی برای نور، خانواده و شادی':e.key==='halloween'?'شب هالووین — تم ترسناک فعال شد':e.key==='blackfriday'?'هفته تخفیف LangBlue — ۱۰٪ تخفیف اشتراک‌ها':'امروز در LangBlue گرامی داشته می‌شود.';
+    box.innerHTML='<div class="occasion-title"></div><div class="occasion-note"></div>';
+    typeText(box.querySelector('.occasion-title'),e.title);
+    box.querySelector('.occasion-note').textContent='امروز زمان این مناسبت است — اعلان LangBlue آماده است.';
   }
 
   function animateLogo(){
@@ -445,7 +496,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   }
 
   const now=new Date();
-  animateLogo();renderLists(now);renderCurrent(now);
+  animateLogo();renderCurrent(now);setupCeremonies();
 })();
 </script>
   <footer>
