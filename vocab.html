@@ -1634,7 +1634,7 @@
                     }
                     var backup = {
                         app: 'LangBlue',
-                        version: '3.3',
+                        version: '3.4',
                         createdAt: new Date().toISOString(),
                         data: data
                     };
@@ -1814,7 +1814,8 @@
                         var v = values[i];
                         if (!v.lastReview) continue;
                         var daysSince = (now - v.lastReview) / (1000 * 60 * 60 * 24);
-                        if (daysSince >= FORGOTTEN_DAYS && v.status !== 'mastered') forgotten.push(v);
+                        if (daysSince >= FORGOTTEN_DAYS && v.status !== 'mastered' &&
+                            Core.state.words.some(function(w){ return w.word === v.word && w.persian === v.persian; })) forgotten.push(v);
                     }
                     return {
                         total: values.length,
@@ -1834,7 +1835,8 @@
                         var v = values[i];
                         if (!v.lastReview) continue;
                         var daysSince = (now - v.lastReview) / (1000 * 60 * 60 * 24);
-                        if (daysSince >= FORGOTTEN_DAYS && v.status !== 'mastered') result.push(v);
+                        if (daysSince >= FORGOTTEN_DAYS && v.status !== 'mastered' &&
+                            Core.state.words.some(function(w){ return w.word === v.word && w.persian === v.persian; })) result.push(v);
                     }
                     return result;
                 },
@@ -1998,7 +2000,7 @@
                     var accuracy = attempts ? correct / attempts : 0.5;
                     var errorRate = attempts ? wrong / attempts : 0.5;
                     var hours = last ? Math.max(0, (now - last) / 3600000) : 72;
-                    var recency = Math.exp(-hours / 48);
+                    var recency = 1 - Math.exp(-hours / 48);
                     var uncertainty = 1 / Math.sqrt(1 + attempts);
                     var mastery = srs.status === 'mastered' ? 1 :
                         srs.status === 'review' ? 0.68 :
