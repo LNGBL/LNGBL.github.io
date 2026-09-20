@@ -149,6 +149,30 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     .research-note{margin:22px auto 0;max-width:900px;padding:15px 18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035);color:var(--muted);font-size:12px;line-height:1.9}
     @media (max-width:900px){.research-grid{grid-template-columns:1fr 1fr}}
     @media (max-width:620px){.research{padding:58px 0}.research-grid{grid-template-columns:1fr}.research-levels{justify-content:flex-start}}
+    .receipt-section{padding:70px 0}
+    .receipt-builder{max-width:980px;margin:28px auto 0;padding:24px;background:var(--glass);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}
+    .receipt-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .receipt-panel{padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035)}
+    .receipt-panel h3{margin:0 0 14px;font-size:17px}
+    .receipt-options{display:grid;gap:10px}
+    .receipt-option{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;background:rgba(255,255,255,.025);transition:.2s}
+    .receipt-option:hover{border-color:rgba(91,192,255,.34);background:rgba(34,158,217,.06)}
+    .receipt-option input{accent-color:var(--blue);width:17px;height:17px}
+    .receipt-option strong{display:block;font-size:14px}.receipt-option small{display:block;color:var(--muted);font-size:11px}
+    .receipt-select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:#0b2235;color:#fff;font:inherit}
+    .receipt-summary{margin-top:16px;padding:15px;border-radius:14px;background:rgba(34,158,217,.08);border:1px solid rgba(91,192,255,.2)}
+    .receipt-summary-row{display:flex;justify-content:space-between;gap:12px;margin:5px 0;color:var(--muted);font-size:13px}
+    .receipt-summary-total{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);color:#fff;font-weight:850;font-size:18px}
+    .receipt-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    .receipt-output{display:none;margin-top:20px;padding:24px;border-radius:16px;background:#f8fbff;color:#15202a}
+    .receipt-output.show{display:block}
+    .receipt-head{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid #d9e2e8;padding-bottom:14px;margin-bottom:16px}
+    .receipt-head strong{font-size:20px}.receipt-head small{color:#61717d}
+    .receipt-line{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #e5ebef;font-size:13px}
+    .receipt-total{display:flex;justify-content:space-between;margin-top:14px;font-size:18px;font-weight:850}
+    .receipt-note{margin-top:14px;color:#61717d;font-size:11px;line-height:1.8}
+    @media(max-width:720px){.receipt-grid{grid-template-columns:1fr}.receipt-builder{padding:16px}}
+    @media print{body *{visibility:hidden!important}.receipt-output,.receipt-output *{visibility:visible!important}.receipt-output{display:block!important;position:absolute;left:0;top:0;width:100%;margin:0;box-shadow:none;border-radius:0}}
 </style>
 </head>
 
@@ -183,6 +207,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
         </p>
         <div class="actions">
           <a class="btn btn-primary" href="#products">محصولات LangBlue ←</a>
+          <a class="btn btn-secondary" href="#receipt">ساخت فیش خرید ←</a>
           <a class="btn btn-secondary" href="#features">آشنایی با امکانات</a>
         </div>
       </div>
@@ -359,6 +384,45 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
             </ul>
             <a class="btn btn-primary" href="LangBlue-De.html">ورود به Deutsch ←</a>
           </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="receipt-section" id="receipt">
+      <div class="wrap">
+        <h2 class="section-title">ساخت فیش خرید LangBlue</h2>
+        <p class="section-lead">
+          لازم نیست همه محصولات را با هم انتخاب کنی. یک محصول یا چند محصول را انتخاب کن،
+          مدت اشتراک را مشخص کن و فیش سفارش خودت را بساز.
+        </p>
+        <div class="receipt-builder">
+          <div class="receipt-grid">
+            <div class="receipt-panel">
+              <h3>۱. محصولات موردنظر</h3>
+              <div class="receipt-options" id="receiptProducts">
+                <label class="receipt-option"><input type="checkbox" value="grammar" checked><span><strong>📐 LangBlue Grammar</strong><small>ابزار گرامر و ساختار زبان</small></span></label>
+                <label class="receipt-option"><input type="checkbox" value="vocabulary"><span><strong>📚 LangBlue Vocabulary</strong><small>ثبت و تمرین واژگان</small></span></label>
+                <label class="receipt-option"><input type="checkbox" value="deutsch"><span><strong>🇩🇪 LangBlue Deutsch</strong><small>یادگیری و فلش‌کارت آلمانی</small></span></label>
+              </div>
+            </div>
+            <div class="receipt-panel">
+              <h3>۲. مدت اشتراک</h3>
+              <select id="receiptPlan" class="receipt-select" aria-label="مدت اشتراک">
+                <option value="irt_7d">۷ روز</option>
+                <option value="irt_14d">۱۴ روز</option>
+                <option value="irt_21d">۲۱ روز</option>
+                <option value="irt_3m">۳ ماه</option>
+                <option value="irt_6m">۶ ماه</option>
+                <option value="irt_12m">۱۲ ماه</option>
+              </select>
+              <div class="receipt-summary" id="receiptSummary" aria-live="polite"></div>
+              <div class="receipt-actions">
+                <button class="btn btn-primary" id="buildReceipt" type="button">🧾 ساخت فیش</button>
+                <button class="btn btn-secondary" id="printReceipt" type="button" style="display:none">🖨️ چاپ فیش</button>
+              </div>
+            </div>
+          </div>
+          <div class="receipt-output" id="receiptOutput" aria-live="polite"></div>
         </div>
       </div>
     </section>
@@ -700,6 +764,51 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 
   const now=new Date();
   animateLogo();renderCurrent(now);setupCeremonies();
+})();
+</script>
+<script>
+(function(){
+  function money(n){return Number(n||0).toLocaleString('en-US')+' T';}
+  function selected(){
+    return Array.from(document.querySelectorAll('#receiptProducts input:checked')).map(function(x){return x.value;});
+  }
+  function plan(){
+    return document.getElementById('receiptPlan').value;
+  }
+  function renderSummary(){
+    var ids=selected(), p=window.LangBlueCommerce.displayPlan(plan());
+    var box=document.getElementById('receiptSummary');
+    if(!ids.length){
+      box.innerHTML='<div style="color:#ffb6b6">حداقل یک محصول را انتخاب کن.</div>';
+      return;
+    }
+    var total=p.finalPrice*ids.length;
+    var discount=p.discount?p.discount+'٪ تخفیف جشنواره‌ای':''; 
+    box.innerHTML='<div class="receipt-summary-row"><span>تعداد محصولات</span><strong>'+ids.length+'</strong></div>'+
+      '<div class="receipt-summary-row"><span>قیمت هر محصول</span><strong>'+money(p.finalPrice)+'</strong></div>'+
+      (discount?'<div class="receipt-summary-row"><span>تخفیف</span><strong>'+discount+'</strong></div>':'')+
+      '<div class="receipt-summary-row receipt-summary-total"><span>مبلغ نهایی</span><strong>'+money(total)+'</strong></div>';
+  }
+  function build(){
+    var ids=selected(), out=document.getElementById('receiptOutput');
+    if(!ids.length){renderSummary();return;}
+    var order=window.LangBlueCommerce.buildOrder(ids,plan());
+    var date=new Date(order.createdAt).toLocaleString('fa-IR');
+    out.innerHTML='<div class="receipt-head"><div><strong>LangBlue</strong><br><small>فیش سفارش</small></div><div><small>شماره فیش: '+order.id+'<br>'+date+'</small></div></div>'+
+      order.products.map(function(p){return '<div class="receipt-line"><span>'+p.icon+' '+p.label+'</span><strong>'+money(order.plan.finalPrice)+'</strong></div>';}).join('')+
+      '<div class="receipt-line"><span>پلن</span><strong>'+order.plan.label+'</strong></div>'+
+      (order.plan.festival?'<div class="receipt-line"><span>تخفیف '+order.plan.festival.title+'</span><strong>'+order.plan.discount+'٪</strong></div>':'')+
+      '<div class="receipt-total"><span>مبلغ نهایی</span><span>'+order.totalStr+'</span></div>'+
+      '<div class="receipt-note">این فیش سفارش بر اساس انتخاب فعلی شما ساخته شده است. یک محصول یا چند محصول را می‌توان انتخاب کرد؛ قیمت و تخفیف از سیستم مرکزی LangBlueCommerce محاسبه می‌شود.</div>';
+    out.classList.add('show');
+    document.getElementById('printReceipt').style.display='inline-flex';
+    out.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+  document.querySelectorAll('#receiptProducts input').forEach(function(x){x.addEventListener('change',renderSummary);});
+  document.getElementById('receiptPlan').addEventListener('change',renderSummary);
+  document.getElementById('buildReceipt').addEventListener('click',build);
+  document.getElementById('printReceipt').addEventListener('click',function(){window.print();});
+  renderSummary();
 })();
 </script>
   <footer>
