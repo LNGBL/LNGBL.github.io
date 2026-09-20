@@ -845,11 +845,9 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
       }
       var code=window.prompt('کد فعال‌سازی را وارد کن:');
       if(!code)return;
-      var result=window.LangBlueCore.subscription.activate(code);
+      var result=window.LangBlueCore.subscription.activate(code,ids);
       if(!result.ok){alert('❌ '+result.error);return;}
-      var sub=window.LangBlueCore.subscription.current();
-      sub.activatedProducts=ids.slice();
-      window.LangBlueCore.storage.set('subscription',sub);
+      var sub=result.subscription||window.LangBlueCore.subscription.current();
       alert('✅ پلن «'+result.plan.label+'» برای '+ids.length+' محصول انتخاب‌شده فعال شد.\n\nمحصولات: '+ids.map(function(id){return window.LangBlueCommerce.PRODUCTS[id].label;}).join('، '));
       window.dispatchEvent(new StorageEvent('storage',{key:'lb:user:'+window.LangBlueCore.userId()+':subscription',newValue:JSON.stringify(sub)}));
     });
