@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+    <script src="langblue-commerce.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LangBlue Vocabulary · واژگان و یادگیری لغات انگلیسی</title>
@@ -3044,14 +3045,17 @@
                         : 'LangBlue تا <strong>۳۵ واژه</strong> را رایگان در اختیار شما می‌گذارد. برای افزودن واژه‌های بیشتر و استفاده از امکانات پیشرفته مانند <strong>PDF</strong> و <strong>بررسی نقاط ضعف</strong>، اشتراک فعال لازم است.';
                     var grid=document.getElementById('paidPlanGrid');
                     grid.innerHTML=this.PLANS.map(function(p){
-                        return '<div class="paid-plan-card"><div class="days">'+p.label+'</div><div class="price">'+p.price+'</div><div class="feature">'+p.feature+'</div><button data-plan="'+p.id+'">💳 درخواست این پلن</button></div>';
+                        var shared=window.LangBlueCommerce.displayPlan(p.id), price=shared.discount?'<span style="text-decoration:line-through;opacity:.55;margin-left:6px;">'+p.price+'</span><strong>'+shared.finalPriceStr+'</strong>':p.price;
+                        var disc=shared.discount?'<div style="margin-top:4px;color:var(--success);font-weight:800;">'+shared.discount+'٪ تخفیف جشنواره‌ای</div>':'';
+                        return '<div class="paid-plan-card"><div class="days">'+p.label+'</div><div class="price">'+price+'</div>'+disc+'<div class="feature">'+p.feature+'</div><button data-plan="'+p.id+'">💳 درخواست این پلن</button></div>';
                     }).join('');
                     modal.classList.add('active');modal.setAttribute('aria-hidden','false');
                 },
                 close:function(){var m=document.getElementById('paidAccessModal');m.classList.remove('active');m.setAttribute('aria-hidden','true');this.pending=null;},
                 request:function(id){
                     var p=this.PLANS.find(function(x){return x.id===id;}); if(!p)return;
-                    alert('📋 درخواست پلن «'+p.label+'» — '+p.price+'\n\nمراحل تهیه:\n1) به کانال تلگرام @langBlue مراجعه کن\n2) به ادمین دایرکت پیام بده و بگو این پلن را می‌خواهی\n3) ادمین شماره کارت بانکی را می‌فرستد\n4) بعد از پرداخت، رسید را برای ادمین بفرست\n5) پس از تایید، کد تایید را دریافت کن\n6) کد را در بخش فعال‌سازی وارد کن');
+                    var shared=window.LangBlueCommerce.displayPlan(p.id), shown=shared.discount?shared.finalPriceStr:p.price;
+                    alert('📋 درخواست پلن «'+p.label+'» — '+shown+(shared.discount?' ('+shared.discount+'٪ تخفیف جشنواره‌ای)':'')+'\n\nمراحل تهیه:\n1) به کانال تلگرام @langBlue مراجعه کن\n2) به ادمین دایرکت پیام بده و بگو این پلن را می‌خواهی\n3) ادمین شماره کارت بانکی را می‌فرستد\n4) بعد از پرداخت، رسید را برای ادمین بفرست\n5) پس از تایید، کد تایید را دریافت کن\n6) کد را در بخش فعال‌سازی وارد کن');
                 },
                 activate:function(){
                     var code=document.getElementById('vocabVerifyCode').value.trim(), status=document.getElementById('vocabVerifyStatus');
