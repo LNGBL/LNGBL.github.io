@@ -1211,6 +1211,7 @@
 
     </style>
 <script src="langblue-commerce.js"></script>
+<script src="langblue-core.js"></script>
 </head>
 <body>
 
@@ -3016,10 +3017,7 @@
                 get PLANS(){ return Object.values(window.LangBlueCommerce.PLANS).map(function(p){ return {id:p.id,days:p.days,label:p.label,price:p.priceStr,feature:p.feature}; }); },
                 get CODES(){ return window.LangBlueCommerce.CODES; },
                 pending:null,
-                current:function(){
-                    var s=Storage.get('subscription',null);
-                    return s&&s.expiresAt>Date.now()?s:null;
-                },
+                current:function(){return window.LangBlueCore.subscription.current();},
                 isActive:function(){return !!this.current();},
                 refreshButtons:function(){
                     var active=this.isActive();
@@ -3050,13 +3048,8 @@
                 },
                 activate:function(){
                     var code=document.getElementById('vocabVerifyCode').value.trim(), status=document.getElementById('vocabVerifyStatus');
-                    var planId=this.CODES[code];
-                    if(!planId){status.innerHTML='<span style="color:var(--danger)">❌ کد تایید نامعتبر است.</span>';return;}
-                    var used=Storage.get('used_codes',{}); if(used[code]){status.innerHTML='<span style="color:var(--danger)">❌ این کد قبلاً استفاده شده است.</span>';return;}
-                    var p=this.PLANS.find(function(x){return x.id===planId;}); if(!p)return;
-                    var now=Date.now(), existing=Storage.get('subscription',null), base=existing&&existing.expiresAt>now?existing.expiresAt:now;
-                    Storage.set('subscription',{planId:p.id,planDays:p.days,currency:'IRT',startedAt:now,expiresAt:base+p.days*86400000,verifiedAt:now,verifiedByCode:true});
-                    used[code]={at:now,planId:p.id};Storage.set('used_codes',used);
+                    var result=window.LangBlueCore.subscription.activate(code);
+                    if(!result.ok){status.innerHTML='<span style="color:var(--danger)">❌ '+result.error+'.</span>';return;}
                     status.innerHTML='<span style="color:var(--success)">✅ اشتراک فعال شد.</span>';
                     this.open(this.pending);
                 },
@@ -3075,18 +3068,6 @@
                     // verifiedByCode ساخته شده باشد، used_codes نشان می‌دهد که کد واقعاً وریفای شده است.
                     var sub=this.current();
                     var verified=!!(sub && sub.verifiedByCode && sub.verifiedAt);
-                    if(!verified && sub){
-                        var used=Storage.get('used_codes',{});
-                        var matched=Object.keys(used).some(function(code){
-                            return used[code] && used[code].planId===sub.planId;
-                        });
-                        if(matched){
-                            sub.verifiedByCode=true;
-                            sub.verifiedAt=sub.verifiedAt||Date.now();
-                            Storage.set('subscription',sub);
-                            verified=true;
-                        }
-                    }
                     if(verified) return true;
                     UI.showToast('🔒 برای استفاده از PDF و بررسی نقاط ضعف، ابتدا اشتراک تهیه کنید و کد وریفای دریافت‌شده را در بخش «فعال‌سازی اشتراک» وارد کنید.','warning');
                     return false;
