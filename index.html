@@ -500,6 +500,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     </section>
   </main>
 
+<script src="langblue-commerce.js"></script>
 <script>
 (function(){
   const WIKI={
@@ -652,7 +653,9 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   }
 
   function row(e,active=false){
-    const badge=e.discount?'<span class="event-badge">'+e.discount+' تخفیف</span>':'';
+    const shared=window.LangBlueCommerce&&window.LangBlueCommerce.FESTIVALS.find(x=>x.key===e.key);
+    const discount=shared?shared.discount:0;
+    const badge=discount?'<span class="event-badge">'+discount+'٪ تخفیف</span>':'';
     return '<div class="event-row'+(active?' active':'')+'"><div class="event-main"><a class="event-name" href="'+e.wiki+'" target="_blank" rel="noopener noreferrer">'+e.title+'</a><span class="event-date">'+e.date+'</span></div>'+badge+'</div>';
   }
 
@@ -678,9 +681,12 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     if(e.key==='valentine')document.body.classList.add('theme-valentine');
     if(e.key==='women')document.body.classList.add('theme-women');
     if(e.key==='men')document.body.classList.add('theme-men');
-    box.innerHTML='<div class="occasion-title"></div><div class="occasion-note"></div>';
+    const shared=window.LangBlueCommerce&&window.LangBlueCommerce.activeFestival(now);
+    box.innerHTML='<div class="occasion-title"></div><div class="occasion-note"></div><div class="occasion-discount"></div>';
     typeText(box.querySelector('.occasion-title'),e.title);
     box.querySelector('.occasion-note').textContent='امروز زمان این مناسبت است — اعلان LangBlue آماده است.';
+    const discountEl=box.querySelector('.occasion-discount');
+    if(discountEl&&shared){discountEl.textContent=shared.discount+'٪ تخفیف جشنواره‌ای برای هر سه محصول';}
   }
 
   function animateLogo(){
