@@ -2354,8 +2354,10 @@ window.__requestPlanIRT = (planId) => {
   else if (plan.id === 'irt_12m') daysLabel = '۱۲ ماه';
   else daysLabel = `${plan.days} روز`;
 
+  const shownPlan=window.LangBlueCommerce.displayPlan(plan.id);
+  const shownPrice=shownPlan.discount?shownPlan.finalPriceStr:plan.price;
   alert(`
-📋 درخواست پلن «${daysLabel}» — ${plan.price}
+📋 درخواست پلن «${daysLabel}» — ${shownPrice}${shownPlan.discount?` (${shownPlan.discount}٪ تخفیف جشنواره‌ای)`:''}
 
 مراحل تهیه:
 1) به کانال تلگرام @langBlue مراجعه کن
