@@ -818,11 +818,16 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
       '<div class="receipt-line"><span>پلن</span><strong>'+order.plan.label+'</strong></div>'+
       (order.plan.festival?'<div class="receipt-line"><span>تخفیف '+order.plan.festival.title+'</span><strong>'+order.plan.discount+'٪</strong></div>':'')+
       (order.bundleDiscount?'<div class="receipt-line"><span>تخفیف بسته کامل ۱۲ ماهه</span><strong>'+order.bundleDiscount+'٪</strong></div>':'')+
-      (order.verificationCode?'<div class="receipt-line"><span>کد وریفای بسته</span><strong>'+order.verificationCode+'</strong></div>':'')+
       '<div class="receipt-total"><span>مبلغ نهایی</span><span>'+order.totalStr+'</span></div>'+
-      '<div class="receipt-note">این فیش سفارش بر اساس انتخاب فعلی شما ساخته شده است. یک محصول یا چند محصول را می‌توان انتخاب کرد؛ برای بسته کامل ۱۲ ماهه، هر سه محصول با ۱۵٪ تخفیف بسته‌ای محاسبه می‌شوند و کد وریفای بر پایه اشتراک ۱۲ ماهه است. قیمت و تخفیف از سیستم مرکزی LangBlueCommerce محاسبه می‌شود.</div>';
+      '<div class="receipt-note">این فیش سفارش بر اساس انتخاب فعلی شما ساخته شده است. پس از ساخت فیش، اطلاعات سفارش برای ارسال در تلگرام آماده می‌شود. کد وریفای برای کاربر نمایش داده نمی‌شود و پس از بررسی سفارش توسط مدیریت صادر می‌شود.</div>'+
+      '<div class="receipt-actions"><button id="sendReceiptTelegram" class="btn btn-primary" type="button">📨 ارسال سفارش به تلگرام</button></div>';
     out.classList.add('show');
     document.getElementById('printReceipt').style.display='inline-flex';
+    var telegramText='درخواست خرید LangBlue\nشماره فیش: '+order.id+'\nمحصولات: '+order.products.map(function(p){return p.label;}).join('، ')+'\nپلن: '+order.plan.label+'\n'+(order.plan.festival?'تخفیف فستیوال: '+order.plan.discount+'٪\n':'')+(order.bundleDiscount?'تخفیف بسته کامل ۱۲ ماهه: '+order.bundleDiscount+'٪\n':'')+'مبلغ نهایی: '+order.totalStr+'\nلطفاً سفارش را بررسی و کد وریفای را ارسال کنید.';
+    document.getElementById('sendReceiptTelegram').addEventListener('click',function(){
+      var url='https://t.me/share/url?url='+encodeURIComponent('https://lngbl.github.io/')+'&text='+encodeURIComponent(telegramText);
+      window.open(url,'_blank','noopener,noreferrer');
+    });
     out.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
   document.querySelectorAll('#receiptProducts input').forEach(function(x){x.addEventListener('change',renderSummary);});
