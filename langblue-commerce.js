@@ -82,19 +82,36 @@
     deutsch:{id:'deutsch',label:'LangBlue Deutsch',icon:'🇩🇪',url:'LangBlue-De.html'}
   };
 
+  var ALL_PRODUCT_IDS = ['grammar','vocabulary','deutsch'];
+  var ALL_PRODUCTS_12M_DISCOUNT = 15;
+  var ALL_PRODUCTS_12M_PLAN_ID = 'irt_12m';
+  var ALL_PRODUCTS_12M_VERIFY_CODE = 'Verify_311012';
+
+  function isAllProducts12M(productIds,planId){
+    var ids=Array.isArray(productIds)?productIds:[productIds];
+    return planId===ALL_PRODUCTS_12M_PLAN_ID &&
+      ids.length===ALL_PRODUCT_IDS.length &&
+      ALL_PRODUCT_IDS.every(function(id){return ids.indexOf(id)!==-1;});
+  }
+
   function buildOrder(productIds,planId,date){
     var ids=Array.isArray(productIds)?productIds:[productIds];
     var plan=displayPlan(planId,date);
     var products=ids.map(function(id){return PRODUCTS[id];}).filter(Boolean);
     if(!plan||!products.length)return null;
-    var total=Math.round(plan.finalPrice*products.length);
+    var subtotal=Math.round(plan.finalPrice*products.length);
+    var bundleDiscount=isAllProducts12M(ids,planId)?ALL_PRODUCTS_12M_DISCOUNT:0;
+    var total=discountedPrice(subtotal,bundleDiscount);
     return {
       id:'LB-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,7).toUpperCase(),
       createdAt:Date.now(),
       plan:plan,
       products:products,
       quantity:products.length,
-      subtotal:total,
+      subtotal:subtotal,
+      bundleDiscount:bundleDiscount,
+      bundleDiscountStr:bundleDiscount+'%',
+      verificationCode:isAllProducts12M(ids,planId)?ALL_PRODUCTS_12M_VERIFY_CODE:null,
       total:total,
       totalStr:comma(total)+' T'
     };
@@ -107,6 +124,10 @@
     PLANS:PLANS,
     DAILY_PLAN_IDS:DAILY_PLAN_IDS,
     MONTHLY_PLAN_IDS:MONTHLY_PLAN_IDS,
+    ALL_PRODUCT_IDS:ALL_PRODUCT_IDS,
+    ALL_PRODUCTS_12M_DISCOUNT:ALL_PRODUCTS_12M_DISCOUNT,
+    ALL_PRODUCTS_12M_PLAN_ID:ALL_PRODUCTS_12M_PLAN_ID,
+    ALL_PRODUCTS_12M_VERIFY_CODE:ALL_PRODUCTS_12M_VERIFY_CODE,
     CODES:CODES,
     PRODUCTS:PRODUCTS,
     buildOrder:buildOrder,
