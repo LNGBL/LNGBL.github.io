@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+<script src="langblue-commerce.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="LangBlue is a language grammar platform for creating, organizing, learning, and exploring grammar rules, vocabulary, and language structures.">
@@ -2284,10 +2285,14 @@ function renderPricingIRT(grid, intro, howToBox, verifyBox, geo) {
     else if (p.id === 'irt_6m') daysLabel = '۶ ماه';
     else if (p.id === 'irt_12m') daysLabel = '۱۲ ماه';
     else daysLabel = `${p.days} روز`;
+    const shared=window.LangBlueCommerce.displayPlan(p.id);
+    const priceHtml=shared.discount ? `<span style="text-decoration:line-through;opacity:.55;margin-left:6px;">${p.price}</span> <strong>${shared.finalPriceStr.replace(' T','')}</strong>` : p.price;
+    const discountHtml=shared.discount ? `<div style="margin-top:5px;color:var(--success);font-weight:800;">${shared.discount}٪ تخفیف جشنواره‌ای</div>` : '';
     return `
       <div class="price-card">
         <div class="duration">${daysLabel}</div>
-        <div class="price">${p.price} <small>تومان</small></div>
+        <div class="price">${priceHtml} <small>تومان</small></div>
+        ${discountHtml}
         <div class="features">${p.features}</div>
         <button onclick="window.__requestPlanIRT('${p.id}')">💳 درخواست این پلن</button>
       </div>`;
