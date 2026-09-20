@@ -1302,7 +1302,7 @@
         <!-- COPYRIGHT -->
         <div class="copyright-footer" style="margin-top:2rem;padding:1.5rem 1rem 0.5rem;border-top:2px solid var(--border-color);text-align:center;font-size:0.85rem;color:var(--copyright-color);display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0.5rem 1.5rem;">
             <span>© ۲۰۲۴ <strong>LangBlue</strong> · تمامی حقوق محفوظ است.</span>
-            <span>نسخه v3.3 · تکرار هوشمند + تلفظ در فلش‌کارت</span>
+            <span>نسخه v3.4 · تکرار هوشمند + حساب کاربری</span>
             <span>🔒 کپی ممنوع</span>
         </div>
     </div>
@@ -2254,7 +2254,7 @@
 
                     var total = this.stats.total;
                     var correct = this.stats.correct;
-                    var score = Math.round((correct / total) * 100);
+                    var score = total ? Math.round((correct / total) * 100) : 0;
 
                     var confidence = 'ضعیف';
                     if (score >= 90) confidence = 'عالی 🌟';
@@ -2272,6 +2272,8 @@
                     alert(msg);
 
                     document.getElementById('flashcardModal').classList.remove('active');
+                    this.currentCard = null;
+                    this.cards = [];
                     UI.renderAll();
                 }
             };
@@ -2397,6 +2399,8 @@
                     var c=this.cards[this.index], mode=c.mode, ok=btn.dataset.correct==='true';
                     var buttons=document.querySelectorAll('#weaknessOptions .option-btn');for(var i=0;i<buttons.length;i++){buttons[i].disabled=true;if(buttons[i].dataset.correct==='true')buttons[i].classList.add('correct');if(buttons[i]===btn&&!ok)buttons[i].classList.add('wrong');}
                     this.correct+=ok?1:0;this.wrong+=ok?0:1;WeaknessSystem.record(c.word.word,c.word.persian,mode,ok);
+                    if(ok){ RepetitionSystem.recordCorrect(c.word.word,c.word.persian); SRS.update(c.word.word,c.persian,'mastered'); }
+                    else { RepetitionSystem.recordWrong(c.word.word,c.persian); SRS.update(c.word.word,c.persian,'review'); }
                     var correctText=(mode==='meaning_to_word'||mode==='listening')?c.word.word:c.persian;
                     var fb=document.getElementById('weaknessFeedback');fb.textContent=ok?'✅ درست!':'❌ اشتباه — پاسخ صحیح: '+correctText;fb.style.color=ok?'var(--success)':'var(--danger)';
                     var self=this;setTimeout(function(){self.index++;self.showCard();},1100);
@@ -3542,6 +3546,10 @@
                                             Flashcard.timerInterval = null;
                                         }
                                     }
+                                    if (modals[i] === 'weaknessModal') {
+                                        WeaknessSystem.active = false;
+                                        if (window.speechSynthesis) window.speechSynthesis.cancel();
+                                    }
                                     break;
                                 }
                             }
@@ -3577,7 +3585,7 @@
                     document.addEventListener('dragstart', function(e) {
                         if (!e.target.closest('.copy-allowed')) { e.preventDefault(); return false; }
                     });
-                    console.log('%c🌊 LangBlue · v3.3', 'font-size:20px;font-weight:bold;color:#1a4f8b;');
+                    console.log('%c🌊 LangBlue · v3.4', 'font-size:20px;font-weight:bold;color:#1a4f8b;');
                     console.log('%c🔒 تمامی حقوق محفوظ است.', 'font-size:14px;color:#e74c3c;');
                 }
             };
