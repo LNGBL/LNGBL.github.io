@@ -1847,7 +1847,7 @@ function renderSubscriptionBanner() {
         </div>
         <button class="ghost small" onclick="document.querySelector('.tab[data-tab=\\'pricing\\']').click()">تمدید</button>
       </div>`;
-  } else if (count >= ${FREE_LIMIT}) {
+  } else if (count >= FREE_LIMIT) {
     banner.innerHTML = `
       <div class="sub-banner">
         <div>
