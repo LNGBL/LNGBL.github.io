@@ -1,9 +1,17 @@
 <!DOCTYPE html>
-<html lang="de" dir="rtl">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LangDE — Deutsch lernen</title>
+<title>LangBlue Deutsch · یادگیری زبان آلمانی</title>
+<meta name="description" content="LangBlue Deutsch برای ثبت واژگان آلمانی، ترجمه فارسی، تمرین فلش‌کارت، تلفظ و مرور ساختاریافته طراحی شده است.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://lngbl.github.io/LangBlue-De.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LangBlue Deutsch · یادگیری زبان آلمانی">
+<meta property="og:description" content="ابزار LangBlue برای ثبت، مرور و تمرین واژگان آلمانی با ترجمه فارسی و تلفظ.">
+<meta property="og:url" content="https://lngbl.github.io/LangBlue-De.html">
+<meta property="og:site_name" content="LangBlue">
 <style>
 :root{--n:#0f1a2b;--n2:#16263d;--st:#1e3a5f;--g:#c9a961;--g2:#e0c084;--sk:#6b7280;--sh:#9ca3af;--pp:#f4efe6;--r:#8b2f2f;--gr:#2f5c3a;--sc:rgba(0,0,0,.35);--li:rgba(201,169,97,.25)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
@@ -19,6 +27,8 @@ header.langde-header h1 small{display:block;font-size:12px;letter-spacing:8px;co
 .header-user .badge.pro{border-color:var(--g);color:var(--g);background:rgba(201,169,97,.1)}
 .header-user button{background:none;border:1px solid var(--sk);color:var(--sh);padding:4px 10px;cursor:pointer;font-size:10px;border-radius:2px;letter-spacing:1px;font-family:inherit}
 .header-user button:hover{border-color:var(--r);color:#e8b4b4}
+.home-link{position:absolute;top:20px;right:24px;padding:6px 12px;border:1px solid var(--li);border-radius:999px;color:var(--g2);text-decoration:none;font-size:11px;letter-spacing:1px;background:rgba(0,0,0,.15)}
+.home-link:hover{border-color:var(--g);color:#fff;background:rgba(201,169,97,.08)}
 .stage{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column;align-items:center;gap:22px}
 .panel{background:linear-gradient(180deg,var(--n2) 0%,#101d31 100%);border:1px solid var(--li);border-radius:4px;box-shadow:0 8px 24px var(--sc),inset 0 0 0 1px rgba(255,255,255,.03);position:relative}
 .panel::before,.panel::after{content:"";position:absolute;width:14px;height:14px;border:1px solid var(--g);opacity:.5}
@@ -174,11 +184,10 @@ td.col-audio{text-align:center;white-space:nowrap}
 @media (max-width:720px){.form-grid{grid-template-columns:1fr 1fr}.options-grid{grid-template-columns:1fr}.pricing-grid{grid-template-columns:1fr}.why-box .two-cols{grid-template-columns:1fr}.edit-grid{grid-template-columns:1fr}header.langde-header h1{font-size:30px;letter-spacing:4px}.header-user{position:static;justify-content:center;margin-top:14px}}
 </style>
 </head>
-<body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
-
-<div id="_trap"><div>⛔</div></div>
+<body>
 
 <header class="langde-header">
+  <a class="home-link" href="index.html">← LangBlue</a>
   <div class="header-user" id="header-user" style="display:none;">
     <div class="avatar" id="user-avatar">?</div>
     <div>
@@ -319,6 +328,7 @@ td.col-audio{text-align:center;white-space:nowrap}
 </div>
 
 <!-- Pricing -->
+<!-- توجه: فعال‌سازی فعلی در سمت مرورگر انجام می‌شود؛ برای اجرای واقعی پلن‌های زمانی به اعتبارسنجی سمت‌سرور نیاز است. -->
 <div class="overlay pricing-overlay" id="overlay-pricing">
   <div class="overlay-card">
     <h2>Sechsfach freischalten</h2>
@@ -442,64 +452,6 @@ td.col-audio{text-align:center;white-space:nowrap}
 <script>
 (function(){
 "use strict";
-
-/* ============================================================
-   Anti-DevTools
-   ============================================================ */
-var _dt=false,_trap=document.getElementById("_trap");
-function _trapOn(){if(!_dt){_dt=true;try{_trap.classList.add("show");}catch(e){}}}
-function _trapOff(){if(_dt){_dt=false;try{_trap.classList.remove("show");}catch(e){}}}
-
-document.addEventListener("contextmenu",function(e){e.preventDefault();return false;},true);
-document.addEventListener("selectstart",function(e){var t=(e.target.tagName||"").toUpperCase();if(t!=="INPUT"&&t!=="TEXTAREA")e.preventDefault();},true);
-document.addEventListener("dragstart",function(e){e.preventDefault();},true);
-document.addEventListener("keydown",function(e){
-  var k=(e.key||"").toLowerCase();
-  if(e.key==="F12"){e.preventDefault();e.stopPropagation();return false;}
-  if(e.ctrlKey&&e.shiftKey&&["i","j","c","k"].indexOf(k)>-1){e.preventDefault();e.stopPropagation();return false;}
-  if(e.metaKey&&e.altKey&&["i","j","c"].indexOf(k)>-1){e.preventDefault();e.stopPropagation();return false;}
-  if(e.ctrlKey&&["u","s","p"].indexOf(k)>-1){e.preventDefault();e.stopPropagation();return false;}
-  var t=(e.target.tagName||"").toUpperCase();
-  if(e.ctrlKey&&k==="a"&&t!=="INPUT"&&t!=="TEXTAREA"){e.preventDefault();return false;}
-  if(e.ctrlKey&&(k==="c"||k==="x")&&t!=="INPUT"&&t!=="TEXTAREA"){e.preventDefault();return false;}
-},true);
-document.addEventListener("copy",function(e){
-  var t=(e.target.tagName||"").toUpperCase();
-  if(t!=="INPUT"&&t!=="TEXTAREA"){
-    e.preventDefault();
-    try{e.clipboardData.setData("text/plain","© LangDE");}catch(x){}
-  }
-},true);
-
-try{
-  var _ol=console.log;
-  Object.defineProperty(console,"_",{get:function(){return _ol;}});
-  console.log(console._);
-}catch(e){}
-
-(function _dl(){
-  var _t=performance.now();
-  (function(){return false;}).constructor("debugger")();
-  var _d=performance.now()-_t;
-  if(_d>120)_trapOn();
-  setTimeout(_dl,1500);
-})();
-
-setInterval(function(){
-  var wd=window.outerWidth-window.innerWidth;
-  var hd=window.outerHeight-window.innerHeight;
-  if(wd>180||hd>180)_trapOn();
-  else if(_dt&&wd<120&&hd<120)_trapOff();
-},1200);
-
-try{
-  Function.prototype.toString=(function(orig){
-    return function(){
-      if(this===Function.prototype.toString)return "function () { [native code] }";
-      try{return orig.call(this);}catch(e){return "function () { [native code] }";}
-    };
-  })(Function.prototype.toString);
-}catch(e){}
 
 /* ============================================================
    Constants
@@ -944,7 +896,7 @@ function _whyBoxHtml(){
       '</div>'+
       '<div class="col">'+
         '<h5>🅑 حالت خاص — Sechsfach</h5>'+
-        '<p>مثل یک <strong>برنامهٔ تمرینی جدی</strong> است. ۶ نوبت کوتاه در روز، با استراحت‌های اجباری.</p>'+
+        '<p>مثل یک <strong>برنامهٔ تمرینی جدی</strong> است. ۶ دوره در چرخه، با استراحت‌های اجباری.</p>'+
         '<p>برای <strong>یادگیری عمیق و ماندگار</strong> طراحی شده — نه فقط برای امتحان دادن.</p>'+
         '<p>محدودیت زمانی و تکرار دارد تا مغز فرصت پردازش داشته باشد.</p>'+
         '<span class="tag">مناسب: کسانی که جدی هستند</span>'+
@@ -965,7 +917,7 @@ function _premiumBoxHtml(){
     'نتیجه؟ بعد از مدتی خسته می‌شوی و کلمه‌ها در حافظهٔ بلندمدتت جا نمی‌گیرند.</p>'+
     '<p>حالت خاص شش‌گانه این مشکل را حل می‌کند:</p>'+
     '<ul>'+
-      '<li>هر روز <span class="highlight">۶ نوبت کوتاه</span> تمرین می‌کنی، نه یک نوبت طولانی.</li>'+
+      '<li>هر چرخه شامل <span class="highlight">۶ دوره</span> تمرین است، نه یک نوبت طولانی.</li>'+
       '<li>هر نوبت بعد از <span class="highlight">۳ کلمه</span>، یک ساعت استراحت اجباری می‌شود.</li>'+
       '<li>هیچ کلمه‌ای <span class="highlight">دو بار پشت سر هم</span> تکرار نمی‌شود.</li>'+
       '<li>هر کلمه در <span class="highlight">۴۸ ساعت</span> فقط ۲ بار می‌آید.</li>'+
@@ -973,10 +925,10 @@ function _premiumBoxHtml(){
     '</ul>'+
     '<p><strong style="color:var(--g);">نتیجه چیست؟</strong></p>'+
     '<ul>'+
-      '<li>حافظه‌ات <span class="highlight">۳ تا ۵ برابر</span> بهتر کار می‌کند.</li>'+
+      '<li>تمرین‌ها با محدودیت تکرار و فاصلهٔ زمانی، ساختارمندتر می‌شوند.</li>'+
       '<li>خسته نمی‌شوی، چون هر نوبت کوتاه است.</li>'+
       '<li>کلمه‌ها <span class="highlight">واقعاً</span> در ذهنت می‌مانند.</li>'+
-      '<li>مثل یک کلاس خصوصی عمل می‌کند، ولی بدون هزینهٔ معلم.</li>'+
+      '<li>این ابزار برای تمرین مستقل و منظم طراحی شده است.</li>'+
     '</ul>'+
   '</div>';
 }
@@ -1535,13 +1487,6 @@ function _init(){
       if(c.phase==="locked")_renderStats();
     }
   },5000);
-  setInterval(function(){
-    if(_dt){
-      var wd=window.outerWidth-window.innerWidth;
-      var hd=window.outerHeight-window.innerHeight;
-      if(wd<120&&hd<120)_trapOff();
-    }
-  },1500);
 }
 
 if(document.readyState==="loading"){
