@@ -827,13 +827,38 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
       (order.bundleDiscount?'<div class="receipt-line"><span>تخفیف بسته کامل ۱۲ ماهه</span><strong>'+order.bundleDiscount+'٪</strong></div>':'')+
       '<div class="receipt-total"><span>مبلغ نهایی</span><span>'+order.totalStr+'</span></div>'+
       '<div class="receipt-note">'+((order.plan.days===7||order.plan.days===14||order.plan.days===21)?'کد وریفای پلن‌های روزانه در فیش نمایش داده می‌شود.':'کد وریفای پلن‌های ماهانه برای کاربر نمایش داده نمی‌شود و پس از بررسی سفارش توسط مدیریت صادر می‌شود.')+'</div>'+
-      '<div class="receipt-actions"><button id="sendReceiptTelegram" class="btn btn-primary" type="button">📨 ارسال سفارش به تلگرام</button></div>';
+      '<div class="receipt-actions"><button id="sendReceiptTelegram" class="btn btn-primary" type="button">📨 ارسال سفارش به تلگرام</button><button id="activateReceiptPlan" class="btn btn-secondary" type="button">🔑 فعال‌سازی پلن‌ها</button></div>';
     out.classList.add('show');
     document.getElementById('printReceipt').style.display='inline-flex';
     var telegramText='درخواست خرید LangBlue\nشماره فیش: '+order.id+'\nمحصولات: '+order.products.map(function(p){return p.label;}).join('، ')+'\nپلن: '+order.plan.label+'\n'+(order.plan.festival?'تخفیف فستیوال: '+order.plan.discount+'٪\n':'')+(order.bundleDiscount?'تخفیف بسته کامل ۱۲ ماهه: '+order.bundleDiscount+'٪\n':'')+'مبلغ نهایی: '+order.totalStr+'\nلطفاً سفارش را بررسی و کد وریفای را ارسال کنید.';
     document.getElementById('sendReceiptTelegram').addEventListener('click',function(){
       var url='https://t.me/share/url?url='+encodeURIComponent('https://lngbl.github.io/')+'&text='+encodeURIComponent(telegramText);
       window.open(url,'_blank','noopener,noreferrer');
+    });
+    document.getElementById('activateReceiptPlan').addEventListener('click',function(){
+      var ids=selected();
+      var session=null;
+      try{session=JSON.parse(localStorage.getItem('lb:session')||'null');}catch(e){}
+      if(!session||!session.userId){
+        var go=confirm('برای فعال‌سازی باید حساب LangBlue داشته باشی. اگر حساب نداری، ثبت‌نام کن و بعد به این صفحه برگرد.\n\nرفتن به صفحه حساب؟');
+        if(go) window.location.href='LangBlue-grammer.html#accountGate';
+        return;
+      }
+      var code=window.prompt('کد فعال‌سازی را وارد کن:');
+      if(!code)return;
+      var planId=window.LangBlueCommerce.CODES[String(code).trim()];
+      if(!planId){alert('❌ کد فعال‌سازی نامعتبر است.');return;}
+      var uid=session.userId,key='lb:user:'+uid+':subscription',usedKey='lb:user:'+uid+':used_codes',now=Date.now(),existing=null,used={};
+      try{existing=JSON.parse(localStorage.getItem(key)||'null');used=JSON.parse(localStorage.getItem(usedKey)||'{}');}catch(e){}
+      if(used[String(code).trim()]){alert('❌ این کد قبلاً استفاده شده است.');return;}
+      var plan=window.LangBlueCommerce.PLANS[planId];
+      var base=existing&&existing.expiresAt>now?existing.expiresAt:now;
+      var sub={planId:plan.id,planDays:plan.days,currency:'IRT',startedAt:base,expiresAt:base+plan.days*86400000,verifiedAt:now,verifiedByCode:true,activatedProducts:ids.slice()};
+      localStorage.setItem(key,JSON.stringify(sub));
+      used[String(code).trim()]={at:now,planId:plan.id,products:ids.slice()};
+      localStorage.setItem(usedKey,JSON.stringify(used));
+      alert('✅ پلن «'+plan.label+'» برای '+ids.length+' محصول انتخاب‌شده فعال شد.\n\nمحصولات: '+ids.map(function(id){return window.LangBlueCommerce.PRODUCTS[id].label;}).join('، '));
+      window.dispatchEvent(new StorageEvent('storage',{key:key,newValue:JSON.stringify(sub)}));
     });
     out.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
