@@ -791,16 +791,19 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     return document.getElementById('receiptPlan').value;
   }
   function renderSummary(){
-    var ids=selected(), p=window.LangBlueCommerce.displayPlan(plan());
+    var ids=selected(), planId=plan(), p=window.LangBlueCommerce.displayPlan(planId);
     var box=document.getElementById('receiptSummary');
     if(!ids.length){
       box.innerHTML='<div style="color:#ffb6b6">حداقل یک محصول را انتخاب کن.</div>';
       return;
     }
-    var total=p.finalPrice*ids.length;
+    var subtotal=p.finalPrice*ids.length;
+    var isBundle=window.LangBlueCommerce.isAllProducts12M?window.LangBlueCommerce.isAllProducts12M(ids,planId):(planId==='irt_12m'&&ids.length===3);
+    var bundleDiscount=isBundle?(window.LangBlueCommerce.ALL_PRODUCTS_12M_DISCOUNT||15):0;
+    var total=window.LangBlueCommerce.discountedPrice(subtotal,bundleDiscount);
     var discount=p.discount?p.discount+'٪ تخفیف جشنواره‌ای':''; 
     box.innerHTML='<div class="receipt-summary-row"><span>تعداد محصولات</span><strong>'+ids.length+'</strong></div>'+
-      '<div class="receipt-summary-row"><span>قیمت هر محصول</span><strong>'+money(p.finalPrice)+'</strong></div>'+
+      '<div class="receipt-summary-row"><span>قیمت پایه هر محصول</span><strong>'+money(p.finalPrice)+'</strong></div>'+
       (discount?'<div class="receipt-summary-row"><span>تخفیف</span><strong>'+discount+'</strong></div>':'')+
       '<div class="receipt-summary-row receipt-summary-total"><span>مبلغ نهایی</span><strong>'+money(total)+'</strong></div>';
   }
