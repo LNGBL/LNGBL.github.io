@@ -1342,7 +1342,8 @@
                 STATE: 'LangBlue_state_v32',
                 REPETITION_DATA: 'LangBlue_repetition_data',
                 FLASHCARD_VISITS: 'LangBlue_flashcard_visits',
-                WEAKNESS: 'LangBlue_weakness_tracker'
+                WEAKNESS: 'LangBlue_weakness_tracker',
+                ADAPTIVE_BRAIN: 'LangBlue_adaptive_brain_v1'
             };
 
             const FORGOTTEN_DAYS = 2;
@@ -1626,10 +1627,10 @@
 
                 createBackup: function() {
                     var data = {};
-                    var keys = [KEYS.WORDS, KEYS.PHRASAL, KEYS.SENTENCES, KEYS.GRAMMAR, KEYS.SRS, KEYS.TOKENS, KEYS.REPETITION_DATA, KEYS.FLASHCARD_VISITS, KEYS.WEAKNESS, KEYS.PAUSED, KEYS.DAILY_REVIEW];
+                    var keys = [KEYS.WORDS, KEYS.PHRASAL, KEYS.SENTENCES, KEYS.GRAMMAR, KEYS.SRS, KEYS.TOKENS, KEYS.REPETITION_DATA, KEYS.FLASHCARD_VISITS, KEYS.WEAKNESS, KEYS.PAUSED, KEYS.DAILY_REVIEW, KEYS.ADAPTIVE_BRAIN];
                     for (var i = 0; i < keys.length; i++) {
-                        var val = Storage.get(keys[i], null); if (val !== null) data[keys[i]] = val;
-                        }
+                        var val = Storage.get(keys[i], null);
+                        if (val !== null) data[keys[i]] = val;
                     }
                     var backup = {
                         app: 'LangBlue',
@@ -1944,6 +1945,130 @@
             };
 
             // ================================================================
+            // ADAPTIVE LEARNING BRAIN v1
+            // Neural-inspired single-layer adaptive scorer.
+            // It learns from accuracy, latency, repetition, weakness and recency
+            // without replacing the existing SRS/account/data structures.
+            // ================================================================
+            var AdaptiveBrain = {
+                KEY: KEYS.ADAPTIVE_BRAIN,
+                DEFAULTS: {
+                    weights: [1.25, 1.05, 0.85, 0.75, 0.55, 0.45],
+                    bias: -0.35,
+                    learningRate: 0.045,
+                    seen: 0
+                },
+
+                load: function() {
+                    var d = Storage.get(this.KEY, null);
+                    if (!d || !Array.isArray(d.weights) || d.weights.length !== 6) {
+                        d = JSON.parse(JSON.stringify(this.DEFAULTS));
+                    }
+                    d.learningRate = Math.min(0.15, Math.max(0.005, Number(d.learningRate) || 0.045));
+                    d.seen = Math.max(0, Number(d.seen) || 0);
+                    return d;
+                },
+
+                save: function(d) { Storage.set(this.KEY, d); },
+
+                sigmoid: function(x) {
+                    if (x < -30) return 0;
+                    if (x > 30) return 1;
+                    return 1 / (1 + Math.exp(-x));
+                },
+
+                key: function(word, persian) { return word + '|' + persian; },
+
+                profile: function(word, persian, mode) {
+                    var now = Date.now();
+                    var srs = SRS.getAll()[this.key(word, persian)] || {};
+                    var weak = WeaknessSystem.getAll();
+                    var attempts = 0, wrong = 0, correct = 0, last = 0;
+
+                    Object.keys(weak).forEach(function(k) {
+                        var x = weak[k];
+                        if (x.word === word && x.persian === persian) {
+                            attempts += Number(x.attempts) || 0;
+                            wrong += Number(x.wrong) || 0;
+                            correct += Number(x.correct) || 0;
+                            last = Math.max(last, Number(x.lastAttempt) || 0);
+                        }
+                    });
+
+                    var accuracy = attempts ? correct / attempts : 0.5;
+                    var errorRate = attempts ? wrong / attempts : 0.5;
+                    var hours = last ? Math.max(0, (now - last) / 3600000) : 72;
+                    var recency = Math.exp(-hours / 48);
+                    var uncertainty = 1 / Math.sqrt(1 + attempts);
+                    var mastery = srs.status === 'mastered' ? 1 :
+                        srs.status === 'review' ? 0.68 :
+                        srs.status === 'learning' ? 0.38 : 0.2;
+                    var modeWeakness = 0.5;
+
+                    if (mode && weak[this.key(word, persian) + '|' + mode]) {
+                        var m = weak[this.key(word, persian) + '|' + mode];
+                        var ma = Number(m.attempts) || 0;
+                        modeWeakness = ma ? (Number(m.wrong) || 0) / ma : 0.5;
+                    }
+
+                    return {
+                        errorRate: errorRate,
+                        uncertainty: uncertainty,
+                        recency: recency,
+                        mastery: mastery,
+                        modeWeakness: modeWeakness,
+                        inverseAccuracy: 1 - accuracy
+                    };
+                },
+
+                score: function(word, persian, mode) {
+                    var d = this.load(), p = this.profile(word, persian, mode);
+                    var x = [p.errorRate, p.uncertainty, p.recency, p.modeWeakness, p.inverseAccuracy, 1 - p.mastery];
+                    var z = d.bias;
+                    for (var i = 0; i < d.weights.length; i++) z += d.weights[i] * x[i];
+                    return { probability: this.sigmoid(z), features: x };
+                },
+
+                priority: function(word, persian, mode) {
+                    var s = this.score(word, persian, mode);
+                    // Small exploration term prevents the learner from getting trapped
+                    // in only the hardest cards.
+                    return s.probability + (1 - s.probability) * 0.18;
+                },
+
+                rank: function(words, mode, limit) {
+                    var self = this;
+                    return words.slice().sort(function(a, b) {
+                        var sb = self.priority(b.word, b.persian, mode);
+                        var sa = self.priority(a.word, a.persian, mode);
+                        return sb - sa;
+                    }).slice(0, limit || words.length);
+                },
+
+                observe: function(word, persian, mode, correct, latencyMs) {
+                    if (!word || !persian) return;
+                    var d = this.load();
+                    var p = this.profile(word, persian, mode);
+                    var x = [p.errorRate, p.uncertainty, p.recency, p.modeWeakness, p.inverseAccuracy, 1 - p.mastery];
+
+                    var latency = Math.min(1, Math.max(0, (Number(latencyMs) || 5000) / 10000));
+                    var target = correct ? (1 - latency * 0.25) : 0;
+                    var pred = this.score(word, persian, mode).probability;
+                    var error = target - pred;
+
+                    for (var i = 0; i < d.weights.length; i++) {
+                        d.weights[i] += d.learningRate * error * x[i];
+                    }
+                    d.bias += d.learningRate * error;
+                    d.seen++;
+
+                    // Slow down learning as the model becomes stable.
+                    d.learningRate = Math.max(0.01, 0.045 / Math.sqrt(1 + d.seen / 40));
+                    this.save(d);
+                }
+            };
+
+                        // ================================================================
             // FLASHCARD (۴ گزینه‌ای + تلفظ + تکرار هوشمند)
             // ================================================================
 
@@ -2058,7 +2183,8 @@
                         }
                     }
 
-                    return shuffled(selected).slice(0, 12);
+                    var finalCards = shuffled(selected).slice(0, 12);
+                    return AdaptiveBrain.rank(finalCards, 'flashcard', finalCards.length);
                 },
 
                 showCard: function() {
@@ -2071,6 +2197,7 @@
                     this.timeLeft = FLASHCARD_TIME;
                     this.currentCard = this.cards[this.currentIndex];
                     var card = this.currentCard;
+                    this.cardStartedAt = Date.now();
                     var total = this.cards.length;
                     var accent = document.getElementById('accentSelect') ? document.getElementById('accentSelect').value : 'us';
 
@@ -2198,6 +2325,7 @@
 
                     this.stats.wrong++;
                     SRS.update(this.currentCard.word, this.currentCard.persian, 'review');
+                    AdaptiveBrain.observe(this.currentCard.word, this.currentCard.persian, 'flashcard', false, Date.now() - (this.cardStartedAt || Date.now()));
                     this.streak = 0;
 
                     var self = this;
@@ -2235,6 +2363,7 @@
                         feedback.style.color = 'var(--success)';
                         this.stats.correct++;
                         this.streak++;
+                        AdaptiveBrain.observe(word, persian, 'flashcard', true, Date.now() - (this.cardStartedAt || Date.now()));
 
                         // ===== ثبت پاسخ درست در سیستم تکرار =====
                         RepetitionSystem.recordCorrect(word, persian);
@@ -2246,6 +2375,7 @@
                         feedback.textContent = '❌ اشتباه! ترجمه صحیح: "' + persian + '"';
                         feedback.style.color = 'var(--danger)';
                         this.stats.wrong++;
+                        AdaptiveBrain.observe(word, persian, 'flashcard', false, Date.now() - (this.cardStartedAt || Date.now()));
                         this.streak = 0;
 
                         // ===== ثبت پاسخ اشتباه در سیستم تکرار =====
@@ -2364,18 +2494,14 @@
                     }
                     return out;
                 },
-                selectCards: function(limit) {
+                selectCards: function(limit, forcedMode) {
                     var cards=[], used={}, modes=this.MODES, self=this;
                     for(var i=0;i<limit;i++){
-                        var mode=self.chooseMode(), pool=self.eligibleWords(mode);
+                        var mode=forcedMode && self.MODES.indexOf(forcedMode)!==-1 ? forcedMode : self.chooseMode();
+                        var pool=self.eligibleWords(mode);
                         if(!pool.length){ mode=self.chooseMode(mode==='sentence_context'?'word_to_meaning':null); pool=self.eligibleWords(mode); }
                         if(!pool.length) continue;
-                        var candidates=pool.slice().sort(function(a,b){
-                            var sa=self.getAll()[self.key(a.word,a.persian,mode)]||{attempts:0,wrong:0};
-                            var sb=self.getAll()[self.key(b.word,b.persian,mode)]||{attempts:0,wrong:0};
-                            var wa=sa.attempts?sa.wrong/sa.attempts:0.5, wb=sb.attempts?sb.wrong/sb.attempts:0.5;
-                            return (wb+Math.random()*.25)-(wa+Math.random()*.25);
-                        });
+                        var candidates=AdaptiveBrain.rank(pool, mode, pool.length);
                         var picked=null;
                         for(var j=0;j<candidates.length;j++){var id=candidates[j].word+'|'+candidates[j].persian; if(!used[id]){picked=candidates[j];break;}}
                         if(!picked) picked=candidates[0];
@@ -2397,7 +2523,7 @@
                 },
                 start: function(forcedMode) {
                     if(Core.state.words.length<3){UI.showToast('حداقل ۳ واژه نیاز است!','warning');return;}
-                    var cards=this.selectCards(12);
+                    var cards=this.selectCards(12, forcedMode);
                     if(!cards.length){UI.showToast('برای تمرین نقاط ضعف کارت مناسبی پیدا نشد.','warning');return;}
                     this.cards=cards;this.index=0;this.correct=0;this.wrong=0;this.active=true;this.forcedMode=forcedMode||null;
                     document.getElementById('weaknessDashboard').style.display='none';document.getElementById('weaknessQuiz').style.display='block';
@@ -2407,6 +2533,7 @@
                     if(!this.active)return;
                     if(this.index>=this.cards.length){this.finish();return;}
                     var c=this.cards[this.index], mode=c.mode, q=document.getElementById('weaknessQuestion'), hint=document.getElementById('weaknessHint');
+                    this.cardStartedAt = Date.now();
                     document.getElementById('weaknessModeTitle').textContent=this.TITLES[mode];
                     document.getElementById('weaknessProgress').textContent=(this.index+1)+'/'+this.cards.length;
                     document.getElementById('weaknessFeedback').textContent='';
@@ -2423,6 +2550,7 @@
                     var c=this.cards[this.index], mode=c.mode, ok=btn.dataset.correct==='true';
                     var buttons=document.querySelectorAll('#weaknessOptions .option-btn');for(var i=0;i<buttons.length;i++){buttons[i].disabled=true;if(buttons[i].dataset.correct==='true')buttons[i].classList.add('correct');if(buttons[i]===btn&&!ok)buttons[i].classList.add('wrong');}
                     this.correct+=ok?1:0;this.wrong+=ok?0:1;WeaknessSystem.record(c.word.word,c.word.persian,mode,ok);
+                    AdaptiveBrain.observe(c.word.word,c.word.persian,mode,ok,Date.now()-(this.cardStartedAt||Date.now()));
                     if(ok){ RepetitionSystem.recordCorrect(c.word.word,c.word.persian); SRS.update(c.word.word,c.persian,'mastered'); }
                     else { RepetitionSystem.recordWrong(c.word.word,c.persian); SRS.update(c.word.word,c.persian,'review'); }
                     var correctText=(mode==='meaning_to_word'||mode==='listening')?c.word.word:c.persian;
