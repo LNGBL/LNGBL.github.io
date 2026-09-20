@@ -903,6 +903,34 @@
         .lock-local-time{font-size:.72rem;opacity:.7;margin-top:.35rem;font-family:Georgia,serif;}
     
         /* ================================================================
+           PAID ACCESS GATE · PDF / WEAKNESS
+           ================================================================ */
+        .paid-access-modal{max-width:760px !important;padding:1.35rem !important;}
+        .paid-access-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;border-bottom:1px solid var(--border-color);padding-bottom:.85rem;margin-bottom:1rem;}
+        .paid-access-head h3{border:0!important;margin:.2rem 0 0!important;padding:0!important;}
+        .paid-access-eyebrow{font-size:.68rem;letter-spacing:.16em;color:var(--voice-bg);font-weight:800;}
+        .paid-access-close{width:38px;height:38px;border:1px solid var(--border-color);border-radius:50%;background:var(--surface-2);color:var(--text-primary);font-size:1.5rem;cursor:pointer;}
+        .paid-access-intro{padding:1rem;border-radius:1rem;background:var(--accent-soft);border:1px solid var(--border-color);line-height:1.9;color:var(--text-secondary);margin-bottom:1rem;}
+        .paid-plan-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;}
+        .paid-plan-card{padding:1rem;border:1px solid var(--border-color);border-radius:1.1rem;background:var(--surface-2);text-align:center;transition:.2s;display:flex;flex-direction:column;justify-content:space-between;gap:.55rem;}
+        .paid-plan-card:hover{transform:translateY(-2px);border-color:var(--voice-bg);box-shadow:0 12px 28px rgba(0,20,50,.08);}
+        .paid-plan-card .days{font-weight:800;color:var(--text-primary);}
+        .paid-plan-card .price{font-size:1.15rem;font-weight:900;color:var(--voice-bg);}
+        .paid-plan-card .feature{font-size:.75rem;color:var(--text-secondary);min-height:2.2em;}
+        .paid-plan-card button{width:100%;border:0;border-radius:.8rem;padding:.65rem;cursor:pointer;background:var(--voice-bg);color:#fff;font-weight:700;}
+        .paid-howto{margin-top:1rem;padding:1rem;border:1px dashed var(--border-color);border-radius:1rem;line-height:1.9;font-size:.82rem;color:var(--text-secondary);}
+        .paid-howto ol{margin:.45rem 1.2rem 0 0;padding-right:1rem;}
+        .paid-warning{margin-top:.65rem;color:#a66b00;font-weight:700;}
+        .paid-verify{margin-top:1rem;padding:1rem;border-radius:1rem;background:var(--surface-2);border:1px solid var(--border-color);}
+        .paid-verify h4{margin:0 0 .35rem;color:var(--text-primary);}
+        .paid-verify p{margin:0 0 .7rem;color:var(--text-secondary);font-size:.8rem;}
+        .paid-verify-row{display:grid;grid-template-columns:1fr auto;gap:.6rem;}
+        .paid-verify-row input{min-height:44px;border:1px solid var(--border-color);border-radius:.8rem;background:var(--input-bg);color:var(--text-primary);padding:.65rem .8rem;direction:ltr;text-align:left;font-family:monospace;}
+        .paid-verify-status{margin-top:.55rem;font-size:.8rem;min-height:1.2rem;}
+        @media(max-width:700px){.paid-plan-grid{grid-template-columns:1fr 1fr;}.paid-verify-row{grid-template-columns:1fr;}}
+        @media(max-width:480px){.paid-plan-grid{grid-template-columns:1fr;}}
+        
+        /* ================================================================
            v3.5 COMPONENT REDESIGN · ACCOUNT / FLASHCARD / WEAKNESS
            ================================================================ */
         :root {
@@ -1195,6 +1223,42 @@
                     <button class="btn btn-primary" id="loginBtn">🔐 ورود</button>
                     <button class="btn btn-outline" id="registerModeBtn">➕ ساخت حساب جدید</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PAID ACCESS MODAL ===== -->
+    <div class="modal-overlay" id="paidAccessModal" aria-hidden="true">
+        <div class="modal paid-access-modal">
+            <div class="paid-access-head">
+                <div>
+                    <span class="paid-access-eyebrow">LANGBLUE ACCESS</span>
+                    <h3>🔓 دسترسی LangBlue</h3>
+                </div>
+                <button class="paid-access-close" id="paidAccessCloseBtn" aria-label="بستن">×</button>
+            </div>
+            <div id="paidAccessIntro" class="paid-access-intro"></div>
+            <div id="paidPlanGrid" class="paid-plan-grid"></div>
+            <div class="paid-howto">
+                <strong>📖 مراحل تهیه اشتراک (تومانی):</strong>
+                <ol>
+                    <li>به کانال تلگرام <a href="https://t.me/langBlue" target="_blank" rel="noopener">@langBlue</a> مراجعه کن</li>
+                    <li>به ادمین دایرکت پیام بده و بگو کدوم پلن رو می‌خوای</li>
+                    <li>ادمین شماره کارت بانکی رو برات می‌فرسته</li>
+                    <li>بعد از پرداخت، از رسید عکس بگیر و برای ادمین بفرست</li>
+                    <li>پس از تایید، ادمین <strong>کد تایید</strong> رو برات می‌فرسته</li>
+                    <li>کد رو در بخش «فعال‌سازی اشتراک» وارد کن</li>
+                </ol>
+                <div class="paid-warning">⚠️ کد تایید فقط از طریق ادمین @langBlue صادر می‌شه.</div>
+            </div>
+            <div class="paid-verify">
+                <h4>🔑 فعال‌سازی اشتراک (تومانی)</h4>
+                <p>کد تاییدی که از ادمین دریافت کردی رو اینجا وارد کن:</p>
+                <div class="paid-verify-row">
+                    <input id="vocabVerifyCode" placeholder="Verify_XXXXX" autocomplete="off" />
+                    <button id="vocabVerifyBtn" class="btn btn-primary">✅ فعال‌سازی</button>
+                </div>
+                <div id="vocabVerifyStatus" class="paid-verify-status"></div>
             </div>
         </div>
     </div>
@@ -1667,7 +1731,7 @@
                     if(!a){Store.set('session',null);Store.set('user',null);return null;}
                     // Never trust stale account objects from an older session.
                     if(!a.id || !a.username){Store.set('session',null);Store.set('user',null);return null;}
-                    var user={id:a.id,fullName:a.fullName||'',age:a.age||'',gender:a.gender||'',username:a.username,createdAt:a.createdAt||new Date().toISOString()};
+                    var user={id:a.id,fullName:a.fullName||a.name||'',name:a.name||a.fullName||'',age:a.age||'',gender:a.gender||a.sex||'',sex:a.sex||a.gender||'',username:a.username,createdAt:a.createdAt||a.at||new Date().toISOString(),at:a.at||a.createdAt||new Date().toISOString()};
                     Store.set('user',user); return user;
                 },
                 register:async function(data){
@@ -1675,7 +1739,8 @@
                     var key=data.username.toLowerCase();
                     if(accounts[key])return{ok:false,error:'این نام کاربری قبلاً ثبت شده است.'};
                     var hashed=await this.hashPassword(data.password),id=crypto.randomUUID();
-                    accounts[key]={id:id,fullName:data.fullName,age:data.age,gender:data.gender||'',username:data.username,passwordHash:hashed.hash,salt:hashed.salt,createdAt:new Date().toISOString()};
+                    var createdAt=new Date().toISOString();
+                    accounts[key]={id:id,fullName:data.fullName,name:data.fullName,age:data.age,gender:data.gender||'',sex:data.gender||'',username:data.username,passwordHash:hashed.hash,salt:hashed.salt,createdAt:createdAt,at:createdAt};
                     Store.set('accounts',accounts);Store.set('session',{userId:id,createdAt:Date.now()});await this.init();
                     return{ok:true,user:this.current()};
                 },
@@ -2849,6 +2914,87 @@
             };
 
             // ================================================================
+            // SHARED PAID ACCESS — same subscription key as Grammar
+            // ================================================================
+            var PaidAccess = {
+                FREE_LIMIT:45,
+                PLANS:[
+                    {id:'irt_7d',days:7,label:'۷ روز',price:'66,890 T',feature:'دسترسی کامل به همه امکانات'},
+                    {id:'irt_14d',days:14,label:'۱۴ روز',price:'123,890 T',feature:'دسترسی کامل به همه امکانات'},
+                    {id:'irt_21d',days:21,label:'۲۱ روز',price:'256,890 T',feature:'دسترسی کامل به همه امکانات'},
+                    {id:'irt_3m',days:90,label:'۳ ماه',price:'570,999 T',feature:'دسترسی کامل + بدون محدودیت'},
+                    {id:'irt_6m',days:180,label:'۶ ماه',price:'665,999 T',feature:'دسترسی کامل + بدون محدودیت'},
+                    {id:'irt_12m',days:365,label:'۱۲ ماه',price:'780,999 T',feature:'دسترسی کامل + امکان پرینت از اطلاعات'}
+                ],
+                CODES:{
+                    'Verify_mU#2292':'irt_7d','Verify_m!!2992':'irt_14d','Verify_I@112':'irt_21d',
+                    'Verify_MIR_ss1':'irt_3m','Verify_ll39332':'irt_6m','Verify_311012':'irt_12m'
+                },
+                pending:null,
+                current:function(){
+                    var s=Storage.get('subscription',null);
+                    return s&&s.expiresAt>Date.now()?s:null;
+                },
+                isActive:function(){return !!this.current();},
+                open:function(pending){
+                    this.pending=pending||null;
+                    var modal=document.getElementById('paidAccessModal');
+                    var sub=this.current();
+                    document.getElementById('paidAccessIntro').innerHTML=sub
+                        ? '✅ اشتراک شما فعال است تا <strong>'+new Date(sub.expiresAt).toLocaleDateString('fa-IR')+'</strong>.'
+                        : 'LangBlue تا <strong>۴۵ گرامر</strong> رایگان در اختیار شما می‌گذارد. امکانات پولی واژگان مانند <strong>PDF</strong> و <strong>بررسی نقاط ضعف</strong> با اشتراک فعال می‌شوند.';
+                    var grid=document.getElementById('paidPlanGrid');
+                    grid.innerHTML=this.PLANS.map(function(p){
+                        return '<div class="paid-plan-card"><div class="days">'+p.label+'</div><div class="price">'+p.price+'</div><div class="feature">'+p.feature+'</div><button data-plan="'+p.id+'">💳 درخواست این پلن</button></div>';
+                    }).join('');
+                    modal.classList.add('active');modal.setAttribute('aria-hidden','false');
+                },
+                close:function(){var m=document.getElementById('paidAccessModal');m.classList.remove('active');m.setAttribute('aria-hidden','true');this.pending=null;},
+                request:function(id){
+                    var p=this.PLANS.find(function(x){return x.id===id;}); if(!p)return;
+                    alert('📋 درخواست پلن «'+p.label+'» — '+p.price+'\n\nمراحل تهیه:\n1) به کانال تلگرام @langBlue مراجعه کن\n2) به ادمین دایرکت پیام بده و بگو این پلن را می‌خواهی\n3) ادمین شماره کارت بانکی را می‌فرستد\n4) بعد از پرداخت، رسید را برای ادمین بفرست\n5) پس از تایید، کد تایید را دریافت کن\n6) کد را در بخش فعال‌سازی وارد کن');
+                },
+                activate:function(){
+                    var code=document.getElementById('vocabVerifyCode').value.trim(), status=document.getElementById('vocabVerifyStatus');
+                    var planId=this.CODES[code];
+                    if(!planId){status.innerHTML='<span style="color:var(--danger)">❌ کد تایید نامعتبر است.</span>';return;}
+                    var used=Storage.get('vocab_used_codes',{}); if(used[code]){status.innerHTML='<span style="color:var(--danger)">❌ این کد قبلاً استفاده شده است.</span>';return;}
+                    var p=this.PLANS.find(function(x){return x.id===planId;}); if(!p)return;
+                    var now=Date.now(), existing=Storage.get('subscription',null), base=existing&&existing.expiresAt>now?existing.expiresAt:now;
+                    Storage.set('subscription',{planId:p.id,planDays:p.days,currency:'IRT',startedAt:now,expiresAt:base+p.days*86400000});
+                    used[code]={at:now,planId:p.id};Storage.set('vocab_used_codes',used);
+                    status.innerHTML='<span style="color:var(--success)">✅ اشتراک فعال شد.</span>';
+                    this.open(this.pending);
+                },
+                exportPdf:function(){
+                    var words = Core.state.words;
+                    if (words.length === 0) { UI.showToast('هیچ واژه‌ای وجود ندارد!', 'warning'); return; }
+                    var types = { noun:'اسم', verb:'فعل', adj:'صفت', other:'سایر' };
+                    var html='<html dir="rtl"><head><meta charset="UTF-8"><title>LangBlue - واژگان</title><style>body{font-family:sans-serif;padding:2rem;direction:rtl;}table{width:100%;border-collapse:collapse;margin-top:1rem;}th,td{padding:0.5rem;border:1px solid #ccc;text-align:right;}th{background:#e7effb;}</style></head><body><h1>📚 LangBlue - واژگان</h1><p>تعداد: '+words.length+'</p><table><thead><tr><th>#</th><th>واژه</th><th>ترجمه</th><th>نوع</th></tr></thead><tbody>';
+                    for(var i=0;i<words.length;i++){var w=words[i];html+='<tr><td>'+(i+1)+'</td><td>'+escapeHtml(w.word)+'</td><td>'+escapeHtml(w.persian)+'</td><td>'+escapeHtml(types[w.type]||'سایر')+'</td></tr>';}
+                    html+='</tbody></table><div style="margin-top:2rem;color:#7b8ba5;">تولید شده توسط LangBlue</div></body></html>';
+                    var win=window.open('','_blank'); if(!win){UI.showToast('پنجره چاپ توسط مرورگر مسدود شد.','warning');return;}
+                    win.document.write(html);win.document.close();win.focus();win.print();
+                },
+                require:function(action){
+                    if(!Auth.isLoggedIn()){
+                        this.pending=action;
+                        showRegisterMode();
+                        document.getElementById('userModal').classList.add('active');
+                        return false;
+                    }
+                    if(this.isActive()) return true;
+                    this.open(action);
+                    return false;
+                },
+                continuePending:function(){
+                    var p=this.pending;if(!p)return;
+                    if(this.isActive()){this.pending=null;this.close();p();return;}
+                    this.open(p);
+                }
+            };
+
+            // ================================================================
             // UI
             // ================================================================
 
@@ -3614,9 +3760,11 @@
                         Flashcard.start();
                     });
                     document.getElementById('openWeaknessBtn').addEventListener('click', function() {
-                        WeaknessSystem.active = false;
-                        document.getElementById('weaknessModal').classList.add('active');
-                        WeaknessSystem.openDashboard();
+                        if(!PaidAccess.require(function(){
+                            WeaknessSystem.active=false;
+                            document.getElementById('weaknessModal').classList.add('active');
+                            WeaknessSystem.openDashboard();
+                        })) return;
                     });
                     document.getElementById('weaknessCloseBtn').addEventListener('click', function() {
                         WeaknessSystem.active = false;
@@ -3795,6 +3943,12 @@
                         document.getElementById('userModal').classList.add('active');
                     });
                     document.getElementById('userModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});
+                    document.getElementById('paidAccessCloseBtn').addEventListener('click',function(){PaidAccess.close();});
+                    document.getElementById('paidAccessModal').addEventListener('click',function(e){if(e.target===this)PaidAccess.close();});
+                    document.getElementById('paidPlanGrid').addEventListener('click',function(e){var b=e.target.closest('[data-plan]');if(b)PaidAccess.request(b.dataset.plan);});
+                    document.getElementById('vocabVerifyBtn').addEventListener('click',function(){PaidAccess.activate();});
+                    document.getElementById('vocabVerifyCode').addEventListener('keydown',function(e){if(e.key==='Enter')PaidAccess.activate();});
+
                     document.getElementById('loginModeBtn').addEventListener('click',showLoginMode);
                     document.getElementById('registerModeBtn').addEventListener('click',showRegisterMode);
 
@@ -3816,13 +3970,13 @@
                         if(password!==confirm){document.getElementById('confirmError').textContent='رمزها مطابقت ندارند';return;}
                         var res=await Auth.register({fullName:fullName,age:age,gender:gender,username:username,password:password});
                         if(!res.ok){document.getElementById('usernameError').textContent=res.error;return;}
-                        LegacyBridge.migrateForCurrentUser();Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ حساب ساخته شد و داده‌های قبلی در صورت وجود حفظ شدند.','success');
+                        LegacyBridge.migrateForCurrentUser();Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ حساب ساخته شد و داده‌های قبلی در صورت وجود حفظ شدند.','success');PaidAccess.continuePending();
                     });
 
                     document.getElementById('loginBtn').addEventListener('click',async function(){
                         var username=document.getElementById('loginUsername').value.trim(),password=document.getElementById('loginPassword').value,res=await Auth.login(username,password);
                         if(!res.ok){document.getElementById('loginError').textContent=res.error;return;}
-                        LegacyBridge.migrateForCurrentUser();Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ ورود موفق بود.','success');
+                        LegacyBridge.migrateForCurrentUser();Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ ورود موفق بود.','success');PaidAccess.continuePending();
                     });
                     document.getElementById('logoutBtn').addEventListener('click',async function(){
                         if(!confirm('آیا از خروج مطمئن هستید؟'))return;
@@ -3914,28 +4068,8 @@
                     });
 
                     document.getElementById('downloadPdfBtn').addEventListener('click', function() {
-                        var words = Core.state.words;
-                        if (words.length === 0) {
-                            self.showToast('هیچ واژه‌ای وجود ندارد!', 'warning');
-                            return;
-                        }
-                        var types = { noun: 'اسم', verb: 'فعل', adj: 'صفت', other: 'سایر' };
-                        var html =
-                            '<html dir="rtl"><head><meta charset="UTF-8"><title>LangBlue - واژگان</title><style>body{font-family:sans-serif;padding:2rem;direction:rtl;}table{width:100%;border-collapse:collapse;margin-top:1rem;}th,td{padding:0.5rem;border:1px solid #ccc;text-align:right;}th{background:#e7effb;}</style></head><body><h1>📚 LangBlue - واژگان</h1><p>تعداد: ' +
-                            words.length +
-                            '</p><table><thead><tr><th>#</th><th>واژه</th><th>ترجمه</th><th>نوع</th></tr></thead><tbody>';
-                        for (var i = 0; i < words.length; i++) {
-                            var w = words[i];
-                            html += '<tr><td>' + (i + 1) + '</td><td>' + w.word + '</td><td>' + w.persian +
-                                '</td><td>' + (types[w.type] || 'سایر') + '</td></tr>';
-                        }
-                        html +=
-                            '</tbody></table><div style="margin-top:2rem;color:#7b8ba5;">تولید شده توسط LangBlue</div></body></html>';
-                        var win = window.open('', '_blank');
-                        win.document.write(html);
-                        win.document.close();
-                        win.focus();
-                        win.print();
+                        if(!PaidAccess.require(function(){ PaidAccess.exportPdf(); })) return;
+                        PaidAccess.exportPdf();
                     });
 
                     // Detail buttons
