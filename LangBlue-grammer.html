@@ -2105,16 +2105,16 @@ function renderForeignAccess(grid, intro, howToBox, verifyBox) {
       <div class="duration">مرحله ۱ — اشتراک‌گذاری</div>
       <div class="features" style="min-height:auto;">یکی از گزینه‌ها را انتخاب کن و لینک LangBlue را به اشتراک بگذار.</div>
       <div style="display:grid;gap:8px;margin-top:12px;">
-        <button class="small" onclick="ForeignAccessUI.share('Telegram')">✈️ Telegram</button>
-        <button class="small" onclick="ForeignAccessUI.share('X / Twitter')">𝕏 X / Twitter</button>
-        <button class="small" onclick="ForeignAccessUI.share('Bluesky')">🦋 Bluesky</button>
-        <button class="small" onclick="ForeignAccessUI.share('Instagram')">📷 Instagram</button>
-        <button class="small" onclick="ForeignAccessUI.share('Mastodon')">🐘 Mastodon</button>
-        <button class="small" onclick="ForeignAccessUI.share('YouTube')">▶️ YouTube</button>
-        <button class="ghost small" onclick="ForeignAccessUI.copyLink()">🔗 کپی لینک LangBlue</button>
+        <button class="small" data-foreign-share="Telegram">✈️ Telegram</button>
+        <button class="small" data-foreign-share="X / Twitter">𝕏 X / Twitter</button>
+        <button class="small" data-foreign-share="Bluesky">🦋 Bluesky</button>
+        <button class="small" data-foreign-share="Instagram">📷 Instagram</button>
+        <button class="small" data-foreign-share="Mastodon">🐘 Mastodon</button>
+        <button class="small" data-foreign-share="YouTube">▶️ YouTube</button>
+        <button class="ghost small" data-foreign-copy="1">🔗 کپی لینک LangBlue</button>
       </div>
       <label style="display:flex;align-items:center;gap:8px;margin-top:14px;cursor:pointer;">
-        <input id="shareConfirm" type="checkbox" ${s.shareDone ? 'checked' : ''} onchange="ForeignAccessUI.confirmShare(this.checked)">
+        <input id="shareConfirm" type="checkbox" ${s.shareDone ? 'checked' : ''} data-foreign-confirm="1">
         <span>اشتراک‌گذاری را انجام دادم.</span>
       </label>
     </div>
@@ -2123,7 +2123,7 @@ function renderForeignAccess(grid, intro, howToBox, verifyBox) {
       <div class="duration">مرحله ۲ — کامنت در سایت</div>
       <div class="features" style="min-height:auto;">نظر، پیشنهاد یا تجربه‌ات درباره LangBlue را بنویس.</div>
       <textarea id="foreignComment" maxlength="1000" placeholder="نظر شما درباره LangBlue..." style="margin-top:10px;min-height:110px;"></textarea>
-      <button style="width:100%;margin-top:10px;" onclick="ForeignAccessUI.submitComment()">💬 ثبت کامنت</button>
+      <button style="width:100%;margin-top:10px;" data-foreign-comment="1">💬 ثبت کامنت</button>
       <div id="foreignAccessStatus" style="margin-top:10px;font-size:12px;color:var(--muted);"></div>
     </div>`;
 
@@ -2203,6 +2203,28 @@ window.ForeignAccessUI = {
     renderPricing(); renderSubscriptionBanner(); renderProfile();
   }
 };
+
+/* Foreign access UI event bridge — avoids inline handlers inside module scripts. */
+document.addEventListener('click', (event) => {
+  const share = event.target.closest('[data-foreign-share]');
+  if (share) {
+    ForeignAccessUI.share(share.getAttribute('data-foreign-share'));
+    return;
+  }
+  const copy = event.target.closest('[data-foreign-copy]');
+  if (copy) {
+    ForeignAccessUI.copyLink();
+    return;
+  }
+  const comment = event.target.closest('[data-foreign-comment]');
+  if (comment) {
+    ForeignAccessUI.submitComment();
+  }
+});
+document.addEventListener('change', (event) => {
+  const confirm = event.target.closest('[data-foreign-confirm]');
+  if (confirm) ForeignAccessUI.confirmShare(confirm.checked);
+});
 
 function renderPricing() {
   const geo = Store.get('geo:country', {});
