@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangBlue · v3.4 Smart Repetition</title>
+    <title>LangBlue · Vocabulary</title>
     <style>
         /* ================================================================
            RESET & BASE
@@ -797,12 +797,12 @@
     <!-- ===== USER MODAL ===== -->
     <div class="modal-overlay" id="userModal">
         <div class="modal">
-            <h3>👤 حساب کاربری</h3>
+            <h3>👤 حساب LangBlue</h3>
             <div id="userStatus" style="background:var(--table-header);border-radius:1rem;padding:0.8rem 1rem;margin-bottom:1rem;border-right:4px solid var(--voice-bg);">
-                <p id="userStatusText" style="font-size:0.9rem;color:var(--text-primary);">در حال بارگذاری...</p>
+                <p id="userStatusText" style="font-size:0.9rem;color:var(--text-primary);">برای استفاده از واژگان وارد حساب شوید یا حساب بسازید.</p>
             </div>
             <div id="userPanel" class="hidden">
-                <div style="background:var(--table-header);border-radius:1rem;padding:1rem;margin-bottom:1rem;border-right:4px solid var(--success);">
+                <div style="background:var(--table-header);border-radius:1rem;padding:1rem;margin-bottom:1rem;border-right:4px solid var(--success);line-height:2;">
                     <p><strong>👤 نام:</strong> <span id="userFullName">—</span></p>
                     <p><strong>📛 نام کاربری:</strong> <span id="userUsername">—</span></p>
                     <p><strong>🎂 سن:</strong> <span id="userAge">—</span></p>
@@ -814,41 +814,29 @@
                 <button class="btn btn-danger" id="logoutBtn" style="width:100%;">🚪 خروج از حساب</button>
             </div>
             <div id="registerForm">
-                <div class="field-group">
-                    <label>👤 نام کامل</label>
-                    <input type="text" id="fullName" placeholder="مثلاً: علی محمدی" />
-                </div>
-                <div class="field-group">
-                    <label>🎂 سن</label>
-                    <input type="number" id="age" placeholder="مثلاً: 25" min="1" max="120" />
-                </div>
+                <div class="field-group"><label>👤 نام کامل</label><input type="text" id="fullName" placeholder="مثلاً: علی محمدی" autocomplete="name" /></div>
+                <div class="field-group"><label>🎂 سن</label><input type="number" id="age" placeholder="مثلاً: 25" min="1" max="120" /></div>
                 <div class="field-group">
                     <label>⚧️ جنسیت</label>
-                    <select id="gender">
-                        <option value="male">مرد</option>
-                        <option value="female">زن</option>
-                    </select>
+                    <select id="gender"><option value="male">مرد</option><option value="female">زن</option><option value="other">سایر</option></select>
                 </div>
-                <div class="field-group">
-                    <label>📛 نام کاربری</label>
-                    <input type="text" id="username" placeholder="مثلاً: ali_english" />
-                    <div class="error-msg" id="usernameError"></div>
-                </div>
-                <div class="field-group">
-                    <label>🔒 رمز عبور</label>
-                    <input type="password" id="password" placeholder="حداقل ۶ کاراکتر" />
-                    <div class="error-msg" id="passwordError"></div>
-                </div>
-                <div class="field-group">
-                    <label>🔐 تکرار رمز عبور</label>
-                    <input type="password" id="confirmPassword" placeholder="رمز را دوباره وارد کنید" />
-                    <div class="error-msg" id="confirmError"></div>
-                </div>
+                <div class="field-group"><label>📛 نام کاربری</label><input type="text" id="username" placeholder="مثلاً: ali_english" autocomplete="username" /><div class="error-msg" id="usernameError"></div></div>
+                <div class="field-group"><label>🔒 رمز عبور</label><input type="password" id="password" placeholder="حداقل ۶ کاراکتر" autocomplete="new-password" /><div class="error-msg" id="passwordError"></div></div>
+                <div class="field-group"><label>🔐 تکرار رمز عبور</label><input type="password" id="confirmPassword" placeholder="رمز را دوباره وارد کنید" autocomplete="new-password" /><div class="error-msg" id="confirmError"></div></div>
                 <div class="modal-actions">
-                    <button class="btn btn-primary" id="registerBtn">✅ ثبت‌نام</button>
-                    <button class="btn btn-outline" id="skipBtn">⏭️ مهمان</button>
+                    <button class="btn btn-primary" id="registerBtn">✅ ساخت حساب</button>
+                    <button class="btn btn-outline" id="loginModeBtn">🔑 ورود به حساب موجود</button>
                 </div>
                 <div id="registerMessage" class="hidden" style="color:var(--success);text-align:center;padding:0.5rem;"></div>
+            </div>
+            <div id="loginForm" class="hidden">
+                <div class="field-group"><label>📛 نام کاربری</label><input type="text" id="loginUsername" autocomplete="username" /></div>
+                <div class="field-group"><label>🔒 رمز عبور</label><input type="password" id="loginPassword" autocomplete="current-password" /></div>
+                <div id="loginError" class="error-msg"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="loginBtn">🔐 ورود</button>
+                    <button class="btn btn-outline" id="registerModeBtn">➕ ساخت حساب جدید</button>
+                </div>
             </div>
         </div>
     </div>
@@ -982,19 +970,20 @@
 
         <!-- HEADER -->
         <h1>
-            <span>🌊 LangBlue</span>
-            <small>· v3.3</small>
+            <a href="/" style="color:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:8px;" title="بازگشت به LangBlue"><span>🌊 LangBlue</span></a>
+            <small>· Vocabulary</small>
             <span class="daily-status" id="dailyStatus">📚 ۰ واژه</span>
             <span class="review-alert" id="reviewAlert" style="display:none;">🔔 کلمات فراموش شده!</span>
             <button class="theme-toggle" id="themeToggle">🌙 دارک</button>
-            <button class="user-btn" id="userBtn">
-                👤 <span id="userBtnText">حساب کاربری</span>
-                <span class="user-badge" id="userBadge">?</span>
-            </button>
+            <button class="user-btn" id="userBtn">👤 <span id="userBtnText">حساب کاربری</span><span class="user-badge" id="userBadge">?</span></button>
             <button class="btn btn-outline btn-sm" id="adminTriggerBtn">🔐 ادمین</button>
         </h1>
 
         <!-- MAIN TABS -->
+        <div style="display:flex;justify-content:flex-start;margin-bottom:.7rem;">
+            <a href="/" style="font-size:.78rem;color:var(--text-secondary);text-decoration:none;padding:.3rem .8rem;border:1px solid var(--border-color);border-radius:40px;">🔷 LangBlue · صفحه اصلی</a>
+        </div>
+
         <div class="main-tabs" id="mainTabs">
             <button class="main-tab active" data-tab="words">📚 واژگان <span class="tab-badge" id="wordsBadge">0</span></button>
             <button class="main-tab" data-tab="phrasal">🔗 فریزال ورب <span class="tab-badge" id="phrasalBadge">0</span></button>
@@ -1236,21 +1225,78 @@
             };
 
             // ================================================================
+            // LOCAL ACCOUNT / SESSION
+            // Same local-first account model as LangBlue Grammar.
+            // ================================================================
+
+            const Store = {
+                _globalKeys: new Set(['accounts','session']),
+                _storageKey: function(key) {
+                    if (this._globalKeys.has(key)) return 'lb:' + key;
+                    var session = null;
+                    try { session = JSON.parse(localStorage.getItem('lb:session') || 'null'); } catch (e) {}
+                    var uid = session && session.userId ? session.userId : 'anonymous';
+                    return 'lb:user:' + uid + ':' + key;
+                },
+                get: function(key, fallback) {
+                    try { var v=localStorage.getItem(this._storageKey(key)); return v ? JSON.parse(v) : fallback; } catch(e){ return fallback; }
+                },
+                set: function(key,val){ localStorage.setItem(this._storageKey(key),JSON.stringify(val)); },
+                remove: function(key){ localStorage.removeItem(this._storageKey(key)); }
+            };
+
+            const Auth = {
+                current:function(){return Store.get('user',null);},
+                isLoggedIn:function(){return !!this.current();},
+                hashPassword:async function(password,saltBytes){
+                    var enc=new TextEncoder(), salt=saltBytes||crypto.getRandomValues(new Uint8Array(16));
+                    var key=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveBits']);
+                    var bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:salt,iterations:120000,hash:'SHA-256'},key,256);
+                    return {hash:Array.from(new Uint8Array(bits)).map(function(b){return b.toString(16).padStart(2,'0');}).join(''),salt:Array.from(salt).map(function(b){return b.toString(16).padStart(2,'0');}).join('')};
+                },
+                verifyPassword:async function(password,account){
+                    var salt=new Uint8Array((account.salt.match(/.{2}/g)||[]).map(function(h){return parseInt(h,16);}));
+                    var result=await this.hashPassword(password,salt); return result.hash===account.passwordHash;
+                },
+                init:async function(){
+                    var session=Store.get('session',null);
+                    if(!session||!session.userId){Store.set('user',null);return null;}
+                    var accounts=Store.get('accounts',{});
+                    var vals=Object.values(accounts),a=null;
+                    for(var i=0;i<vals.length;i++) if(vals[i].id===session.userId){a=vals[i];break;}
+                    if(!a){Store.set('session',null);Store.set('user',null);return null;}
+                    var user={id:a.id,fullName:a.fullName||'',age:a.age||'',gender:a.gender||'',username:a.username,createdAt:a.createdAt||new Date().toISOString()};
+                    Store.set('user',user); return user;
+                },
+                register:async function(data){
+                    var accounts=Store.get('accounts',{});
+                    var key=data.username.toLowerCase();
+                    if(accounts[key])return{ok:false,error:'این نام کاربری قبلاً ثبت شده است.'};
+                    var hashed=await this.hashPassword(data.password),id=crypto.randomUUID();
+                    accounts[key]={id:id,fullName:data.fullName,age:data.age,gender:data.gender||'',username:data.username,passwordHash:hashed.hash,salt:hashed.salt,createdAt:new Date().toISOString()};
+                    Store.set('accounts',accounts);Store.set('session',{userId:id,createdAt:Date.now()});await this.init();
+                    return{ok:true,user:this.current()};
+                },
+                login:async function(username,password){
+                    var accounts=Store.get('accounts',{}),a=accounts[username.trim().toLowerCase()];
+                    if(!a||!(await this.verifyPassword(password,a)))return{ok:false,error:'نام کاربری یا رمز عبور نادرست است.'};
+                    Store.set('session',{userId:a.id,createdAt:Date.now()});await this.init();return{ok:true,user:this.current()};
+                },
+                logout:async function(){Store.set('session',null);Store.set('user',null);}
+            };
+
+            // ================================================================
             // STORAGE
             // ================================================================
 
             const Storage = {
-                get: function(key, fallback) {
-                    fallback = fallback || null;
-                    try { var d = localStorage.getItem(key); return d ? JSON.parse(d) : fallback; } catch { return fallback; }
-                },
-                set: function(key, value) {
-                    try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; }
-                },
-                remove: function(key) { localStorage.removeItem(key); },
-                getString: function(key, fallback) { fallback = fallback || ''; return localStorage.getItem(key) || fallback; },
-                setString: function(key, value) { localStorage.setItem(key, String(value)); },
-                has: function(key) { return localStorage.getItem(key) !== null; }
+                _key:function(key){return Store._storageKey(key);},
+                get:function(key,fallback){fallback=fallback||null;try{var d=localStorage.getItem(this._key(key));return d?JSON.parse(d):fallback;}catch{return fallback;}},
+                set:function(key,value){try{localStorage.setItem(this._key(key),JSON.stringify(value));return true;}catch{return false;}},
+                remove:function(key){localStorage.removeItem(this._key(key));},
+                getString:function(key,fallback){fallback=fallback||'';return localStorage.getItem(this._key(key))||fallback;},
+                setString:function(key,value){localStorage.setItem(this._key(key),String(value));},
+                has:function(key){return localStorage.getItem(this._key(key))!==null;}
             };
 
             // ================================================================
@@ -1497,6 +1543,10 @@
                 },
 
                 load: function() {
+                    if (!Auth.isLoggedIn()) {
+                        this.state.words=[];this.state.phrasal=[];this.state.sentences=[];this.state.grammar=[];this.state.tokens=0;this.state.lastSpin=null;this.state.pausedWords={};
+                        return this.state;
+                    }
                     this.state.words = Storage.get(KEYS.WORDS, []);
                     this.state.phrasal = Storage.get(KEYS.PHRASAL, []);
                     this.state.sentences = Storage.get(KEYS.SENTENCES, []);
@@ -1568,23 +1618,9 @@
                     this.state.isLocked = false;
                 },
 
-                getUser: function() { return Storage.get(KEYS.USER); },
-                saveUser: function(data) {
-                    var users = Storage.get(KEYS.USER_DATA, []);
-                    for (var i = 0; i < users.length; i++) {
-                        if (users[i].username === data.username) {
-                            throw new Error('این نام کاربری قبلاً ثبت شده است!');
-                        }
-                    }
-                    var user = { id: Date.now(), isRegistered: true };
-                    for (var key in data) user[key] = data[key];
-                    users.push(user);
-                    Storage.set(KEYS.USER_DATA, users);
-                    Storage.set(KEYS.USER, user);
-                    Storage.set(KEYS.SESSION, { userId: user.id, username: user.username, createdAt: new Date().toISOString() });
-                },
-                logout: function() { Storage.remove(KEYS.SESSION);
-                    Storage.remove(KEYS.USER); },
+                getUser:function(){return Auth.current();},
+                saveUser:async function(data){return Auth.register(data);},
+                logout:async function(){return Auth.logout();},
 
                 getTheme: function() { return Storage.getString(KEYS.THEME, 'light'); },
                 setTheme: function(theme) {
@@ -3096,92 +3132,57 @@
                         self.renderTheme();
                     });
 
-                    // User
-                    document.getElementById('userBtn').addEventListener('click', function() {
-                        var user = Core.getUser();
-                        var status = document.getElementById('userStatusText');
-                        var panel = document.getElementById('userPanel');
-                        var form = document.getElementById('registerForm');
-                        if (user && user.isRegistered) {
-                            form.classList.add('hidden');
-                            panel.classList.remove('hidden');
-                            document.getElementById('userFullName').textContent = user.fullName || '—';
-                            document.getElementById('userUsername').textContent = user.username || '—';
-                            document.getElementById('userAge').textContent = user.age || '—';
-                            document.getElementById('userGender').textContent = user.gender === 'male' ? 'مرد' : 'زن';
-                            document.getElementById('userWordCount').textContent = Core.state.words.length;
-                            document.getElementById('userTokens').textContent = Core.state.tokens;
-                            document.getElementById('userCreatedAt').textContent = user.createdAt ? new Date(user
-                                .createdAt).toLocaleDateString('fa-IR') : '—';
-                            status.innerHTML = '✅ خوش آمدید!';
-                            status.style.borderRightColor = 'var(--success)';
-                        } else {
-                            form.classList.remove('hidden');
-                            panel.classList.add('hidden');
-                            status.innerHTML = '👤 شما در حالت مهمان هستید. ثبت‌نام کنید.';
-                            status.style.borderRightColor = 'var(--warning)';
-                        }
+                    // User / local account
+                    function showRegisterMode(){
+                        document.getElementById('registerForm').classList.remove('hidden');
+                        document.getElementById('loginForm').classList.add('hidden');
+                        document.getElementById('userPanel').classList.add('hidden');
+                        document.getElementById('userStatusText').textContent='برای ساخت حساب، اطلاعات را وارد کنید.';
+                    }
+                    function showLoginMode(){
+                        document.getElementById('registerForm').classList.add('hidden');
+                        document.getElementById('loginForm').classList.remove('hidden');
+                        document.getElementById('userPanel').classList.add('hidden');
+                        document.getElementById('userStatusText').textContent='با نام کاربری و رمز عبور وارد شوید.';
+                    }
+                    document.getElementById('userBtn').addEventListener('click',function(){
+                        var user=Auth.current(),status=document.getElementById('userStatusText'),panel=document.getElementById('userPanel');
+                        if(user){
+                            document.getElementById('registerForm').classList.add('hidden');document.getElementById('loginForm').classList.add('hidden');panel.classList.remove('hidden');
+                            document.getElementById('userFullName').textContent=user.fullName||'—';
+                            document.getElementById('userUsername').textContent=user.username||'—';
+                            document.getElementById('userAge').textContent=user.age||'—';
+                            document.getElementById('userGender').textContent=user.gender==='male'?'مرد':(user.gender==='female'?'زن':'سایر');
+                            document.getElementById('userWordCount').textContent=Core.state.words.length;document.getElementById('userTokens').textContent=Core.state.tokens;
+                            document.getElementById('userCreatedAt').textContent=user.createdAt?new Date(user.createdAt).toLocaleDateString('fa-IR'):'—';
+                            status.textContent='✅ حساب فعال است.';status.style.borderRightColor='var(--success)';
+                        }else{showRegisterMode();status.style.borderRightColor='var(--voice-bg)';}
                         document.getElementById('userModal').classList.add('active');
                     });
-                    document.getElementById('userModal').addEventListener('click', function(e) {
-                        if (e.target === this) this.classList.remove('active');
+                    document.getElementById('userModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});
+                    document.getElementById('loginModeBtn').addEventListener('click',showLoginMode);
+                    document.getElementById('registerModeBtn').addEventListener('click',showRegisterMode);
+
+                    document.getElementById('registerBtn').addEventListener('click',async function(){
+                        var fullName=document.getElementById('fullName').value.trim(),age=parseInt(document.getElementById('age').value),gender=document.getElementById('gender').value,username=document.getElementById('username').value.trim(),password=document.getElementById('password').value,confirm=document.getElementById('confirmPassword').value;
+                        document.getElementById('usernameError').textContent='';document.getElementById('passwordError').textContent='';document.getElementById('confirmError').textContent='';
+                        if(!fullName||isNaN(age)||age<1||age>120){self.showToast('نام و سن معتبر الزامی است.','warning');return;}
+                        if(username.length<3||!/^[a-zA-Z0-9_]+$/.test(username)){document.getElementById('usernameError').textContent='نام کاربری: حداقل ۳ کاراکتر و فقط حروف انگلیسی، عدد و زیرخط';return;}
+                        if(password.length<6){document.getElementById('passwordError').textContent='حداقل ۶ کاراکتر';return;}
+                        if(password!==confirm){document.getElementById('confirmError').textContent='رمزها مطابقت ندارند';return;}
+                        var res=await Auth.register({fullName:fullName,age:age,gender:gender,username:username,password:password});
+                        if(!res.ok){document.getElementById('usernameError').textContent=res.error;return;}
+                        Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ حساب ساخته شد و داده‌های واژگان این حساب جداست.','success');
                     });
 
-                    // Register
-                    document.getElementById('registerBtn').addEventListener('click', function() {
-                        var fullName = document.getElementById('fullName').value.trim();
-                        var age = parseInt(document.getElementById('age').value);
-                        var gender = document.getElementById('gender').value;
-                        var username = document.getElementById('username').value.trim();
-                        var password = document.getElementById('password').value;
-                        var confirm = document.getElementById('confirmPassword').value;
-
-                        var valid = true;
-                        document.getElementById('usernameError').textContent = '';
-                        document.getElementById('passwordError').textContent = '';
-                        document.getElementById('confirmError').textContent = '';
-
-                        if (!fullName) { valid = false;
-                            self.showToast('نام کامل الزامی است.', 'warning'); }
-                        if (isNaN(age) || age < 1 || age > 120) { valid = false;
-                            self.showToast('سن معتبر وارد کنید.', 'warning'); }
-                        if (username.length < 3) { valid = false;
-                            document.getElementById('usernameError').textContent = 'حداقل ۳ کاراکتر'; }
-                        if (!/^[a-zA-Z0-9_]+$/.test(username)) { valid = false;
-                            document.getElementById('usernameError').textContent = 'فقط حروف انگلیسی، اعداد و زیرخط'; }
-                        if (password.length < 6) { valid = false;
-                            document.getElementById('passwordError').textContent = 'حداقل ۶ کاراکتر'; }
-                        if (password !== confirm) { valid = false;
-                            document.getElementById('confirmError').textContent = 'رمزها مطابقت ندارند'; }
-
-                        if (!valid) return;
-
-                        try {
-                            Core.saveUser({ fullName: fullName, age: age, gender: gender, username: username,
-                                password: password, createdAt: new Date().toISOString() });
-                            document.getElementById('registerMessage').textContent = '✅ ثبت‌نام با موفقیت انجام شد!';
-                            document.getElementById('registerMessage').classList.remove('hidden');
-                            setTimeout(function() {
-                                document.getElementById('userModal').classList.remove('active');
-                                self.renderUser();
-                                self.showToast('✅ ثبت‌نام موفق!', 'success');
-                            }, 1000);
-                        } catch (e) {
-                            document.getElementById('usernameError').textContent = e.message;
-                            self.showToast(e.message, 'error');
-                        }
+                    document.getElementById('loginBtn').addEventListener('click',async function(){
+                        var username=document.getElementById('loginUsername').value.trim(),password=document.getElementById('loginPassword').value,res=await Auth.login(username,password);
+                        if(!res.ok){document.getElementById('loginError').textContent=res.error;return;}
+                        Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ ورود موفق بود.','success');
                     });
-
-                    document.getElementById('skipBtn').addEventListener('click', function() {
-                        document.getElementById('userModal').classList.remove('active');
-                    });
-
-                    document.getElementById('logoutBtn').addEventListener('click', function() {
-                        if (!confirm('آیا از خروج مطمئن هستید؟')) return;
-                        Core.logout();
-                        document.getElementById('userModal').classList.remove('active');
-                        self.renderUser();
-                        self.showToast('🚪 خروج انجام شد؛ اطلاعات محلی حفظ شد.', 'info');
+                    document.getElementById('logoutBtn').addEventListener('click',async function(){
+                        if(!confirm('آیا از خروج مطمئن هستید؟'))return;
+                        await Auth.logout();document.getElementById('userModal').classList.remove('active');Core.load();self.renderAll();self.showToast('🚪 از حساب خارج شدید. داده‌های حساب قبلی باقی ماند.','info');
                     });
 
                     // Admin
@@ -3408,30 +3409,18 @@
             // INIT
             // ================================================================
 
-            function init() {
+            async function init() {
+                await Auth.init();
                 Core.load();
                 Security.apply();
-
-                if (Core.isLockedNow()) {
-                    UI.showLock();
-                }
-
+                if(Core.isLockedNow()) UI.showLock();
                 UI.renderAll();
                 UI.bindEvents();
-
-                if (window.speechSynthesis) {
-                    window.speechSynthesis.getVoices();
-                    window.speechSynthesis.onvoiceschanged = function() {
-                        window.speechSynthesis.getVoices();
-                    };
-                }
-
+                if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
                 Repetition.cleanPaused();
-
-                console.log('🌊 LangBlue v3.4 · Smart Repetition + Flashcard Pronunciation');
-                console.log('📊 ' + Core.state.words.length + ' واژه · ' + Core.state.phrasal.length + ' فریزال ورب · ' + Core
-                    .state.sentences.length + ' جمله');
-                console.log('🪙 ' + Core.state.tokens + ' توکن');
+                console.log('🌊 LangBlue v3.4 · Vocabulary + Smart Repetition · Account scoped');
+                console.log('📊 '+Core.state.words.length+' واژه · '+Core.state.phrasal.length+' فریزال ورب · '+Core.state.sentences.length+' جمله');
+                console.log('🪙 '+Core.state.tokens+' توکن');
             }
 
             if (document.readyState === 'loading') {
