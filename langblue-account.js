@@ -122,5 +122,7 @@ const Auth = {
   }
 };
 
+window.Store=Store;
+window.Auth=Auth;
 window.LangBlueAccount={Store:Store,Auth:Auth};
 })(window);
