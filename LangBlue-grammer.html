@@ -1862,7 +1862,7 @@ function renderSubscriptionBanner() {
           <div style="font-size:12px;opacity:.9;margin-top:4px;">
             ${unlocked
               ? 'اشتراک‌گذاری + کامنت تکمیل شده؛ دسترسی بیشتر فعال است.'
-              : '${count} از ${FREE_LIMIT} گرامر رایگان استفاده شده — برای ادامه، دو مرحله دسترسی خارجی را تکمیل کن.'}
+              : count + ' از ' + FREE_LIMIT + ' گرامر رایگان استفاده شده — برای ادامه، دو مرحله دسترسی خارجی را تکمیل کن.'}
           </div>
         </div>
         <button class="ghost small" onclick="document.querySelector('.tab[data-tab=\\'pricing\\']').click()">
@@ -2278,7 +2278,7 @@ const ForeignAccessUI = {
     } else if (platform === 'Bluesky') {
       target = 'https://bsky.app/intent/compose?text=' + encodeURIComponent(text + ' ' + url);
     } else if (platform === 'Instagram') {
-      await navigator.clipboard?.writeText(url).catch(()=>{});
+      try { if (navigator.clipboard) await navigator.clipboard.writeText(url); } catch (e) {}
       target = 'https://www.instagram.com/';
       toast('لینک LangBlue کپی شد؛ آن را در Instagram منتشر کن.', 'success');
     } else if (platform === 'YouTube') {
