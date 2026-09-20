@@ -246,6 +246,8 @@
     .sitemap-grid { grid-template-columns: 1fr; }
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
 </head>
 <body>
 
@@ -1088,51 +1090,13 @@ const Subscription = {
    FOREIGN ACCESS — اشتراک‌گذاری + کامنت
    ============================================================ */
 const ForeignAccess = {
-  key() { return 'foreign:access'; },
-
-  isForeign() {
-    const geo = Store.get('geo:country', {});
-    return geo.isIran !== true;
-  },
-
-  state() {
-    return Store.get(this.key(), {
-      shareDone: false,
-      commentDone: false,
-      platform: '',
-      comment: '',
-      completedAt: null
-    });
-  },
-
-  isUnlocked() {
-    if (!this.isForeign()) return true;
-    const s = this.state();
-    return !!(s.shareDone && s.commentDone);
-  },
-
-  markShare(platform) {
-    const s = this.state();
-    s.shareDone = true;
-    s.platform = platform || 'unknown';
-    s.shareAt = Date.now();
-    Store.set(this.key(), s);
-    Audit.log('foreign_share_confirmed', { platform: s.platform });
-    return s;
-  },
-
-  saveComment(comment) {
-    const text = String(comment || '').trim();
-    if (text.length < 5) return { ok:false, error:'لطفاً یک کامنت حداقل ۵ کاراکتری بنویس.' };
-    const s = this.state();
-    s.commentDone = true;
-    s.comment = text.slice(0, 1000);
-    s.commentAt = Date.now();
-    s.completedAt = Date.now();
-    Store.set(this.key(), s);
-    Audit.log('foreign_comment_submitted', { length: s.comment.length });
-    return { ok:true, state:s };
-  }
+  key(){return 'foreign:access';},
+  isForeign(){return Store.get('geo:country',{}).isIran!==true;},
+  state(){return Store.get(this.key(),{shareDone:false,commentDone:false,platform:'',comment:'',completedAt:null});},
+  async sync(){if(!this.isForeign()||!window.LangBlueSupabase)return this.state();const r=await window.LangBlueSupabase.getAccess();if(!r)return this.state();const l=this.state(),m={...l,shareDone:!!r.share_completed||l.shareDone,commentDone:!!r.comment_completed||l.commentDone,platform:r.share_platform||l.platform||'',shareAt:r.share_at?Date.parse(r.share_at):l.shareAt,completedAt:r.completed_at?Date.parse(r.completed_at):l.completedAt};Store.set(this.key(),m);return m;},
+  isUnlocked(){if(!this.isForeign())return true;const s=this.state();return!!(s.shareDone&&s.commentDone);},
+  markShare(platform){const s=this.state();s.shareDone=true;s.shareStarted=true;s.platform=platform||'unknown';s.shareAt=Date.now();Store.set(this.key(),s);Audit.log('foreign_share_confirmed',{platform:s.platform});window.LangBlueSupabase?.saveAccess(s).catch(()=>{});return s;},
+  saveComment(comment){const text=String(comment||'').trim();if(text.length<5)return{ok:false,error:'لطفاً یک کامنت حداقل ۵ کاراکتری بنویس.'};const s=this.state();s.commentDone=true;s.comment=text.slice(0,1000);s.commentAt=Date.now();s.completedAt=Date.now();Store.set(this.key(),s);Audit.log('foreign_comment_submitted',{length:s.comment.length});window.LangBlueSupabase?.saveComment(s.comment).catch(()=>{});window.LangBlueSupabase?.saveAccess(s).catch(()=>{});return{ok:true,state:s};}
 };
 
 /* ============================================================
@@ -2587,6 +2551,7 @@ window.__resetGeo = () => {
    INIT
    ============================================================ */
 checkAuth();
+setTimeout(async()=>{try{await ForeignAccess.sync();renderSubscriptionBanner();renderPricing();renderProfile();}catch(e){console.warn("[LangBlue] Supabase sync skipped:",e);}},1200);
 </script>
 </body>
 </html>
