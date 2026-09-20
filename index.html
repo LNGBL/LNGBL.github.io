@@ -79,6 +79,20 @@ h1{max-width:900px;margin:0 auto 18px;font-size:clamp(36px,7vw,72px);line-height
 .occasion-title a:hover{text-decoration:underline}
 .occasion-note{font-size:12px;color:#c6d8e6;margin-top:2px}
 .occasion-discount{display:inline-flex;margin-top:8px;padding:3px 10px;border-radius:999px;background:rgba(34,158,217,.18);border:1px solid rgba(91,192,255,.28);color:#8edaff;font-weight:800;font-size:12px}
+.occasion-pack{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:980px;margin:22px auto 0;position:relative;z-index:2}
+.occasion-group{padding:20px;border:1px solid var(--line);border-radius:20px;background:rgba(4,17,29,.48);backdrop-filter:blur(16px);box-shadow:0 16px 50px rgba(0,0,0,.16);text-align:right}
+.iran-group{border-color:rgba(91,192,255,.20)}.global-group{border-color:rgba(255,255,255,.12)}
+.group-head{display:flex;align-items:center;gap:12px;padding-bottom:14px;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+.group-symbol{font-size:30px}.group-head h2{margin:0;font-size:22px}.group-head p{margin:2px 0 0;color:var(--muted);font-size:11px}
+.occasion-list{display:grid;gap:7px}
+.event-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 11px;border-radius:11px;background:rgba(255,255,255,.035);border:1px solid transparent;transition:.2s}
+.event-row:hover{background:rgba(255,255,255,.07);border-color:rgba(91,192,255,.18);transform:translateX(-2px)}
+.event-main{min-width:0}.event-name{display:block;font-size:13px;font-weight:750}.event-date{display:block;color:var(--muted);font-size:10px;margin-top:1px}.event-row a{text-decoration:none}.event-row a:hover{text-decoration:underline}
+.event-badge{flex:none;font-size:10px;padding:2px 7px;border-radius:999px;color:#8edaff;background:rgba(34,158,217,.12);border:1px solid rgba(91,192,255,.20)}
+.event-row.active{background:rgba(34,158,217,.12);border-color:rgba(91,192,255,.30);box-shadow:0 0 24px rgba(34,158,217,.10)}
+.event-row.active .event-name{color:#8edaff}
+@media(max-width:850px){.occasion-pack{grid-template-columns:1fr}}
+@media(max-width:600px){.occasion-group{padding:15px}.group-head h2{font-size:19px}.event-row{padding:8px}.event-name{font-size:12px}}
 .type-cursor{display:inline-block;width:2px;height:1em;background:#72d2ff;margin-right:3px;vertical-align:-2px;animation:cursor .75s steps(1) infinite}
 section{padding:54px 0}
 .section-title{text-align:center;margin:0 0 12px;font-size:30px}
@@ -130,6 +144,30 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 <div id="occasionBanner" class="occasion" aria-live="polite">
   <div class="occasion-title">LangBlue</div>
   <div class="occasion-note">در حال بررسی مناسبت امروز…</div>
+</div>
+
+<div class="occasion-pack">
+  <article class="occasion-group iran-group">
+    <div class="group-head">
+      <span class="group-symbol">🇮🇷</span>
+      <div>
+        <h2>Lovely Iran</h2>
+        <p>مناسبت‌های ایران · تقویم شمسی + مناسبت‌های اسلامی</p>
+      </div>
+    </div>
+    <div id="iranOccasions" class="occasion-list"></div>
+  </article>
+
+  <article class="occasion-group global-group">
+    <div class="group-head">
+      <span class="group-symbol">🌍</span>
+      <div>
+        <h2>Lovely Global</h2>
+        <p>مناسبت‌های جهانی · تقویم میلادی (Gregorian)</p>
+      </div>
+    </div>
+    <div id="globalOccasions" class="occasion-list"></div>
+  </article>
 </div>
         <h1>ساختار زبانت را با <strong>LangBlue</strong> بساز، سازمان‌دهی کن و یاد بگیر.</h1>
         <p class="hero-lead">
@@ -302,63 +340,114 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 <script>
 (function(){
   const WIKI={
+    cyrus:'https://en.wikipedia.org/wiki/Cyrus_the_Great_Day',
+    amordadgan:'https://en.wikipedia.org/wiki/Amordadegan_festival',
+    yalda:'https://en.wikipedia.org/wiki/Yalda_Night',
+    islamic:'https://en.wikipedia.org/wiki/Islamic_holidays',
+    fitr:'https://en.wikipedia.org/wiki/Eid_al-Fitr',
+    adha:'https://en.wikipedia.org/wiki/Eid_al-Adha',
+    ghadir:'https://en.wikipedia.org/wiki/Eid_al-Ghadir',
     christmas:'https://en.wikipedia.org/wiki/Christmas',
     blackfriday:'https://en.wikipedia.org/wiki/Black_Friday_(shopping)',
     halloween:'https://en.wikipedia.org/wiki/Halloween',
     women:'https://en.wikipedia.org/wiki/International_Women%27s_Day',
     men:'https://en.wikipedia.org/wiki/International_Men%27s_Day',
-    valentine:'https://en.wikipedia.org/wiki/Valentine%27s_Day',
-    yalda:'https://en.wikipedia.org/wiki/Yalda_Night',
-    mehrgan:'https://en.wikipedia.org/wiki/Mehregan',
-    nowruz:'https://en.wikipedia.org/wiki/Nowruz'
+    valentine:'https://en.wikipedia.org/wiki/Valentine%27s_Day'
   };
-  const events=[
-    {key:'christmas',start:'2026-12-25',end:'2026-12-25',title:'🎄 Christmas',note:'Merry Christmas — جشن کریسمس',theme:'christmas',wiki:WIKI.christmas},
-    {key:'blackfriday',start:'2026-11-20',end:'2026-11-27',title:'🛍️ Black Friday',note:'هفته تخفیف LangBlue',discount:'۱۰٪ تخفیف اشتراک‌ها',theme:'',wiki:WIKI.blackfriday},
-    {key:'halloween',start:'2026-10-31',end:'2026-10-31',title:'🎃 Halloween',note:'شب هالووین — حالت ترسناک فعال شد',theme:'halloween',wiki:WIKI.halloween},
-    {key:'women',start:'2027-03-08',end:'2027-03-08',title:'♀️ International Women’s Day',note:'روز جهانی زنان',theme:'women',wiki:WIKI.women},
-    {key:'men',start:'2026-11-19',end:'2026-11-19',title:'♂️ International Men’s Day',note:'روز جهانی مردان',theme:'men',wiki:WIKI.men},
-    {key:'valentine',start:'2027-02-14',end:'2027-02-14',title:'♥️ Valentine’s Day',note:'روز عشق و محبت',theme:'valentine',wiki:WIKI.valentine}
+
+  const iranSolar=[
+    {key:'cyrus',title:'👑 روز کوروش بزرگ',date:'۷ آبان',wiki:WIKI.cyrus,when:j=>j.month===8&&j.day===7},
+    {key:'amordadgan',title:'🌿 امردادگان',date:'۷ امرداد',wiki:WIKI.amordadgan,when:j=>j.month===5&&j.day===7},
+    {key:'deygan',title:'☀️ دیگان (خرم‌روز)',date:'۱ دی',wiki:'https://en.wikipedia.org/wiki/Deygan',when:j=>j.month===10&&j.day===1},
+    {key:'yalda',title:'🍉 یلدا',date:'۳۰ آذر',wiki:WIKI.yalda,when:j=>j.month===9&&j.day===30}
   ];
-  function iso(d){return d.toISOString().slice(0,10)}
+
+  const iranIslamic=[
+    {key:'fitr',title:'🌙 عید فطر',date:'۱ شوال',wiki:WIKI.fitr,when:i=>i.month===10&&i.day===1},
+    {key:'adha',title:'🐑 عید قربان',date:'۱۰ ذی‌الحجه',wiki:WIKI.adha,when:i=>i.month===12&&i.day===10},
+    {key:'ghadir',title:'🕊️ عید غدیر',date:'۱۸ ذی‌الحجه',wiki:WIKI.ghadir,when:i=>i.month===12&&i.day===18}
+  ];
+
+  const global=[
+    {key:'christmas',title:'🎄 Christmas',date:'25 Dec',wiki:WIKI.christmas,when:d=>d.getMonth()===11&&d.getDate()===25},
+    {key:'blackfriday',title:'🛍️ Black Friday',date:'20–27 Nov',wiki:WIKI.blackfriday,discount:'۱۰٪',when:d=>d.getMonth()===10&&d.getDate()>=20&&d.getDate()<=27},
+    {key:'halloween',title:'🎃 Halloween',date:'31 Oct',wiki:WIKI.halloween,when:d=>d.getMonth()===9&&d.getDate()===31},
+    {key:'men',title:'♂️ International Men’s Day',date:'19 Nov',wiki:WIKI.men,when:d=>d.getMonth()===10&&d.getDate()===19},
+    {key:'women',title:'♀️ International Women’s Day',date:'8 Mar',wiki:WIKI.women,when:d=>d.getMonth()===2&&d.getDate()===8},
+    {key:'valentine',title:'❤️ Valentine’s Day',date:'14 Feb',wiki:WIKI.valentine,when:d=>d.getMonth()===1&&d.getDate()===14}
+  ];
+
   function jalali(d){
     const p=new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(d);
     const get=t=>Number(p.find(x=>x.type===t)?.value||0);
     return {year:get('year'),month:get('month'),day:get('day')};
   }
-  function getEvent(now){
-    const today=iso(now);
-    for(const e of events) if(today>=e.start&&today<=e.end)return e;
-    const j=jalali(now);
-    if(j.month===9&&j.day===30)return {key:'yalda',title:'🍉 Yalda Night',note:'یلدا مبارک! شبی برای نور، خانواده و انار و هندوانه',theme:'yalda',wiki:WIKI.yalda};
-    if(j.month===7&&j.day===10)return {key:'mehrgan',title:'🍂 Mehregan',note:'مهرگان خجسته — جشن مهر و دوستی',theme:'mehrgan',wiki:WIKI.mehrgan};
-    if(j.month===1&&j.day>=1&&j.day<=4)return {key:'nowruz',title:'🌱 Nowruz',note:'نوروز مبارک! سال نو و آغاز بهار',theme:'nowruz',wiki:WIKI.nowruz};
-    if(j.month===7&&j.day>=1&&j.day<=7)return {key:'school',title:'📚 سال تحصیلی جدید',note:'از ۱ مهر تا ۷ مهر — ۱۰٪ تخفیف اشتراک‌ها',discount:'۱۰٪ تخفیف اشتراک‌ها',theme:'',wiki:null};
+
+  function islamic(d){
+    try{
+      const p=new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura',{month:'numeric',day:'numeric'}).formatToParts(d);
+      const get=t=>Number(p.find(x=>x.type===t)?.value||0);
+      const month=get('month'),day=get('day');
+      if(month&&day)return {month,day};
+    }catch(e){}
     return null;
   }
+
   function typeText(el,text){
     el.innerHTML='';
-    [...text].forEach((ch,i)=>{const s=document.createElement('span');s.textContent=ch;s.style.opacity='0';s.style.display='inline-block';s.style.transform='translateY(8px)';s.style.transition='opacity .28s ease,transform .28s ease';s.style.transitionDelay=(i*28)+'ms';el.appendChild(s);requestAnimationFrame(()=>{s.style.opacity='1';s.style.transform='translateY(0)'})});
+    [...text].forEach((ch,i)=>{
+      const s=document.createElement('span');
+      s.textContent=ch;s.style.opacity='0';s.style.display='inline-block';s.style.transform='translateY(8px)';
+      s.style.transition='opacity .28s ease,transform .28s ease';s.style.transitionDelay=(i*25)+'ms';
+      el.appendChild(s);requestAnimationFrame(()=>{s.style.opacity='1';s.style.transform='translateY(0)'});
+    });
   }
-  function renderEvent(){
+
+  function row(e,active=false){
+    const badge=e.discount?'<span class="event-badge">'+e.discount+' تخفیف</span>':'';
+    return '<div class="event-row'+(active?' active':'')+'"><div class="event-main"><a class="event-name" href="'+e.wiki+'" target="_blank" rel="noopener noreferrer">'+e.title+'</a><span class="event-date">'+e.date+'</span></div>'+badge+'</div>';
+  }
+
+  function renderLists(now){
+    const j=jalali(now), i=islamic(now);
+    const iran=[...iranSolar,...iranIslamic];
+    document.getElementById('iranOccasions').innerHTML=iran.map(e=>row(e,(e.when(j)||!!(i&&e.when(i))))).join('');
+    document.getElementById('globalOccasions').innerHTML=global.map(e=>row(e,e.when(now))).join('');
+  }
+
+  function renderCurrent(now){
     const box=document.getElementById('occasionBanner');if(!box)return;
-    const e=getEvent(new Date());
-    document.body.classList.remove('theme-halloween','theme-yalda','theme-christmas','theme-valentine','theme-women','theme-men','theme-nowruz','theme-mehrgan');
-    if(!e){box.innerHTML='<div class="occasion-title">LangBlue</div><div class="occasion-note">زبانت را بساز. ساختارت را منظم کن.</div>';return}
-    if(e.theme)document.body.classList.add('theme-'+e.theme);
-    box.innerHTML='<div class="occasion-title"><a target="_blank" rel="noopener noreferrer" href="'+(e.wiki||'#')+'"></a><span class="type-cursor"></span></div><div class="occasion-note"></div>'+(e.discount?'<div class="occasion-discount">'+e.discount+'</div>':'');
-    const a=box.querySelector('.occasion-title a'), n=box.querySelector('.occasion-note');
-    typeText(a,e.title);n.textContent=e.note;
+    const j=jalali(now),i=islamic(now);
+    let e=iranSolar.find(x=>x.when(j)) || (i&&iranIslamic.find(x=>x.when(i))) || global.find(x=>x.when(now));
+    document.body.classList.remove('theme-halloween','theme-yalda','theme-christmas','theme-valentine','theme-women','theme-men');
+    if(!e){
+      box.innerHTML='<div class="occasion-title">🔷 LangBlue</div><div class="occasion-note">زبانت را بساز. ساختارت را منظم کن.</div>';
+      return;
+    }
+    if(e.key==='halloween')document.body.classList.add('theme-halloween');
+    if(e.key==='yalda')document.body.classList.add('theme-yalda');
+    if(e.key==='christmas')document.body.classList.add('theme-christmas');
+    if(e.key==='valentine')document.body.classList.add('theme-valentine');
+    if(e.key==='women')document.body.classList.add('theme-women');
+    if(e.key==='men')document.body.classList.add('theme-men');
+    box.innerHTML='<div class="occasion-title"><a target="_blank" rel="noopener noreferrer" href="'+e.wiki+'"></a><span class="type-cursor"></span></div><div class="occasion-note"></div>'+(e.discount?'<div class="occasion-discount">۱۰٪ تخفیف اشتراک‌ها</div>':'');
+    typeText(box.querySelector('.occasion-title a'),e.title);
+    box.querySelector('.occasion-note').textContent=e.key==='yalda'?'یلدا مبارک! 🍉 شبی برای نور، خانواده و شادی':e.key==='halloween'?'شب هالووین — تم ترسناک فعال شد':e.key==='blackfriday'?'هفته تخفیف LangBlue — ۱۰٪ تخفیف اشتراک‌ها':'امروز در LangBlue گرامی داشته می‌شود.';
   }
+
   function animateLogo(){
     const word=document.querySelector('.logo-word');if(!word)return;
     const text=word.textContent.trim();word.textContent='';
-    [...text].forEach((ch,i)=>{const s=document.createElement('span');s.className='logo-letter';s.textContent=ch;s.style.animationDelay=(i*70)+'ms';word.appendChild(s)});
+    [...text].forEach((ch,i)=>{
+      const s=document.createElement('span');s.className='logo-letter';s.textContent=ch;
+      s.style.animationDelay=(i*70)+'ms';word.appendChild(s);
+    });
   }
-  animateLogo();renderEvent();
+
+  const now=new Date();
+  animateLogo();renderLists(now);renderCurrent(now);
 })();
 </script>
-
   <footer>
     <div class="wrap">
       © 2026 LangBlue — Language Grammar Platform
