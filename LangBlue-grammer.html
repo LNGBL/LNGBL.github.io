@@ -58,7 +58,7 @@
     background: var(--bg); color: var(--text);
     font-family: 'Segoe UI', Tahoma, system-ui, sans-serif;
     min-height: 100vh;
-    user-select: none; -webkit-user-select: none;
+    user-select: text; -webkit-user-select: text;
   }
   input, textarea { user-select: text; -webkit-user-select: text; }
   .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
@@ -545,44 +545,8 @@ const DeviceGuard = {
 
 window.__isLangBlueTablet = () => DeviceGuard.isTablet();
 
-(function protectDevTools() {
-  const tablet = DeviceGuard.isTablet();
+/* DevTools/context-menu blocking disabled. */
 
-  // روی تبلت هیچ تشخیص DevTools/مسدودی اجرا نمی‌شود؛
-  // این کار جلوی خطای کاذب روی Samsung Galaxy Tab و سایر تبلت‌ها را می‌گیرد.
-  if (tablet) return;
-
-  document.addEventListener('contextmenu', e => e.preventDefault());
-  document.addEventListener('keydown', e => {
-    if (e.key === 'F12') { e.preventDefault(); return false; }
-    if (e.ctrlKey && e.shiftKey && ['I','J','C','i','j','c'].includes(e.key)) { e.preventDefault(); return false; }
-    if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) { e.preventDefault(); return false; }
-    if (e.metaKey && e.altKey && ['I','J','C','i','j','c'].includes(e.key)) { e.preventDefault(); return false; }
-    if (e.metaKey && e.shiftKey && ['C','c'].includes(e.key)) { e.preventDefault(); return false; }
-  }, true);
-
-  let devtoolsOpen = false;
-  setInterval(() => {
-    const wDiff = window.outerWidth - window.innerWidth;
-    const hDiff = window.outerHeight - window.innerHeight;
-    const open = wDiff > 160 || hDiff > 160;
-    if (open && !devtoolsOpen) {
-      devtoolsOpen = true;
-      document.body.innerHTML = `
-        <div style="display:flex; align-items:center; justify-content:center; min-height:100vh;
-                    background:#0a0e1a; color:#ff4757; font-family:sans-serif; text-align:center; padding:20px; direction:rtl;">
-          <div>
-            <div style="font-size:72px;">⛔</div>
-            <h1 style="color:#ff4757;">دسترسی مسدود شد</h1>
-            <p style="color:#8a96b8;">DevTools شناسایی شد. لطفاً آن را ببندید و صفحه را رفرش کنید.</p>
-          </div>
-        </div>`;
-    } else if (!open && devtoolsOpen) {
-      devtoolsOpen = false;
-      location.reload();
-    }
-  }, 1000);
-})();
 
 /* ============================================================
    CORE: Store
@@ -722,10 +686,6 @@ const Auth = {
    - IP ایران → تومان برای اشتراک
    - IP خارج از ایران → بدون پرداخت ارزی؛ اشتراک‌گذاری + کامنت
    ============================================================ */
-const SUPPORTED_COUNTRIES_USD = [
-  'GB','US','CA','NZ','AU','TR','UA','SE','FI','FR','TJ','KR'
-];
-
 const GeoService = {
   _cache: null,
   NEIGHBOR_COUNTRIES: ['AZ', 'TR', 'AE', 'AF', 'IQ', 'AM', 'TM', 'PK'],
@@ -815,96 +775,27 @@ const GeoService = {
     return false;
   },
 
-  async detect() {
-    // تشخیص بر اساس IP فعلی انجام می‌شود؛ انتخاب دستی ارز مجاز نیست.
-    const [primary, secondary, tertiary] = await Promise.all([
-      this._detectPrimary(),
-      this._detectSecondary(),
-      this._detectTertiary()
-    ]);
-
-    const codes = [primary?.code, secondary?.code, tertiary?.code].filter(Boolean);
-
-    // اگر یک سرویس شکست خورد، از دو سرویس دیگر استفاده می‌کنیم.
-    // اگر همه شکست خوردند، برای جلوگیری از انتخاب دستی، پرداخت خارجی/USDT
-    // به‌عنوان حالت پیش‌فرض در نظر گرفته می‌شود.
-    if (codes.length === 0) {
-      const unknown = {
-        version: 5,
-        code: null,
-        name: 'Unknown',
-        currency: 'USD',
-        isIran: false,
-        isVpn: false,
-        reason: 'all_sources_failed_default_usdt',
-        needsUserInput: false,
-        manualOverride: false,
-        detectedAt: Date.now()
-      };
-      Store.set('geo:country', unknown);
-      this._cache = unknown;
-      Audit.log('geo_unknown_default_usdt');
-      return unknown;
+  async detect(force=false) {
+    if (!force && this._cache) return this._cache;
+    const stored = Store.get('geo:country', null);
+    if (!force && stored?.detectedAt && Date.now() - stored.detectedAt < 86400000) {
+      this._cache = stored;
+      return stored;
     }
-
-    // رای‌گیری بین منابع تشخیص IP
-    const codeCounts = {};
-    codes.forEach(c => codeCounts[c] = (codeCounts[c] || 0) + 1);
-    const topCode = Object.entries(codeCounts)
-      .sort((a, b) => b[1] - a[1])[0][0];
-
-    const isIran = topCode === 'IR';
-
-    // فقط کشور IP تعیین‌کننده ارز است؛ VPN/Proxy یا همسایه بودن
-    // دیگر باعث نمایش انتخاب دستی نمی‌شود.
-    const currency = isIran ? 'IRT' : null;
-    const reason = isIran ? 'iranian_ip' : 'foreign_ip';
-
-    const country = {
-      version: 5,
-      code: topCode,
-      name: this._countryName(topCode) || primary?.name || secondary?.name || topCode || 'نامشخص',
-      isIran,
-      isVpn: !!(primary?.isProxy || primary?.isVpn || primary?.isTor),
-      isNeighbor: this.NEIGHBOR_COUNTRIES.includes(topCode),
-      currency,
-      reason,
-      needsUserInput: false,
-      votes: codeCounts,
-      isp: primary?.isp || '',
-      manualOverride: false,
-      detectedAt: Date.now()
-    };
-
-    Store.set('geo:country', country);
-    this._cache = country;
-    Audit.log('geo_detected', {
-      code: country.code,
-      currency: country.currency,
-      vpn: country.isVpn,
-      neighbor: country.isNeighbor,
-      reason: country.reason
-    });
-    return country;
-  },
-
-  confirmCurrency(currency) {
-    if (currency !== 'IRT' && currency !== 'USD') return false;
-    const current = Store.get('geo:country', {});
-    Store.set('geo:country', {
-      ...current,
-      currency,
-      isIran: currency === 'IRT',
-      manualOverride: true,
-      confirmedByUser: true,
-      needsUserInput: false,
-      manualAt: Date.now()
-    });
-    this._cache = null;
-    Audit.log('user_confirmed_currency', { currency });
-    return true;
-  }
-};
+    const [primary, secondary, tertiary] = await Promise.all([
+      this._detectPrimary(), this._detectSecondary(), this._detectTertiary()
+    ]);
+    const codes = [primary?.code, secondary?.code, tertiary?.code].filter(Boolean);
+    if (!codes.length) {
+      const unknown={version:6,code:null,name:'Unknown',currency:null,isIran:false,isForeign:false,unknown:true,isVpn:false,reason:'all_sources_failed',needsUserInput:false,manualOverride:false,detectedAt:Date.now()};
+      Store.set('geo:country',unknown); this._cache=unknown; Audit.log('geo_unknown'); return unknown;
+    }
+    const counts={}; codes.forEach(x=>counts[x]=(counts[x]||0)+1);
+    const topCode=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
+    const isIran=topCode==='IR';
+    const country={version:6,code:topCode,name:this._countryName(topCode)||primary?.name||secondary?.name||topCode,isIran,isForeign:!isIran,unknown:false,isVpn:!!(primary?.isProxy||primary?.isVpn||primary?.isTor),isNeighbor:this.NEIGHBOR_COUNTRIES.includes(topCode),currency:isIran?'IRT':null,reason:isIran?'iranian_ip':'foreign_ip',needsUserInput:false,votes:counts,isp:primary?.isp||'',manualOverride:false,detectedAt:Date.now()};
+    Store.set('geo:country',country); this._cache=country; Audit.log('geo_detected',{code:country.code,currency:country.currency,vpn:country.isVpn,reason:country.reason}); return country;
+  }};
 
 /* ============================================================
    PLANS (IRT — Iran)
@@ -1091,12 +982,33 @@ const Subscription = {
    ============================================================ */
 const ForeignAccess = {
   key(){return 'foreign:access';},
-  isForeign(){return Store.get('geo:country',{}).isIran!==true;},
-  state(){return Store.get(this.key(),{shareDone:false,commentDone:false,platform:'',comment:'',completedAt:null});},
-  async sync(){if(!this.isForeign()||!window.LangBlueSupabase)return this.state();const r=await window.LangBlueSupabase.getAccess();if(!r)return this.state();const l=this.state(),m={...l,shareDone:!!r.share_completed||l.shareDone,commentDone:!!r.comment_completed||l.commentDone,platform:r.share_platform||l.platform||'',shareAt:r.share_at?Date.parse(r.share_at):l.shareAt,completedAt:r.completed_at?Date.parse(r.completed_at):l.completedAt};Store.set(this.key(),m);return m;},
-  isUnlocked(){if(!this.isForeign())return true;const s=this.state();return!!(s.shareDone&&s.commentDone);},
-  markShare(platform){const s=this.state();s.shareDone=true;s.shareStarted=true;s.platform=platform||'unknown';s.shareAt=Date.now();Store.set(this.key(),s);Audit.log('foreign_share_confirmed',{platform:s.platform});window.LangBlueSupabase?.saveAccess(s).catch(()=>{});return s;},
-  saveComment(comment){const text=String(comment||'').trim();if(text.length<5)return{ok:false,error:'لطفاً یک کامنت حداقل ۵ کاراکتری بنویس.'};const s=this.state();s.commentDone=true;s.comment=text.slice(0,1000);s.commentAt=Date.now();s.completedAt=Date.now();Store.set(this.key(),s);Audit.log('foreign_comment_submitted',{length:s.comment.length});window.LangBlueSupabase?.saveComment(s.comment).catch(()=>{});window.LangBlueSupabase?.saveAccess(s).catch(()=>{});return{ok:true,state:s};}
+  isForeign(){return Store.get('geo:country',{}).isForeign===true;},
+  isUnknown(){return Store.get('geo:country',{}).unknown===true;},
+  state(){return Store.get(this.key(),{shareDone:false,commentDone:false,platform:'',comment:'',shareAt:null,commentAt:null,completedAt:null,synced:false});},
+  async sync(){
+    if(!this.isForeign()||!window.LangBlueSupabase)return this.state();
+    const r=await window.LangBlueSupabase.getAccess(); if(!r)return this.state();
+    const s={...this.state(),shareDone:!!r.share_completed,shareStarted:!!r.share_started,commentDone:!!r.comment_completed,platform:r.share_platform||'',shareAt:r.share_at?Date.parse(r.share_at):null,completedAt:r.completed_at?Date.parse(r.completed_at):null,synced:true};
+    Store.set(this.key(),s); return s;
+  },
+  isUnlocked(){const s=this.state();return this.isForeign()&&s.synced&&s.shareDone&&s.commentDone;},
+  async markShare(platform){
+    if(!window.LangBlueSupabase)return{ok:false,error:'اتصال سرور در دسترس نیست.'};
+    const s={...this.state(),shareStarted:true,platform:platform||'unknown',shareAt:Date.now()};
+    const r=await window.LangBlueSupabase.saveAccess(s);
+    if(!r)return{ok:false,error:'اشتراک‌گذاری در سرور ثبت نشد. دوباره تلاش کن.'};
+    const next={...s,shareDone:!!r.share_completed,synced:true}; Store.set(this.key(),next); Audit.log('foreign_share_recorded',{platform:next.platform}); return{ok:true,state:next};
+  },
+  async saveComment(comment){
+    const text=String(comment||'').trim(); if(text.length<5)return{ok:false,error:'لطفاً یک کامنت حداقل ۵ کاراکتری بنویس.'};
+    if(!this.isForeign())return{ok:false,error:'دسترسی اجتماعی برای این کشور لازم نیست.'};
+    const s=this.state(); if(!s.shareDone)return{ok:false,error:'ابتدا مرحله اشتراک‌گذاری را کامل کن.'};
+    if(!window.LangBlueSupabase)return{ok:false,error:'اتصال سرور در دسترس نیست.'};
+    const inserted=await window.LangBlueSupabase.saveComment(text); if(!inserted)return{ok:false,error:'کامنت در سرور ثبت نشد. دوباره تلاش کن.'};
+    const next={...s,comment:text.slice(0,1000),commentDone:true,commentAt:Date.now(),completedAt:Date.now()};
+    const r=await window.LangBlueSupabase.saveAccess(next); if(!r)return{ok:false,error:'کامنت ذخیره شد اما وضعیت دسترسی ثبت نشد. دوباره صفحه را باز کن.'};
+    const synced={...next,shareDone:!!r.share_completed,commentDone:!!r.comment_completed,synced:true}; Store.set(this.key(),synced); Audit.log('foreign_comment_recorded',{length:synced.comment.length}); return{ok:true,state:synced};
+  }
 };
 
 /* ============================================================
@@ -2274,23 +2186,19 @@ const ForeignAccessUI = {
     }
   },
 
-  confirmShare(checked, platform='manual') {
+  async confirmShare(checked, platform='manual') {
     if (!checked) return;
-    ForeignAccess.markShare(platform);
-    renderPricing();
+    const res=await ForeignAccess.markShare(platform);
+    if(!res.ok){const box=document.getElementById('shareConfirm');if(box)box.checked=false;toast(res.error,'error');return;}
+    renderPricing(); renderSubscriptionBanner();
   },
 
-  submitComment() {
-    const el = document.getElementById('foreignComment');
-    const res = ForeignAccess.saveComment(el?.value || '');
-    if (!res.ok) {
-      toast(res.error, 'error');
-      return;
-    }
-    toast('کامنت ثبت شد؛ دسترسی شما فعال شد.', 'success');
-    renderPricing();
-    renderSubscriptionBanner();
-    renderProfile();
+  async submitComment() {
+    const el=document.getElementById('foreignComment');
+    const res=await ForeignAccess.saveComment(el?.value||'');
+    if(!res.ok){toast(res.error,'error');return;}
+    toast('کامنت در سرور ثبت شد و دسترسی شما فعال شد.','success');
+    renderPricing(); renderSubscriptionBanner(); renderProfile();
   }
 };
 
