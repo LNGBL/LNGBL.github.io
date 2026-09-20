@@ -1470,9 +1470,7 @@
                     var data = {};
                     var keys = [KEYS.WORDS, KEYS.PHRASAL, KEYS.SENTENCES, KEYS.GRAMMAR, KEYS.SRS, KEYS.TOKENS, KEYS.REPETITION_DATA, KEYS.FLASHCARD_VISITS];
                     for (var i = 0; i < keys.length; i++) {
-                        var val = localStorage.getItem(keys[i]);
-                        if (val !== null) {
-                            try { data[keys[i]] = JSON.parse(val); } catch { data[keys[i]] = val; }
+                        var val = Storage.get(keys[i], null); if (val !== null) data[keys[i]] = val;
                         }
                     }
                     var backup = {
@@ -1508,10 +1506,7 @@
                             if (!data.data || data.app !== 'LangBlue') {
                                 throw new Error('فایل معتبر نیست.');
                             }
-                            var keys = Object.keys(data.data);
-                            for (var i = 0; i < keys.length; i++) {
-                                localStorage.setItem(keys[i], JSON.stringify(data.data[keys[i]]));
-                            }
+                            var keys = Object.keys(data.data); for (var i = 0; i < keys.length; i++) { Storage.set(keys[i], data.data[keys[i]]); }
                             if (callback) callback(null, data);
                         } catch (e) {
                             if (callback) callback(e);
