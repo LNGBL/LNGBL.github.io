@@ -301,7 +301,7 @@
       <button class="tab" data-tab="add">➕ افزودن گرامر</button>
       <button class="tab" data-tab="table">📊 جدول</button>
       <button class="tab" data-tab="flashcard">🎴 فلش‌کارت</button>
-      <button class="tab" data-tab="pricing">💳 اشتراک</button>
+      <button class="tab" data-tab="pricing">🔓 دسترسی</button>
       <button class="tab" data-tab="profile">⚙️ پروفایل</button>
     </div>
 
@@ -450,14 +450,14 @@
       </div>
     </div>
 
-    <!-- PRICING -->
+    <!-- PRICING / ACCESS -->
     <div id="tab-pricing" class="tab-content hidden">
       <div class="card">
-        <h2>💳 اشتراک LangBlue <span class="security-badge">🔒 امن</span></h2>
+        <h2 id="pricingTitle">🔓 دسترسی LangBlue</h2>
         <div id="pricingIntro"></div>
         <div class="pricing-grid" id="pricingGrid"></div>
         <div class="how-to-box" id="howToBox"></div>
-        <div class="verify-box" id="verifyBox">
+        <div class="verify-box hidden" id="verifyBox">
           <h3 style="color: var(--accent);" id="verifyTitle">🔑 فعال‌سازی اشتراک</h3>
           <p style="color: var(--muted); font-size: 13px; line-height: 1.8;" id="verifyDesc">
             کد تاییدی که از ادمین دریافت کردی رو اینجا وارد کن:
@@ -714,12 +714,11 @@ const Auth = {
 };
 
 /* ============================================================
-   GEO SERVICE — تشخیص کشور از IP و تعیین خودکار ارز
+   GEO SERVICE — تشخیص کشور از IP
    ============================================================
-   قانون پرداخت:
-   - IP ایران → تومان (IRT)
-   - هر IP خارج از ایران → تتر (USDT)
-   - کاربر هیچ انتخاب دستی برای ارز ندارد.
+   قانون دسترسی:
+   - IP ایران → تومان برای اشتراک
+   - IP خارج از ایران → بدون پرداخت ارزی؛ اشتراک‌گذاری + کامنت
    ============================================================ */
 const SUPPORTED_COUNTRIES_USD = [
   'GB','US','CA','NZ','AU','TR','UA','SE','FI','FR','TJ','KR'
@@ -856,7 +855,7 @@ const GeoService = {
 
     // فقط کشور IP تعیین‌کننده ارز است؛ VPN/Proxy یا همسایه بودن
     // دیگر باعث نمایش انتخاب دستی نمی‌شود.
-    const currency = isIran ? 'IRT' : 'USD';
+    const currency = isIran ? 'IRT' : null;
     const reason = isIran ? 'iranian_ip' : 'foreign_ip';
 
     const country = {
@@ -924,55 +923,15 @@ const PLANS_IRT = [
 ];
 
 /* ============================================================
-   PLANS (USDT — تتر روی شبکه TON)
-   ============================================================ */
-const PLANS_USD = [
-  { id: 'usd_7d',   days: 7,   priceUSDT: 4,
-    features: 'دسترسی کامل به همه امکانات' },
-  { id: 'usd_14d',  days: 14,  priceUSDT: 8,
-    features: 'دسترسی کامل به همه امکانات' },
-  { id: 'usd_21d',  days: 21,  priceUSDT: 13,
-    features: 'دسترسی کامل به همه امکانات' },
-  { id: 'usd_3m',   days: 90,  priceUSDT: 20,
-    features: 'دسترسی کامل + بدون محدودیت' },
-  { id: 'usd_6m',   days: 180, priceUSDT: 25,
-    features: 'دسترسی کامل + بدون محدودیت' },
-  { id: 'usd_12m',  days: 365, priceUSDT: 37,
-    features: 'دسترسی کامل + امکان پرینت از اطلاعات' }
-];
-
-/* ============================================================
-   VALID CODES — کدهای مجاز (فقط ادمین می‌دونه)
-   ============================================================
-   per 7 days (IRT)   = 66,890 T   → Verify_mU#2292
-   per 14 days (IRT)  = 123,890 T  → Verify_m!!2992
-   per 21 days (IRT)  = 256,890 T  → Verify_I@112
-   per 3 month (IRT)  = 570,999 T  → Verify_MIR_ss1
-   per 6 month (IRT)  = 665,999 T  → Verify_ll39332
-   per 12 month (IRT) = 780,999 T  → Verify_311012   (+ پرینت)
-
-   per 7 days (USDT)   = 4 USDT    → Verify_US$4X729
-   per 14 days (USDT)  = 8 USDT    → Verify_US$8B!441
-   per 21 days (USDT)  = 13 USDT   → Verify_US$13K@770
-   per 3 month (USDT)  = 20 USDT   → Verify_USD20_MR9
-   per 6 month (USDT)  = 25 USDT   → Verify_USD25_FF51
-   per 12 month (USDT) = 37 USDT   → Verify_USD37_AX!_99  (+ پرینت)
+   VALID CODES — کدهای اشتراک تومانی (فقط ادمین می‌دونه)
    ============================================================ */
 const VALID_CODES = {
-  // 🇮🇷 تومانی
-  'Verify_mU#2292':      { planId: 'irt_7d' },
-  'Verify_m!!2992':      { planId: 'irt_14d' },
-  'Verify_I@112':        { planId: 'irt_21d' },
-  'Verify_MIR_ss1':      { planId: 'irt_3m' },
-  'Verify_ll39332':      { planId: 'irt_6m' },
-  'Verify_311012':       { planId: 'irt_12m' },
-  // 💎 تتر
-  'Verify_US$4X729':     { planId: 'usd_7d' },
-  'Verify_US$8B!441':    { planId: 'usd_14d' },
-  'Verify_US$13K@770':   { planId: 'usd_21d' },
-  'Verify_USD20_MR9':    { planId: 'usd_3m' },
-  'Verify_USD25_FF51':   { planId: 'usd_6m' },
-  'Verify_USD37_AX!_99': { planId: 'usd_12m' }
+  'Verify_mU#2292': { planId: 'irt_7d' },
+  'Verify_m!!2992': { planId: 'irt_14d' },
+  'Verify_I@112': { planId: 'irt_21d' },
+  'Verify_MIR_ss1': { planId: 'irt_3m' },
+  'Verify_ll39332': { planId: 'irt_6m' },
+  'Verify_311012': { planId: 'irt_12m' }
 };
 
 const FREE_LIMIT = 45;
@@ -1032,8 +991,7 @@ const Subscription = {
       return { ok: false, error: 'این کد قبلاً استفاده شده است' };
     }
 
-    const allPlans = [...PLANS_IRT, ...PLANS_USD];
-    const plan = allPlans.find(p => p.id === entry.planId);
+    const plan = PLANS_IRT.find(p => p.id === entry.planId);
     if (!plan) return { ok: false, error: 'پلن نامعتبر است' };
 
     return { ok: true, plan, code: trimmed };
@@ -1071,7 +1029,7 @@ const Subscription = {
     Store.set('subscription', {
       planId: result.plan.id,
       planDays: result.plan.days,
-      currency: result.plan.id.startsWith('usd_') ? 'USDT' : 'IRT',
+      currency: 'IRT',
       startedAt: now,
       expiresAt
     });
@@ -1096,6 +1054,7 @@ const Subscription = {
 
   canAddGrammar(currentCount) {
     if (currentCount < FREE_LIMIT) return true;
+    if (ForeignAccess.isForeign()) return ForeignAccess.isUnlocked();
     return this.isActive();
   },
 
@@ -1122,6 +1081,57 @@ const Subscription = {
   markRenewalWarned() {
     const s = Store.get('subscription', null);
     if (s) { s.lastWarnedAt = Date.now(); Store.set('subscription', s); }
+  }
+};
+
+/* ============================================================
+   FOREIGN ACCESS — اشتراک‌گذاری + کامنت
+   ============================================================ */
+const ForeignAccess = {
+  key() { return 'foreign:access'; },
+
+  isForeign() {
+    const geo = Store.get('geo:country', {});
+    return geo.isIran !== true;
+  },
+
+  state() {
+    return Store.get(this.key(), {
+      shareDone: false,
+      commentDone: false,
+      platform: '',
+      comment: '',
+      completedAt: null
+    });
+  },
+
+  isUnlocked() {
+    if (!this.isForeign()) return true;
+    const s = this.state();
+    return !!(s.shareDone && s.commentDone);
+  },
+
+  markShare(platform) {
+    const s = this.state();
+    s.shareDone = true;
+    s.platform = platform || 'unknown';
+    s.shareAt = Date.now();
+    Store.set(this.key(), s);
+    Audit.log('foreign_share_confirmed', { platform: s.platform });
+    return s;
+  },
+
+  saveComment(comment) {
+    const text = String(comment || '').trim();
+    if (text.length < 5) return { ok:false, error:'لطفاً یک کامنت حداقل ۵ کاراکتری بنویس.' };
+    const s = this.state();
+    s.commentDone = true;
+    s.comment = text.slice(0, 1000);
+    s.commentAt = Date.now();
+    s.completedAt = Date.now();
+    Store.set(this.key(), s);
+    Audit.log('foreign_comment_submitted', { length: s.comment.length });
+    return { ok:true, state:s };
   }
 };
 
@@ -1716,9 +1726,6 @@ function renderAccountMode() {
 async function checkAuth() {
   await Auth.init();
 
-  // تشخیص IP نباید جلوی ورود کاربر به برنامه را بگیرد.
-  // اگر سرویس‌های تشخیص کشور در دسترس نباشند، برنامه همچنان باز می‌شود
-  // و بخش اشتراک بعداً می‌تواند دوباره تلاش کند.
   try {
     await GeoService.detect();
   } catch (e) {
@@ -1726,32 +1733,13 @@ async function checkAuth() {
   }
 
   if (!Auth.isLoggedIn()) {
-    UsageLimiter.stop();
     document.getElementById('mainApp').classList.add('hidden');
     document.getElementById('accountGate').classList.remove('hidden');
     renderAccountMode();
     return;
   }
 
-  const geo = Store.get('geo:country', {});
-  // ارز از IP تعیین شده و کاربر امکان تغییر آن را ندارد.
-  if (!geo.currency) {
-    try {
-      await GeoService.detect();
-    } catch (e) {
-      Audit.log('geo_retry_failed', {message: String(e?.message || e)});
-    }
-  }
-
-  if (!UsageLimiter.canEnter()) {
-    document.getElementById('mainApp').classList.add('hidden');
-    UsageLimiter.showBlocked();
-    return;
-  }
-
-  // ورود موفق: بلافاصله صفحه اصلی را نمایش بده.
   document.getElementById('accountGate').classList.add('hidden');
-  UsageLimiter.hideBlocked();
   document.getElementById('mainApp').classList.remove('hidden');
 
   try {
@@ -1760,33 +1748,6 @@ async function checkAuth() {
     console.error('LangBlue boot error:', e);
     Audit.log('boot_error', {message: String(e?.message || e)});
   }
-
-  UsageLimiter.start();
-}
-
-function showCurrencyPrompt() {
-  const old = document.getElementById('currencyModal');
-  if (old) old.remove();
-  document.getElementById('mainApp').classList.add('hidden');
-
-  const modal = document.createElement('div');
-  modal.id='currencyModal';
-  modal.className='currency-modal';
-  modal.innerHTML=`
-    <div class="card">
-      <h2 style="color:var(--accent);">🌍 انتخاب نوع پرداخت</h2>
-      <p style="color:var(--muted);font-size:13px;line-height:1.9;">
-        کشور شما به‌درستی تشخیص داده نشد. لطفاً منطقه پرداخت را انتخاب کن:
-      </p>
-      <div style="display:grid;gap:12px;margin-top:20px;">
-        <button id="chooseIRT">🇮🇷 داخل ایران — تومان</button>
-        <button id="chooseUSD">🌍 خارج از ایران — تتر (USDT)</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  document.getElementById('chooseIRT').onclick=()=>{GeoService.confirmCurrency('IRT');modal.remove();checkAuth();};
-  document.getElementById('chooseUSD').onclick=()=>{GeoService.confirmCurrency('USD');modal.remove();checkAuth();};
 }
 
 document.getElementById('btnAccount').onclick = async () => {
@@ -1830,7 +1791,6 @@ document.getElementById('btnSwitchAccount').onclick=()=>{
 
 document.getElementById('btnLogout').onclick=async()=>{
   if(!confirm('از حساب خارج می‌شوی؟')) return;
-  UsageLimiter.stop();
   await Auth.logout();
   location.reload();
 };
@@ -1893,44 +1853,52 @@ function renderSubscriptionBanner() {
   const isActive = sub && Date.now() < sub.expiresAt;
   const count = Object.keys(Graph.nodes).length;
 
-  if (isActive) {
-    const days = Subscription.daysLeft();
-    const cls = days <= 1 ? 'warn' : 'ok';
-    const curLabel = sub.currency === 'USDT' ? 'تتر' : 'تومان';
+  if (ForeignAccess.isForeign()) {
+    const unlocked = ForeignAccess.isUnlocked();
     banner.innerHTML = `
-      <div class="sub-banner ${cls}">
+      <div class="sub-banner ${unlocked ? 'ok' : (count >= ${FREE_LIMIT} ? '' : 'ok')}">
         <div>
-          <strong>✅ اشتراک فعال (${curLabel})</strong>
-          <div style="font-size: 12px; opacity: .9; margin-top: 4px;">
-            ${days} روز باقی‌مونده — تا ${formatDate(sub.expiresAt)}
+          <strong>${unlocked ? '🌍 دسترسی خارجی فعال' : '🌍 دسترسی خارجی'}</strong>
+          <div style="font-size:12px;opacity:.9;margin-top:4px;">
+            ${unlocked
+              ? 'اشتراک‌گذاری + کامنت تکمیل شده؛ دسترسی بیشتر فعال است.'
+              : '${count} از ${FREE_LIMIT} گرامر رایگان استفاده شده — برای ادامه، دو مرحله دسترسی خارجی را تکمیل کن.'}
           </div>
         </div>
         <button class="ghost small" onclick="document.querySelector('.tab[data-tab=\\'pricing\\']').click()">
-          تمدید
+          ${unlocked ? 'وضعیت دسترسی' : 'تکمیل دو مرحله'}
         </button>
       </div>`;
-  } else if (count >= FREE_LIMIT) {
+    return;
+  }
+
+  if (isActive) {
+    const days = Subscription.daysLeft();
+    const cls = days <= 1 ? 'warn' : 'ok';
+    banner.innerHTML = `
+      <div class="sub-banner ${cls}">
+        <div>
+          <strong>✅ اشتراک فعال (تومان)</strong>
+          <div style="font-size:12px;opacity:.9;margin-top:4px;">${days} روز باقی‌مونده — تا ${formatDate(sub.expiresAt)}</div>
+        </div>
+        <button class="ghost small" onclick="document.querySelector('.tab[data-tab=\\'pricing\\']').click()">تمدید</button>
+      </div>`;
+  } else if (count >= ${FREE_LIMIT}) {
     banner.innerHTML = `
       <div class="sub-banner">
         <div>
           <strong>⛔ به سقف رایگان رسیدی (${count}/${FREE_LIMIT})</strong>
-          <div style="font-size: 12px; opacity: .9; margin-top: 4px;">
-            برای افزودن بیشتر، اشتراک تهیه کن
-          </div>
+          <div style="font-size:12px;opacity:.9;margin-top:4px;">برای افزودن بیشتر، اشتراک تومانی تهیه کن</div>
         </div>
-        <button class="ghost small" style="background:white; color:#c0392b;"
-                onclick="document.querySelector('.tab[data-tab=\\'pricing\\']').click()">
-          💳 تهیه اشتراک
-        </button>
+        <button class="ghost small" style="background:white;color:#c0392b;"
+                onclick="document.querySelector('.tab[data-tab=\\'pricing\\']').click()">💳 تهیه اشتراک</button>
       </div>`;
   } else {
     banner.innerHTML = `
       <div class="sub-banner ok">
         <div>
           <strong>🎁 نسخه رایگان</strong>
-          <div style="font-size: 12px; opacity: .9; margin-top: 4px;">
-            ${count} از ${FREE_LIMIT} گرامر استفاده شده
-          </div>
+          <div style="font-size:12px;opacity:.9;margin-top:4px;">${count} از ${FREE_LIMIT} گرامر استفاده شده</div>
         </div>
       </div>`;
   }
@@ -2176,120 +2144,6 @@ function renderFlashcard(q, session) {
 }
 
 /* ============================================================
-   INTERNAL ACCESS LIMITER
-   Two hidden 130-minute windows, then a 4-hour stop.
-   No counters or A/B labels are shown to the user.
-   ============================================================ */
-const UsageLimiter = {
-  MAX_WINDOW_MS: 130 * 60 * 1000,
-  MAX_WINDOWS: 2,
-  STOP_MS: 4 * 60 * 60 * 1000,
-  timer: null,
-
-  _key() {
-    const u = Auth.current();
-    return u ? 'usage:' + u.id : null;
-  },
-
-  _day() {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-  },
-
-  _state() {
-    const key=this._key(); if(!key) return null;
-    const today=this._day(), old=Store.get(key,null);
-    if (!old || old.date !== today) {
-      const fresh={date:today, windows:0, currentStartedAt:null, currentUsedMs:0, blockedUntil:0};
-      Store.set(key,fresh); return fresh;
-    }
-    return old;
-  },
-
-  _save(s) { const key=this._key(); if(key) Store.set(key,s); },
-
-  _commitCurrent(s) {
-    if (!s.currentStartedAt) return;
-    s.currentUsedMs += Math.max(0, Date.now() - s.currentStartedAt);
-    s.currentStartedAt = null;
-
-    if (s.currentUsedMs >= this.MAX_WINDOW_MS) {
-      s.windows = Math.min(this.MAX_WINDOWS, s.windows + 1);
-      s.currentUsedMs = 0;
-      if (s.windows >= this.MAX_WINDOWS) s.blockedUntil = Date.now() + this.STOP_MS;
-    }
-  },
-
-  canEnter() {
-    const s=this._state(); if(!s) return false;
-    if(s.blockedUntil && Date.now() < s.blockedUntil) return false;
-    if(s.windows >= this.MAX_WINDOWS) return false;
-    if(s.currentUsedMs >= this.MAX_WINDOW_MS) {
-      this._commitCurrent(s);
-      this._save(s);
-    }
-    return s.windows < this.MAX_WINDOWS;
-  },
-
-  start() {
-    this.stop();
-    const s=this._state();
-    if(!s || !this.canEnter()) return;
-
-    if(!s.currentStartedAt) s.currentStartedAt=Date.now();
-    this._save(s);
-    this.timer=setInterval(()=>this.tick(),1000);
-  },
-
-  tick() {
-    const s=this._state(); if(!s || !s.currentStartedAt) return;
-    const elapsed=Date.now()-s.currentStartedAt;
-
-    if(s.currentUsedMs + elapsed < this.MAX_WINDOW_MS) return;
-
-    this._commitCurrent(s);
-    this._save(s);
-    this.stop();
-
-    if(s.blockedUntil) {
-      document.getElementById('mainApp').classList.add('hidden');
-      this.showBlocked();
-    } else {
-      toast('دسترسی این نوبت به پایان رسید.', 'warn');
-    }
-  },
-
-  stop() {
-    if(this.timer){ clearInterval(this.timer); this.timer=null; }
-    const s=this._state();
-    if(s && s.currentStartedAt){
-      this._commitCurrent(s);
-      this._save(s);
-    }
-  },
-
-  showBlocked() {
-    let box=document.getElementById('usageBlocked');
-    if(!box){
-      box=document.createElement('div');
-      box.id='usageBlocked';
-      box.className='currency-modal';
-      box.innerHTML=`<div class="card" style="max-width:520px;text-align:center;">
-        <h2 style="color:var(--warn);">⏳ دسترسی موقتاً محدود شده</h2>
-        <p style="color:var(--muted);line-height:1.9;">زمان استفاده فعلی به پایان رسیده است. لطفاً بعداً دوباره تلاش کنید.</p>
-      </div>`;
-      document.body.appendChild(box);
-    }
-    box.classList.remove('hidden');
-  },
-
-  hideBlocked() {
-    const box=document.getElementById('usageBlocked');
-    if(box) box.classList.add('hidden');
-  }
-};
-
-/* ============================================================
    HOME
    ============================================================ */
 function renderHome() {
@@ -2350,39 +2204,144 @@ function renderHome() {
 /* ============================================================
    PRICING — فقط دو حالت (IRT یا USD)
    ============================================================ */
+function renderForeignAccess(grid, intro, howToBox, verifyBox) {
+  const s = ForeignAccess.state();
+
+  intro.innerHTML = `
+    <p style="color:var(--muted);font-size:13px;line-height:1.9;">
+      برای کاربران خارج از ایران، اشتراک پولی تتر حذف شده است.
+      برای دسترسی بیشتر از سقف رایگان <strong>${FREE_LIMIT} گرامر</strong>،
+      فقط دو کار لازم است:
+    </p>
+    <div style="display:grid;gap:10px;margin-top:14px;">
+      <div style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--panel-2);">
+        <strong>۱. معرفی LangBlue</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">سایت را حداقل در یکی از شبکه‌های اجتماعی معرفی کن.</div>
+      </div>
+      <div style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--panel-2);">
+        <strong>۲. ثبت کامنت</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">یک نظر واقعی درباره LangBlue داخل همین بخش ثبت کن.</div>
+      </div>
+    </div>`;
+
+  grid.innerHTML = `
+    <div class="price-card" style="text-align:right;">
+      <div class="duration">مرحله ۱ — اشتراک‌گذاری</div>
+      <div class="features" style="min-height:auto;">یکی از گزینه‌ها را انتخاب کن و لینک LangBlue را به اشتراک بگذار.</div>
+      <div style="display:grid;gap:8px;margin-top:12px;">
+        <button class="small" onclick="ForeignAccessUI.share('Telegram')">✈️ Telegram</button>
+        <button class="small" onclick="ForeignAccessUI.share('X / Twitter')">𝕏 X / Twitter</button>
+        <button class="small" onclick="ForeignAccessUI.share('Bluesky')">🦋 Bluesky</button>
+        <button class="small" onclick="ForeignAccessUI.share('Instagram')">📷 Instagram</button>
+        <button class="small" onclick="ForeignAccessUI.share('Mastodon')">🐘 Mastodon</button>
+        <button class="small" onclick="ForeignAccessUI.share('YouTube')">▶️ YouTube</button>
+        <button class="ghost small" onclick="ForeignAccessUI.copyLink()">🔗 کپی لینک LangBlue</button>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:14px;cursor:pointer;">
+        <input id="shareConfirm" type="checkbox" ${s.shareDone ? 'checked' : ''} onchange="ForeignAccessUI.confirmShare(this.checked)">
+        <span>اشتراک‌گذاری را انجام دادم.</span>
+      </label>
+    </div>
+
+    <div class="price-card" style="text-align:right;">
+      <div class="duration">مرحله ۲ — کامنت در سایت</div>
+      <div class="features" style="min-height:auto;">نظر، پیشنهاد یا تجربه‌ات درباره LangBlue را بنویس.</div>
+      <textarea id="foreignComment" maxlength="1000" placeholder="نظر شما درباره LangBlue..." style="margin-top:10px;min-height:110px;"></textarea>
+      <button style="width:100%;margin-top:10px;" onclick="ForeignAccessUI.submitComment()">💬 ثبت کامنت</button>
+      <div id="foreignAccessStatus" style="margin-top:10px;font-size:12px;color:var(--muted);"></div>
+    </div>`;
+
+  howToBox.innerHTML = `
+    <strong>🔓 وضعیت دسترسی</strong>
+    <div style="margin-top:8px;line-height:2;">
+      <div>${s.shareDone ? '✅' : '⬜'} مرحله ۱: اشتراک‌گذاری ${s.shareDone ? 'انجام شد' : 'انجام نشده'}</div>
+      <div>${s.commentDone ? '✅' : '⬜'} مرحله ۲: کامنت ${s.commentDone ? 'ثبت شد' : 'انجام نشده'}</div>
+      <div style="margin-top:8px;color:${s.shareDone && s.commentDone ? 'var(--success)' : 'var(--warn)'};">
+        ${s.shareDone && s.commentDone
+          ? '🎉 دسترسی شما فعال است و دیگر پرداخت USDT لازم نیست.'
+          : 'هر دو مرحله را کامل کن تا سقف رایگان برایت برداشته شود.'}
+      </div>
+    </div>`;
+  verifyBox.classList.add('hidden');
+}
+
+const ForeignAccessUI = {
+  async share(platform) {
+    const url = 'https://lngbl.github.io/';
+    const text = 'LangBlue — پلتفرم ساخت و یادگیری گرامر زبان';
+    let target = '';
+
+    if (platform === 'Telegram') {
+      target = 'https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text);
+    } else if (platform === 'X / Twitter') {
+      target = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url);
+    } else if (platform === 'Bluesky') {
+      target = 'https://bsky.app/intent/compose?text=' + encodeURIComponent(text + ' ' + url);
+    } else if (platform === 'Instagram') {
+      await navigator.clipboard?.writeText(url).catch(()=>{});
+      target = 'https://www.instagram.com/';
+      toast('لینک LangBlue کپی شد؛ آن را در Instagram منتشر کن.', 'success');
+    } else if (platform === 'YouTube') {
+      await navigator.clipboard?.writeText(url).catch(()=>{});
+      target = 'https://www.youtube.com/';
+      toast('لینک LangBlue کپی شد؛ آن را در YouTube منتشر کن.', 'success');
+    } else if (platform === 'Mastodon') {
+      if (navigator.share) {
+        try {
+          await navigator.share({title:'LangBlue', text, url});
+          this.confirmShare(true, platform);
+          return;
+        } catch (e) {}
+      }
+      await navigator.clipboard?.writeText(url).catch(()=>{});
+      target = 'https://mastodon.social/';
+      toast('لینک کپی شد؛ آن را در Mastodon منتشر کن.', 'success');
+    }
+
+    if (target) window.open(target, '_blank', 'noopener,noreferrer');
+  },
+
+  async copyLink() {
+    try {
+      await navigator.clipboard.writeText('https://lngbl.github.io/');
+      toast('لینک LangBlue کپی شد.', 'success');
+    } catch {
+      toast('کپی خودکار در این مرورگر در دسترس نیست.', 'warn');
+    }
+  },
+
+  confirmShare(checked, platform='manual') {
+    if (!checked) return;
+    ForeignAccess.markShare(platform);
+    renderPricing();
+  },
+
+  submitComment() {
+    const el = document.getElementById('foreignComment');
+    const res = ForeignAccess.saveComment(el?.value || '');
+    if (!res.ok) {
+      toast(res.error, 'error');
+      return;
+    }
+    toast('کامنت ثبت شد؛ دسترسی شما فعال شد.', 'success');
+    renderPricing();
+    renderSubscriptionBanner();
+    renderProfile();
+  }
+};
+
 function renderPricing() {
   const geo = Store.get('geo:country', {});
-  const currency = geo.currency;
   const grid = document.getElementById('pricingGrid');
   const intro = document.getElementById('pricingIntro');
   const howToBox = document.getElementById('howToBox');
   const verifyBox = document.getElementById('verifyBox');
+  if (!grid || !intro || !howToBox || !verifyBox) return;
 
-  const lockWarning = document.getElementById('lockWarning');
-  const lockedMin = RateLimit.isLocked('verify_code');
-  if (lockedMin > 0) {
-    lockWarning.classList.remove('hidden');
-    lockWarning.textContent = `🔒 به دلیل تلاش‌های ناموفق، ${lockedMin} دقیقه‌ی دیگه دوباره امتحان کن.`;
-  } else {
-    lockWarning.classList.add('hidden');
-  }
-
-  // اگه ارز مشخص نیست
-  if (!currency) {
-    intro.innerHTML = `
-      <p style="color: var(--warn); font-size: 14px; line-height: 1.9;">
-        ⚠️ ارز شما هنوز مشخص نشده. لطفاً صفحه رو رفرش کنید تا کشور شما تشخیص داده بشه.
-      </p>`;
-    grid.innerHTML = '';
-    howToBox.innerHTML = '';
-    verifyBox.classList.add('hidden');
-    return;
-  }
-
-  if (currency === 'USD') {
-    renderPricingUSD(grid, intro, howToBox, verifyBox, geo);
-  } else {
+  if (geo.isIran === true) {
     renderPricingIRT(grid, intro, howToBox, verifyBox, geo);
+  } else {
+    renderForeignAccess(grid, intro, howToBox, verifyBox);
   }
 }
 
@@ -2390,7 +2349,7 @@ function renderPricingIRT(grid, intro, howToBox, verifyBox, geo) {
   intro.innerHTML = `
     <p style="color: var(--muted); font-size: 13px; line-height: 1.8;">
       LangBlue تا <strong>${FREE_LIMIT} گرامر</strong> رایگان در اختیارت می‌ذاره.
-      برای افزودن بیشتر، یکی از پلن‌های زیر رو تهیه کن.
+      برای افزودن بیشتر، یکی از پلن‌های تومانی زیر رو تهیه کن.
     </p>`;
 
   grid.innerHTML = PLANS_IRT.map(p => {
@@ -2418,88 +2377,23 @@ function renderPricingIRT(grid, intro, howToBox, verifyBox, geo) {
       <li>پس از تایید، ادمین <strong>کد تایید</strong> رو برات می‌فرسته</li>
       <li>کد رو در بخش «فعال‌سازی اشتراک» وارد کن</li>
     </ol>
-    <div style="margin-top:10px; color:var(--warn);">
-      ⚠️ کد تایید <strong>فقط از طریق ادمین @langBlue</strong> صادر می‌شه.
-    </div>`;
+    <div style="margin-top:10px;color:var(--warn);">⚠️ کد تایید <strong>فقط از طریق ادمین @langBlue</strong> صادر می‌شه.</div>`;
 
   verifyBox.classList.remove('hidden');
   document.getElementById('verifyTitle').textContent = '🔑 فعال‌سازی اشتراک (تومانی)';
-  document.getElementById('verifyDesc').textContent =
-    'کد تاییدی که از ادمین دریافت کردی رو اینجا وارد کن:';
+  document.getElementById('verifyDesc').textContent = 'کد تاییدی که از ادمین دریافت کردی رو اینجا وارد کن:';
   const input = document.getElementById('verifyCode');
   input.placeholder = 'Verify_XXXXX';
   input.value = '';
 
-  document.getElementById('btnVerify').onclick = () => {
-    const code = document.getElementById('verifyCode').value;
-    const status = document.getElementById('verifyStatus');
-    const res = Subscription.activate(code);
-    if (!res.ok) {
-      status.innerHTML = `<span style="color:var(--danger);">❌ ${res.error}</span>`;
-      toast(res.error, 'error');
-      renderPricing();
-      return;
-    }
-    status.innerHTML = `<span style="color:var(--success);">✅ اشتراک فعال شد تا ${formatDate(res.expiresAt)}</span>`;
-    toast('اشتراک فعال شد ✅', 'success');
-    document.getElementById('verifyCode').value = '';
-    renderSubscriptionBanner();
-    renderPricing();
-    renderProfile();
-  };
-}
-
-function renderPricingUSD(grid, intro, howToBox, verifyBox, geo) {
-  intro.innerHTML = `
-    <p style="color: var(--muted); font-size: 13px; line-height: 1.8;">
-      LangBlue تا <strong>${FREE_LIMIT} گرامر</strong> رایگان در اختیارت می‌ذاره.
-      برای افزودن بیشتر، یکی از پلن‌های زیر رو تهیه کن.
-      <br>
-      <span style="color: var(--accent);">
-        🌍 کشور تشخیص‌داده‌شده: <strong>${escapeHtml(geo.name)}</strong>
-        — پرداخت با <strong>تتر (USDT)</strong> روی شبکه TON
-      </span>
-    </p>`;
-
-  grid.innerHTML = PLANS_USD.map(p => {
-    let daysLabel;
-    if (p.id === 'usd_3m') daysLabel = '۳ ماه';
-    else if (p.id === 'usd_6m') daysLabel = '۶ ماه';
-    else if (p.id === 'usd_12m') daysLabel = '۱۲ ماه';
-    else daysLabel = `${p.days} روز`;
-    return `
-      <div class="price-card">
-        <div class="duration">${daysLabel}</div>
-        <div class="price">${p.priceUSDT} <small>USDT</small></div>
-        <div class="features">${p.features}</div>
-        <button onclick="window.__requestPlanUSD('${p.id}')">💎 درخواست این پلن</button>
-      </div>`;
-  }).join('');
-
-  howToBox.innerHTML = `
-    <strong>📖 مراحل تهیه اشتراک (تتر USDT):</strong>
-    <ol>
-      <li>به کانال تلگرام <a href="https://t.me/langBlue" class="tg-link" target="_blank">@langBlue</a> مراجعه کن</li>
-      <li>به ادمین دایرکت پیام بده و بگو پلن موردنظرت رو می‌خوای</li>
-      <li>ادمین <strong>آدرس ولت Tonkeeper</strong> رو برات می‌فرسته</li>
-      <li>مبلغ <strong>تتر (USDT)</strong> رو روی شبکه <strong>TON</strong> واریز کن</li>
-      <li>از واریز <strong>عکس رسید (Screenshot)</strong> بگیر و برای ادمین بفرست</li>
-      <li>پس از تایید، ادمین <strong>کد تایید</strong> رو برات می‌فرسته</li>
-      <li>کد رو در بخش «فعال‌سازی اشتراک» پایین وارد کن</li>
-    </ol>
-    <div style="margin-top:10px; color:var(--warn); line-height:1.9;">
-      ⚠️ <strong>مهم:</strong> فقط از شبکه <strong>TON</strong> استفاده کن.
-      <br>
-      ⚠️ کد تایید <strong>فقط از طریق ادمین @langBlue</strong> صادر می‌شه.
-    </div>`;
-
-  verifyBox.classList.remove('hidden');
-  document.getElementById('verifyTitle').textContent = '🔑 فعال‌سازی اشتراک (تتر)';
-  document.getElementById('verifyDesc').textContent =
-    'کد تاییدی که از ادمین دریافت کردی رو اینجا وارد کن:';
-  const input = document.getElementById('verifyCode');
-  input.placeholder = 'Verify_XXXXX';
-  input.value = '';
+  const lockWarning = document.getElementById('lockWarning');
+  const lockedMin = RateLimit.isLocked('verify_code');
+  if (lockedMin > 0) {
+    lockWarning.classList.remove('hidden');
+    lockWarning.textContent = `🔒 به دلیل تلاش‌های ناموفق، ${lockedMin} دقیقه‌ی دیگه دوباره امتحان کن.`;
+  } else {
+    lockWarning.classList.add('hidden');
+  }
 
   document.getElementById('btnVerify').onclick = () => {
     const code = document.getElementById('verifyCode').value;
@@ -2544,33 +2438,6 @@ window.__requestPlanIRT = (planId) => {
   `);
 };
 
-window.__requestPlanUSD = (planId) => {
-  const plan = PLANS_USD.find(p => p.id === planId);
-  if (!plan) return;
-  let daysLabel;
-  if (plan.id === 'usd_3m') daysLabel = '۳ ماه';
-  else if (plan.id === 'usd_6m') daysLabel = '۶ ماه';
-  else if (plan.id === 'usd_12m') daysLabel = '۱۲ ماه';
-  else daysLabel = `${plan.days} روز`;
-
-  alert(`
-💎 درخواست پلن «${daysLabel}» — ${plan.priceUSDT} USDT
-
-📋 مراحل تهیه:
-
-1) به کانال تلگرام @langBlue مراجعه کن
-2) به ادمین دایرکت پیام بده و بگو این پلن رو می‌خوای
-3) ادمین آدرس ولت Tonkeeper رو برات می‌فرسته
-4) مبلغ ${plan.priceUSDT} USDT رو روی شبکه TON واریز کن
-5) از رسید واریز Screenshot بگیر و برای ادمین بفرست
-6) پس از تایید، ادمین کد تایید رو برات می‌فرسته
-7) کد رو در بخش «فعال‌سازی اشتراک» وارد کن
-
-⚠️ فقط از شبکه TON استفاده کن.
-⚠️ کد تایید فقط از طریق ادمین @langBlue صادر می‌شه.
-  `);
-};
-
 /* ============================================================
    PROFILE
    ============================================================ */
@@ -2581,11 +2448,14 @@ function renderProfile() {
   const isActive = sub && Date.now() < sub.expiresAt;
   const nodes = Object.keys(Graph.nodes).length;
   const geo = Store.get('geo:country', { name:'—', currency:null });
-  const curLabel = geo.currency === 'USD' ? 'تتر (USDT)' :
-                   geo.currency === 'IRT' ? 'تومان (T)' : 'نامشخص';
-  const subStatus = isActive
-    ? `<span style="color:var(--success);">فعال — ${Subscription.daysLeft()} روز باقی‌مونده</span>`
-    : `<span style="color:var(--warn);">نسخه رایگان (${nodes}/${FREE_LIMIT})</span>`;
+  const curLabel = geo.isIran === true ? 'تومان (T)' : 'بدون پرداخت ارزی';
+  const subStatus = ForeignAccess.isForeign()
+    ? (ForeignAccess.isUnlocked()
+        ? `<span style="color:var(--success);">فعال — دسترسی اجتماعی تکمیل شده</span>`
+        : `<span style="color:var(--warn);">نیازمند اشتراک‌گذاری + کامنت</span>`)
+    : (isActive
+        ? `<span style="color:var(--success);">فعال — ${Subscription.daysLeft()} روز باقی‌مونده</span>`
+        : `<span style="color:var(--warn);">نسخه رایگان (${nodes}/${FREE_LIMIT})</span>`);
   const countryDisplay = geo.code ? `${escapeHtml(geo.name)} (${escapeHtml(geo.code)})` : 'نامشخص';
 
   document.getElementById('profileInfo').innerHTML = `
