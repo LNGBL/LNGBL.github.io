@@ -3064,12 +3064,24 @@
                     win.document.write(html);win.document.close();win.focus();win.print();
                 },
                 require:function(action){
-                    // PDF و بررسی نقاط ضعف فقط با تأیید کد فعال‌سازی قابل استفاده‌اند.
-                    // اگر کد وریفای نشده باشد، مستقیماً نیاز کاربر اعلام می‌شود و هیچ پلن/مودال دیگری باز نمی‌شود.
+                    // اشتراک Grammar و Vocabulary مشترک است. اگر اشتراک قدیمی قبل از ثبت
+                    // verifiedByCode ساخته شده باشد، used_codes نشان می‌دهد که کد واقعاً وریفای شده است.
                     var sub=this.current();
                     var verified=!!(sub && sub.verifiedByCode && sub.verifiedAt);
+                    if(!verified && sub){
+                        var used=Storage.get('used_codes',{});
+                        var matched=Object.keys(used).some(function(code){
+                            return used[code] && used[code].planId===sub.planId;
+                        });
+                        if(matched){
+                            sub.verifiedByCode=true;
+                            sub.verifiedAt=sub.verifiedAt||Date.now();
+                            Storage.set('subscription',sub);
+                            verified=true;
+                        }
+                    }
                     if(verified) return true;
-                    UI.showToast('🔒 برای استفاده از PDF و بررسی نقاط ضعف، ابتدا اشتراک تهیه کنید، با ادمین @langBlue هماهنگ شوید و کد وریفای دریافت‌شده را در بخش «فعال‌سازی اشتراک» وارد کنید.','warning');
+                    UI.showToast('🔒 برای استفاده از PDF و بررسی نقاط ضعف، ابتدا اشتراک تهیه کنید و کد وریفای دریافت‌شده را در بخش «فعال‌سازی اشتراک» وارد کنید.','warning');
                     return false;
                 },
                 continuePending:function(){
