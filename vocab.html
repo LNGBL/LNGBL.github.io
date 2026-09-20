@@ -4304,8 +4304,11 @@
                 });
                 var verify=document.getElementById('vocabGateVerifyBtn');
                 if(verify) verify.addEventListener('click',function(){
+                    var gateCode=document.getElementById('vocabGateVerifyCode');
+                    var modalCode=document.getElementById('vocabVerifyCode');
+                    if(gateCode && modalCode) modalCode.value=gateCode.value.trim();
                     PaidAccess.activate();
-                    if(enforceVocabularyAccess()) {
+                    if(PaidAccess.isActive() && enforceVocabularyAccess()) {
                         Core.load(); UI.renderAll();
                     }
                 });
