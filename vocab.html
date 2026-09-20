@@ -903,6 +903,35 @@
         .lock-local-time{font-size:.72rem;opacity:.7;margin-top:.35rem;font-family:Georgia,serif;}
     
         /* ================================================================
+           FULL VOCABULARY PAGE ACCESS GATE
+           ================================================================ */
+        .vocab-access-gate{min-height:calc(100vh - 3rem);display:flex;align-items:center;justify-content:center;padding:1.5rem;}
+        .vocab-access-card{width:min(860px,100%);padding:2rem;border:1px solid var(--border-color);border-radius:2rem;background:var(--bg-card);box-shadow:0 24px 70px rgba(0,20,50,.12);text-align:center;}
+        .vocab-access-icon{width:72px;height:72px;margin:0 auto .8rem;display:grid;place-items:center;border-radius:22px;background:var(--table-header);font-size:2rem;}
+        .vocab-access-kicker{font-size:.68rem;letter-spacing:.16em;color:var(--voice-bg);font-weight:900;}
+        .vocab-access-card h1{margin:.35rem 0 .65rem;padding:0;border:0;background:none;box-shadow:none;font-size:clamp(1.5rem,4vw,2.1rem);}
+        .vocab-access-card>p{max-width:620px;margin:0 auto 1.2rem;color:var(--text-secondary);line-height:1.9;}
+        .vocab-access-actions{display:flex;justify-content:center;gap:.7rem;}
+        .vocab-subscription-panel{margin-top:1.2rem;text-align:right;}
+        .vocab-access-notice{display:flex;flex-direction:column;gap:.25rem;padding:1rem;border-radius:1rem;background:var(--table-header);border:1px solid var(--border-color);line-height:1.8;}
+        .vocab-plan-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:.9rem;}
+        .vocab-plan-card{padding:.9rem;border:1px solid var(--border-color);border-radius:1rem;background:var(--bg-card);text-align:center;}
+        .vocab-plan-card strong{display:block;color:var(--text-primary);}
+        .vocab-plan-card .price{font-weight:900;color:var(--voice-bg);margin:.3rem 0;}
+        .vocab-plan-card small{display:block;color:var(--text-secondary);min-height:2.4em;line-height:1.6;}
+        .vocab-plan-card button{width:100%;margin-top:.6rem;}
+        .vocab-telegram-box,.vocab-verify-box{margin-top:.9rem;padding:1rem;border:1px dashed var(--border-color);border-radius:1rem;line-height:1.9;color:var(--text-secondary);}
+        .vocab-telegram-box ol{margin:.45rem 1.1rem 0 0;padding-right:1rem;}
+        .vocab-telegram-box a{color:var(--voice-bg);font-weight:800;}
+        .vocab-access-warning{margin-top:.6rem;color:#a66b00;font-weight:700;}
+        .vocab-verify-box label{display:block;color:var(--text-primary);font-weight:800;margin-bottom:.55rem;}
+        .vocab-verify-row{display:grid;grid-template-columns:1fr auto;gap:.6rem;}
+        .vocab-verify-row input{min-height:44px;direction:ltr;text-align:left;font-family:monospace;}
+        #vocabGateVerifyStatus{min-height:1.3rem;margin-top:.55rem;font-size:.82rem;}
+        @media(max-width:700px){.vocab-plan-grid{grid-template-columns:1fr 1fr;}.vocab-verify-row{grid-template-columns:1fr;}}
+        @media(max-width:480px){.vocab-access-card{padding:1.2rem;border-radius:1.4rem;}.vocab-plan-grid{grid-template-columns:1fr;}}
+        
+        /* ================================================================
            PAID ACCESS GATE · PDF / WEAKNESS
            ================================================================ */
         .paid-access-modal{max-width:760px !important;padding:1.35rem !important;}
@@ -1389,8 +1418,50 @@
         </div>
     </div>
 
+    <!-- ===== VOCABULARY ACCESS GATE ===== -->
+    <section id="vocabAccessGate" class="vocab-access-gate" aria-live="polite">
+        <div class="vocab-access-card">
+            <div class="vocab-access-icon">🌊</div>
+            <div class="vocab-access-kicker">LANGBLUE · VOCABULARY</div>
+            <h1>🔓 دسترسی به Vocabulary</h1>
+            <p id="vocabAccessMessage">برای استفاده از بخش ورود و مدیریت واژگان، ابتدا وارد حساب LangBlue شو.</p>
+
+            <div id="vocabAccountActions" class="vocab-access-actions">
+                <button class="btn btn-primary" id="vocabCreateAccountBtn">👤 ساخت حساب / ورود</button>
+            </div>
+
+            <div id="vocabSubscriptionPanel" class="vocab-subscription-panel" style="display:none;">
+                <div class="vocab-access-notice">
+                    <strong>🔒 دسترسی این صفحه نیاز به اشتراک فعال دارد.</strong>
+                    <span>بعد از تهیه اشتراک از ادمین @langBlue، کد تایید را در همین صفحه فعال کن.</span>
+                </div>
+                <div class="vocab-plan-grid" id="vocabGatePlans"></div>
+                <div class="vocab-telegram-box">
+                    <strong>📖 مراحل تهیه اشتراک:</strong>
+                    <ol>
+                        <li>به کانال تلگرام <a href="https://t.me/langBlue" target="_blank" rel="noopener">@langBlue</a> مراجعه کن.</li>
+                        <li>به ادمین دایرکت بده و پلن موردنظر را اعلام کن.</li>
+                        <li>ادمین شماره کارت بانکی را برایت می‌فرستد.</li>
+                        <li>پس از پرداخت، رسید را برای ادمین ارسال کن.</li>
+                        <li>بعد از تایید، <strong>کد تایید</strong> را از ادمین دریافت کن.</li>
+                        <li>کد را در بخش فعال‌سازی وارد کن.</li>
+                    </ol>
+                    <div class="vocab-access-warning">⚠️ کد تایید فقط از طریق ادمین @langBlue صادر می‌شود.</div>
+                </div>
+                <div class="vocab-verify-box">
+                    <label for="vocabGateVerifyCode">🔑 فعال‌سازی اشتراک</label>
+                    <div class="vocab-verify-row">
+                        <input id="vocabGateVerifyCode" placeholder="Verify_XXXXX" autocomplete="off">
+                        <button class="btn btn-primary" id="vocabGateVerifyBtn">✅ فعال‌سازی</button>
+                    </div>
+                    <div id="vocabGateVerifyStatus"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== MAIN CONTAINER ===== -->
-    <div class="container" id="mainContainer">
+    <div class="container" id="mainContainer" style="display:none;">
 
         <!-- HEADER -->
         <h1>
@@ -3987,13 +4058,13 @@
                         if(password!==confirm){document.getElementById('confirmError').textContent='رمزها مطابقت ندارند';return;}
                         var res=await Auth.register({fullName:fullName,age:age,gender:gender,username:username,password:password});
                         if(!res.ok){document.getElementById('usernameError').textContent=res.error;return;}
-                        LegacyBridge.migrateForCurrentUser();Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ حساب ساخته شد و داده‌های قبلی در صورت وجود حفظ شدند.','success');PaidAccess.continuePending();
+                        LegacyBridge.migrateForCurrentUser();document.getElementById('userModal').classList.remove('active');self.showToast('✅ حساب ساخته شد. حالا اشتراک Vocabulary را فعال کن.','success');renderVocabularyGate();PaidAccess.continuePending();
                     });
 
                     document.getElementById('loginBtn').addEventListener('click',async function(){
                         var username=document.getElementById('loginUsername').value.trim(),password=document.getElementById('loginPassword').value,res=await Auth.login(username,password);
                         if(!res.ok){document.getElementById('loginError').textContent=res.error;return;}
-                        LegacyBridge.migrateForCurrentUser();Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ ورود موفق بود.','success');PaidAccess.continuePending();
+                        LegacyBridge.migrateForCurrentUser();document.getElementById('userModal').classList.remove('active');self.showToast('✅ ورود موفق بود. حالا اشتراک Vocabulary را فعال کن.','success');renderVocabularyGate();PaidAccess.continuePending();
                     });
                     document.getElementById('logoutBtn').addEventListener('click',async function(){
                         if(!confirm('آیا از خروج مطمئن هستید؟'))return;
@@ -4173,16 +4244,93 @@
             };
 
             // ================================================================
+            // FULL PAGE ACCESS
+            // Vocabulary is intentionally inaccessible until account + active subscription.
+            // The account flow remains available from this gate; the actual vocabulary UI
+            // is only displayed after access is confirmed.
+            function renderVocabularyGate() {
+                var gate=document.getElementById('vocabAccessGate');
+                var main=document.getElementById('mainContainer');
+                var message=document.getElementById('vocabAccessMessage');
+                var accountActions=document.getElementById('vocabAccountActions');
+                var subPanel=document.getElementById('vocabSubscriptionPanel');
+                var plans=document.getElementById('vocabGatePlans');
+                if(!gate||!main) return false;
+
+                var loggedIn=Auth.isLoggedIn();
+                var active=loggedIn && PaidAccess.isActive();
+
+                if(active){
+                    gate.style.display='none';
+                    main.style.display='';
+                    return true;
+                }
+
+                gate.style.display='flex';
+                main.style.display='none';
+
+                if(!loggedIn){
+                    message.innerHTML='برای ورود به Vocabulary ابتدا حساب LangBlue بساز یا وارد حساب موجود شو.';
+                    accountActions.style.display='flex';
+                    subPanel.style.display='none';
+                    return false;
+                }
+
+                message.innerHTML='حساب شما تایید شد، اما برای دیدن و استفاده از صفحه Vocabulary باید اشتراک فعال داشته باشی.';
+                accountActions.style.display='none';
+                subPanel.style.display='block';
+
+                plans.innerHTML=PaidAccess.PLANS.map(function(p){
+                    return '<div class="vocab-plan-card"><strong>'+p.label+'</strong><div class="price">'+p.price+'</div><small>'+p.feature+'</small><button class="btn btn-primary" data-vocab-plan="'+p.id+'">💳 درخواست این پلن</button></div>';
+                }).join('');
+                return false;
+            }
+
+            function enforceVocabularyAccess(){
+                return renderVocabularyGate();
+            }
+
+            function bindVocabularyGate(){
+                var create=document.getElementById('vocabCreateAccountBtn');
+                if(create) create.addEventListener('click',function(){
+                    if(typeof showRegisterMode==='function') showRegisterMode();
+                    var modal=document.getElementById('userModal');
+                    if(modal) modal.classList.add('active');
+                });
+                var plans=document.getElementById('vocabGatePlans');
+                if(plans) plans.addEventListener('click',function(e){
+                    var b=e.target.closest('[data-vocab-plan]');
+                    if(b) PaidAccess.request(b.dataset.vocabPlan);
+                });
+                var verify=document.getElementById('vocabGateVerifyBtn');
+                if(verify) verify.addEventListener('click',function(){
+                    PaidAccess.activate();
+                    if(enforceVocabularyAccess()) {
+                        Core.load(); UI.renderAll();
+                    }
+                });
+                var input=document.getElementById('vocabGateVerifyCode');
+                if(input) input.addEventListener('keydown',function(e){if(e.key==='Enter') document.getElementById('vocabGateVerifyBtn').click();});
+            }
+
+            // ================================================================
             // INIT
             // ================================================================
 
             async function init() {
                 await Auth.init();
                 LegacyBridge.migrateForCurrentUser();
-                Core.load();
                 Security.apply();
-                UI.renderAll();
                 UI.bindEvents();
+                bindVocabularyGate();
+
+                if(!enforceVocabularyAccess()) {
+                    console.log('🔒 Vocabulary page hidden until account + active subscription.');
+                    return;
+                }
+
+                Core.load();
+                UI.renderAll();
                 if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
                 Repetition.cleanPaused();
                 console.log('🌊 LangBlue v3.4 · Vocabulary + Smart Repetition · Account scoped');
