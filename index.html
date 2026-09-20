@@ -19,7 +19,8 @@
   <meta name="twitter:title" content="LangBlue — Language Grammar Platform">
   <meta name="twitter:description" content="پلتفرمی برای ساخت، سازمان‌دهی، تمرین و یادگیری گرامر و ساختارهای زبان.">
 
-  <meta name="theme-color" content="#0a0e1a">
+  <meta name="theme-color" content="#168AAD">
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script type="application/ld+json">
   {
@@ -34,8 +35,8 @@
 
   <style>
 :root{
-  --blue:#229ed9;--blue2:#1688d4;--blue3:#5bc0ff;--deep:#071521;
-  --text:#f7fbff;--muted:#b8c9d8;--line:rgba(255,255,255,.12);
+  --blue:#168AAD;--blue2:#11758F;--blue3:#45B7C8;--deep:#071521;
+  --text:#f7fbff;--muted:#AFC0C4;--line:rgba(255,255,255,.12);
   --glass:rgba(8,24,38,.58);--shadow:0 24px 80px rgba(0,0,0,.28)
 }
 *{box-sizing:border-box}
@@ -48,40 +49,40 @@ body{
     linear-gradient(145deg,#06121e 0%,#0b2740 45%,#071827 100%);
   line-height:1.9;overflow-x:hidden;transition:background .6s ease
 }
-body:before{content:"";position:fixed;inset:-30%;pointer-events:none;opacity:.22;background:linear-gradient(115deg,transparent 40%,rgba(91,192,255,.12) 50%,transparent 60%);animation:ambient 12s linear infinite}
+body:before{content:"";position:fixed;inset:-30%;pointer-events:none;opacity:.22;background:rgba(22,138,173,.08);animation:ambient 12s linear infinite}
 a{color:inherit}
 .wrap{width:min(1120px,calc(100% - 32px));margin:0 auto}
 header{padding:22px 0;border-bottom:1px solid var(--line);position:relative;z-index:5;background:rgba(5,17,28,.34);backdrop-filter:blur(16px)}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .brand{display:inline-flex;align-items:center;gap:10px;font-size:25px;font-weight:850;text-decoration:none;letter-spacing:-.5px;position:relative}
-.brand-mark{width:32px;height:24px;border-radius:9px;background:linear-gradient(135deg,#fff,#8dd8ff);display:inline-flex;align-items:center;justify-content:center;color:#1688d4;font-size:14px;box-shadow:0 0 22px rgba(91,192,255,.65);animation:markPulse 2.8s ease-in-out infinite}
+.brand-mark{width:32px;height:24px;border-radius:9px;background:var(--cream);display:inline-flex;align-items:center;justify-content:center;color:var(--blue);font-size:14px;box-shadow:0 0 22px rgba(91,192,255,.65);animation:markPulse 2.8s ease-in-out infinite}
 .logo-word{display:inline-flex;overflow:hidden;direction:ltr;unicode-bidi:isolate}
 .logo-letter{display:inline-block;opacity:0;transform:translateY(18px) scale(.82);animation:logoIn .55s cubic-bezier(.2,.8,.2,1) forwards}
-.brand-sub{color:#b9d8eb;font-size:11px;font-weight:500;margin-right:4px}
-.nav-link{color:#d8edf9;text-decoration:none;font-size:14px;padding:8px 14px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.05);transition:.2s}
+.brand-sub{color:#BFD1D4;font-size:11px;font-weight:500;margin-right:4px}
+.nav-link{color:#DCE8E8;text-decoration:none;font-size:14px;padding:8px 14px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.05);transition:.2s}
 .nav-link:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}
 .hero{padding:72px 0 76px;text-align:center;position:relative}
 .hero:after{content:"";position:absolute;width:420px;height:420px;border:1px solid rgba(91,192,255,.12);border-radius:50%;left:50%;top:80px;transform:translateX(-50%);box-shadow:0 0 80px rgba(34,158,217,.12);pointer-events:none}
-.eyebrow{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border:1px solid rgba(91,192,255,.30);border-radius:999px;color:#bdeaff;background:rgba(34,158,217,.10);font-size:12px;margin-bottom:18px;backdrop-filter:blur(12px)}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border:1px solid rgba(91,192,255,.30);border-radius:999px;color:#CDE8EA;background:rgba(34,158,217,.10);font-size:12px;margin-bottom:18px;backdrop-filter:blur(12px)}
 .eyebrow:before{content:"";width:6px;height:6px;border-radius:50%;background:#5bc0ff;box-shadow:0 0 12px #5bc0ff;animation:blink 1.5s infinite}
 h1{max-width:900px;margin:0 auto 18px;font-size:clamp(36px,7vw,72px);line-height:1.18;letter-spacing:-2px;position:relative;z-index:1}
-.hero h1 strong{background:linear-gradient(90deg,#fff,#73d0ff,#fff);background-size:220% auto;color:transparent;background-clip:text;-webkit-background-clip:text;animation:shine 4s linear infinite}
+.hero h1 strong{color:var(--cream);}
 .hero-lead{max-width:760px;margin:0 auto;color:var(--muted);font-size:17px;position:relative;z-index:1}
 .actions{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:28px;position:relative;z-index:1}
 .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 23px;border-radius:12px;text-decoration:none;font-weight:750;border:1px solid var(--line);transition:transform .2s,box-shadow .2s,background .2s}
 .btn:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.18)}
-.btn-primary{background:linear-gradient(135deg,#229ed9,#1688d4);border-color:rgba(255,255,255,.18);color:#fff;box-shadow:0 10px 35px rgba(34,158,217,.28)}
+.btn-primary{background:var(--blue);border-color:rgba(255,255,255,.18);color:#fff;box-shadow:0 10px 35px rgba(34,158,217,.28)}
 .btn-secondary{background:rgba(255,255,255,.06);color:var(--text);backdrop-filter:blur(12px)}
 .occasion{max-width:760px;margin:28px auto 0;min-height:88px;padding:16px 20px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(4,17,29,.52);backdrop-filter:blur(18px);box-shadow:var(--shadow);position:relative;z-index:2;overflow:hidden}
-.occasion:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);transform:translateX(-100%);animation:eventSweep 4s ease-in-out infinite}
+.occasion:before{content:"";position:absolute;inset:0;background:rgba(245,241,233,.05);transform:translateX(-100%);animation:eventSweep 4s ease-in-out infinite}
 .occasion-title{font-size:20px;font-weight:800;color:#fff}
 .occasion-title a{text-decoration:none}
 .occasion-title a:hover{text-decoration:underline}
 .occasion-note{font-size:12px;color:#c6d8e6;margin-top:2px}
 .ceremony-control{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px;position:relative;z-index:3}.ceremony-control #ceremonyStatus{font-size:11px;color:var(--muted)}
-.occasion-discount{display:inline-flex;margin-top:8px;padding:3px 10px;border-radius:999px;background:rgba(34,158,217,.18);border:1px solid rgba(91,192,255,.28);color:#8edaff;font-weight:800;font-size:12px}
+.occasion-discount{display:inline-flex;margin-top:8px;padding:3px 10px;border-radius:999px;background:rgba(34,158,217,.18);border:1px solid rgba(91,192,255,.28);color:#72CBD7;font-weight:800;font-size:12px}
 @media(max-width:600px){.occasion-group{padding:15px}.group-head h2{font-size:19px}.event-row{padding:8px}.event-name{font-size:12px}}
-.type-cursor{display:inline-block;width:2px;height:1em;background:#72d2ff;margin-right:3px;vertical-align:-2px;animation:cursor .75s steps(1) infinite}
+.type-cursor{display:inline-block;width:2px;height:1em;background:#45B7C8;margin-right:3px;vertical-align:-2px;animation:cursor .75s steps(1) infinite}
 section{padding:54px 0}
 .section-title{text-align:center;margin:0 0 12px;font-size:30px}
 .section-lead{max-width:760px;margin:0 auto 28px;text-align:center;color:var(--muted)}
@@ -116,6 +117,10 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     .research-levels span{padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(34,158,217,.08);color:#dff4ff;font-size:12px}
     .research-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
     .research-card{display:flex;flex-direction:column;min-height:250px}
+    .icon-heading{display:flex;align-items:center;gap:9px}
+    .icon-heading svg{width:20px;height:20px;color:var(--blue3);stroke-width:2}
+    .research-source{display:flex;align-items:center;gap:7px}
+    .research-source svg{width:15px;height:15px;color:var(--blue3);stroke-width:2}
     .research-source{font-size:11px;letter-spacing:.04em;color:var(--blue3);font-weight:700;margin-bottom:10px}
     .research-card h3{margin:0 0 10px}
     .research-card p{color:var(--muted);line-height:1.85;font-size:14px;margin:0 0 18px}
@@ -266,7 +271,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
         <h2 class="section-title">LangBlue برای چه کسانی است؟</h2>
         <div class="audience">
           <div class="card">
-            <h3>زبان‌آموزان</h3>
+            <h3 class="icon-heading"><i data-lucide="graduation-cap" aria-hidden="true"></i>زبان‌آموزان</h3>
             <ul>
               <li>ثبت قواعدی که در حال یادگیری آن‌ها هستید.</li>
               <li>مرور فرمول‌ها و مثال‌ها.</li>
@@ -274,7 +279,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
             </ul>
           </div>
           <div class="card">
-            <h3>آموزگاران زبان</h3>
+            <h3 class="icon-heading"><i data-lucide="presentation" aria-hidden="true"></i>آموزگاران زبان</h3>
             <ul>
               <li>قواعد گرامری و نکات آموزشی را به‌صورت منظم ثبت و سازمان‌دهی کنند.</li>
               <li>مثال‌ها و فرمول‌های آموزشی را در کنار هر قاعده نگه دارند و هنگام تدریس به آن‌ها مراجعه کنند.</li>
@@ -325,7 +330,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 
         <div class="research-grid">
           <article class="card research-card">
-            <div class="research-source">Cambridge University Press</div>
+            <div class="research-source"><i data-lucide="library" aria-hidden="true"></i> Cambridge University Press</div>
             <h3>پژوهش‌های نوین آموزش زبان</h3>
             <p>
               پژوهش‌های جدید کمبریج در یادگیری زبان دوم، نوشتار، بازخورد، واژگان و روش‌های
@@ -335,7 +340,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
           </article>
 
           <article class="card research-card">
-            <div class="research-source">Oxford Learner’s Dictionaries</div>
+            <div class="research-source"><i data-lucide="book-open" aria-hidden="true"></i> Oxford Learner’s Dictionaries</div>
             <h3>Grammar در سطح‌های مختلف</h3>
             <p>
               توضیح‌های روشن گرامری و تمرین‌های تعاملی که با CEFR هماهنگ شده‌اند؛
@@ -345,7 +350,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
           </article>
 
           <article class="card research-card">
-            <div class="research-source">Harvard University</div>
+            <div class="research-source"><i data-lucide="university" aria-hidden="true"></i> Harvard University</div>
             <h3>Grammar، نوشتار و کاربرد دانشگاهی</h3>
             <p>
               منابع هاروارد برای تقویت ساختار جمله، گرامر، انتخاب واژه و نوشتار روشن و دقیق؛
@@ -355,7 +360,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
           </article>
 
           <article class="card research-card">
-            <div class="research-source">Longman · Pearson</div>
+            <div class="research-source"><i data-lucide="languages" aria-hidden="true"></i> Longman · Pearson</div>
             <h3>انگلیسی طبیعی و کاربردی</h3>
             <p>
               دیکشنری‌ها و منابع Longman با مثال‌های واقعی، پشتیبانی گرامری، الگوهای کاربردی
@@ -365,7 +370,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
           </article>
 
           <article class="card research-card">
-            <div class="research-source">Merriam-Webster</div>
+            <div class="research-source"><i data-lucide="book-marked" aria-hidden="true"></i> Merriam-Webster</div>
             <h3>Grammar و Usage</h3>
             <p>
               توضیح اصطلاحات و کاربردهای گرامری، نکات مربوط به ساختار جمله و تفاوت‌های
@@ -375,7 +380,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
           </article>
 
           <article class="card research-card">
-            <div class="research-source">Oxford · Cambridge · Harvard · Longman · Merriam-Webster</div>
+            <div class="research-source"><i data-lucide="library-big" aria-hidden="true"></i> Oxford · Cambridge · Harvard · Longman · Merriam-Webster</div>
             <h3>از A1 تا C2</h3>
             <p>
               LangBlue می‌تواند این منابع را به ساختار قابل‌مدیریت تبدیل کند:
@@ -607,5 +612,8 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
       © 2026 LangBlue — Language Grammar Platform
     </div>
   </footer>
+<script>
+    if (window.lucide) lucide.createIcons();
+  </script>
 </body>
 </html>
