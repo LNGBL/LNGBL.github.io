@@ -157,6 +157,54 @@
             .input-panel { padding: 1rem; }
         }
 
+        .action-toolbar {
+            position: sticky;
+            top: 5.7rem;
+            z-index: 18;
+            display: flex;
+            justify-content: space-between;
+            gap: .75rem;
+            flex-wrap: wrap;
+            padding: .75rem;
+            margin: 0 0 1rem;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 25px rgba(0,20,50,.06);
+        }
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0,1fr));
+            gap: .7rem;
+            margin-bottom: 1rem;
+        }
+        .stat-card {
+            padding: .8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 1.2rem;
+            background: var(--bg-card);
+        }
+        .stat-card .stat-label { color: var(--text-secondary); font-size: .75rem; }
+        .stat-card .stat-value { display:block; margin-top:.2rem; font-size:1.35rem; font-weight:700; }
+        .input-panel {
+            border-top: 3px solid var(--voice-bg);
+        }
+        .input-panel .btn-primary {
+            min-height: 44px;
+            padding-inline: 1.35rem;
+        }
+        .empty-state {
+            padding: 3rem 1rem !important;
+            text-align: center;
+        }
+        .empty-state strong { display:block; font-size:1.05rem; color:var(--text-primary); margin-bottom:.35rem; }
+        .empty-state span { color:var(--text-secondary); font-size:.85rem; }
+        @media (max-width: 760px) {
+            .action-toolbar { top: .35rem; }
+            .stats-strip { grid-template-columns: repeat(2,minmax(0,1fr)); }
+        }
+
         /* ===== HEADER ===== */
         h1 {
             font-size: 2.4rem;
@@ -1051,8 +1099,18 @@
         </h1>
 
         <!-- MAIN TABS -->
-        <div style="display:flex;justify-content:flex-start;margin-bottom:.7rem;">
-            <a href="/" style="font-size:.78rem;color:var(--text-secondary);text-decoration:none;padding:.3rem .8rem;border:1px solid var(--border-color);border-radius:40px;">🔷 LangBlue · صفحه اصلی</a>
+        <div class="action-toolbar">
+            <a href="/" class="btn btn-outline btn-sm">🔷 صفحه اصلی</a>
+            <div style="display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;">
+                <span class="text-muted">مدیریت واژگان و تمرین</span>
+                <button class="btn btn-primary btn-sm" id="focusAddWordBtn">➕ افزودن سریع</button>
+            </div>
+        </div>
+        <div class="stats-strip" aria-label="خلاصه یادگیری">
+            <div class="stat-card"><span class="stat-label">واژه‌ها</span><span class="stat-value" id="overviewWords">۰</span></div>
+            <div class="stat-card"><span class="stat-label">مرور لازم</span><span class="stat-value" id="overviewDue">۰</span></div>
+            <div class="stat-card"><span class="stat-label">فریزال ورب</span><span class="stat-value" id="overviewPhrasal">۰</span></div>
+            <div class="stat-card"><span class="stat-label">جملات</span><span class="stat-value" id="overviewSentences">۰</span></div>
         </div>
 
         <div class="main-tabs" id="mainTabs">
@@ -1063,7 +1121,7 @@
         </div>
 
         <div class="quick-guide" aria-label="راهنمای سریع">
-            <div class="quick-guide-card"><strong>📚 واژه اضافه کن</strong>واژه، ترجمه و نوع کلمه را وارد کن؛ بقیه اطلاعات را بعداً هم می‌توانی تکمیل کنی.</div>
+            <div class="quick-guide-card"><strong>📚 واژه اضافه کن</strong>واژه و ترجمه را وارد کن و با Enter هم می‌توانی ثبت کنی؛ تکراری‌ها خودکار متوقف می‌شوند.</div>
             <div class="quick-guide-card"><strong>🔎 سریع پیدا کن</strong>از جست‌وجو و تب‌های بالا برای رسیدن سریع به واژه، فریزال ورب، جمله یا گرامر استفاده کن.</div>
             <div class="quick-guide-card"><strong>🧠 مرور هوشمند</strong>مرورهای پیشنهادی را انجام بده تا سیستم تکرار فاصله‌دار وضعیت یادگیری را به‌روز کند.</div>
         </div>
@@ -1106,7 +1164,7 @@
                 <div class="table-scroll" id="wordsTableScroll">
                     <table>
                         <thead><tr><th>واژه</th><th>ترجمه</th><th>نوع</th><th>تکرار</th><th>تلفظ</th><th>استیکرها</th></tr></thead>
-                        <tbody id="wordsTableBody"><tr class="empty-row"><td colspan="6">📭 هیچ واژه‌ای ثبت نشده.</td></tr></tbody>
+                        <tbody id="wordsTableBody"><tr class="empty-row"><td colspan="6" class="empty-state"><strong>📚 هنوز واژه‌ای نداری</strong><span>از فرم بالا اولین واژه را اضافه کن یا از دکمه «افزودن سریع» استفاده کن.</span></td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -2356,9 +2414,22 @@
             // UI
             // ================================================================
 
+            function escapeHtml(value) {
+                return String(value == null ? '' : value)
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            function csvCell(value) {
+                return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"';
+            }
+
             var UI = {
                 renderAll: function() {
                     this.renderWords();
+                    this.updateOverviewStats();
+                    this.updateStorageStatus();
                     this.renderPhrasal();
                     this.renderSentences();
                     this.renderGrammar();
@@ -2417,9 +2488,9 @@
                         var repClass = RepetitionSystem.getStatusClass(item.word, item.persian);
 
                         html += '<tr>' +
-                            '<td class="copy-allowed"><strong>' + item.word + '</strong> ' + forgottenBadge + ' ' + pausedBadge +
+                            '<td class="copy-allowed"><strong>' + escapeHtml(item.word) + '</strong> ' + forgottenBadge + ' ' + pausedBadge +
                             '</td>' +
-                            '<td class="copy-allowed">' + item.persian + '</td>' +
+                            '<td class="copy-allowed">' + escapeHtml(item.persian) + '</td>' +
                             '<td><span class="word-type-badge ' + typeClass + '">' + (typeLabels[item.type] || 'سایر') +
                             '</span></td>' +
                             '<td><span class="rep-status-badge ' + repClass + '">' + repLabel + '</span></td>' +
@@ -2625,6 +2696,38 @@
                     }
                 },
 
+                updateStorageStatus: function() {
+                    var el = document.getElementById('storageStatusText');
+                    if (!el) return;
+                    try {
+                        var testKey = '__lb_storage_test__';
+                        localStorage.setItem(testKey, '1');
+                        localStorage.removeItem(testKey);
+                        el.textContent = '💾 ذخیره‌سازی محلی فعال است';
+                    } catch (e) {
+                        el.textContent = '⚠️ ذخیره‌سازی مرورگر در دسترس نیست';
+                    }
+                    var backup = Storage.get(KEYS.BACKUP, null);
+                    var b = document.getElementById('backupStatusText');
+                    if (b) b.textContent = backup && backup.createdAt ? '🛡️ آخرین بکاپ: ' + new Date(backup.createdAt).toLocaleString('fa-IR') : '🛡️ هنوز بکاپی ساخته نشده';
+                },
+
+                updateOverviewStats: function() {
+                    var ids = ['overviewWords','overviewPhrasal','overviewSentences'];
+                    var vals = [Core.state.words.length, Core.state.phrasal.length, Core.state.sentences.length];
+                    for (var i = 0; i < ids.length; i++) {
+                        var el = document.getElementById(ids[i]);
+                        if (el) el.textContent = vals[i].toLocaleString('fa-IR');
+                    }
+                    var due = 0;
+                    for (var j = 0; j < Core.state.words.length; j++) {
+                        var w = Core.state.words[j];
+                        if (RepetitionSystem.getStatusClass(w.word, w.persian) === 'due' || SRS.getForgottenWords().some(function(x){return x.word===w.word;})) due++;
+                    }
+                    var dueEl = document.getElementById('overviewDue');
+                    if (dueEl) dueEl.textContent = due.toLocaleString('fa-IR');
+                },
+
                 applySearch: function() {
                     var query = document.getElementById('searchInput').value.trim();
                     this.searchQuery = query;
@@ -2725,6 +2828,20 @@
                         });
                     }
 
+                    // Fast keyboard entry
+                    ['wordInput','persianInput'].forEach(function(id) {
+                        document.getElementById(id).addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                document.getElementById('addWordBtn').click();
+                            }
+                        });
+                    });
+                    document.getElementById('focusAddWordBtn').addEventListener('click', function() {
+                        document.getElementById('wordInput').focus();
+                        document.getElementById('wordInput').scrollIntoView({behavior:'smooth',block:'center'});
+                    });
+
                     // Add Word
                     document.getElementById('addWordBtn').addEventListener('click', function() {
                         var word = document.getElementById('wordInput').value.trim();
@@ -2732,6 +2849,15 @@
                         var type = document.getElementById('typeInput').value;
                         if (!word || !persian) {
                             self.showToast('لطفاً واژه و ترجمه را وارد کنید.', 'warning');
+                            return;
+                        }
+                        var normalized = word.toLocaleLowerCase().replace(/\s+/g, ' ');
+                        var duplicate = Core.state.words.some(function(w) {
+                            return String(w.word || '').toLocaleLowerCase().replace(/\s+/g, ' ') === normalized;
+                        });
+                        if (duplicate) {
+                            self.showToast('⚠️ این واژه قبلاً ثبت شده است.', 'warning');
+                            document.getElementById('wordInput').focus();
                             return;
                         }
                         var sticker = Core.state.selectedSticker ? [Core.state.selectedSticker] : [];
@@ -3256,6 +3382,21 @@
                         await Auth.logout();document.getElementById('userModal').classList.remove('active');Core.load();self.renderAll();self.showToast('🚪 از حساب خارج شدید. داده‌های حساب قبلی باقی ماند.','info');
                     });
 
+                    // Backup reminder modal
+                    document.getElementById('backupDownloadBtn').addEventListener('click', function() {
+                        try {
+                            BackupManager.downloadBackup();
+                            document.getElementById('backupModal').classList.remove('active');
+                            document.getElementById('backupModal').setAttribute('aria-hidden','true');
+                            self.updateStorageStatus();
+                            self.showToast('🛡️ بکاپ ساخته و دانلود شد.', 'success');
+                        } catch (e) { self.showToast('❌ '+e.message, 'error'); }
+                    });
+                    document.getElementById('backupSkipBtn').addEventListener('click', function() {
+                        document.getElementById('backupModal').classList.remove('active');
+                        document.getElementById('backupModal').setAttribute('aria-hidden','true');
+                    });
+
                     // Backup
                     document.getElementById('backupNowBtn').addEventListener('click', function() {
                         try {
@@ -3390,7 +3531,7 @@
                     // Keyboard shortcuts
                     document.addEventListener('keydown', function(e) {
                         if (e.key === 'Escape') {
-                            var modals = ['flashcardModal', 'weaknessModal', 'editModal', 'userModal'];
+                            var modals = ['flashcardModal', 'weaknessModal', 'editModal', 'userModal', 'backupModal'];
                             for (var i = 0; i < modals.length; i++) {
                                 var el = document.getElementById(modals[i]);
                                 if (el && el.classList.contains('active')) {
@@ -3422,8 +3563,11 @@
                 apply: function() {
                     document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
                     document.addEventListener('keydown', function(e) {
-                        if (e.ctrlKey && ['c', 'x', 'v', 'u', 's'].indexOf(e.key.toLowerCase()) !== -1) {
-                            if (!e.target.closest('.copy-allowed')) { e.preventDefault(); return false; }
+                        // Do not block normal copy/paste: it is essential for language learning.
+                        // Keep only browser/shortcut restrictions that are useful to the page.
+                        if (e.ctrlKey && e.key.toLowerCase() === 's') {
+                            e.preventDefault();
+                            return false;
                         }
                         if (e.key === 'F12') { e.preventDefault(); return false; }
                         if (e.ctrlKey && e.shiftKey && ['i', 'j'].indexOf(e.key.toLowerCase()) !== -1) {
@@ -3432,9 +3576,6 @@
                         }
                     });
                     document.addEventListener('dragstart', function(e) {
-                        if (!e.target.closest('.copy-allowed')) { e.preventDefault(); return false; }
-                    });
-                    document.addEventListener('selectstart', function(e) {
                         if (!e.target.closest('.copy-allowed')) { e.preventDefault(); return false; }
                     });
                     console.log('%c🌊 LangBlue · v3.3', 'font-size:20px;font-weight:bold;color:#1a4f8b;');
