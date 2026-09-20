@@ -1626,7 +1626,7 @@
 
                 createBackup: function() {
                     var data = {};
-                    var keys = [KEYS.WORDS, KEYS.PHRASAL, KEYS.SENTENCES, KEYS.GRAMMAR, KEYS.SRS, KEYS.TOKENS, KEYS.REPETITION_DATA, KEYS.FLASHCARD_VISITS];
+                    var keys = [KEYS.WORDS, KEYS.PHRASAL, KEYS.SENTENCES, KEYS.GRAMMAR, KEYS.SRS, KEYS.TOKENS, KEYS.REPETITION_DATA, KEYS.FLASHCARD_VISITS, KEYS.WEAKNESS, KEYS.PAUSED, KEYS.DAILY_REVIEW];
                     for (var i = 0; i < keys.length; i++) {
                         var val = Storage.get(keys[i], null); if (val !== null) data[keys[i]] = val;
                         }
