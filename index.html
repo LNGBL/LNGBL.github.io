@@ -119,7 +119,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     .eyebrow-cloud:after{content:"";position:absolute;left:2px;right:2px;bottom:0;height:7px;border-radius:7px;background:var(--blue3);}
     .eyebrow-cloud,.eyebrow-cloud span,.eyebrow-cloud:after{animation:none!important;}
     .products{padding:70px 0}
-    .products-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:900px;margin:30px auto 0}
+    .products-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:1120px;margin:30px auto 0}
     .product-card{position:relative;display:flex;flex-direction:column;min-height:270px;padding:28px;background:var(--glass);border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 45px rgba(0,0,0,.14);backdrop-filter:blur(14px);transition:transform .2s,border-color .2s,box-shadow .2s}
     .product-card:hover{transform:translateY(-5px);border-color:rgba(91,192,255,.36);box-shadow:0 20px 55px rgba(0,0,0,.2)}
     .product-badge{display:inline-flex;align-self:flex-start;padding:5px 10px;border-radius:999px;background:rgba(34,158,217,.12);border:1px solid rgba(91,192,255,.24);color:#9de3ff;font-size:11px;font-weight:800;margin-bottom:16px}
@@ -128,6 +128,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     .product-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.9}
     .product-list{margin:16px 0 22px;padding:0 20px 0 0;color:#d9edf3;font-size:13px;line-height:2}
     .product-card .btn{margin-top:auto;align-self:flex-start}
+    @media(max-width:850px){.products-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:650px){.products-grid{grid-template-columns:1fr}.products{padding:54px 0}}
     .research{padding:78px 0}
     .seo-vocabulary{padding:64px 0 30px}
@@ -161,6 +162,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 </a>
       <a class="nav-link" href="LangBlue-grammer.html">ورود به پلتفرم</a>
       <a class="nav-link" href="vocab.html">📚 واژگان</a>
+      <a class="nav-link" href="LangBlue-De.html">🇩🇪 Deutsch</a>
     </div>
   </header>
 
@@ -343,6 +345,19 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
               <li>مرور و تمرین واژگان</li>
             </ul>
             <a class="btn btn-primary" href="vocab.html">ورود به Vocabulary ←</a>
+          </article>
+
+          <article class="product-card">
+            <span class="product-badge">LANGBLUE · DEUTSCH</span>
+            <div class="product-icon">🇩🇪</div>
+            <h3>LangBlue Deutsch</h3>
+            <p>ابزار یادگیری آلمانی LangBlue برای ثبت واژگان، ترجمه فارسی، تلفظ و تمرین فلش‌کارت با مرور ساختاریافته.</p>
+            <ul class="product-list">
+              <li>ثبت واژگان آلمانی و ترجمه فارسی</li>
+              <li>تلفظ و جست‌وجوی سریع</li>
+              <li>فلش‌کارت و تمرین مرور</li>
+            </ul>
+            <a class="btn btn-primary" href="LangBlue-De.html">ورود به Deutsch ←</a>
           </article>
         </div>
       </div>
