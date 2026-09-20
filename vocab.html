@@ -2998,7 +2998,7 @@
             // SHARED PAID ACCESS — same subscription key as Grammar
             // ================================================================
             var PaidAccess = {
-                FREE_LIMIT:45,
+                FREE_LIMIT:35,
                 PLANS:[
                     {id:'irt_7d',days:7,label:'۷ روز',price:'66,890 T',feature:'دسترسی کامل به همه امکانات'},
                     {id:'irt_14d',days:14,label:'۱۴ روز',price:'123,890 T',feature:'دسترسی کامل به همه امکانات'},
@@ -3029,7 +3029,7 @@
                     var sub=this.current();
                     document.getElementById('paidAccessIntro').innerHTML=sub
                         ? '✅ اشتراک شما فعال است تا <strong>'+new Date(sub.expiresAt).toLocaleDateString('fa-IR')+'</strong>.'
-                        : 'LangBlue تا <strong>۴۵ گرامر</strong> رایگان در اختیار شما می‌گذارد. امکانات پولی واژگان مانند <strong>PDF</strong> و <strong>بررسی نقاط ضعف</strong> با اشتراک فعال می‌شوند.';
+                        : 'LangBlue تا <strong>۳۵ واژه</strong> را رایگان در اختیار شما می‌گذارد. برای افزودن واژه‌های بیشتر و استفاده از امکانات پیشرفته مانند <strong>PDF</strong> و <strong>بررسی نقاط ضعف</strong>، اشتراک فعال لازم است.';
                     var grid=document.getElementById('paidPlanGrid');
                     grid.innerHTML=this.PLANS.map(function(p){
                         return '<div class="paid-plan-card"><div class="days">'+p.label+'</div><div class="price">'+p.price+'</div><div class="feature">'+p.feature+'</div><button data-plan="'+p.id+'">💳 درخواست این پلن</button></div>';
@@ -3523,6 +3523,14 @@
                             self.showToast('لطفاً واژه و ترجمه را وارد کنید.', 'warning');
                             return;
                         }
+
+                        // ۳۵ واژه اول رایگان؛ از واژه ۳۶ به بعد اشتراک لازم است.
+                        if (!PaidAccess.isActive() && Core.state.words.length >= PaidAccess.FREE_LIMIT) {
+                            self.showToast('🔒 سقف ۳۵ واژه رایگان تکمیل شده است. برای افزودن واژه‌های بیشتر اشتراک را فعال کنید.', 'warning');
+                            PaidAccess.open();
+                            return;
+                        }
+
                         var normalized = word.toLocaleLowerCase().replace(/\s+/g, ' ');
                         var duplicate = Core.state.words.some(function(w) {
                             return String(w.word || '').toLocaleLowerCase().replace(/\s+/g, ' ') === normalized;
@@ -4258,9 +4266,10 @@
                 if(!gate||!main) return false;
 
                 var loggedIn=Auth.isLoggedIn();
-                var active=loggedIn && PaidAccess.isActive();
 
-                if(active){
+                // قبل از ثبت‌نام/ورود، هیچ‌یک از امکانات Vocabulary نمایش داده نمی‌شود.
+                // بعد از ورود، ۳۵ واژه اول رایگان است و فقط سقف افزودن واژه و امکانات پولی محدود می‌شوند.
+                if(loggedIn){
                     gate.style.display='none';
                     main.style.display='';
                     return true;
@@ -4268,21 +4277,9 @@
 
                 gate.style.display='flex';
                 main.style.display='none';
-
-                if(!loggedIn){
-                    message.innerHTML='برای ورود به Vocabulary ابتدا حساب LangBlue بساز یا وارد حساب موجود شو.';
-                    accountActions.style.display='flex';
-                    subPanel.style.display='none';
-                    return false;
-                }
-
-                message.innerHTML='حساب شما تایید شد، اما برای دیدن و استفاده از صفحه Vocabulary باید اشتراک فعال داشته باشی.';
-                accountActions.style.display='none';
-                subPanel.style.display='block';
-
-                plans.innerHTML=PaidAccess.PLANS.map(function(p){
-                    return '<div class="vocab-plan-card"><strong>'+p.label+'</strong><div class="price">'+p.price+'</div><small>'+p.feature+'</small><button class="btn btn-primary" data-vocab-plan="'+p.id+'">💳 درخواست این پلن</button></div>';
-                }).join('');
+                message.innerHTML='برای ورود به Vocabulary ابتدا حساب LangBlue بساز یا وارد حساب موجود شو.';
+                accountActions.style.display='flex';
+                subPanel.style.display='none';
                 return false;
             }
 
@@ -4327,12 +4324,15 @@
                 UI.bindEvents();
                 bindVocabularyGate();
 
+                // داده‌ها فقط برای تعیین وضعیت حساب/سقف رایگان بارگذاری می‌شوند؛
+                // تا قبل از ورود، رابط اصلی Vocabulary همچنان کاملاً مخفی است.
+                Core.load();
+
                 if(!enforceVocabularyAccess()) {
-                    console.log('🔒 Vocabulary page hidden until account + active subscription.');
+                    console.log('🔒 Vocabulary UI hidden until account/login.');
                     return;
                 }
 
-                Core.load();
                 UI.renderAll();
                 if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
                 Repetition.cleanPaused();
