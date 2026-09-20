@@ -23,13 +23,18 @@ function validateCode(code){
   var plan=window.LangBlueCommerce&&window.LangBlueCommerce.displayPlan?window.LangBlueCommerce.displayPlan(planId):null;
   return plan?{ok:true,plan:plan,code:trimmed}:{ok:false,error:'پلن نامعتبر است'};
 }
-function activate(code){
+function activate(code,productIds){
   var r=validateCode(code); if(!r.ok)return r;
   var now=Date.now(), existing=get('subscription',null), base=existing&&existing.expiresAt>now?existing.expiresAt:now;
   var expiresAt=base+r.plan.days*86400000, used=get('used_codes',{});
   used[r.code]={at:now,planId:r.plan.id}; set('used_codes',used);
-  set('subscription',{planId:r.plan.id,planDays:r.plan.days,currency:'IRT',startedAt:now,expiresAt:expiresAt,verifiedAt:now,verifiedByCode:true});
-  return{ok:true,expiresAt:expiresAt,plan:r.plan};
+  var products=Array.isArray(productIds)&&productIds.length?productIds.slice():null;
+  var previous=get('subscription',null);
+  if(!products&&previous&&Array.isArray(previous.activatedProducts)&&previous.activatedProducts.length) products=previous.activatedProducts.slice();
+  var sub={planId:r.plan.id,planDays:r.plan.days,currency:'IRT',startedAt:base,expiresAt:expiresAt,verifiedAt:now,verifiedByCode:true};
+  if(products) sub.activatedProducts=products;
+  set('subscription',sub);
+  return{ok:true,expiresAt:expiresAt,plan:r.plan,subscription:sub};
 }
-window.LangBlueCore={version:'1.0.0-phase1',session:session,userId:userId,account:account,storage:{get:get,set:set,remove:remove,key:key},subscription:{current:currentSubscription,hasProduct:hasProduct,hasAnyProduct:hasAny,hasAllProducts:hasAll,validateCode:validateCode,activate:activate}};
+window.LangBlueCore={version:'1.0.0-phase5',session:session,userId:userId,account:account,storage:{get:get,set:set,remove:remove,key:key},subscription:{current:currentSubscription,hasProduct:hasProduct,hasAnyProduct:hasAny,hasAllProducts:hasAll,validateCode:validateCode,activate:activate}};
 })(window);
