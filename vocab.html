@@ -901,6 +901,244 @@
         .lock-box:before{content:"✦  ◇  ✦";display:block;font-family:Georgia,serif;letter-spacing:.65rem;opacity:.42;margin-bottom:.65rem;color:#526b78;}
         .timer-text{font-family:Georgia,'Times New Roman',serif !important;letter-spacing:.08em;text-shadow:0 1px 0 #fff;}
         .lock-local-time{font-size:.72rem;opacity:.7;margin-top:.35rem;font-family:Georgia,serif;}
+    
+        /* ================================================================
+           v3.5 COMPONENT REDESIGN · ACCOUNT / FLASHCARD / WEAKNESS
+           ================================================================ */
+        :root {
+            --accent: #1a4f8b;
+            --accent-soft: #eaf2ff;
+            --surface-2: #f7f9fd;
+            --success-soft: #eaf8f1;
+            --danger-soft: #fff0ef;
+            --warning-soft: #fff8df;
+            --radius-xl: 1.6rem;
+            --radius-lg: 1.2rem;
+        }
+        [data-theme="dark"] {
+            --accent-soft: #182b45;
+            --surface-2: #202b3b;
+            --success-soft: #173528;
+            --danger-soft: #3a2022;
+            --warning-soft: #3b3318;
+        }
+
+        .modal-overlay {
+            background: rgba(9, 20, 36, .62);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+        }
+        .modal {
+            width: min(100%, 680px);
+            max-height: min(88vh, 820px);
+            overflow: auto;
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 1.8rem;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(31,107,192,.08), transparent 34%),
+                var(--bg-card);
+            box-shadow: 0 30px 90px rgba(0,0,0,.28);
+        }
+        .modal > h3,
+        .modal #weaknessDashboard > h3,
+        .modal #weaknessQuiz > div:first-child h3 {
+            font-size: 1.35rem;
+            letter-spacing: -.02em;
+        }
+        #userModal .modal {
+            width: min(100%, 560px);
+        }
+        #userStatus {
+            background: linear-gradient(135deg, var(--accent-soft), var(--surface-2)) !important;
+            border: 1px solid var(--border-color);
+            border-right: 4px solid var(--voice-bg) !important;
+        }
+        #userPanel > div {
+            background: linear-gradient(135deg, var(--success-soft), var(--surface-2)) !important;
+            border: 1px solid var(--border-color);
+        }
+        #userPanel p {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            border-bottom: 1px dashed var(--border-color);
+            padding: .25rem 0;
+        }
+        #userPanel p:last-child { border-bottom: 0; }
+        .field-group {
+            margin-bottom: .85rem;
+        }
+        .field-group label {
+            display: block;
+            margin-bottom: .35rem;
+            color: var(--text-secondary);
+            font-size: .8rem;
+            font-weight: 700;
+        }
+        .field-group input,
+        .field-group select {
+            width: 100%;
+            min-height: 44px;
+            border: 1px solid var(--border-color);
+            border-radius: .9rem;
+            padding: .65rem .8rem;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+        .field-group input:focus,
+        .field-group select:focus {
+            border-color: var(--voice-bg);
+            box-shadow: var(--focus-ring);
+            outline: none;
+        }
+        .error-msg {
+            min-height: 1.1rem;
+            margin-top: .25rem;
+            color: var(--danger);
+            font-size: .76rem;
+        }
+
+        #flashcardModal .modal,
+        #weaknessModal .modal {
+            padding: 1.4rem;
+        }
+        #flashcardModal .modal > div:first-child {
+            padding: .35rem;
+        }
+        .flashcard-timer {
+            display: inline-flex;
+            min-width: 72px;
+            min-height: 72px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--accent-soft);
+            border: 1px solid var(--border-color);
+            margin-bottom: .75rem;
+            box-shadow: inset 0 0 0 7px var(--bg-card);
+        }
+        #flashcardWord,
+        .weakness-question {
+            letter-spacing: -.02em;
+            line-height: 1.35;
+        }
+        #flashcardProgress,
+        #weaknessProgress {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 72px;
+            padding: .3rem .75rem;
+            border-radius: 999px;
+            background: var(--surface-2);
+            border: 1px solid var(--border-color);
+            font-variant-numeric: tabular-nums;
+        }
+        .flashcard-options {
+            gap: .8rem;
+        }
+        .flashcard-options .option-btn {
+            min-height: 68px;
+            border-radius: 1rem;
+            border-width: 1px;
+            background: var(--surface-2);
+            box-shadow: 0 5px 14px rgba(0,20,50,.04);
+        }
+        .flashcard-options .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: var(--voice-bg);
+            background: var(--accent-soft);
+        }
+        .flashcard-options .option-btn.correct {
+            background: var(--success-soft);
+            border-color: var(--success);
+            color: var(--success);
+            box-shadow: 0 0 0 3px rgba(43,140,94,.08);
+        }
+        .flashcard-options .option-btn.wrong {
+            background: var(--danger-soft);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        .flashcard-pronounce-btn {
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            padding: .5rem .9rem;
+            background: var(--surface-2);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        .weakness-grid {
+            gap: .8rem !important;
+        }
+        .weakness-mode-card {
+            min-height: 118px;
+            padding: 1rem !important;
+            border-radius: 1.2rem !important;
+            background: var(--surface-2) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: 0 8px 22px rgba(0,20,50,.04);
+            transition: transform .2s, border-color .2s, background .2s;
+        }
+        .weakness-mode-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--voice-bg) !important;
+        }
+        .weakness-bar {
+            overflow: hidden;
+            height: 7px !important;
+            border-radius: 999px !important;
+            background: var(--border-color) !important;
+            margin-top: .65rem;
+        }
+        .weakness-bar span {
+            display: block;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--voice-bg), #4e8fd0);
+            transition: width .35s ease;
+        }
+        #weaknessRecommendation {
+            background: var(--warning-soft);
+            border-color: rgba(255,193,7,.45) !important;
+        }
+        #weaknessQuestion {
+            margin: 1rem 0;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: 1.2rem;
+            background: linear-gradient(135deg, var(--surface-2), var(--bg-card));
+            font-size: 1.35rem;
+            font-weight: 750;
+            text-align: center;
+        }
+        #storageStatusBar {
+            background: var(--surface-2) !important;
+        }
+        @media (max-width: 620px) {
+            #flashcardModal .modal, #weaknessModal .modal, #userModal .modal {
+                padding: 1rem;
+                border-radius: 1.35rem;
+            }
+            .flashcard-options {
+                grid-template-columns: 1fr !important;
+            }
+            .flashcard-options .option-btn {
+                min-height: 58px;
+            }
+            #userPanel p {
+                flex-direction: column;
+                gap: .1rem;
+            }
+            .modal-actions {
+                flex-direction: column;
+            }
+            .modal-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1014,7 +1252,8 @@
                     <span id="flashcardRepStatus" style="font-size:0.75rem;color:var(--text-secondary);"></span>
                 </div>
                 
-                <div id="flashcardProgress" style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.8rem;">۰/۰</div>
+                <div id="flashcardProgress" style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.55rem;">۰/۰</div>
+                <div class="weakness-bar" style="margin-bottom:.8rem;"><span id="flashcardProgressBar" style="width:0%;"></span></div>
 
                 <!-- ===== ۴ گزینه ===== -->
                 <div class="flashcard-options" id="flashcardOptions">
@@ -1052,6 +1291,7 @@
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;">
                     <h3 id="weaknessModeTitle">🎯 تمرین</h3><span id="weaknessProgress">۱/۱</span>
                 </div>
+                <div class="weakness-bar" style="margin:.8rem 0;"><span id="weaknessProgressBar" style="width:0%;"></span></div>
                 <div class="weakness-hint" id="weaknessHint"></div>
                 <div class="weakness-question" id="weaknessQuestion">—</div>
                 <button class="flashcard-pronounce-btn" id="weaknessPronounceBtn" style="display:none;margin-bottom:.5rem;">🔊 پخش تلفظ</button>
@@ -1425,6 +1665,8 @@
                     var vals=Object.values(accounts),a=null;
                     for(var i=0;i<vals.length;i++) if(vals[i].id===session.userId){a=vals[i];break;}
                     if(!a){Store.set('session',null);Store.set('user',null);return null;}
+                    // Never trust stale account objects from an older session.
+                    if(!a.id || !a.username){Store.set('session',null);Store.set('user',null);return null;}
                     var user={id:a.id,fullName:a.fullName||'',age:a.age||'',gender:a.gender||'',username:a.username,createdAt:a.createdAt||new Date().toISOString()};
                     Store.set('user',user); return user;
                 },
@@ -1451,11 +1693,11 @@
 
             const Storage = {
                 _key:function(key){return Store._storageKey(key);},
-                get:function(key,fallback){fallback=fallback||null;try{var d=localStorage.getItem(this._key(key));return d?JSON.parse(d):fallback;}catch{return fallback;}},
-                set:function(key,value){try{localStorage.setItem(this._key(key),JSON.stringify(value));return true;}catch{return false;}},
-                remove:function(key){localStorage.removeItem(this._key(key));},
-                getString:function(key,fallback){fallback=fallback||'';return localStorage.getItem(this._key(key))||fallback;},
-                setString:function(key,value){localStorage.setItem(this._key(key),String(value));},
+                get:function(key,fallback){fallback=(fallback===undefined?null:fallback);try{var d=localStorage.getItem(this._key(key));return d!==null?JSON.parse(d):fallback;}catch(e){return fallback;}},
+                set:function(key,value){try{localStorage.setItem(this._key(key),JSON.stringify(value));return true;}catch(e){return false;}},
+                remove:function(key){try{localStorage.removeItem(this._key(key));}catch(e){}},
+                getString:function(key,fallback){fallback=(fallback===undefined?'':fallback);try{var v=localStorage.getItem(this._key(key));return v!==null?v:fallback;}catch(e){return fallback;}},
+                setString:function(key,value){try{localStorage.setItem(this._key(key),String(value));return true;}catch(e){return false;}},
                 has:function(key){return localStorage.getItem(this._key(key))!==null;}
             };
 
@@ -1805,6 +2047,16 @@
                     this.saveAll(data);
                 },
 
+                recordOutcome: function(word, persian, correct) {
+                    var rep = RepetitionSystem.getWordStatus(word, persian);
+                    if (!correct) {
+                        this.update(word, persian, 'review');
+                        return;
+                    }
+                    var count = rep && Number(rep.correctCount) || 0;
+                    this.update(word, persian, count >= 5 ? 'mastered' : 'learning');
+                },
+
                 getStats: function() {
                     var data = this.getAll();
                     var values = Object.values(data);
@@ -1955,37 +2207,53 @@
             var AdaptiveBrain = {
                 KEY: KEYS.ADAPTIVE_BRAIN,
                 DEFAULTS: {
-                    weights: [1.25, 1.05, 0.85, 0.75, 0.55, 0.45],
-                    bias: -0.35,
+                    weights: [1.35, 0.85, 0.75, 1.15, 0.55, 0.65],
+                    bias: -0.55,
                     learningRate: 0.045,
                     seen: 0
                 },
+                _model: null,
+                _srs: null,
+                _weakness: null,
+
+                invalidate: function() {
+                    this._model = null;
+                    this._srs = null;
+                    this._weakness = null;
+                },
 
                 load: function() {
+                    if (this._model) return this._model;
                     var d = Storage.get(this.KEY, null);
                     if (!d || !Array.isArray(d.weights) || d.weights.length !== 6) {
                         d = JSON.parse(JSON.stringify(this.DEFAULTS));
                     }
                     d.learningRate = Math.min(0.15, Math.max(0.005, Number(d.learningRate) || 0.045));
                     d.seen = Math.max(0, Number(d.seen) || 0);
+                    this._model = d;
                     return d;
                 },
 
-                save: function(d) { Storage.set(this.KEY, d); },
+                save: function(d) {
+                    this._model = d;
+                    Storage.set(this.KEY, d);
+                },
 
-                sigmoid: function(x) {
-                    if (x < -30) return 0;
-                    if (x > 30) return 1;
-                    return 1 / (1 + Math.exp(-x));
+                snapshot: function() {
+                    this._srs = SRS.getAll() || {};
+                    this._weakness = WeaknessSystem.getAll() || {};
+                    return {srs:this._srs, weakness:this._weakness};
                 },
 
                 key: function(word, persian) { return word + '|' + persian; },
 
-                profile: function(word, persian, mode) {
+                profile: function(word, persian, mode, snapshot) {
                     var now = Date.now();
-                    var srs = SRS.getAll()[this.key(word, persian)] || {};
-                    var weak = WeaknessSystem.getAll();
+                    var snap = snapshot || this.snapshot();
+                    var srs = snap.srs[this.key(word, persian)] || {};
+                    var weak = snap.weakness;
                     var attempts = 0, wrong = 0, correct = 0, last = 0;
+                    var modeAttempts = 0, modeWrong = 0;
 
                     Object.keys(weak).forEach(function(k) {
                         var x = weak[k];
@@ -1994,83 +2262,97 @@
                             wrong += Number(x.wrong) || 0;
                             correct += Number(x.correct) || 0;
                             last = Math.max(last, Number(x.lastAttempt) || 0);
+                            if (mode && x.mode === mode) {
+                                modeAttempts += Number(x.attempts) || 0;
+                                modeWrong += Number(x.wrong) || 0;
+                            }
                         }
                     });
 
                     var accuracy = attempts ? correct / attempts : 0.5;
                     var errorRate = attempts ? wrong / attempts : 0.5;
                     var hours = last ? Math.max(0, (now - last) / 3600000) : 72;
-                    var recency = 1 - Math.exp(-hours / 48);
+                    var forgettingRisk = 1 - Math.exp(-hours / 72);
                     var uncertainty = 1 / Math.sqrt(1 + attempts);
                     var mastery = srs.status === 'mastered' ? 1 :
                         srs.status === 'review' ? 0.68 :
                         srs.status === 'learning' ? 0.38 : 0.2;
-                    var modeWeakness = 0.5;
-
-                    if (mode && weak[this.key(word, persian) + '|' + mode]) {
-                        var m = weak[this.key(word, persian) + '|' + mode];
-                        var ma = Number(m.attempts) || 0;
-                        modeWeakness = ma ? (Number(m.wrong) || 0) / ma : 0.5;
-                    }
+                    var modeWeakness = modeAttempts ? modeWrong / modeAttempts : 0.5;
 
                     return {
                         errorRate: errorRate,
                         uncertainty: uncertainty,
-                        recency: recency,
+                        forgettingRisk: forgettingRisk,
                         mastery: mastery,
                         modeWeakness: modeWeakness,
                         inverseAccuracy: 1 - accuracy
                     };
                 },
 
-                score: function(word, persian, mode) {
-                    var d = this.load(), p = this.profile(word, persian, mode);
-                    var x = [p.errorRate, p.uncertainty, p.recency, p.modeWeakness, p.inverseAccuracy, 1 - p.mastery];
+                scoreFromProfile: function(p) {
+                    var d = this.load();
+                    var x = [p.errorRate, p.uncertainty, p.forgettingRisk, p.modeWeakness, p.inverseAccuracy, 1 - p.mastery];
                     var z = d.bias;
                     for (var i = 0; i < d.weights.length; i++) z += d.weights[i] * x[i];
-                    return { probability: this.sigmoid(z), features: x };
+                    return {probability:this.sigmoid(z), features:x};
                 },
 
-                priority: function(word, persian, mode) {
-                    var s = this.score(word, persian, mode);
-                    // Small exploration term prevents the learner from getting trapped
-                    // in only the hardest cards.
-                    return s.probability + (1 - s.probability) * 0.18;
+                sigmoid: function(x) {
+                    if (x < -30) return 0;
+                    if (x > 30) return 1;
+                    return 1 / (1 + Math.exp(-x));
+                },
+
+                score: function(word, persian, mode, snapshot) {
+                    return this.scoreFromProfile(this.profile(word, persian, mode, snapshot));
+                },
+
+                priority: function(word, persian, mode, snapshot) {
+                    var s = this.score(word, persian, mode, snapshot);
+                    // Exploration remains small so new cards are sampled without
+                    // overpowering genuinely weak cards.
+                    return s.probability + (s.features[1] * 0.08);
                 },
 
                 rank: function(words, mode, limit) {
                     var self = this;
-                    return words.slice().sort(function(a, b) {
-                        var sb = self.priority(b.word, b.persian, mode);
-                        var sa = self.priority(a.word, a.persian, mode);
-                        return sb - sa;
-                    }).slice(0, limit || words.length);
+                    var snapshot = this.snapshot();
+                    var scored = words.map(function(w) {
+                        return {
+                            word: w,
+                            score: self.priority(w.word, w.persian, mode, snapshot)
+                        };
+                    });
+                    scored.sort(function(a,b){ return b.score - a.score; });
+                    return scored.slice(0, limit || scored.length).map(function(x){ return x.word; });
                 },
 
                 observe: function(word, persian, mode, correct, latencyMs) {
                     if (!word || !persian) return;
                     var d = this.load();
-                    var p = this.profile(word, persian, mode);
-                    var x = [p.errorRate, p.uncertainty, p.recency, p.modeWeakness, p.inverseAccuracy, 1 - p.mastery];
-
+                    var p = this.profile(word, persian, mode, this.snapshot());
+                    var pred = this.scoreFromProfile(p).probability;
                     var latency = Math.min(1, Math.max(0, (Number(latencyMs) || 5000) / 10000));
-                    var target = correct ? (1 - latency * 0.25) : 0;
-                    var pred = this.score(word, persian, mode).probability;
+
+                    // This is a difficulty/need model:
+                    // wrong = high target, correct = low target.
+                    var target = correct ? (0.12 + latency * 0.18) : 0.92;
                     var error = target - pred;
+                    var x = this.scoreFromProfile(p).features;
 
                     for (var i = 0; i < d.weights.length; i++) {
                         d.weights[i] += d.learningRate * error * x[i];
                     }
                     d.bias += d.learningRate * error;
                     d.seen++;
-
-                    // Slow down learning as the model becomes stable.
                     d.learningRate = Math.max(0.01, 0.045 / Math.sqrt(1 + d.seen / 40));
                     this.save(d);
+                    this._srs = null;
+                    this._weakness = null;
                 }
             };
 
-                        // ================================================================
+            // ================================================================
             // FLASHCARD (۴ گزینه‌ای + تلفظ + تکرار هوشمند)
             // ================================================================
 
@@ -2227,6 +2509,7 @@
                     document.getElementById('flashcardType').textContent = '📖 ' + (WORD_TYPES[card.type] || 'سایر');
                     document.getElementById('flashcardIpa').textContent = Voice.generateIPA(card.word, accent);
                     document.getElementById('flashcardProgress').textContent = (this.currentIndex + 1) + '/' + total;
+                    var fp=document.getElementById('flashcardProgressBar'); if(fp) fp.style.width=Math.round(((this.currentIndex+1)/total)*100)+'%';
                     document.getElementById('flashcardStreak').textContent = '🔥 استریک: ' + this.streak + ' روز | بهترین: ' + this.bestStreak + ' روز';
 
                     // ===== وضعیت تکرار =====
@@ -2326,7 +2609,7 @@
                     }
 
                     this.stats.wrong++;
-                    SRS.update(this.currentCard.word, this.currentCard.persian, 'review');
+                    SRS.recordOutcome(this.currentCard.word, this.currentCard.persian, false);
                     AdaptiveBrain.observe(this.currentCard.word, this.currentCard.persian, 'flashcard', false, Date.now() - (this.cardStartedAt || Date.now()));
                     this.streak = 0;
 
@@ -2370,7 +2653,7 @@
                         // ===== ثبت پاسخ درست در سیستم تکرار =====
                         RepetitionSystem.recordCorrect(word, persian);
 
-                        SRS.update(word, persian, 'mastered');
+                        SRS.recordOutcome(word, persian, true);
                         Core.addTokens(5);
                         UI.updateTokenDisplay();
                     } else {
@@ -2383,7 +2666,7 @@
                         // ===== ثبت پاسخ اشتباه در سیستم تکرار =====
                         RepetitionSystem.recordWrong(word, persian);
 
-                        SRS.update(word, persian, 'review');
+                        SRS.recordOutcome(word, persian, false);
                     }
 
                     if (this.streak > this.bestStreak) this.bestStreak = this.streak;
@@ -2457,6 +2740,7 @@
                     if (correct) data[key].correct++; else data[key].wrong++;
                     data[key].lastAttempt = Date.now();
                     this.saveAll(data);
+                    if (typeof AdaptiveBrain !== 'undefined') AdaptiveBrain.invalidate();
                 },
                 getModeStats: function(mode) {
                     var data=this.getAll(), attempts=0, correct=0, wrong=0;
@@ -2538,6 +2822,7 @@
                     this.cardStartedAt = Date.now();
                     document.getElementById('weaknessModeTitle').textContent=this.TITLES[mode];
                     document.getElementById('weaknessProgress').textContent=(this.index+1)+'/'+this.cards.length;
+                    var wp=document.getElementById('weaknessProgressBar'); if(wp) wp.style.width=Math.round(((this.index+1)/this.cards.length)*100)+'%';
                     document.getElementById('weaknessFeedback').textContent='';
                     var pb=document.getElementById('weaknessPronounceBtn');pb.style.display='none';
                     if(mode==='word_to_meaning'){q.textContent=c.word.word;hint.textContent='معنی فارسی را انتخاب کنید.';}
@@ -3722,22 +4007,10 @@
 
             var Security = {
                 apply: function() {
-                    document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
-                    document.addEventListener('keydown', function(e) {
-                        // Do not block normal copy/paste: it is essential for language learning.
-                        // Keep only browser/shortcut restrictions that are useful to the page.
-                        if (e.ctrlKey && e.key.toLowerCase() === 's') {
-                            e.preventDefault();
-                            return false;
-                        }
-                        if (e.key === 'F12') { e.preventDefault(); return false; }
-                        if (e.ctrlKey && e.shiftKey && ['i', 'j'].indexOf(e.key.toLowerCase()) !== -1) {
-                            e.preventDefault();
-                            return false;
-                        }
-                    });
+                    // Keep the page usable for accessibility, debugging and language study.
+                    // Copy/paste, context menu and browser developer tools remain available.
                     document.addEventListener('dragstart', function(e) {
-                        if (!e.target.closest('.copy-allowed')) { e.preventDefault(); return false; }
+                        if (!e.target.closest('.copy-allowed')) e.preventDefault();
                     });
                     console.log('%c🌊 LangBlue · v3.4', 'font-size:20px;font-weight:bold;color:#1a4f8b;');
                     console.log('%c🔒 تمامی حقوق محفوظ است.', 'font-size:14px;color:#e74c3c;');
