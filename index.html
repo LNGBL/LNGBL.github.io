@@ -200,6 +200,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 </div>
 
 <div class="ceremony-control" id="ceremonyControl" aria-live="polite"><button id="enableCeremonies" class="btn btn-secondary" type="button">🔔 فعال‌سازی اعلان مناسبت‌ها</button><span id="ceremonyStatus"></span></div>
+<div class="ceremony-control" id="notificationControl" aria-live="polite"><button id="enableNotifications" class="btn btn-secondary" type="button">🔔 فعال‌سازی اعلان‌های LangBlue</button><span id="notificationStatus"></span></div>
         <h1>ساختار زبانت را با <strong>LangBlue</strong> بساز، سازمان‌دهی کن و یاد بگیر.</h1>
         <p class="hero-lead">
           LangBlue یک پلتفرم برای ساخت، ثبت، سازمان‌دهی، تمرین و مرور قواعد گرامری و ساختارهای زبان است.
@@ -562,6 +563,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   </main>
 
 <script src="langblue-commerce.js"></script>
+<script src="langblue-notifications.js"></script>
 <script>
 (function(){
   const WIKI={
@@ -761,6 +763,22 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 
   const now=new Date();
   animateLogo();renderCurrent(now);setupCeremonies();
+  (function(){
+    var btn=document.getElementById('enableNotifications'),status=document.getElementById('notificationStatus');
+    if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+    if(!btn)return;
+    function sync(){
+      var p=window.LangBlueNotifications.permission();
+      if(p==='granted'){btn.style.display='none';status.textContent=' اعلان‌ها فعال است';}
+      else if(p==='denied'){btn.textContent='🔔 فعال‌سازی اعلان‌ها از تنظیمات مرورگر';status.textContent='اجازه اعلان توسط مرورگر مسدود شده است.';}
+    }
+    btn.addEventListener('click',async function(){
+      var p=await window.LangBlueNotifications.request();
+      if(p==='granted') await window.LangBlueNotifications.show();
+      sync();
+    });
+    sync();
+  })();
 })();
 </script>
 <script>
