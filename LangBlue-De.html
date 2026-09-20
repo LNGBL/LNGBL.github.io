@@ -535,14 +535,7 @@ var Auth={
    License
    ============================================================ */
 var License={
-  CODES:{
-    "Verify_mU#2292":{planId:"irt_7d",days:7},
-    "Verify_m!!2992":{planId:"irt_14d",days:14},
-    "Verify_I@112":{planId:"irt_21d",days:21},
-    "Verify_MIR_ss1":{planId:"irt_3m",days:90},
-    "Verify_ll39332":{planId:"irt_6m",days:180},
-    "Verify_311012":{planId:"irt_12m",days:365}
-  },
+  get CODES(){return window.LangBlueCommerce.CODES;},
   _sharedSession:function(){
     try{var s=JSON.parse(localStorage.getItem("lb:session")||"null");return s&&s.userId?s:null;}
     catch(e){return null;}
@@ -615,15 +608,6 @@ var License={
 /* ============================================================
    Plans
    ============================================================ */
-var PLANS={
-  "irt_7d":  {label:"۷ روز",  days:7,   price:201998, priceStr:"201,998 T"},
-  "irt_14d": {label:"۱۴ روز", days:14,  price:527998, priceStr:"527,998 T"},
-  "irt_21d": {label:"۲۱ روز", days:21,  price:913998, priceStr:"913,998 T"},
-  "irt_3m":  {label:"۳ ماه",  days:90,  price:1469998, priceStr:"1,469,998 T"},
-  "irt_6m":  {label:"۶ ماه",  days:180, price:1661998, priceStr:"1,661,998 T"},
-  "irt_12m": {label:"۱۲ ماه", days:365, price:1901998, priceStr:"1,901,998 T"}
-};
-
 /* ============================================================
    Invoice
    ============================================================ */
@@ -643,7 +627,7 @@ var Invoice={
   },
   generate:function(planKey,userId){
     var now=Date.now();
-    var planIdx=Object.keys(PLANS).indexOf(planKey);
+    var planIdx=Object.keys(window.LangBlueCommerce.PLANS).indexOf(planKey);
     var uidH=this.hash(String(userId));
     var tsH=this.hash(String(now));
     var combo=uidH^tsH^(planIdx*0x9E3779B1);
@@ -1408,7 +1392,7 @@ function _closeInvoice(){E.oi.classList.remove("show");}
 function _showInvoice(planKey){
   var u=Auth.current();
   if(!u){_toast("ابتدا ثبت‌نام کن","error");return;}
-  var plan=PLANS[planKey];
+  var plan=window.LangBlueCommerce.PLANS[planKey];
   if(!plan){_toast("پلن نامعتبر","error");return;}
   var tracking=Invoice.generate(planKey,u.id);
   var now=new Date();
@@ -1437,7 +1421,7 @@ function _openSignup(){E.os.classList.add("show");}
 function _closeSignup(){E.os.classList.remove("show");}
 function _openPricing(){
   var grid=document.getElementById('pricing-grid');
-  if(grid){grid.innerHTML=Object.keys(PLANS).map(function(id){var p=PLANS[id],d=LangBlueCommerce.displayPlan(id),price=d.discount?'<span style="text-decoration:line-through;opacity:.55;margin-left:6px;">'+p.priceStr+'</span><strong>'+d.finalPriceStr+'</strong>':p.priceStr,disc=d.discount?'<div style="margin-top:5px;color:var(--g2);font-weight:bold;">'+d.discount+'٪ تخفیف جشنواره‌ای</div>':'';return '<div class="price-card" data-plan="'+id+'"><div class="price">'+price.replace(' T','')+' <small>T</small></div><div class="duration"><span class="days">'+p.label+'</span></div>'+disc+'</div>';}).join('');
+  if(grid){grid.innerHTML=Object.keys(window.LangBlueCommerce.PLANS).map(function(id){var p=window.LangBlueCommerce.PLANS[id],d=LangBlueCommerce.displayPlan(id),price=d.discount?'<span style="text-decoration:line-through;opacity:.55;margin-left:6px;">'+p.priceStr+'</span><strong>'+d.finalPriceStr+'</strong>':p.priceStr,disc=d.discount?'<div style="margin-top:5px;color:var(--g2);font-weight:bold;">'+d.discount+'٪ تخفیف جشنواره‌ای</div>':'';return '<div class="price-card" data-plan="'+id+'"><div class="price">'+price.replace(' T','')+' <small>T</small></div><div class="duration"><span class="days">'+p.label+'</span></div>'+disc+'</div>';}).join('');
     grid.querySelectorAll('.price-card').forEach(function(c){c.addEventListener('click',function(){var u=Auth.current();if(!u){_toast('ابتدا ثبت‌نام کن','error');_closePricing();_openSignup();return;}_closePricing();_showInvoice(c.dataset.plan);});});
   }
   E.op.classList.add("show");
