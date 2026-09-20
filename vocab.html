@@ -2958,11 +2958,11 @@
                     var code=document.getElementById('vocabVerifyCode').value.trim(), status=document.getElementById('vocabVerifyStatus');
                     var planId=this.CODES[code];
                     if(!planId){status.innerHTML='<span style="color:var(--danger)">❌ کد تایید نامعتبر است.</span>';return;}
-                    var used=Storage.get('vocab_used_codes',{}); if(used[code]){status.innerHTML='<span style="color:var(--danger)">❌ این کد قبلاً استفاده شده است.</span>';return;}
+                    var used=Storage.get('used_codes',{}); if(used[code]){status.innerHTML='<span style="color:var(--danger)">❌ این کد قبلاً استفاده شده است.</span>';return;}
                     var p=this.PLANS.find(function(x){return x.id===planId;}); if(!p)return;
                     var now=Date.now(), existing=Storage.get('subscription',null), base=existing&&existing.expiresAt>now?existing.expiresAt:now;
                     Storage.set('subscription',{planId:p.id,planDays:p.days,currency:'IRT',startedAt:now,expiresAt:base+p.days*86400000});
-                    used[code]={at:now,planId:p.id};Storage.set('vocab_used_codes',used);
+                    used[code]={at:now,planId:p.id};Storage.set('used_codes',used);
                     status.innerHTML='<span style="color:var(--success)">✅ اشتراک فعال شد.</span>';
                     this.open(this.pending);
                 },
