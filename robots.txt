@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lngbl.github.io/sitemap.xml
