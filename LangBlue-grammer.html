@@ -2262,14 +2262,14 @@ function renderPricingIRT(grid, intro, howToBox, verifyBox, geo) {
     else if (p.id === 'irt_12m') daysLabel = '۱۲ ماه';
     else daysLabel = `${p.days} روز`;
     const shared=window.LangBlueCommerce.displayPlan(p.id);
-    const priceHtml=shared.discount ? `<span style="text-decoration:line-through;opacity:.55;margin-left:6px;">${p.price}</span> <strong>${shared.finalPriceStr.replace(' T','')}</strong>` : p.price;
+    const priceHtml=shared.discount ? `<span style="text-decoration:line-through;opacity:.55;margin-left:6px;">${p.priceStr.replace(' T','')}</span> <strong>${shared.finalPriceStr.replace(' T','')}</strong>` : p.price;
     const discountHtml=shared.discount ? `<div style="margin-top:5px;color:var(--success);font-weight:800;">${shared.discount}٪ تخفیف جشنواره‌ای</div>` : '';
     return `
       <div class="price-card">
         <div class="duration">${daysLabel}</div>
         <div class="price">${priceHtml} <small>تومان</small></div>
         ${discountHtml}
-        <div class="features">${p.features}</div>
+        <div class="features">${p.feature}</div>
         <button onclick="window.__requestPlanIRT('${p.id}')">💳 درخواست این پلن</button>
       </div>`;
   }).join('');
