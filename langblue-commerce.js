@@ -2,12 +2,12 @@
   'use strict';
 
   var PLANS = {
-    irt_7d:  {id:'irt_7d',  days:7,   label:'۷ روز',  price:201998, priceStr:'201,998 T'},
-    irt_14d: {id:'irt_14d', days:14,  label:'۱۴ روز', price:527998, priceStr:'527,998 T'},
-    irt_21d: {id:'irt_21d', days:21,  label:'۲۱ روز', price:913998, priceStr:'913,998 T'},
-    irt_3m:  {id:'irt_3m',  days:90,  label:'۳ ماه',  price:1469998, priceStr:'1,469,998 T'},
-    irt_6m:  {id:'irt_6m',  days:180, label:'۶ ماه',  price:1661998, priceStr:'1,661,998 T'},
-    irt_12m: {id:'irt_12m', days:365, label:'۱۲ ماه', price:1901998, priceStr:'1,901,998 T'}
+    irt_7d:  {id:'irt_7d',  days:7,   label:'۷ روز',  price:201998, priceStr:'201,998 T', feature:'دسترسی کامل به Grammar + Vocabulary'},
+    irt_14d: {id:'irt_14d', days:14,  label:'۱۴ روز', price:527998, priceStr:'527,998 T', feature:'دسترسی کامل به Grammar + Vocabulary'},
+    irt_21d: {id:'irt_21d', days:21,  label:'۲۱ روز', price:913998, priceStr:'913,998 T', feature:'دسترسی کامل به Grammar + Vocabulary'},
+    irt_3m:  {id:'irt_3m',  days:90,  label:'۳ ماه',  price:1469998, priceStr:'1,469,998 T', feature:'دسترسی کامل به Grammar + Vocabulary + بدون محدودیت'},
+    irt_6m:  {id:'irt_6m',  days:180, label:'۶ ماه',  price:1661998, priceStr:'1,661,998 T', feature:'دسترسی کامل به Grammar + Vocabulary + بدون محدودیت'},
+    irt_12m: {id:'irt_12m', days:365, label:'۱۲ ماه', price:1901998, priceStr:'1,901,998 T', feature:'دسترسی کامل به Grammar + Vocabulary + امکان پرینت از اطلاعات'}
   };
 
   var FESTIVALS = [
