@@ -1820,7 +1820,7 @@ function renderSubscriptionBanner() {
   if (ForeignAccess.isForeign()) {
     const unlocked = ForeignAccess.isUnlocked();
     banner.innerHTML = `
-      <div class="sub-banner ${unlocked ? 'ok' : (count >= ${FREE_LIMIT} ? '' : 'ok')}">
+      <div class="sub-banner ${unlocked ? 'ok' : (count >= FREE_LIMIT ? '' : 'ok')}">
         <div>
           <strong>${unlocked ? '🌍 دسترسی خارجی فعال' : '🌍 دسترسی خارجی'}</strong>
           <div style="font-size:12px;opacity:.9;margin-top:4px;">
