@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+<script src="langblue-commerce.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LangBlue Deutsch · یادگیری زبان آلمانی</title>
@@ -334,27 +335,7 @@ td.col-audio{text-align:center;white-space:nowrap}
     <h2>Sechsfach freischalten</h2>
     <div class="subtitle">فعال‌سازی حالت خاص شش‌گانه</div>
     <div class="pricing-grid" id="pricing-grid">
-      <div class="price-card" data-plan="4d">
-        <div class="price">10,450 <small>T</small></div>
-        <div class="duration"><span class="days">4 Days</span></div>
-      </div>
-      <div class="price-card" data-plan="8d">
-        <div class="price">15,450 <small>T</small></div>
-        <div class="duration"><span class="days">8 Days</span></div>
-      </div>
-      <div class="price-card featured" data-plan="3m">
-        <span class="price-tag">POPULAR</span>
-        <div class="price">385,540 <small>T</small></div>
-        <div class="duration"><span class="days">3 Month</span></div>
-      </div>
-      <div class="price-card" data-plan="6m">
-        <div class="price">466,560 <small>T</small></div>
-        <div class="duration"><span class="days">6 Month</span></div>
-      </div>
-      <div class="price-card" data-plan="12m" style="grid-column:1/-1;">
-        <div class="price">499,210 <small>T</small></div>
-        <div class="duration"><span class="days">12 Month</span></div>
-      </div>
+      
     </div>
     <div class="pricing-note">
       برای پرداخت و دریافت کد فعال‌سازی:<br>
@@ -1452,7 +1433,13 @@ function _showInvoice(planKey){
    ============================================================ */
 function _openSignup(){E.os.classList.add("show");}
 function _closeSignup(){E.os.classList.remove("show");}
-function _openPricing(){E.op.classList.add("show");}
+function _openPricing(){
+  var grid=document.getElementById('pricing-grid');
+  if(grid){grid.innerHTML=Object.keys(PLANS).map(function(id){var p=PLANS[id],d=LangBlueCommerce.displayPlan(id),price=d.discount?'<span style="text-decoration:line-through;opacity:.55;margin-left:6px;">'+p.priceStr+'</span><strong>'+d.finalPriceStr+'</strong>':p.priceStr,disc=d.discount?'<div style="margin-top:5px;color:var(--g2);font-weight:bold;">'+d.discount+'٪ تخفیف جشنواره‌ای</div>':'';return '<div class="price-card" data-plan="'+id+'"><div class="price">'+price.replace(' T','')+' <small>T</small></div><div class="duration"><span class="days">'+p.label+'</span></div>'+disc+'</div>';}).join('');
+    grid.querySelectorAll('.price-card').forEach(function(c){c.addEventListener('click',function(){var u=Auth.current();if(!u){_toast('ابتدا ثبت‌نام کن','error');_closePricing();_openSignup();return;}_closePricing();_showInvoice(c.dataset.plan);});});
+  }
+  E.op.classList.add("show");
+}
 function _closePricing(){E.op.classList.remove("show");}
 
 function _fallbackCopy(txt){
