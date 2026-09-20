@@ -71,6 +71,11 @@
     });
   }
 
+  var CODES = {
+    'Verify_mU#2292':'irt_7d','Verify_m!!2992':'irt_14d','Verify_I@112':'irt_21d',
+    'Verify_MIR_ss1':'irt_3m','Verify_ll39332':'irt_6m','Verify_311012':'irt_12m'
+  };
+
   var PRODUCTS = {
     grammar:{id:'grammar',label:'LangBlue Grammar',icon:'📐',url:'LangBlue-grammer.html'},
     vocabulary:{id:'vocabulary',label:'LangBlue Vocabulary',icon:'📚',url:'vocab.html'},
@@ -97,6 +102,7 @@
 
   window.LangBlueCommerce={
     PLANS:PLANS,
+    CODES:CODES,
     PRODUCTS:PRODUCTS,
     buildOrder:buildOrder,
     FESTIVALS:FESTIVALS,
