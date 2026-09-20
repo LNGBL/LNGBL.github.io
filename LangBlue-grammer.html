@@ -2141,7 +2141,7 @@ function renderForeignAccess(grid, intro, howToBox, verifyBox) {
   verifyBox.classList.add('hidden');
 }
 
-const ForeignAccessUI = {
+window.ForeignAccessUI = {
   lastPlatform: '',
   async share(platform) {
     this.lastPlatform = platform;
