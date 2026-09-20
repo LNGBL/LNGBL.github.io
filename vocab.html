@@ -1376,7 +1376,32 @@
                     try { var v=localStorage.getItem(this._storageKey(key)); return v ? JSON.parse(v) : fallback; } catch(e){ return fallback; }
                 },
                 set: function(key,val){ localStorage.setItem(this._storageKey(key),JSON.stringify(val)); },
-                remove: function(key){ localStorage.removeItem(this._storageKey(key)); }
+                remove: function(key){ localStorage.removeItem(this._storageKey(key)); },
+                has: function(key){ return localStorage.getItem(this._storageKey(key)) !== null; }
+            };
+
+            // Preserve data from older non-account versions by copying it into the
+            // active account once. Legacy source keys are never deleted.
+            const LegacyBridge = {
+                DATA_KEYS: ['WORDS','PHRASAL','SENTENCES','GRAMMAR','SRS','TOKENS','DAILY_REVIEW','REPETITION_DATA','FLASHCARD_VISITS','WEAKNESS','PAUSED'],
+                migrateForCurrentUser: function(){
+                    var session=null;
+                    try { session=JSON.parse(localStorage.getItem('lb:session')||'null'); } catch(e){}
+                    if(!session||!session.userId) return false;
+                    var uid=session.userId, marker='lb:legacy_migrated:'+uid;
+                    if(localStorage.getItem(marker)==='1') return false;
+                    var copied=false;
+                    for(var i=0;i<this.DATA_KEYS.length;i++){
+                        var key=this.DATA_KEYS[i], target='lb:user:'+uid+':LangBlue_'+key;
+                        if(localStorage.getItem(target)!==null) continue;
+                        var legacy=localStorage.getItem('LangBlue_'+key);
+                        var anonymous=localStorage.getItem('lb:user:anonymous:LangBlue_'+key);
+                        var source=legacy!==null?legacy:anonymous;
+                        if(source!==null){localStorage.setItem(target,source);copied=true;}
+                    }
+                    localStorage.setItem(marker,'1');
+                    return copied;
+                }
             };
 
             const Auth = {
@@ -1476,7 +1501,7 @@
                         data[key].nextReview = Date.now() + (24 * 60 * 60 * 1000);
                     } else {
                         data[key].interval = 'every_2_visits';
-                        data[key].nextReview = Date.now();
+                        data[key].nextReview = Number.MAX_SAFE_INTEGER;
                     }
 
                     this.saveData(data);
@@ -1527,16 +1552,15 @@
                             continue;
                         }
 
-                        if (repData.nextReview <= now) {
-                            dueWords.push(word);
+                        if (repData.interval === 'every_2_visits') {
+                            var visits = Storage.get(KEYS.FLASHCARD_VISITS, 0);
+                            if (visits > 0 && visits % 2 === 0) dueWords.push(word);
                             continue;
                         }
 
-                        if (repData.interval === 'every_2_visits') {
-                            var visits = Storage.get(KEYS.FLASHCARD_VISITS, 0);
-                            if (visits % 2 === 0) {
-                                dueWords.push(word);
-                            }
+                        if (repData.nextReview <= now) {
+                            dueWords.push(word);
+                            continue;
                         }
                     }
 
@@ -3373,13 +3397,13 @@
                         if(password!==confirm){document.getElementById('confirmError').textContent='رمزها مطابقت ندارند';return;}
                         var res=await Auth.register({fullName:fullName,age:age,gender:gender,username:username,password:password});
                         if(!res.ok){document.getElementById('usernameError').textContent=res.error;return;}
-                        Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ حساب ساخته شد و داده‌های واژگان این حساب جداست.','success');
+                        LegacyBridge.migrateForCurrentUser();Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ حساب ساخته شد و داده‌های قبلی در صورت وجود حفظ شدند.','success');
                     });
 
                     document.getElementById('loginBtn').addEventListener('click',async function(){
                         var username=document.getElementById('loginUsername').value.trim(),password=document.getElementById('loginPassword').value,res=await Auth.login(username,password);
                         if(!res.ok){document.getElementById('loginError').textContent=res.error;return;}
-                        Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ ورود موفق بود.','success');
+                        LegacyBridge.migrateForCurrentUser();Core.load();self.renderAll();document.getElementById('userModal').classList.remove('active');self.showToast('✅ ورود موفق بود.','success');
                     });
                     document.getElementById('logoutBtn').addEventListener('click',async function(){
                         if(!confirm('آیا از خروج مطمئن هستید؟'))return;
@@ -3596,6 +3620,7 @@
 
             async function init() {
                 await Auth.init();
+                LegacyBridge.migrateForCurrentUser();
                 Core.load();
                 Security.apply();
                 UI.renderAll();
