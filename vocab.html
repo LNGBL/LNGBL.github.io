@@ -3048,7 +3048,7 @@
                     var used=Storage.get('used_codes',{}); if(used[code]){status.innerHTML='<span style="color:var(--danger)">❌ این کد قبلاً استفاده شده است.</span>';return;}
                     var p=this.PLANS.find(function(x){return x.id===planId;}); if(!p)return;
                     var now=Date.now(), existing=Storage.get('subscription',null), base=existing&&existing.expiresAt>now?existing.expiresAt:now;
-                    Storage.set('subscription',{planId:p.id,planDays:p.days,currency:'IRT',startedAt:now,expiresAt:base+p.days*86400000});
+                    Storage.set('subscription',{planId:p.id,planDays:p.days,currency:'IRT',startedAt:now,expiresAt:base+p.days*86400000,verifiedAt:now,verifiedByCode:true});
                     used[code]={at:now,planId:p.id};Storage.set('used_codes',used);
                     status.innerHTML='<span style="color:var(--success)">✅ اشتراک فعال شد.</span>';
                     this.open(this.pending);
@@ -3064,14 +3064,12 @@
                     win.document.write(html);win.document.close();win.focus();win.print();
                 },
                 require:function(action){
-                    if(!Auth.isLoggedIn()){
-                        this.pending=action;
-                        showRegisterMode();
-                        document.getElementById('userModal').classList.add('active');
-                        return false;
-                    }
-                    if(this.isActive()) return true;
-                    this.open(action);
+                    // PDF و بررسی نقاط ضعف فقط با تأیید کد فعال‌سازی قابل استفاده‌اند.
+                    // اگر کد وریفای نشده باشد، مستقیماً نیاز کاربر اعلام می‌شود و هیچ پلن/مودال دیگری باز نمی‌شود.
+                    var sub=this.current();
+                    var verified=!!(sub && sub.verifiedByCode && sub.verifiedAt);
+                    if(verified) return true;
+                    UI.showToast('🔒 برای استفاده از PDF و بررسی نقاط ضعف، ابتدا اشتراک تهیه کنید، با ادمین @langBlue هماهنگ شوید و کد وریفای دریافت‌شده را در بخش «فعال‌سازی اشتراک» وارد کنید.','warning');
                     return false;
                 },
                 continuePending:function(){
