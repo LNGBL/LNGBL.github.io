@@ -100,10 +100,12 @@
     };
   }
 
+  var DAILY_PLAN_IDS = ['irt_7d','irt_14d','irt_21d'];
   var MONTHLY_PLAN_IDS = ['irt_3m','irt_6m','irt_12m'];
 
   window.LangBlueCommerce={
     PLANS:PLANS,
+    DAILY_PLAN_IDS:DAILY_PLAN_IDS,
     MONTHLY_PLAN_IDS:MONTHLY_PLAN_IDS,
     CODES:CODES,
     PRODUCTS:PRODUCTS,
