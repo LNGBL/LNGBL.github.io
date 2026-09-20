@@ -2240,8 +2240,25 @@
                 },
 
                 snapshot: function() {
+                    if (this._srs && this._weakness) return {srs:this._srs, weakness:this._weakness};
                     this._srs = SRS.getAll() || {};
-                    this._weakness = WeaknessSystem.getAll() || {};
+                    var raw = WeaknessSystem.getAll() || {};
+                    var byWord = {};
+                    Object.keys(raw).forEach(function(k) {
+                        var x = raw[k], id = (x.word || '') + '|' + (x.persian || '');
+                        if (!byWord[id]) byWord[id] = {attempts:0,wrong:0,correct:0,lastAttempt:0,modes:{}};
+                        var a = byWord[id];
+                        a.attempts += Number(x.attempts) || 0;
+                        a.wrong += Number(x.wrong) || 0;
+                        a.correct += Number(x.correct) || 0;
+                        a.lastAttempt = Math.max(a.lastAttempt, Number(x.lastAttempt) || 0);
+                        if (x.mode) {
+                            if (!a.modes[x.mode]) a.modes[x.mode] = {attempts:0,wrong:0};
+                            a.modes[x.mode].attempts += Number(x.attempts) || 0;
+                            a.modes[x.mode].wrong += Number(x.wrong) || 0;
+                        }
+                    });
+                    this._weakness = byWord;
                     return {srs:this._srs, weakness:this._weakness};
                 },
 
@@ -2251,23 +2268,10 @@
                     var now = Date.now();
                     var snap = snapshot || this.snapshot();
                     var srs = snap.srs[this.key(word, persian)] || {};
-                    var weak = snap.weakness;
-                    var attempts = 0, wrong = 0, correct = 0, last = 0;
-                    var modeAttempts = 0, modeWrong = 0;
-
-                    Object.keys(weak).forEach(function(k) {
-                        var x = weak[k];
-                        if (x.word === word && x.persian === persian) {
-                            attempts += Number(x.attempts) || 0;
-                            wrong += Number(x.wrong) || 0;
-                            correct += Number(x.correct) || 0;
-                            last = Math.max(last, Number(x.lastAttempt) || 0);
-                            if (mode && x.mode === mode) {
-                                modeAttempts += Number(x.attempts) || 0;
-                                modeWrong += Number(x.wrong) || 0;
-                            }
-                        }
-                    });
+                    var a = snap.weakness[this.key(word, persian)] || {attempts:0,wrong:0,correct:0,lastAttempt:0,modes:{}};
+                    var attempts = a.attempts, wrong = a.wrong, correct = a.correct, last = a.lastAttempt;
+                    var modeData = mode && a.modes[mode] ? a.modes[mode] : {attempts:0,wrong:0};
+                    var modeAttempts = modeData.attempts, modeWrong = modeData.wrong;
 
                     var accuracy = attempts ? correct / attempts : 0.5;
                     var errorRate = attempts ? wrong / attempts : 0.5;
@@ -2437,38 +2441,29 @@
                     }
 
                     var selected = [];
-                    // ۵ کلمه فراموش شده
-                    var shuffledForgotten = shuffled(forgottenList);
-                    for (var k = 0; k < Math.min(5, shuffledForgotten.length); k++) {
-                        selected.push(shuffledForgotten[k]);
-                    }
-                    // ۷ کلمه دیگر
-                    var shuffledOther = shuffled(otherList);
-                    for (var l = 0; l < Math.min(7, shuffledOther.length); l++) {
-                        selected.push(shuffledOther[l]);
+                    var seen = {};
+
+                    var priorityDue = forgottenList.concat(otherList);
+                    priorityDue = AdaptiveBrain.rank(priorityDue, 'flashcard', priorityDue.length);
+                    for (var k = 0; k < priorityDue.length && selected.length < 12; k++) {
+                        var dueId = priorityDue[k].word + '|' + priorityDue[k].persian;
+                        if (!seen[dueId]) { seen[dueId]=true; selected.push(priorityDue[k]); }
                     }
 
-                    // اگر کمتر از ۵ کلمه بود، از بقیه کلمات پر کن
-                    if (selected.length < 5) {
+                    if (selected.length < 12) {
                         var remaining = [];
                         for (var m = 0; m < eligible.length; m++) {
-                            var found = false;
-                            for (var n = 0; n < selected.length; n++) {
-                                if (selected[n].word === eligible[m].word && selected[n].persian === eligible[m].persian) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (!found) remaining.push(eligible[m]);
+                            var id = eligible[m].word + '|' + eligible[m].persian;
+                            if (!seen[id]) remaining.push(eligible[m]);
                         }
-                        var extra = shuffled(remaining);
-                        for (var o = 0; o < Math.min(8 - selected.length, extra.length); o++) {
-                            selected.push(extra[o]);
+                        var exploratory = AdaptiveBrain.rank(remaining, 'flashcard', remaining.length);
+                        for (var n = 0; n < exploratory.length && selected.length < 12; n++) {
+                            var eid = exploratory[n].word + '|' + exploratory[n].persian;
+                            if (!seen[eid]) { seen[eid]=true; selected.push(exploratory[n]); }
                         }
                     }
 
-                    var finalCards = shuffled(selected).slice(0, 12);
-                    return AdaptiveBrain.rank(finalCards, 'flashcard', finalCards.length);
+                    return AdaptiveBrain.rank(selected, 'flashcard', selected.length);
                 },
 
                 showCard: function() {
@@ -3802,6 +3797,15 @@
                     document.getElementById('userModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});
                     document.getElementById('loginModeBtn').addEventListener('click',showLoginMode);
                     document.getElementById('registerModeBtn').addEventListener('click',showRegisterMode);
+
+                    ['fullName','age','username','password','confirmPassword'].forEach(function(id){
+                        var el=document.getElementById(id);
+                        if(el) el.addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('registerBtn').click();});
+                    });
+                    ['loginUsername','loginPassword'].forEach(function(id){
+                        var el=document.getElementById(id);
+                        if(el) el.addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('loginBtn').click();});
+                    });
 
                     document.getElementById('registerBtn').addEventListener('click',async function(){
                         var fullName=document.getElementById('fullName').value.trim(),age=parseInt(document.getElementById('age').value),gender=document.getElementById('gender').value,username=document.getElementById('username').value.trim(),password=document.getElementById('password').value,confirm=document.getElementById('confirmPassword').value;
