@@ -933,7 +933,9 @@ const Subscription = {
       planDays: result.plan.days,
       currency: 'IRT',
       startedAt: now,
-      expiresAt
+      expiresAt,
+      verifiedAt: now,
+      verifiedByCode: true
     });
 
     RateLimit.reset('verify_code');
