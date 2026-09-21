@@ -4,315 +4,99 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>LangBlue Kurmancî | کرمانجی</title>
-
+<title>LangBlue Kurmancî</title>
 
 <style>
 
-
 body{
-
-font-family:
-Tahoma,
-Arial,
-sans-serif;
-
+font-family:tahoma,Arial;
 background:#07111f;
-
-color:#f5f7fa;
-
+color:white;
 margin:0;
-
 }
-
-
 
 .wrap{
-
-max-width:1200px;
-
+max-width:1100px;
 margin:auto;
-
 padding:30px;
-
 }
-
-
-
-.header{
-
-text-align:center;
-
-padding:40px 20px;
-
-background:
-linear-gradient(135deg,#0b2239,#123b52);
-
-border-radius:20px;
-
-margin-bottom:30px;
-
-}
-
-
-
-.header h1{
-
-font-size:40px;
-
-margin-bottom:10px;
-
-}
-
-
-
-.header p{
-
-color:#cbd5e1;
-
-font-size:18px;
-
-}
-
-
-
-
 
 .card{
-
 background:#102235;
-
-border-radius:18px;
-
 padding:25px;
-
+border-radius:20px;
 margin-bottom:25px;
-
-box-shadow:
-0 10px 30px rgba(0,0,0,.25);
-
 }
 
-
-
-.card h2{
-
+h1,h2{
 color:#7dd3fc;
-
 }
 
-
-
-
-
-input,
-select{
-
+input,select{
 width:100%;
-
 padding:12px;
-
 margin:8px 0;
-
-border-radius:10px;
-
-border:none;
-
 background:#1e344d;
-
+border:none;
+border-radius:10px;
 color:white;
-
 }
-
-
-
-
 
 button{
-
-padding:12px 22px;
-
-border-radius:12px;
-
+padding:12px 20px;
 border:none;
-
-cursor:pointer;
-
+border-radius:10px;
 background:#2563eb;
-
 color:white;
-
-font-size:15px;
-
+cursor:pointer;
 }
-
-
-
-button:hover{
-
-opacity:.85;
-
-}
-
-
 
 button:disabled{
-
 background:#475569;
-
-cursor:not-allowed;
-
 }
-
-
-
-
-
-.table-container{
-
-overflow:auto;
-
-}
-
-
 
 table{
-
 width:100%;
-
 border-collapse:collapse;
-
 }
 
-
-
-th,
-td{
-
+td,th{
 padding:12px;
-
 border-bottom:1px solid #334155;
-
 text-align:center;
-
 }
-
-
 
 th{
-
 background:#1e3a5f;
-
 }
-
-
-
-.badge{
-
-background:#0ea5e9;
-
-padding:5px 10px;
-
-border-radius:20px;
-
-font-size:12px;
-
-}
-
-
 
 .lock{
-
 background:#422006;
-
-border:1px solid #f59e0b;
-
-padding:15px;
-
-border-radius:12px;
-
 color:#fde68a;
-
+padding:12px;
+border-radius:10px;
 display:none;
-
 }
 
-
-
-
-
-.actions button{
-
-margin:3px;
-
-}
-
-
-
-.audio-btn{
-
-background:#059669;
-
-}
-
-
-
-
-
-.search-box{
-
-margin-bottom:20px;
-
-}
-
-
-
-
-
-.flashcard{
-
-text-align:center;
-
-font-size:22px;
-
-min-height:150px;
-
-display:flex;
-
-align-items:center;
-
-justify-content:center;
-
-background:#162d46;
-
+.badge{
+background:#0ea5e9;
+padding:5px 10px;
 border-radius:20px;
-
 }
 
-
-
-
-
-.footer{
-
-text-align:center;
-
-color:#94a3b8;
-
+.flash{
+background:#162d46;
 padding:30px;
-
+border-radius:20px;
+text-align:center;
+font-size:22px;
 }
-
-
 
 </style>
 
-
 </head>
-
 
 
 <body>
@@ -321,21 +105,30 @@ padding:30px;
 <div class="wrap">
 
 
-
-<section class="header">
-
+<div class="card">
 
 <h1>
 🟦 LangBlue Kurmancî
 </h1>
 
-
 <p>
-سیستم یادگیری، واژگان، گرامر و مدیریت داده زبان کرمانجی
+سیستم مدیریت و یادگیری زبان کرمانجی
 </p>
 
+</div>
 
-</section>
+
+
+
+<div class="card">
+
+<h2>
+🔐 حساب مرکزی
+</h2>
+
+<div id="accountStatus"></div>
+
+</div>
 
 
 
@@ -345,43 +138,20 @@ padding:30px;
 
 
 <h2>
-🔐 وضعیت حساب مرکزی
+➕ افزودن واژه
 </h2>
-
-
-<div id="accountStatus">
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<div class="card">
-
-
-<h2>
-➕ افزودن واژه کرمانجی
-</h2>
-
 
 
 <div id="accountWarning" class="lock">
 
-🔒 برای افزودن، ویرایش و حذف داده‌ها باید وارد حساب مرکزی LangBlue شوید.
+🔒 برای افزودن داده باید وارد حساب مرکزی شوید.
 
 </div>
 
 
 
-
 <input id="kWord"
-placeholder="کلمه به کرمانجی">
+placeholder="کلمه کرمانجی">
 
 
 
@@ -392,83 +162,31 @@ placeholder="معنی فارسی">
 
 <select id="type">
 
-
 <option value="noun">
 اسم
 </option>
-
 
 <option value="verb">
 فعل
 </option>
 
-
 <option value="adjective">
 صفت
 </option>
-
 
 <option value="other">
 سایر
 </option>
 
-
 </select>
 
 
 
-
-<input id="phonetic"
-placeholder="فونتیک تلفظ">
-
-
-
-<input id="audio"
-placeholder="لینک صوت">
-
-
-
-<select id="level">
-
-
-<option value="A1">
-A1
-</option>
-
-
-<option value="A2">
-A2
-</option>
-
-
-<option value="B1">
-B1
-</option>
-
-
-<option value="B2">
-B2
-</option>
-
-
-<option value="C1">
-C1
-</option>
-
-
-</select>
-
-
-
-
-
-<button id="addWordButton"
-onclick="addWord()">
+<button id="addButton" onclick="addWord()">
 
 ثبت واژه
 
 </button>
-
 
 
 </div>
@@ -481,27 +199,18 @@ onclick="addWord()">
 
 <div class="card">
 
-
 <h2>
-📚 پایگاه واژگان کرمانجی
+📚 واژگان
 </h2>
 
 
-
-<input class="search-box"
-id="search"
-placeholder="جستجو کرمانجی یا فارسی..."
+<input id="search"
+placeholder="جستجو..."
 oninput="renderTable()">
 
 
 
-
-
-<div class="table-container">
-
-
 <table>
-
 
 <thead>
 
@@ -511,53 +220,38 @@ oninput="renderTable()">
 کرمانجی
 </th>
 
-
 <th>
 فارسی
 </th>
-
 
 <th>
 نوع
 </th>
 
-
 <th>
 فونتیک
 </th>
-
 
 <th>
 صوت
 </th>
 
-
 <th>
 سطح
 </th>
 
-
-<th>
-SRS
-</th>
-
-
 <th>
 عملیات
 </th>
-
 
 </tr>
 
 </thead>
 
 
-
-<tbody id="wordTable">
-
+<tbody id="table">
 
 </tbody>
-
 
 
 </table>
@@ -566,58 +260,70 @@ SRS
 </div>
 
 
-</div>
-
-
-
 
 
 
 
 <div class="card">
-<h2></h2>
-🧠 مرور SRS
+
+<h2>
+🧠 SRS
 </h2>
-<div class="flashcard"
-id="flashcard">
-برای شروع مرور، واژه اضافه کنید.
+
+
+<div id="flash" class="flash">
+
+مرور شروع نشده
+
 </div>
+
+
 <br>
-<button onclick="nextReview()">
+
+
+<button onclick="review()">
+
 واژه بعدی
+
 </button>
+
+
 </div>
-<div class="footer">
-LangBlue Kurmancî System
+
+
+
+
 </div>
-</div>
+
+
+
+
+
+<script src="langblue-core.js"></script>
+
+
 <script>
-  // ======================================
-// LangBlue Kurmancî Core Integration
-// ======================================
 
 
-let database = [];
+const LANG="kurmanci";
 
-const LANGUAGE_ID = "kurmanci";
 
+let database=[];
 
 
 
-// ==============================
-// Load Central Database
-// ==============================
+// =======================
+// Core Load
+// =======================
 
 
-function loadKurmanci(){
+function load(){
 
 
-    database =
-    LangBlueCore.database.words(
-        LANGUAGE_ID
-    )
-    ||
-    [];
+database =
+LangBlueCore.database.words(LANG)
+||
+[];
 
 
 }
@@ -625,13 +331,17 @@ function loadKurmanci(){
 
 
 
+// =======================
+// Account
+// =======================
 
-// ==============================
-// Account Status
-// ==============================
+
+function account(){
 
 
-function updateAccountStatus(){
+let ok =
+LangBlueCore.hasPermission();
+
 
 
 let status =
@@ -640,70 +350,129 @@ document.getElementById(
 );
 
 
+
 let warning =
 document.getElementById(
 "accountWarning"
 );
 
 
-let button =
+
+let btn =
 document.getElementById(
-"addWordButton"
+"addButton"
 );
 
 
 
-if(
-LangBlueCore.hasPermission()
-){
+if(ok){
 
 
-status.innerHTML =
+status.innerHTML=
 `
 <span class="badge">
-🟢 حساب مرکزی فعال
+🟢 فعال
 </span>
 <br>
-مدیریت داده کرمانجی فعال است.
+ویرایش داده فعال است.
 `;
-
-
 
 warning.style.display="none";
 
-
-button.disabled=false;
-
+btn.disabled=false;
 
 
 }
+
 else{
 
 
-status.innerHTML =
+status.innerHTML=
 `
 <span class="badge">
-👤 حالت مهمان
+👤 مهمان
 </span>
-
 <br>
-
-فقط مشاهده و مرور فعال است.
+فقط مشاهده فعال است.
 `;
-
-
 
 warning.style.display="block";
 
+btn.disabled=true;
 
-button.disabled=true;
 
+}
 
 
 }
 
 
 
+
+
+// =======================
+// Auto Language Engine
+// =======================
+
+
+function generateData(word){
+
+
+return {
+
+
+phonetic:
+"/"+word+"/",
+
+
+
+audio:function(){
+
+
+let u =
+new SpeechSynthesisUtterance(word);
+
+u.lang="ku";
+
+speechSynthesis.speak(u);
+
+
+},
+
+
+
+level:
+detectLevel(word),
+
+
+
+srs:0
+
+
+
+};
+
+
+}
+
+
+
+
+
+function detectLevel(word){
+
+
+if(word.length<=3)
+return "A1";
+
+
+if(word.length<=6)
+return "A2";
+
+
+return "B1";
+
+
 }
 
 
@@ -711,68 +480,77 @@ button.disabled=true;
 
 
 
-
-// ==============================
-// Add Word
-// ==============================
+// =======================
+// Add
+// =======================
 
 
 function addWord(){
 
 
 
-if(
-!LangBlueCore.hasPermission()
-){
-
+if(!LangBlueCore.hasPermission()){
 
 alert(
-"🔒 برای افزودن واژه وارد حساب مرکزی LangBlue شوید."
+"حساب مرکزی لازم است."
 );
 
-
 return;
-
 
 }
 
 
+
+let k =
+document.getElementById("kWord").value.trim();
+
+
+
+let fa =
+document.getElementById("faWord").value.trim();
+
+
+
+let type =
+document.getElementById("type").value;
+
+
+
+if(!k||!fa)
+return;
+
+
+
+let auto =
+generateData(k);
 
 
 
 let word={
 
 
-kurmanci:
-document.getElementById("kWord").value.trim(),
+kurmanci:k,
 
 
-persian:
-document.getElementById("faWord").value.trim(),
+persian:fa,
 
 
-type:
-document.getElementById("type").value,
+type:type,
 
 
-phonetic:
-document.getElementById("phonetic").value.trim(),
+phonetic:auto.phonetic,
 
 
-audio:
-document.getElementById("audio").value.trim(),
+audio:true,
 
 
-level:
-document.getElementById("level").value,
+level:auto.level,
 
 
-srs:0,
+srs:auto.srs,
 
 
-nextReview:
-Date.now()
-
+created:Date.now()
 
 
 };
@@ -780,117 +558,65 @@ Date.now()
 
 
 
-
-if(
-!word.kurmanci ||
-!word.persian
-){
-
-
-alert(
-"کلمه کرمانجی و فارسی الزامی است."
-);
-
-
-return;
-
-
-}
-
-
-
-
-
-let result =
 LangBlueCore.database.add(
-LANGUAGE_ID,
+LANG,
 word
 );
 
 
 
-if(result.ok){
-
-
-loadKurmanci();
+load();
 
 renderTable();
 
-clearForm();
 
 
 }
 
 
 
-}
 
 
 
 
-
-
-
-
-
-// ==============================
-// Render Table
-// ==============================
+// =======================
+// Table
+// =======================
 
 
 function renderTable(){
 
 
-
-let table =
-document.getElementById(
-"wordTable"
-);
+let box =
+document.getElementById("table");
 
 
-let search =
-document.getElementById(
-"search"
-)
+
+let q =
+document.getElementById("search")
 .value
 .toLowerCase();
 
 
 
-table.innerHTML="";
+box.innerHTML="";
 
 
 
 database
-.filter(function(w){
+.filter(w=>
 
-
-return (
-
-w.kurmanci
-.toLowerCase()
-.includes(search)
-
+w.kurmanci.toLowerCase().includes(q)
 ||
+w.persian.toLowerCase().includes(q)
 
-w.persian
-.toLowerCase()
-.includes(search)
-
-);
+)
+.forEach(w=>{
 
 
-})
-.forEach(function(w){
+box.innerHTML+=`
 
-
-
-let row =
-document.createElement("tr");
-
-
-
-row.innerHTML=`
+<tr>
 
 <td>${w.kurmanci}</td>
 
@@ -898,57 +624,44 @@ row.innerHTML=`
 
 <td>${w.type}</td>
 
-<td>${w.phonetic || "-"}</td>
+<td>${w.phonetic}</td>
 
 
 <td>
 
-${
-w.audio
-?
-`
-<button onclick="playAudio('${w.audio}')">
+<button onclick="speak('${w.kurmanci}')">
+
 🔊
+
 </button>
-`
-:
-"-"
-}
 
 </td>
 
 
-<td>${w.level}</td>
-
-
 <td>
-${w.srs || 0}/5
+${w.level}
 </td>
 
 
 <td>
 
 
-<button onclick="editWord(${w.id})">
-✏️
-</button>
+<button onclick="removeWord(${w.id})">
 
-
-<button onclick="deleteWord(${w.id})">
 🗑
+
 </button>
 
 
 </td>
+
+
+</tr>
 
 `;
 
 
 
-table.appendChild(row);
-
-
-
 });
 
 
@@ -960,49 +673,58 @@ table.appendChild(row);
 
 
 
-// ==============================
-// Delete
-// ==============================
+
+// =======================
+// Audio
+// =======================
 
 
-function deleteWord(id){
+function speak(text){
 
 
-
-if(
-!LangBlueCore.hasPermission()
-){
+let u =
+new SpeechSynthesisUtterance(text);
 
 
-alert(
-"🔒 دسترسی نیاز به حساب مرکزی دارد."
-);
+u.lang="ku";
 
 
-return;
+speechSynthesis.speak(u);
 
 
 }
+
+
+
+
+
+
+// =======================
+// Delete
+// =======================
+
+
+function removeWord(id){
+
+
+
+if(!LangBlueCore.hasPermission())
+return;
 
 
 
 LangBlueCore.database.delete(
-
-LANGUAGE_ID,
-
+LANG,
 id
-
 );
 
 
 
-loadKurmanci();
-
+load();
 
 renderTable();
 
 
-
 }
 
 
@@ -1012,172 +734,20 @@ renderTable();
 
 
 
-// ==============================
-// Edit
-// ==============================
-
-
-function editWord(id){
-
-
-
-if(
-!LangBlueCore.hasPermission()
-){
-
-
-alert(
-"🔒 دسترسی نیاز به حساب مرکزی دارد."
-);
-
-
-return;
-
-
-}
-
-
-
-let word =
-database.find(function(w){
-
-return w.id===id;
-
-});
-
-
-
-if(!word)
-return;
-
-
-
-
-let newText =
-prompt(
-"ویرایش کلمه کرمانجی:",
-word.kurmanci
-);
-
-
-
-if(!newText)
-return;
-
-
-
-
-LangBlueCore.database.update(
-
-LANGUAGE_ID,
-
-id,
-
-{
-
-kurmanci:newText
-
-}
-
-);
-
-
-
-loadKurmanci();
-
-
-renderTable();
-
-
-
-}
-
-
-
-
-
-
-
-// ==============================
-// Audio
-// ==============================
-
-
-function playAudio(url){
-
-
-new Audio(url).play();
-
-
-}
-
-
-
-
-
-
-
-
-// ==============================
-// Clear Form
-// ==============================
-
-
-function clearForm(){
-
-
-[
-"kWord",
-"faWord",
-"phonetic",
-"audio"
-
-]
-.forEach(function(id){
-
-
-document.getElementById(id).value="";
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-// ==============================
+// =======================
 // SRS
-// ==============================
+// =======================
 
 
-function nextReview(){
+function review(){
 
 
-
-if(!database.length){
-
-
-document.getElementById(
-"flashcard"
-)
-.innerHTML=
-"واژه‌ای وجود ندارد";
-
-
+if(!database.length)
 return;
 
 
-}
 
-
-
-let word =
+let w =
 database[
 Math.floor(
 Math.random()*database.length
@@ -1186,24 +756,22 @@ Math.random()*database.length
 
 
 
-document.getElementById(
-"flashcard"
-)
+document.getElementById("flash")
 .innerHTML=
 
 `
 
-<strong>
-${word.kurmanci}
-</strong>
+<b>
+${w.kurmanci}
+</b>
 
 <br><br>
 
-${word.persian}
+${w.persian}
 
-<br><br>
+<br>
 
-${word.level}
+${w.level}
 
 `;
 
@@ -1215,32 +783,32 @@ ${word.level}
 
 
 
-// ==============================
-// Start
-// ==============================
 
 
 window.addEventListener(
 "storage",
 function(){
 
-loadKurmanci();
+load();
 
 renderTable();
 
-updateAccountStatus();
+account();
 
 });
 
 
 
-loadKurmanci();
+load();
 
 renderTable();
 
-updateAccountStatus();
+account();
+
+
+
 </script>
-  
+
 
 </body>
 
