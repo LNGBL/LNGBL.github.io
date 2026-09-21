@@ -592,34 +592,33 @@ LangBlue Kurmancî System
 </div>
 </div>
 <script>
-  
+  // ======================================
+// LangBlue Kurmancî Core Integration
+// ======================================
+
+
 let database = [];
 
+const LANGUAGE_ID = "kurmanci";
+
+
+
 
 // ==============================
-// دیتابیس LocalStorage
+// Load Central Database
 // ==============================
 
 
-function loadDatabase(){
+function loadKurmanci(){
+
 
     database =
-    JSON.parse(
-        localStorage.getItem("langblue_kurmanci_db")
+    LangBlueCore.database.words(
+        LANGUAGE_ID
     )
     ||
     [];
 
-}
-
-
-
-function saveDatabase(){
-
-    localStorage.setItem(
-        "langblue_kurmanci_db",
-        JSON.stringify(database)
-    );
 
 }
 
@@ -628,19 +627,8 @@ function saveDatabase(){
 
 
 // ==============================
-// حساب مرکزی LangBlue
+// Account Status
 // ==============================
-
-
-function hasAccount(){
-
-    return !!localStorage.getItem(
-        "langblue_account"
-    );
-
-}
-
-
 
 
 function updateAccountStatus(){
@@ -652,12 +640,10 @@ document.getElementById(
 );
 
 
-
 let warning =
 document.getElementById(
 "accountWarning"
 );
-
 
 
 let button =
@@ -667,7 +653,9 @@ document.getElementById(
 
 
 
-if(hasAccount()){
+if(
+LangBlueCore.hasPermission()
+){
 
 
 status.innerHTML =
@@ -676,7 +664,7 @@ status.innerHTML =
 🟢 حساب مرکزی فعال
 </span>
 <br>
-دسترسی: افزودن، ویرایش و مدیریت داده‌ها
+مدیریت داده کرمانجی فعال است.
 `;
 
 
@@ -689,7 +677,6 @@ button.disabled=false;
 
 
 }
-
 else{
 
 
@@ -698,7 +685,9 @@ status.innerHTML =
 <span class="badge">
 👤 حالت مهمان
 </span>
+
 <br>
+
 فقط مشاهده و مرور فعال است.
 `;
 
@@ -724,7 +713,7 @@ button.disabled=true;
 
 
 // ==============================
-// افزودن واژه
+// Add Word
 // ==============================
 
 
@@ -732,22 +721,26 @@ function addWord(){
 
 
 
-if(!hasAccount()){
+if(
+!LangBlueCore.hasPermission()
+){
+
 
 alert(
-"🔒 برای افزودن واژه وارد حساب مرکزی شوید."
+"🔒 برای افزودن واژه وارد حساب مرکزی LangBlue شوید."
 );
 
+
 return;
+
 
 }
 
 
 
-let item={
 
 
-id:Date.now(),
+let word={
 
 
 kurmanci:
@@ -777,7 +770,8 @@ document.getElementById("level").value,
 srs:0,
 
 
-nextReview:Date.now()
+nextReview:
+Date.now()
 
 
 
@@ -785,11 +779,16 @@ nextReview:Date.now()
 
 
 
-if(!item.kurmanci || !item.persian){
+
+
+if(
+!word.kurmanci ||
+!word.persian
+){
 
 
 alert(
-"کلمه کرمانجی و معنی فارسی لازم است."
+"کلمه کرمانجی و فارسی الزامی است."
 );
 
 
@@ -800,16 +799,28 @@ return;
 
 
 
-database.push(item);
 
 
-saveDatabase();
+let result =
+LangBlueCore.database.add(
+LANGUAGE_ID,
+word
+);
 
+
+
+if(result.ok){
+
+
+loadKurmanci();
 
 renderTable();
 
-
 clearForm();
+
+
+}
+
 
 
 }
@@ -820,8 +831,10 @@ clearForm();
 
 
 
+
+
 // ==============================
-// نمایش جدول
+// Render Table
 // ==============================
 
 
@@ -835,14 +848,12 @@ document.getElementById(
 );
 
 
-
-let q =
+let search =
 document.getElementById(
 "search"
 )
 .value
 .toLowerCase();
-
 
 
 
@@ -858,13 +869,13 @@ return (
 
 w.kurmanci
 .toLowerCase()
-.includes(q)
+.includes(search)
 
 ||
 
 w.persian
 .toLowerCase()
-.includes(q)
+.includes(search)
 
 );
 
@@ -874,24 +885,20 @@ w.persian
 
 
 
-let tr =
+let row =
 document.createElement("tr");
 
 
 
-tr.innerHTML = `
-
+row.innerHTML=`
 
 <td>${w.kurmanci}</td>
 
-
 <td>${w.persian}</td>
-
 
 <td>${w.type}</td>
 
-
-<td>${w.phonetic}</td>
+<td>${w.phonetic || "-"}</td>
 
 
 <td>
@@ -900,11 +907,8 @@ ${
 w.audio
 ?
 `
-<button class="audio-btn"
-onclick="playAudio('${w.audio}')">
-
+<button onclick="playAudio('${w.audio}')">
 🔊
-
 </button>
 `
 :
@@ -914,77 +918,40 @@ onclick="playAudio('${w.audio}')">
 </td>
 
 
+<td>${w.level}</td>
+
+
 <td>
-${w.level}
+${w.srs || 0}/5
 </td>
 
 
 <td>
-
-${w.srs}/5
-
-</td>
-
-
-
-<td class="actions">
 
 
 <button onclick="editWord(${w.id})">
-
 ✏️
-
 </button>
 
 
 <button onclick="deleteWord(${w.id})">
-
 🗑
-
 </button>
 
 
-
 </td>
-
-
 
 `;
 
 
 
-table.appendChild(tr);
+table.appendChild(row);
 
 
 
 });
 
 
-
-}
-
-
-
-
-
-
-
-
-// ==============================
-// صوت
-// ==============================
-
-
-function playAudio(url){
-
-
-let audio =
-new Audio(url);
-
-
-audio.play();
-
-
 }
 
 
@@ -994,18 +961,21 @@ audio.play();
 
 
 // ==============================
-// حذف
+// Delete
 // ==============================
 
 
 function deleteWord(id){
 
 
-if(!hasAccount()){
+
+if(
+!LangBlueCore.hasPermission()
+){
 
 
 alert(
-"🔒 حذف فقط برای کاربران دارای حساب فعال است."
+"🔒 دسترسی نیاز به حساب مرکزی دارد."
 );
 
 
@@ -1016,19 +986,21 @@ return;
 
 
 
-database =
-database.filter(function(w){
+LangBlueCore.database.delete(
 
-return w.id!==id;
+LANGUAGE_ID,
 
-});
+id
+
+);
 
 
 
-saveDatabase();
+loadKurmanci();
 
 
 renderTable();
+
 
 
 }
@@ -1039,8 +1011,9 @@ renderTable();
 
 
 
+
 // ==============================
-// ویرایش
+// Edit
 // ==============================
 
 
@@ -1048,11 +1021,13 @@ function editWord(id){
 
 
 
-if(!hasAccount()){
+if(
+!LangBlueCore.hasPermission()
+){
 
 
 alert(
-"🔒 ویرایش فقط برای کاربران دارای حساب فعال است."
+"🔒 دسترسی نیاز به حساب مرکزی دارد."
 );
 
 
@@ -1063,36 +1038,55 @@ return;
 
 
 
+let word =
+database.find(function(w){
 
-let w =
-database.find(function(x){
-
-return x.id===id;
+return w.id===id;
 
 });
 
 
 
-if(!w)
+if(!word)
 return;
 
 
 
-document.getElementById("kWord").value=w.kurmanci;
 
-document.getElementById("faWord").value=w.persian;
-
-document.getElementById("type").value=w.type;
-
-document.getElementById("phonetic").value=w.phonetic;
-
-document.getElementById("audio").value=w.audio;
-
-document.getElementById("level").value=w.level;
+let newText =
+prompt(
+"ویرایش کلمه کرمانجی:",
+word.kurmanci
+);
 
 
 
-deleteWord(id);
+if(!newText)
+return;
+
+
+
+
+LangBlueCore.database.update(
+
+LANGUAGE_ID,
+
+id,
+
+{
+
+kurmanci:newText
+
+}
+
+);
+
+
+
+loadKurmanci();
+
+
+renderTable();
 
 
 
@@ -1105,7 +1099,27 @@ deleteWord(id);
 
 
 // ==============================
-// پاک کردن فرم
+// Audio
+// ==============================
+
+
+function playAudio(url){
+
+
+new Audio(url).play();
+
+
+}
+
+
+
+
+
+
+
+
+// ==============================
+// Clear Form
 // ==============================
 
 
@@ -1121,7 +1135,9 @@ function clearForm(){
 ]
 .forEach(function(id){
 
+
 document.getElementById(id).value="";
+
 
 });
 
@@ -1136,7 +1152,7 @@ document.getElementById(id).value="";
 
 
 // ==============================
-// SRS ساده
+// SRS
 // ==============================
 
 
@@ -1144,17 +1160,13 @@ function nextReview(){
 
 
 
-let card =
-document.getElementById(
-"flashcard"
-);
-
-
-
 if(!database.length){
 
 
-card.innerHTML=
+document.getElementById(
+"flashcard"
+)
+.innerHTML=
 "واژه‌ای وجود ندارد";
 
 
@@ -1165,63 +1177,35 @@ return;
 
 
 
-let index =
+let word =
+database[
 Math.floor(
 Math.random()*database.length
-);
+)
+];
 
 
 
-let w =
-database[index];
+document.getElementById(
+"flashcard"
+)
+.innerHTML=
 
-
-
-card.innerHTML = `
-
+`
 
 <strong>
-
-${w.kurmanci}
-
+${word.kurmanci}
 </strong>
 
+<br><br>
+
+${word.persian}
 
 <br><br>
 
-
-${w.persian}
-
-
-
-<br><br>
-
-
-<span class="badge">
-
-${w.level}
-
-</span>
-
+${word.level}
 
 `;
-
-
-
-w.srs =
-Math.min(
-5,
-w.srs+1
-);
-
-
-
-w.nextReview =
-Date.now()+86400000;
-
-
-
-saveDatabase();
 
 
 
@@ -1231,11 +1215,8 @@ saveDatabase();
 
 
 
-
-
-
 // ==============================
-// شروع سیستم
+// Start
 // ==============================
 
 
@@ -1243,20 +1224,21 @@ window.addEventListener(
 "storage",
 function(){
 
+loadKurmanci();
+
+renderTable();
+
 updateAccountStatus();
 
 });
 
 
 
-loadDatabase();
-
+loadKurmanci();
 
 renderTable();
 
-
 updateAccountStatus();
-
 </script>
   
 
