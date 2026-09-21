@@ -1,128 +1,87 @@
-/* LangBlue Account — shared local account/session layer. */
+/* LangBlue Account — central account + learning profile layer */
 (function(window){
 'use strict';
+
 const Store = {
-  _globalKeys: new Set(['accounts', 'session']),
-  _storageKey(key) {
-    if (this._globalKeys.has(key)) return 'lb:' + key;
-    const session = (() => {
-      try { return JSON.parse(localStorage.getItem('lb:session') || 'null'); } catch { return null; }
-    })();
-    const uid = session?.userId || 'anonymous';
-    return 'lb:user:' + uid + ':' + key;
+  key:'lb:data',
+  get(){
+    try{return JSON.parse(localStorage.getItem(this.key)||'{"accounts":{},"session":null}')}catch{return {accounts:{},session:null}}
   },
-  get(key, fallback = null) {
-    try {
-      const v = localStorage.getItem(this._storageKey(key));
-      return v ? JSON.parse(v) : fallback;
-    } catch { return fallback; }
-  },
-  set(key, val) { localStorage.setItem(this._storageKey(key), JSON.stringify(val)); },
-  update(key, fn, fallback) {
-    const cur = this.get(key, fallback);
-    const next = fn(cur);
-    this.set(key, next);
-    return next;
-  }
+  save(data){localStorage.setItem(this.key,JSON.stringify(data))}
 };
 
 const Auth = {
-  current() { return Store.get('user', null); },
-  isLoggedIn() { return !!this.current(); },
+ current(){
+   const d=Store.get();
+   return d.session ? d.accounts[d.session] || null : null;
+ },
+ isLoggedIn(){return !!this.current()},
 
-  async hashPassword(password, saltBytes) {
-    const enc = new TextEncoder();
-    const salt = saltBytes || crypto.getRandomValues(new Uint8Array(16));
-    const key = await crypto.subtle.importKey(
-      'raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']
-    );
-    const bits = await crypto.subtle.deriveBits(
-      { name:'PBKDF2', salt, iterations:120000, hash:'SHA-256' },
-      key, 256
-    );
-    return {
-      hash: Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,'0')).join(''),
-      salt: Array.from(salt).map(b=>b.toString(16).padStart(2,'0')).join('')
-    };
-  },
+ async hashPassword(password){
+   const data=new TextEncoder().encode(password);
+   const hash=await crypto.subtle.digest('SHA-256',data);
+   return Array.from(new Uint8Array(hash)).map(x=>x.toString(16).padStart(2,'0')).join('');
+ },
 
-  async verifyPassword(password, account) {
-    const salt = new Uint8Array((account.salt.match(/.{2}/g)||[]).map(h=>parseInt(h,16)));
-    const result = await this.hashPassword(password, salt);
-    return result.hash === account.passwordHash;
-  },
+ async register(data){
+   const db=Store.get();
+   const username=data.username.toLowerCase();
+   if(db.accounts[username]) return {ok:false,error:'username exists'};
 
-  async init() {
-    const session = Store.get('session', null);
-    if (!session?.userId) {
-      Store.set('user', null);
-      return null;
+   const id=crypto.randomUUID();
+   db.accounts[username]={
+    id,
+    username:data.username,
+    name:data.name||'',
+    passwordHash:await this.hashPassword(data.password),
+    profile:{created:new Date().toISOString()},
+    learning:{
+      kurmanci:{
+        level:'A1',
+        wordsLearned:[],
+        completedLessons:[],
+        mistakes:[]
+      },
+      vocabulary:{
+        savedWords:[],
+        progress:0
+      }
     }
-    const accounts = Store.get('accounts', {});
-    const a = Object.values(accounts).find(x => x.id === session.userId);
-    if (!a) {
-      Store.set('session', null);
-      Store.set('user', null);
-      return null;
-    }
-    const user = {
-      id:a.id,
-      name:a.name || a.fullName || '',
-      fullName:a.fullName || a.name || '',
-      sex:a.sex || a.gender || '',
-      gender:a.gender || a.sex || '',
-      username:a.username,
-      country:a.country || null,
-      countryName:a.countryName || '',
-      currency:a.currency || null,
-      at:a.at || a.createdAt
-    };
-    Store.set('user', user);
-    return user;
-  },
+   };
+   db.session=username;
+   Store.save(db);
+   return {ok:true,user:this.current()};
+ },
 
-  async register(data) {
-    const accounts = Store.get('accounts', {});
-    const key = data.username.toLowerCase();
-    if (accounts[key]) return {ok:false,error:'این نام کاربری قبلاً ثبت شده است.'};
+ async login(username,password){
+   const db=Store.get();
+   const user=db.accounts[username.toLowerCase()];
+   if(!user || user.passwordHash!==await this.hashPassword(password))
+     return {ok:false,error:'invalid login'};
+   db.session=username.toLowerCase();
+   Store.save(db);
+   return {ok:true,user:user};
+ },
 
-    const hashed = await this.hashPassword(data.password);
-    const id = crypto.randomUUID();
-    const createdAt = new Date().toISOString();
-    accounts[key] = {
-      id, name:data.name, fullName:data.name, sex:data.sex || '', gender:data.sex || '',
-      username:data.username, age:data.age || '',
-      country:data.country || null, countryName:data.countryName || '',
-      currency:data.currency || null,
-      passwordHash:hashed.hash, salt:hashed.salt, at:createdAt, createdAt:createdAt
-    };
-    Store.set('accounts', accounts);
-    Store.set('session', {userId:id, createdAt:Date.now()});
-    await this.init();
-    Audit.log('user_register', {username:data.username});
-    return {ok:true,user:this.current()};
-  },
+ logout(){
+   const db=Store.get();
+   db.session=null;
+   Store.save(db);
+ },
 
-  async login(username, password) {
-    const accounts = Store.get('accounts', {});
-    const a = accounts[username.trim().toLowerCase()];
-    if (!a || !(await this.verifyPassword(password, a))) {
-      return {ok:false,error:'نام کاربری یا رمز عبور نادرست است.'};
-    }
-    Store.set('session', {userId:a.id, createdAt:Date.now()});
-    await this.init();
-    Audit.log('user_login', {username:a.username});
-    return {ok:true,user:this.current()};
-  },
-
-  async logout() {
-    Audit.log('user_logout');
-    Store.set('session', null);
-    Store.set('user', null);
-  }
+ updateLearning(section,data){
+   const user=this.current();
+   if(!user)return false;
+   Object.assign(user.learning[section],data);
+   const db=Store.get();
+   db.accounts[user.username]=user;
+   Store.save(db);
+   return true;
+ }
 };
 
 window.Store=Store;
 window.Auth=Auth;
-window.LangBlueAccount={Store:Store,Auth:Auth};
+window.LangBlueAccount={Store,Auth};
+
 })(window);
