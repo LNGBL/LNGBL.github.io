@@ -429,52 +429,76 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
         </div>
       </div>
     </section>
-
-    <section class="receipt-section" id="receipt">
-      <div class="wrap">
-        <h2 class="section-title">ساخت فیش خرید LangBlue</h2>
-        <p class="section-lead">
-          لازم نیست همه محصولات را با هم انتخاب کنی. یک محصول یا چند محصول را انتخاب کن،
-          مدت اشتراک روزانه یا ماهانه را مشخص کن و فیش درخواست خودت را بساز؛ سپس شناسه فیش را برای ادمین بفرست تا کد وریفای متناسب با مدت اشتراک را دریافت کنی.
-        </p>
-        <div class="receipt-builder">
-          <div class="receipt-grid">
-            <div class="receipt-panel">
-              <h3>۱. محصولات موردنظر</h3>
-              <div class="receipt-options" id="receiptProducts">
-                <label class="receipt-option"><input type="checkbox" value="grammar" checked><span><strong>📐 LangBlue Grammar</strong><small>ابزار گرامر و ساختار زبان</small></span></label>
-                <label class="receipt-option"><input type="checkbox" value="vocabulary"><span><strong>📚 LangBlue Vocabulary</strong><small>ثبت و تمرین واژگان</small></span></label>
-                <label class="receipt-option"><input type="checkbox" value="deutsch"><span><strong>🇩🇪 LangBlue Deutsch</strong><small>یادگیری و فلش‌کارت آلمانی</small></span></label>
-                <label class="receipt-option"><input type="checkbox" value="deutsch"><span><strong> Kurmanci Deutsch</strong><small>یادگیری و فلش‌کارت کرمانجی</small></span></label>
-              </div>
-              </div>
-            </div>
-            <div class="receipt-panel">
-              <h3>۲. مدت اشتراک روزانه / ماهانه</h3>
-              <select id="receiptPlan" class="receipt-select" aria-label="مدت اشتراک">
-                <optgroup label="اشتراک روزانه">
-                  <option value="irt_7d">۷ روز</option>
-                  <option value="irt_14d">۱۴ روز</option>
-                  <option value="irt_21d">۲۱ روز</option>
-                </optgroup>
-                <optgroup label="اشتراک ماهانه">
-                  <option value="irt_3m">۳ ماه</option>
-                  <option value="irt_6m">۶ ماه</option>
-                  <option value="irt_12m">۱۲ ماه</option>
-                </optgroup>
-              </select>
-              <div class="receipt-summary" id="receiptSummary" aria-live="polite"></div>
-              <div class="receipt-actions">
-                <button class="btn btn-primary" id="buildReceipt" type="button">🧾 ساخت فیش</button>
-                <button class="btn btn-secondary" id="printReceipt" type="button" style="display:none">🖨️ چاپ فیش</button>
-              </div>
-            </div>
+    
+   <section class="receipt-section" id="receipt">
+  <div class="wrap">
+    <h2 class="section-title">ساخت فیش خرید LangBlue</h2>
+    <p class="section-lead">
+      لازم نیست همه محصولات را با هم انتخاب کنی. یک محصول یا چند محصول را انتخاب کن،
+      مدت اشتراک روزانه یا ماهانه را مشخص کن و فیش درخواست خودت را بساز؛ سپس شناسه فیش را برای ادمین بفرست تا کد وریفای متناسب با مدت اشتراک را دریافت کنی.
+    </p>
+    <div class="receipt-builder">
+      <div class="receipt-grid">
+        <div class="receipt-panel">
+          <h3>۱. محصولات موردنظر</h3>
+          <div class="receipt-options" id="receiptProducts">
+            <label class="receipt-option">
+              <input type="checkbox" value="grammar" checked>
+              <span>
+                <strong>📐 LangBlue Grammar</strong>
+                <small>ابزار گرامر و ساختار زبان</small>
+              </span>
+            </label>
+            <label class="receipt-option">
+              <input type="checkbox" value="vocabulary">
+              <span>
+                <strong>📚 LangBlue Vocabulary</strong>
+                <small>ثبت و تمرین واژگان</small>
+              </span>
+            </label>
+            <label class="receipt-option">
+              <input type="checkbox" value="deutsch">
+              <span>
+                <strong>🇩🇪 LangBlue Deutsch</strong>
+                <small>یادگیری و فلش‌کارت آلمانی</small>
+              </span>
+            </label>
+            <label class="receipt-option">
+              <input type="checkbox" value="kurmanci">
+              <span>
+                <strong>🟦 LangBlue Kurmancî</strong>
+                <small>یادگیری، واژگان و فلش‌کارت کرمانجی</small>
+              </span>
+            </label>
           </div>
-          <div class="receipt-output" id="receiptOutput" aria-live="polite"></div>
+        </div>
+        <div class="receipt-panel">
+          <h3>۲. مدت اشتراک روزانه / ماهانه</h3>
+          <select id="receiptPlan" class="receipt-select" aria-label="مدت اشتراک">
+            <optgroup label="اشتراک روزانه">
+              <option value="irt_7d">۷ روز</option>
+              <option value="irt_14d">۱۴ روز</option>
+              <option value="irt_21d">۲۱ روز</option>
+            </optgroup>
+            <optgroup label="اشتراک ماهانه">
+              <option value="irt_3m">۳ ماه</option>
+              <option value="irt_6m">۶ ماه</option>
+              <option value="irt_12m">۱۲ ماه</option>
+            </optgroup>
+          </select>
+          <div class="receipt-summary" id="receiptSummary" aria-live="polite"></div>
+          <div class="receipt-actions">
+            <button class="btn btn-primary" id="buildReceipt" type="button">  🧾 ساخت فیش </button>
+            <button class="btn btn-secondary" id="printReceipt" type="button" style="display:none">
+              🖨️ چاپ فیش
+            </button>
+          </div>
         </div>
       </div>
-    </section>
-
+      <div class="receipt-output" id="receiptOutput" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
     <section class="research">
       <div class="wrap">
         <div class="eyebrow"><span class="eyebrow-cloud" aria-hidden="true"><span></span><span></span><span></span></span>LANGUAGE LEARNING · RESEARCH &amp; REFERENCES</div>
