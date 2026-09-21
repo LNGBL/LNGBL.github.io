@@ -1,34 +1,977 @@
 <!DOCTYPE html>
-<html lang="ku" dir="ltr">
+<html lang="fa" dir="rtl">
+
 <head>
-<script src="langblue-commerce.js"></script>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>LangBlue Kurmancî · Vocabulary Economy System</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>
+LangBlue Kurmancî | پایگاه داده زبان کرمانجی
+</title>
+
+
 <style>
-:root{--bg:#f0f4fc;--card:#fff;--text:#1e293b;--blue:#1a4f8b;--border:#dde7f5;--green:#2b8c5e;--gold:#d9a441}
-*{box-sizing:border-box}body{background:var(--bg);font-family:Segoe UI,sans-serif;color:var(--text);padding:1.5rem}.container{max-width:1600px;margin:auto;background:var(--card);border:1px solid var(--border);border-radius:2.5rem;padding:2rem;box-shadow:0 20px 40px #0001}h1{background:#f8fbff;border-radius:1.5rem;padding:1rem;border:1px solid var(--border)}.tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin:1rem 0}.tab{border:1px solid var(--border);background:white;border-radius:40px;padding:.7rem 1.5rem;cursor:pointer}.tab.active{background:var(--blue);color:white}.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}.card{border:1px solid var(--border);border-radius:1.3rem;padding:1rem;background:white}.word{font-size:1.2rem;color:var(--blue);font-weight:bold}.meta{color:#64748b;font-size:.85rem}.eco{border-top:3px solid var(--green)}.commerce{border-top:3px solid var(--gold)}@media(max-width:800px){.grid{grid-template-columns:1fr}}
+
+
+*{
+box-sizing:border-box;
+}
+
+
+body{
+
+font-family:Tahoma,Arial;
+background:#f1f5fb;
+color:#1e293b;
+padding:20px;
+
+}
+
+
+
+.container{
+
+max-width:1300px;
+margin:auto;
+background:white;
+padding:30px;
+border-radius:25px;
+box-shadow:0 15px 40px #0002;
+
+}
+
+
+
+.header{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+margin-bottom:25px;
+
+}
+
+
+h1{
+
+color:#164b8a;
+
+}
+
+
+
+.account{
+
+background:#eaf2ff;
+padding:12px 20px;
+border-radius:20px;
+
+}
+
+
+
+.box{
+
+background:#fafcff;
+border:1px solid #dbe7f5;
+padding:20px;
+border-radius:20px;
+margin-bottom:20px;
+
+}
+
+
+
+input,select{
+
+width:100%;
+padding:12px;
+margin:7px 0;
+border-radius:12px;
+border:1px solid #ccd8ea;
+
+}
+
+
+
+button{
+
+background:#164b8a;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:20px;
+cursor:pointer;
+
+}
+
+
+
+button:hover{
+
+opacity:.85;
+
+}
+
+
+
+.grid{
+
+display:grid;
+grid-template-columns:
+repeat(auto-fit,minmax(220px,1fr));
+
+gap:15px;
+
+}
+
+
+
+table{
+
+width:100%;
+border-collapse:collapse;
+
+}
+
+
+th,td{
+
+padding:12px;
+border-bottom:1px solid #ddd;
+text-align:center;
+
+}
+
+
+
+.search{
+
+font-size:16px;
+
+}
+
+
+
+.tag{
+
+background:#e8f1ff;
+padding:5px 10px;
+border-radius:15px;
+
+}
+
+
+
+.flash{
+
+font-size:24px;
+text-align:center;
+padding:30px;
+
+}
+
+
+
+.economy{
+
+display:none;
+background:#fff7d6;
+
+}
+
+
+
 </style>
+
+
 </head>
+
+
+
 <body>
+
+
+
 <div class="container">
-<h1>🟦 Kurmancî Learning Hub <small>· LangBlue Language Economy</small></h1>
-<p>سیستەمی فێربوون، وشە، گرامەر، و زانیاریی زمانێ کرمانجی لە ناو ئیکۆسیستەمی LangBlue.</p>
-<div class="tabs">
-<button class="tab active" onclick="tab('vocab',this)">Vocabulary</button>
-<button class="tab" onclick="tab('grammar',this)">Grammar</button>
-<button class="tab" onclick="tab('economy',this)">Language Economy</button>
-<button class="tab" onclick="tab('research',this)">Research</button>
+
+
+
+<div class="header">
+
+
+<div>
+
+<h1>
+🟦 LangBlue Kurmancî
+</h1>
+
+
+<p>
+سیستم مدیریت، یادگیری و توسعه داده‌های زبان کرمانجی
+</p>
+
+
 </div>
-<div id="vocab" class="panel active"><h2>Structured Vocabulary Database</h2><div class="grid">
-<div class="card"><div class="word">ez</div><div>من · I</div><span class="meta">Pronoun</span></div>
-<div class="card"><div class="word">av</div><div>ئاو · Water</div><span class="meta">Noun</span></div>
-<div class="card"><div class="word">mal</div><div>ماڵ · House</div><span class="meta">Noun</span></div>
-<div class="card"><div class="word">roj</div><div>ڕۆژ · Day</div><span class="meta">Time</span></div>
-</div></div>
-<div id="grammar" class="panel"><h2>Grammar Engine</h2><div class="card">Modules: verbs, tenses, cases, sentence patterns and pronunciation rules.</div></div>
-<div id="economy" class="panel"><h2>Language Economy System</h2><div class="card eco"><b>Knowledge Value:</b> Each vocabulary item can become a structured digital asset with learning data, examples and user contribution.</div><div class="card commerce"><b>Commerce Layer:</b> Compatible with LangBlue central economic system for educational services, digital products and language resources.</div></div>
-<div id="research" class="panel"><h2>Research & References</h2><div class="card">Kurmancî linguistic data, historical notes and comparative language research will be organized here.</div></div>
+
+
+<div class="account"
+id="accountStatus">
+
+بررسی حساب...
+
 </div>
-<script>function tab(id,b){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');b.classList.add('active')}</script>
-</body></html>
+
+
+</div>
+
+
+
+
+
+<div class="box">
+
+
+<h2>
+➕ افزودن واژه جدید
+</h2>
+
+
+
+<div class="grid">
+
+
+<input id="kWord"
+placeholder="کلمه کرمانجی">
+
+
+<input id="faWord"
+placeholder="معنی فارسی">
+
+
+<input id="type"
+placeholder="نوع کلمه">
+
+
+<input id="phonetic"
+placeholder="فونتیک">
+
+
+<input id="audio"
+placeholder="لینک فایل صوتی">
+
+
+
+<select id="level">
+
+
+<option>A1</option>
+
+<option>A2</option>
+
+<option>B1</option>
+
+<option>B2</option>
+
+<option>C1</option>
+
+<option>C2</option>
+
+
+</select>
+
+
+</div>
+
+
+
+<button onclick="addWord()">
+
+ثبت واژه
+
+</button>
+
+
+</div>
+
+
+
+
+
+<div class="box">
+
+
+<h2>
+🔎 جستجوی واژه
+</h2>
+
+
+<input class="search"
+id="search"
+onkeyup="searchData()"
+placeholder="جستجو در کرمانجی و فارسی">
+
+
+</div>
+
+
+
+
+
+<div class="box">
+
+
+<h2>
+📚 پایگاه داده کرمانجی
+</h2>
+
+
+<table>
+
+
+<thead>
+
+<tr>
+
+<th>کرمانجی</th>
+
+<th>فارسی</th>
+
+<th>نوع</th>
+
+<th>سطح</th>
+
+<th>فونتیک</th>
+
+<th>صوت</th>
+
+<th>عملیات</th>
+
+
+</tr>
+
+
+</thead>
+
+
+<tbody id="table">
+
+</tbody>
+
+
+
+</table>
+
+
+</div>
+
+
+
+
+
+<div class="box">
+
+
+<h2>
+🧠 مرور هوشمند SRS
+</h2>
+
+
+<div class="flash"
+id="flash">
+
+آماده مرور
+
+</div>
+
+
+<button onclick="review()">
+
+شروع مرور
+
+</button>
+
+
+</div>
+
+
+
+
+
+<div class="box economy"
+id="economy">
+
+
+<h2>
+💎 اقتصاد داده زبانی LangBlue
+</h2>
+
+
+<p>
+
+با حساب مرکزی LangBlue،
+مشارکت در توسعه داده‌های کرمانجی،
+ثبت منابع و ارزش‌گذاری داده زبانی فعال می‌شود.
+
+</p>
+
+
+</div>
+
+
+
+
+</div>
+<script>
+
+
+// ===============================
+// LangBlue Kurmancî Database
+// ===============================
+
+
+let database =
+JSON.parse(
+localStorage.getItem("kurmanci_database")
+)
+||
+[];
+
+
+
+
+// ===============================
+// ذخیره دیتابیس
+// ===============================
+
+
+function saveDatabase(){
+
+localStorage.setItem(
+"kurmanci_database",
+JSON.stringify(database)
+);
+
+}
+
+
+
+// ===============================
+// افزودن واژه
+// ===============================
+
+
+function addWord(){
+
+
+let word={
+
+
+id:Date.now(),
+
+
+kurmanci:
+document.getElementById("kWord").value,
+
+
+persian:
+document.getElementById("faWord").value,
+
+
+type:
+document.getElementById("type").value,
+
+
+phonetic:
+document.getElementById("phonetic").value,
+
+
+audio:
+document.getElementById("audio").value,
+
+
+level:
+document.getElementById("level").value,
+
+
+review:
+Date.now()
+
+
+};
+
+
+
+
+if(!word.kurmanci || !word.persian){
+
+alert("کلمه کرمانجی و معنی فارسی لازم است");
+
+return;
+
+}
+
+
+
+database.push(word);
+
+
+saveDatabase();
+
+
+renderTable();
+
+
+clearForm();
+
+
+}
+
+
+
+// ===============================
+// پاک کردن فرم
+// ===============================
+
+
+function clearForm(){
+
+
+document.querySelectorAll(
+"input"
+)
+.forEach(
+x=>x.value=""
+);
+
+
+}
+
+
+
+// ===============================
+// نمایش جدول
+// ===============================
+
+
+function renderTable(data=database){
+
+
+let table=
+document.getElementById("table");
+
+
+table.innerHTML="";
+
+
+
+data.forEach(w=>{
+
+
+table.innerHTML += `
+
+
+<tr>
+
+
+<td>
+<b>${w.kurmanci}</b>
+</td>
+
+
+<td>
+${w.persian}
+</td>
+
+
+<td>
+
+<span class="tag">
+${w.type}
+</span>
+
+</td>
+
+
+
+<td>
+
+${w.level}
+
+</td>
+
+
+
+<td>
+
+${w.phonetic || "-"}
+
+</td>
+
+
+
+<td>
+
+
+${
+w.audio
+
+?
+
+`
+<audio controls width="100">
+<source src="${w.audio}">
+</audio>
+`
+
+:
+
+"-"
+
+}
+
+
+
+</td>
+
+
+
+<td>
+
+
+<button onclick="editWord(${w.id})">
+
+✏️
+
+</button>
+
+
+<button onclick="deleteWord(${w.id})">
+
+🗑
+
+</button>
+
+
+</td>
+
+
+</tr>
+
+
+
+`;
+
+
+
+});
+
+
+}
+
+
+
+
+// ===============================
+// حذف
+// ===============================
+
+
+function deleteWord(id){
+
+
+database =
+
+database.filter(
+w=>w.id!==id
+);
+
+
+
+saveDatabase();
+
+
+renderTable();
+
+
+
+}
+
+
+
+// ===============================
+// ویرایش
+// ===============================
+
+
+function editWord(id){
+
+
+
+let w =
+
+database.find(
+x=>x.id===id
+);
+
+
+
+document.getElementById("kWord")
+.value=w.kurmanci;
+
+
+document.getElementById("faWord")
+.value=w.persian;
+
+
+document.getElementById("type")
+.value=w.type;
+
+
+document.getElementById("phonetic")
+.value=w.phonetic;
+
+
+document.getElementById("audio")
+.value=w.audio;
+
+
+document.getElementById("level")
+.value=w.level;
+
+
+
+deleteWord(id);
+
+
+
+}
+
+
+
+
+// ===============================
+// جستجو
+// ===============================
+
+
+function searchData(){
+
+
+let value =
+
+document.getElementById("search")
+.value
+.toLowerCase();
+
+
+
+let result =
+
+database.filter(w=>
+
+
+w.kurmanci
+.toLowerCase()
+.includes(value)
+
+
+||
+
+
+w.persian
+.toLowerCase()
+.includes(value)
+
+
+
+);
+
+
+
+renderTable(result);
+
+
+
+}
+
+
+
+
+
+// ===============================
+// SRS مرور هوشمند
+// ===============================
+
+
+function review(){
+
+
+
+let now=Date.now();
+
+
+
+let list =
+
+database.filter(
+w=>w.review <= now
+);
+
+
+
+
+if(list.length===0){
+
+
+document.getElementById("flash")
+.innerHTML=
+
+"🎉 واژه‌ای برای مرور نیست";
+
+
+return;
+
+
+}
+
+
+
+let word =
+
+list[
+Math.floor(
+Math.random()*list.length
+)
+];
+
+
+
+
+document.getElementById("flash")
+.innerHTML=
+
+
+`
+
+<h2>
+${word.kurmanci}
+</h2>
+
+
+<p>
+معنی:
+${word.persian}
+</p>
+
+
+<p>
+فونتیک:
+${word.phonetic}
+</p>
+
+
+`;
+
+
+
+
+// مرور بعدی
+
+word.review =
+
+Date.now()
++
+(24*60*60*1000);
+
+
+
+saveDatabase();
+
+
+
+}
+
+
+
+
+
+// ===============================
+// حساب مرکزی LangBlue
+// ===============================
+
+
+function checkAccount(){
+
+
+
+let account =
+
+localStorage.getItem(
+"langblue_account"
+);
+
+
+
+if(account){
+
+
+document.getElementById(
+"accountStatus"
+)
+.innerHTML=
+
+"🟢 حساب مرکزی فعال";
+
+
+
+document.getElementById(
+"economy"
+)
+.style.display="block";
+
+
+
+}
+
+else{
+
+
+document.getElementById(
+"accountStatus"
+)
+.innerHTML=
+
+"⚪ حالت مهمان";
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+// ===============================
+// شروع سیستم
+// ===============================
+
+
+renderTable();
+
+
+checkAccount();
+
+
+
+</script>
+
+
+</body>
+</html>
