@@ -1,35 +1,34 @@
 <!DOCTYPE html>
 <html lang="ku" dir="ltr">
 <head>
+<script src="langblue-commerce.js"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LangBlue · Kurmancî Learning</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LangBlue Kurmancî · Vocabulary Economy System</title>
 <style>
-:root{--bg:#f0f4fc;--card:#fff;--text:#1e293b;--blue:#1a4f8b;--border:#dde7f5}
-*{box-sizing:border-box}body{margin:0;padding:1.5rem;background:var(--bg);font-family:Segoe UI,sans-serif;color:var(--text)}.container{max-width:1200px;margin:auto;background:var(--card);padding:2rem;border-radius:2rem;box-shadow:0 20px 40px #0001}h1{border-bottom:3px solid var(--border);padding-bottom:1rem}.tabs{display:flex;gap:.5rem;flex-wrap:wrap}.tab{padding:.7rem 1.2rem;border:1px solid var(--border);border-radius:30px;background:white;cursor:pointer}.tab.active{background:var(--blue);color:white}.section{display:none;margin-top:1.5rem}.section.active{display:block}.card{padding:1rem;border:1px solid var(--border);border-radius:1rem;margin:.8rem 0;background:#fff}.word{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}.tag{color:var(--blue);font-weight:bold}@media(max-width:700px){.word{grid-template-columns:1fr}}
+:root{--bg:#f0f4fc;--card:#fff;--text:#1e293b;--blue:#1a4f8b;--border:#dde7f5;--green:#2b8c5e;--gold:#d9a441}
+*{box-sizing:border-box}body{background:var(--bg);font-family:Segoe UI,sans-serif;color:var(--text);padding:1.5rem}.container{max-width:1600px;margin:auto;background:var(--card);border:1px solid var(--border);border-radius:2.5rem;padding:2rem;box-shadow:0 20px 40px #0001}h1{background:#f8fbff;border-radius:1.5rem;padding:1rem;border:1px solid var(--border)}.tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin:1rem 0}.tab{border:1px solid var(--border);background:white;border-radius:40px;padding:.7rem 1.5rem;cursor:pointer}.tab.active{background:var(--blue);color:white}.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}.card{border:1px solid var(--border);border-radius:1.3rem;padding:1rem;background:white}.word{font-size:1.2rem;color:var(--blue);font-weight:bold}.meta{color:#64748b;font-size:.85rem}.eco{border-top:3px solid var(--green)}.commerce{border-top:3px solid var(--gold)}@media(max-width:800px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>🟦 Kurmancî <small>· LangBlue Language Platform</small></h1>
-<p>Kurmancî learning space: vocabulary, grammar, pronunciation and structured language research.</p>
+<h1>🟦 Kurmancî Learning Hub <small>· LangBlue Language Economy</small></h1>
+<p>سیستەمی فێربوون، وشە، گرامەر، و زانیاریی زمانێ کرمانجی لە ناو ئیکۆسیستەمی LangBlue.</p>
 <div class="tabs">
-<button class="tab active" onclick="showTab('vocab',this)">Vocabulary</button>
-<button class="tab" onclick="showTab('grammar',this)">Grammar</button>
-<button class="tab" onclick="showTab('phrases',this)">Phrases</button>
-<button class="tab" onclick="showTab('research',this)">Research</button>
+<button class="tab active" onclick="tab('vocab',this)">Vocabulary</button>
+<button class="tab" onclick="tab('grammar',this)">Grammar</button>
+<button class="tab" onclick="tab('economy',this)">Language Economy</button>
+<button class="tab" onclick="tab('research',this)">Research</button>
 </div>
-<section id="vocab" class="section active"><h2>Basic Vocabulary</h2><div class="word">
-<div class="card"><span class="tag">ez</span><br>من · I</div>
-<div class="card"><span class="tag">tu</span><br>تو · You</div>
-<div class="card"><span class="tag">mal</span><br>خانه · House</div>
-<div class="card"><span class="tag">av</span><br>آب · Water</div>
-<div class="card"><span class="tag">roj</span><br>روز · Day</div>
-<div class="card"><span class="tag">jîn</span><br>زندگی · Life</div>
-</div></section>
-<section id="grammar" class="section"><h2>Grammar System</h2><div class="card">Subject + Object + Verb structure is introduced with examples. Grammar modules will expand into tense, cases and agreement.</div></section>
-<section id="phrases" class="section"><h2>Common Expressions</h2><div class="card">Silav! — سلام</div><div class="card">Tu çawa yî? — حالت چطور است؟</div></section>
-<section id="research" class="section"><h2>Language Research</h2><div class="card">Designed following LangBlue principles: organized knowledge, transparent learning path and expandable linguistic data.</div></section>
+<div id="vocab" class="panel active"><h2>Structured Vocabulary Database</h2><div class="grid">
+<div class="card"><div class="word">ez</div><div>من · I</div><span class="meta">Pronoun</span></div>
+<div class="card"><div class="word">av</div><div>ئاو · Water</div><span class="meta">Noun</span></div>
+<div class="card"><div class="word">mal</div><div>ماڵ · House</div><span class="meta">Noun</span></div>
+<div class="card"><div class="word">roj</div><div>ڕۆژ · Day</div><span class="meta">Time</span></div>
+</div></div>
+<div id="grammar" class="panel"><h2>Grammar Engine</h2><div class="card">Modules: verbs, tenses, cases, sentence patterns and pronunciation rules.</div></div>
+<div id="economy" class="panel"><h2>Language Economy System</h2><div class="card eco"><b>Knowledge Value:</b> Each vocabulary item can become a structured digital asset with learning data, examples and user contribution.</div><div class="card commerce"><b>Commerce Layer:</b> Compatible with LangBlue central economic system for educational services, digital products and language resources.</div></div>
+<div id="research" class="panel"><h2>Research & References</h2><div class="card">Kurmancî linguistic data, historical notes and comparative language research will be organized here.</div></div>
 </div>
-<script>function showTab(id,btn){document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active')}</script>
+<script>function tab(id,b){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');b.classList.add('active')}</script>
 </body></html>
