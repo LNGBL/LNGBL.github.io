@@ -1,1 +1,35 @@
-<p>Kurmanci</p>
+<!DOCTYPE html>
+<html lang="ku" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LangBlue · Kurmancî Learning</title>
+<style>
+:root{--bg:#f0f4fc;--card:#fff;--text:#1e293b;--blue:#1a4f8b;--border:#dde7f5}
+*{box-sizing:border-box}body{margin:0;padding:1.5rem;background:var(--bg);font-family:Segoe UI,sans-serif;color:var(--text)}.container{max-width:1200px;margin:auto;background:var(--card);padding:2rem;border-radius:2rem;box-shadow:0 20px 40px #0001}h1{border-bottom:3px solid var(--border);padding-bottom:1rem}.tabs{display:flex;gap:.5rem;flex-wrap:wrap}.tab{padding:.7rem 1.2rem;border:1px solid var(--border);border-radius:30px;background:white;cursor:pointer}.tab.active{background:var(--blue);color:white}.section{display:none;margin-top:1.5rem}.section.active{display:block}.card{padding:1rem;border:1px solid var(--border);border-radius:1rem;margin:.8rem 0;background:#fff}.word{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}.tag{color:var(--blue);font-weight:bold}@media(max-width:700px){.word{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🟦 Kurmancî <small>· LangBlue Language Platform</small></h1>
+<p>Kurmancî learning space: vocabulary, grammar, pronunciation and structured language research.</p>
+<div class="tabs">
+<button class="tab active" onclick="showTab('vocab',this)">Vocabulary</button>
+<button class="tab" onclick="showTab('grammar',this)">Grammar</button>
+<button class="tab" onclick="showTab('phrases',this)">Phrases</button>
+<button class="tab" onclick="showTab('research',this)">Research</button>
+</div>
+<section id="vocab" class="section active"><h2>Basic Vocabulary</h2><div class="word">
+<div class="card"><span class="tag">ez</span><br>من · I</div>
+<div class="card"><span class="tag">tu</span><br>تو · You</div>
+<div class="card"><span class="tag">mal</span><br>خانه · House</div>
+<div class="card"><span class="tag">av</span><br>آب · Water</div>
+<div class="card"><span class="tag">roj</span><br>روز · Day</div>
+<div class="card"><span class="tag">jîn</span><br>زندگی · Life</div>
+</div></section>
+<section id="grammar" class="section"><h2>Grammar System</h2><div class="card">Subject + Object + Verb structure is introduced with examples. Grammar modules will expand into tense, cases and agreement.</div></section>
+<section id="phrases" class="section"><h2>Common Expressions</h2><div class="card">Silav! — سلام</div><div class="card">Tu çawa yî? — حالت چطور است؟</div></section>
+<section id="research" class="section"><h2>Language Research</h2><div class="card">Designed following LangBlue principles: organized knowledge, transparent learning path and expandable linguistic data.</div></section>
+</div>
+<script>function showTab(id,btn){document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active')}</script>
+</body></html>
