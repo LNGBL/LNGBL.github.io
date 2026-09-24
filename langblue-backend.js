@@ -13,6 +13,7 @@
  }
  async function activateCode(code,productIds){return invoke('activate-code',{code:String(code||'').trim(),productIds:Array.isArray(productIds)?productIds:[]});}
  window.LangBlueBackend={CONFIG,invoke,activateCode};
+                  setTimeout(()=>alert(typeof window.LangBlueBackend),1000);
                   alert("before export");
                   console.log("LangBlueBackend exporting", window.LangBlueBackend);
 })(window);
