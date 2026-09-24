@@ -2163,7 +2163,7 @@ function renderPricingIRT(grid, intro, howToBox, verifyBox, geo) {
     lockWarning.classList.add('hidden');
   }
 
-  document.getElementById('btnVerify').onclick = () => {
+  document.getElementById('btnVerify').onclick = async () => {
     const code = document.getElementById('verifyCode').value;
     const status = document.getElementById('verifyStatus');
     const res = Subscription.activate(code);
