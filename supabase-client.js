@@ -21,9 +21,29 @@ async function signUpLocal(username,password){
 async function signInLocal(username,password){
   const sb=getClient();
   if(!sb)return {ok:false,error:'SUPABASE_CLIENT_UNAVAILABLE'};
-  const {data,error}=await sb.auth.signInWithPassword({email:authEmail(username),password});
-  if(error)return {ok:false,error:error.message||'BACKEND_LOGIN_FAILED'};
-  return {ok:true,session:data&&data.session||null,user:data&&data.user||null};
+  const email=authEmail(username);
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(!error){
+    return {ok:true,session:data&&data.session||null,user:data&&data.user||null,created:false};
+  }
+
+  // Existing LangBlue local accounts predate Supabase Auth. On their first
+  // backend login, create the matching internal Auth identity automatically.
+  // The local password has already been verified by Auth.login().
+  const message=String(error.message||'');
+  if(/invalid login credentials/i.test(message)){
+    const created=await sb.auth.signUp({email,password});
+    if(!created.error){
+      return {
+        ok:true,
+        session:created.data&&created.data.session||null,
+        user:created.data&&created.data.user||null,
+        created:true
+      };
+    }
+  }
+
+  return {ok:false,error:message||'BACKEND_LOGIN_FAILED'};
 }
 async function signOut(){const sb=getClient();if(!sb)return false;await sb.auth.signOut();return true}
 async function getAuthSession(){const sb=getClient();if(!sb)return null;const {data}=await sb.auth.getSession();return data&&data.session||null}
