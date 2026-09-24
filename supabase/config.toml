@@ -1,4 +1,4 @@
-project_id = "langblue"
+project_id = "ocxeyponzzcvlrvwndji"
 
 [functions.activate-code]
 verify_jwt = true
