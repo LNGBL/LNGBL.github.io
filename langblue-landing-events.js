@@ -158,14 +158,17 @@
     const date=e.date || '';
     const discount=shared?shared.discount:0;
     const badge=discount?'<span class="event-badge">'+discount+'٪ تخفیف</span>':'';
-    return '<div class="event-row'+(active?' active':'')+'"><div class="event-main"><a class="event-name" href="'+wiki+'" target="_blank" rel="noopener noreferrer">'+e.title+'</a><span class="event-date">'+e.date+'</span></div>'+badge+'</div>';
+    return '<div class="event-row'+(active?' active':'')+'"><div class="event-main"><a class="event-name" href="'+wiki+'" target="_blank" rel="noopener noreferrer">'+e.title+'</a><span class="event-date">'+date+'</span></div>'+badge+'</div>';
   }
 
   function renderLists(now){
+    const iranEl=document.getElementById('iranOccasions');
+    const globalEl=document.getElementById('globalOccasions');
+    if(!iranEl && !globalEl) return;
     const j=jalali(now), i=islamic(now);
     const iran=[...iranSolar,...iranIslamic];
-    document.getElementById('iranOccasions').innerHTML=iran.map(e=>row(e,(e.when(j)||!!(i&&e.when(i))))).join('');
-    document.getElementById('globalOccasions').innerHTML=global.map(e=>row(e,e.when(now))).join('');
+    if(iranEl) iranEl.innerHTML=iran.map(e=>row(e,(e.when(j)||!!(i&&e.when(i))))).join('');
+    if(globalEl) globalEl.innerHTML=global.map(e=>row(e,e.when(now))).join('');
   }
 
   function renderCurrent(now){
