@@ -42,7 +42,7 @@
         if(reg && reg.showNotification){
           await reg.showNotification(ANNOUNCEMENT.title,{
             body:ANNOUNCEMENT.body,
-            icon:'favicon.ico',
+            icon:'/favicon.svg',
             tag:ANNOUNCEMENT.id,
             data:{url:ANNOUNCEMENT.url}
           });
