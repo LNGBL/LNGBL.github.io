@@ -838,6 +838,44 @@ const ForeignAccess = {
 /* ============================================================
    GRAPH
    ============================================================ */
+/* Central Store safety bridge.
+   langblue-core.js normally defines window.Store. This fallback prevents
+   Graph/Auth initialization from crashing if the core script is delayed,
+   blocked, or served from cache before the page script runs. */
+if (!window.Store) {
+  window.Store = {
+    _globalKeys: new Set(['accounts','session']),
+    _storageKey(key) {
+      key = String(key);
+      if (this._globalKeys.has(key)) return 'lb:' + key;
+      let session = null;
+      try { session = JSON.parse(localStorage.getItem('lb:session') || 'null'); } catch (e) {}
+      const uid = session && session.userId ? session.userId : 'anonymous';
+      return 'lb:user:' + uid + ':' + key;
+    },
+    get(key, fallback) {
+      if (fallback === undefined) fallback = null;
+      try {
+        const raw = localStorage.getItem(this._storageKey(key));
+        return raw === null ? fallback : JSON.parse(raw);
+      } catch (e) { return fallback; }
+    },
+    set(key, value) {
+      try { localStorage.setItem(this._storageKey(key), JSON.stringify(value)); } catch (e) {}
+      return value;
+    },
+    remove(key) {
+      try { localStorage.removeItem(this._storageKey(key)); } catch (e) {}
+    },
+    update(key, updater, fallback) {
+      const current = this.get(key, fallback);
+      const next = typeof updater === 'function' ? updater(current) : updater;
+      this.set(key, next);
+      return next;
+    }
+  };
+}
+
 const Graph = {
   nodes: Store.get('graph:nodes', {}),
   edges: Store.get('graph:edges', {}),
