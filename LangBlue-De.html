@@ -1437,10 +1437,10 @@ function _bindOverlays(){
       .catch(function(){_fallbackCopy(txt);});
     }catch(e){_fallbackCopy(txt);}
   });
-  E.cf.addEventListener("submit",function(e){
+  E.cf.addEventListener("submit",async function(e){
     e.preventDefault();
     var code=E.ic.value.trim();
-    var r=License.activate(code);
+    var r=await License.activate(code);
     if(r.ok){
       _toast("فعال شد! حالت شش‌گانه باز است ✦","success");
       E.ic.value="";_closePricing();
