@@ -98,7 +98,7 @@ ${order.totalStr}
       window.open(url, "_blank");
     };
 
-    document.getElementById("activateReceipt").onclick = function () {
+    document.getElementById("activateReceipt").onclick = async function () {
       if (!window.LangBlueCore || typeof window.LangBlueCore.hasPermission !== "function" ||
           !window.LangBlueCore.hasPermission()) {
         alert("ابتدا وارد حساب LangBlue شوید.");
@@ -110,7 +110,7 @@ ${order.totalStr}
 
       // The Core activation API accepts the activation code only.
       // Product IDs are already represented by the selected receipt/order.
-      var result = window.LangBlueCore.subscription.activate(code);
+      var result = await window.LangBlueCore.subscription.activateAsync(code, ids);
       if (!result.ok) {
         alert("❌ " + result.error);
         return;
