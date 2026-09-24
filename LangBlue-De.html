@@ -548,8 +548,8 @@ var License={
     return raw||{pro:false};
   },
   save:function(d){return window.LangBlueCore.storage.set("subscription",d);},
-  activate:function(code){
-    var result=window.LangBlueCore.subscription.activate(code);
+  activate:async function(code){
+    var result=await window.LangBlueCore.subscription.activateAsync(code, ['deutsch']);
     if(!result.ok)return {ok:false,message:result.error};
     return {ok:true,expiresAt:result.expiresAt,plan:result.plan};
   },
