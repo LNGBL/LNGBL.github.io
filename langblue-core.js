@@ -342,8 +342,12 @@
             verifiedAt: Date.now()
           });
           storage.set(subscriptionKey(), localSub);
-          return Object.assign({}, remote, {subscription:localSub, productIds:localSub.productIds});
-        }
+return Object.assign({}, remote, {
+  subscription: localSub,
+  plan: localSub.plan,
+  expiresAt: localSub.expiresAt,
+  productIds: localSub.productIds
+});        }
         if (remote && remote.error && remote.error !== 'BACKEND_NOT_ENABLED') return remote;
       }
       return this.activate(code, ids);
