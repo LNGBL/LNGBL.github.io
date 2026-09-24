@@ -13,4 +13,5 @@
  }
  async function activateCode(code,productIds){return invoke('activate-code',{code:String(code||'').trim(),productIds:Array.isArray(productIds)?productIds:[]});}
  window.LangBlueBackend={CONFIG,invoke,activateCode};
+                  alert("before export");
 })(window);
