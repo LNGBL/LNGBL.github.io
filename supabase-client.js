@@ -7,7 +7,7 @@ function authEmail(username){
   const bytes=new TextEncoder().encode(value);
   let binary='';
   for(let i=0;i<bytes.length;i++) binary+=String.fromCharCode(bytes[i]);
-  const token=btoa(binary).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');
+  const token=btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   return 'u-'+token+'@accounts.langblue.local';
 }
 async function signUpLocal(username,password){
