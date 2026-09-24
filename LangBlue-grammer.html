@@ -819,8 +819,13 @@ const ForeignAccess = {
   isUnlocked(){const s=this.state();return this.isForeign()&&s.synced&&s.shareDone&&s.commentDone;},
   async markShare(platform){
     if(!window.LangBlueSupabase)return{ok:false,error:'اتصال سرور در دسترس نیست.'};
-    const s={...this.state(),shareStarted:true,platform:platform||'unknown',shareAt:Date.now()};
-    const r=await window.LangBlueSupabase.saveAccess(s);
+const s={
+  ...this.state(),
+  shareStarted:true,
+  shareDone:true,
+  platform:platform||'unknown',
+  shareAt:Date.now()
+};    const r=await window.LangBlueSupabase.saveAccess(s);
     if(!r)return{ok:false,error:'اشتراک‌گذاری در سرور ثبت نشد. دوباره تلاش کن.'};
     const next={...s,shareDone:!!r.share_completed,synced:true}; Store.set(this.key(),next); Audit.log('foreign_share_recorded',{platform:next.platform}); return{ok:true,state:next};
   },
