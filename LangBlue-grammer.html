@@ -752,7 +752,7 @@ const Subscription = {
       Audit.log('verify_failed', { reason: result.error });
       return result;
     }
-    const activated = window.LangBlueCore.subscription.activate(result.code);
+    const activated = await window.LangBlueCore.subscription.activateAsync(result.code, ['grammar']);
     if (!activated.ok) return activated;
     RateLimit.reset('verify_code');
     Audit.log('subscription_activated', { planId: activated.plan.id, expiresAt: activated.expiresAt });
