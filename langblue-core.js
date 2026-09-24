@@ -73,6 +73,124 @@
 
   window.Store = Store;
 
+
+  /*
+   * Central local account/auth API shared by Grammar, Vocabulary and German.
+   * Accounts are intentionally local to this browser; no email or SMTP flow.
+   */
+  const Auth = {
+    _currentUser() {
+      const s = Store.get('session', null);
+      if (!s || !s.userId) return null;
+      return Store.get('user', null);
+    },
+
+    async init() {
+      // Migrate the older session shape when present.
+      const legacy = parseJSON(localStorage.getItem(ACCOUNT_KEY), null);
+      if (!Store.get('session', null) && legacy && legacy.id) {
+        Store.set('session', { userId: legacy.id, username: legacy.username || '' });
+        Store.set('user', legacy);
+      }
+      return this._currentUser();
+    },
+
+    isLoggedIn() {
+      return !!this._currentUser();
+    },
+
+    current() {
+      return this._currentUser();
+    },
+
+    async hashPassword(password) {
+      const value = String(password || '');
+      const saltBytes = new Uint8Array(16);
+      crypto.getRandomValues(saltBytes);
+      const salt = Array.from(saltBytes).map(b => b.toString(16).padStart(2,'0')).join('');
+      if (crypto.subtle) {
+        const enc = new TextEncoder();
+        const key = await crypto.subtle.importKey('raw', enc.encode(value), 'PBKDF2', false, ['deriveBits']);
+        const bits = await crypto.subtle.deriveBits(
+          {name:'PBKDF2', salt:enc.encode(salt), iterations:100000, hash:'SHA-256'},
+          key, 256
+        );
+        const hash = Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2,'0')).join('');
+        return {hash, salt};
+      }
+      // Very old browsers: keep a deterministic fallback so local accounts remain usable.
+      let h = 2166136261;
+      for (let i=0;i<value.length;i++) h = Math.imul(h ^ value.charCodeAt(i), 16777619);
+      return {hash:(h>>>0).toString(16), salt};
+    },
+
+    async verifyPassword(password, account) {
+      if (!account) return false;
+      if (account.passwordHash && account.salt && crypto.subtle) {
+        const enc = new TextEncoder();
+        const key = await crypto.subtle.importKey('raw', enc.encode(String(password || '')), 'PBKDF2', false, ['deriveBits']);
+        const bits = await crypto.subtle.deriveBits(
+          {name:'PBKDF2', salt:enc.encode(account.salt), iterations:100000, hash:'SHA-256'},
+          key, 256
+        );
+        const hash = Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2,'0')).join('');
+        return hash === account.passwordHash;
+      }
+      return account.password === String(password || '');
+    },
+
+    async register(data) {
+      const username = String(data && data.username || '').trim();
+      const key = username.toLowerCase();
+      const accounts = Store.get('accounts', {});
+      if (accounts[key]) return {ok:false, error:'این نام کاربری قبلاً استفاده شده است'};
+      const hashed = await this.hashPassword(data.password);
+      const now = Date.now();
+      const id = (crypto.randomUUID ? crypto.randomUUID() : 'lb-' + now + '-' + Math.random().toString(36).slice(2));
+      const user = {
+        id, name:String(data.name || '').trim(), sex:data.sex || '',
+        username, country:data.country || null, countryName:data.countryName || null,
+        currency:data.currency || null, at:now
+      };
+      accounts[key] = {
+        id:user.id, name:user.name, sex:user.sex, username:user.username,
+        country:user.country, countryName:user.countryName, currency:user.currency, at:now,
+        passwordHash:hashed.hash, salt:hashed.salt
+      };
+      Store.set('accounts', accounts);
+      Store.set('session', {userId:id, username});
+      Store.set('user', user);
+      return {ok:true, user};
+    },
+
+    async login(username, password) {
+      const key = String(username || '').trim().toLowerCase();
+      const accounts = Store.get('accounts', {});
+      const account = accounts[key];
+      if (!account || !(await this.verifyPassword(password, account))) {
+        return {ok:false, error:'نام کاربری یا رمز عبور نادرست است'};
+      }
+      const user = {
+        id:account.id, name:account.name || '', sex:account.sex || '',
+        username:account.username || username, country:account.country || null,
+        countryName:account.countryName || null, currency:account.currency || null,
+        at:account.at || Date.now()
+      };
+      Store.set('session', {userId:user.id, username:user.username});
+      Store.set('user', user);
+      return {ok:true, user};
+    },
+
+    async logout() {
+      Store.remove('session');
+      Store.remove('user');
+      return true;
+    }
+  };
+
+  window.Auth = Auth;
+
+
   function loadDB(){
     const stored = parseJSON(localStorage.getItem(DB_KEY), null);
     if (stored && stored.languages && typeof stored.languages === 'object') return stored;
