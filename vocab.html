@@ -3049,7 +3049,7 @@
                     var shared=window.LangBlueCommerce.displayPlan(p.id), shown=shared.discount?shared.finalPriceStr:p.price;
                     alert('📋 درخواست پلن «'+p.label+'» — '+shown+(shared.discount?' ('+shared.discount+'٪ تخفیف جشنواره‌ای)':'')+'\n\nمراحل تهیه:\n1) به کانال تلگرام @langBlue مراجعه کن\n2) به ادمین دایرکت پیام بده و بگو این پلن را می‌خواهی\n3) ادمین شماره کارت بانکی را می‌فرستد\n4) بعد از پرداخت، رسید را برای ادمین بفرست\n5) پس از تایید، کد تایید را دریافت کن\n6) کد را در بخش فعال‌سازی وارد کن');
                 },
-                activate:function(){
+                activate:async function(){
                     var code=document.getElementById('vocabVerifyCode').value.trim(), status=document.getElementById('vocabVerifyStatus');
                     var result=await window.LangBlueCore.subscription.activateAsync(code, ['vocabulary']);
                     if(!result.ok){status.innerHTML='<span style="color:var(--danger)">❌ '+result.error+'.</span>';return;}
