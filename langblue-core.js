@@ -350,7 +350,9 @@ return Object.assign({}, remote, {
 });        }
         if (remote && remote.error && remote.error !== 'BACKEND_NOT_ENABLED') return remote;
       }
-      return this.activate(code, ids);
+     alert("CALLING BACKEND");
+const remote = await backend.activateCode(code, ids);
+alert(JSON.stringify(remote));
     },
 
     current(){
