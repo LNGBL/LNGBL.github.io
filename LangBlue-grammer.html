@@ -2066,13 +2066,21 @@ window.ForeignAccessUI = {
       toast('کپی خودکار در این مرورگر در دسترس نیست.', 'warn');
     }
   },
+ForeignAccessUI.confirmShare();
 
-  async confirmShare(checked, platform='manual') {
-    if (!checked) return;
-    const res=await ForeignAccess.markShare(this.lastPlatform || platform);
-    if(!res.ok){const box=document.getElementById('shareConfirm');if(box)box.checked=false;toast(res.error,'error');return;}
-    renderPricing(); renderSubscriptionBanner();
-  },
+async confirmShare(platform='manual') {
+    const res = await ForeignAccess.markShare(this.lastPlatform || platform);
+
+    if (!res.ok) {
+        toast(res.error || 'ثبت اشتراک‌گذاری ناموفق بود.', 'error');
+        return;
+    }
+
+    toast('اشتراک‌گذاری با موفقیت ثبت شد ✅', 'success');
+
+    renderPricing();
+    renderSubscriptionBanner();
+},
 
   async submitComment() {
     const el=document.getElementById('foreignComment');
@@ -2102,7 +2110,7 @@ document.addEventListener('click', (event) => {
 });
 document.addEventListener('change', (event) => {
   const confirm = event.target.closest('[data-foreign-confirm]');
-  if (confirm) ForeignAccessUI.confirmShare(confirm.checked);
+  ForeignAccessUI.confirmShare();
 });
 
 function renderPricing() {
