@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<script src="langblue-commerce.js"></script>
-  <script src="langblue-backend.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="LangBlue is a language grammar platform for creating, organizing, learning, and exploring grammar rules, vocabulary, and language structures.">
@@ -2398,5 +2396,7 @@ window.addEventListener('storage', (event) => {
 
 setTimeout(async()=>{try{await ForeignAccess.sync();renderSubscriptionBanner();renderPricing();renderProfile();}catch(e){console.warn("[LangBlue] Supabase sync skipped:",e);}},1200);
 </script>
+  <script src="langblue-commerce.js"></script>
+  <script src="langblue-backend.js"></script>
 </body>
 </html>
