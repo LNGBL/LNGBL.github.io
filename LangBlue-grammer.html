@@ -743,7 +743,7 @@ const Subscription = {
     const plan = { ...result.plan, features: 'دسترسی کامل به Grammar + Vocabulary' };
     return { ...result, plan };
   },
-  activate(code) {
+  async activate(code) {
     const lockedMin = RateLimit.isLocked('verify_code');
     if (lockedMin > 0) return { ok:false, error:`به دلیل تلاش‌های ناموفق، ${lockedMin} دقیقه‌ی دیگه دوباره امتحان کن`, locked:true, lockedMin };
     const result = this.validateCode(code);
