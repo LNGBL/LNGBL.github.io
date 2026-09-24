@@ -95,7 +95,7 @@
       body:'امروز زمان این مناسبت در LangBlue است.',
       tag:'langblue-ceremony-'+e.key,
       renotify:true,
-      icon:'/favicon.ico',
+      icon:'/favicon.svg',
       dir:'rtl',
       lang:'fa'
     };
