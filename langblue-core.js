@@ -160,7 +160,13 @@
       Store.set('accounts', accounts);
       Store.set('session', {userId:id, username});
       Store.set('user', user);
-      return {ok:true, user};
+
+      const sbAuth = window.LangBlueSupabase;
+      let backendAuth = null;
+      if (window.LangBlueBackendConfig && window.LangBlueBackendConfig.enabled && sbAuth && typeof sbAuth.signUpLocal === 'function') {
+        backendAuth = await sbAuth.signUpLocal(username, String(data.password || ''));
+      }
+      return {ok:true, user, backendAuth};
     },
 
     async login(username, password) {
@@ -178,10 +184,20 @@
       };
       Store.set('session', {userId:user.id, username:user.username});
       Store.set('user', user);
-      return {ok:true, user};
+
+      const sbAuth = window.LangBlueSupabase;
+      let backendAuth = null;
+      if (window.LangBlueBackendConfig && window.LangBlueBackendConfig.enabled && sbAuth && typeof sbAuth.signInLocal === 'function') {
+        backendAuth = await sbAuth.signInLocal(user.username, String(password || ''));
+      }
+      return {ok:true, user, backendAuth};
     },
 
     async logout() {
+      const sbAuth = window.LangBlueSupabase;
+      if (window.LangBlueBackendConfig && window.LangBlueBackendConfig.enabled && sbAuth && typeof sbAuth.signOut === 'function') {
+        await sbAuth.signOut();
+      }
       Store.remove('session');
       Store.remove('user');
       return true;
