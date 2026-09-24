@@ -14,6 +14,65 @@
     }
   }
 
+  /*
+   * Central local-first storage used by Grammar, Vocabulary and German.
+   *
+   * Global data:
+   *   lb:accounts / lb:session
+   *
+   * User data:
+   *   lb:user:<userId>:<key>
+   *
+   * This object is intentionally exposed as window.Store because the existing
+   * Grammar page and parts of Vocabulary use Store directly.
+   */
+  const Store = {
+    _globalKeys: new Set(['accounts', 'session']),
+
+    _storageKey(key){
+      key = String(key);
+      if (this._globalKeys.has(key)) return STORAGE_PREFIX + key;
+
+      const session = parseJSON(localStorage.getItem(SESSION_KEY), null);
+      const uid = session && session.userId ? session.userId : 'anonymous';
+      return STORAGE_PREFIX + 'user:' + uid + ':' + key;
+    },
+
+    get(key, fallback){
+      if (fallback === undefined) fallback = null;
+      try {
+        const raw = localStorage.getItem(this._storageKey(key));
+        return raw === null ? fallback : JSON.parse(raw);
+      } catch (e) {
+        console.warn('LangBlue Store.get failed:', key, e);
+        return fallback;
+      }
+    },
+
+    set(key, value){
+      try {
+        localStorage.setItem(this._storageKey(key), JSON.stringify(value));
+        return value;
+      } catch (e) {
+        console.warn('LangBlue Store.set failed:', key, e);
+        return value;
+      }
+    },
+
+    remove(key){
+      try { localStorage.removeItem(this._storageKey(key)); } catch (e) {}
+    },
+
+    update(key, updater, fallback){
+      const current = this.get(key, fallback);
+      const next = typeof updater === 'function' ? updater(current) : updater;
+      this.set(key, next);
+      return next;
+    }
+  };
+
+  window.Store = Store;
+
   function loadDB(){
     const stored = parseJSON(localStorage.getItem(DB_KEY), null);
     if (stored && stored.languages && typeof stored.languages === 'object') return stored;
@@ -83,11 +142,16 @@
 
   function words(language){ return getLanguage(language).words; }
 
+  /*
+   * Keep the newer API as a compatibility layer. It now follows the same
+   * per-user storage rules as Store instead of writing subscriptions/data
+   * into one shared browser-wide key.
+   */
   const storage = {
-    key(key){ return STORAGE_PREFIX + String(key); },
-    get(key, fallback){ return parseJSON(localStorage.getItem(this.key(key)), fallback); },
-    set(key, value){ localStorage.setItem(this.key(key), JSON.stringify(value)); return value; },
-    remove(key){ localStorage.removeItem(this.key(key)); }
+    key(key){ return Store._storageKey(key); },
+    get(key, fallback){ return Store.get(key, fallback); },
+    set(key, value){ return Store.set(key, value); },
+    remove(key){ return Store.remove(key); }
   };
 
   function subscriptionKey(){ return 'subscription'; }
@@ -101,10 +165,12 @@
       if (!plan) return {ok:false, error:'کد فعال‌سازی نامعتبر است.'};
       return {ok:true, code:normalized, plan:Object.assign({}, plan)};
     },
+
     activate(code){
       if (!hasPermission()) return {ok:false, error:'ACCOUNT_REQUIRED'};
       const result = this.validateCode(code);
       if (!result.ok) return result;
+
       const now = Date.now();
       const sub = {
         planId: result.plan.id,
@@ -115,12 +181,15 @@
         expiresAt: now + Number(result.plan.days || 0) * 86400000,
         expired: false
       };
+
       storage.set(subscriptionKey(), sub);
       storage.set('used_codes', Object.assign(storage.get('used_codes', {}), {
         [result.code]: {planId: sub.planId, usedAt: now}
       }));
+
       return {ok:true, plan:result.plan, expiresAt:sub.expiresAt, subscription:sub};
     },
+
     current(){
       const sub = storage.get(subscriptionKey(), null);
       if (!sub) return null;
