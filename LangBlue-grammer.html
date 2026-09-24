@@ -2066,8 +2066,6 @@ window.ForeignAccessUI = {
       toast('کپی خودکار در این مرورگر در دسترس نیست.', 'warn');
     }
   },
-ForeignAccessUI.confirmShare();
-
 async confirmShare(platform='manual') {
     const res = await ForeignAccess.markShare(this.lastPlatform || platform);
 
