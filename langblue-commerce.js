@@ -118,9 +118,9 @@ return Number(n||0)
 
 
 
-function activeFestival(){
+function activeFestival(date){
 
-var d=new Date();
+var d = date instanceof Date ? date : new Date();
 
 
 for(
