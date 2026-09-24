@@ -2030,16 +2030,36 @@ window.ForeignAccessUI = {
       if (navigator.share) {
         try {
           await navigator.share({title:'LangBlue', text, url});
-          this.confirmShare(true, platform);
+          const result = await ForeignAccess.markShare(platform);
+          if (!result.ok) {
+            toast(result.error, 'error');
+            return;
+          }
+          toast('مرحله اشتراک‌گذاری ثبت شد. ✅', 'success');
+          renderPricing();
+          renderSubscriptionBanner();
           return;
-        } catch (e) {}
+        } catch (e) {
+          // User cancelled native sharing; do not mark the step complete.
+          if (e?.name === 'AbortError') return;
+        }
       }
       await navigator.clipboard?.writeText(url).catch(()=>{});
       target = 'https://mastodon.social/';
       toast('لینک کپی شد؛ آن را در Mastodon منتشر کن.', 'success');
     }
 
-    if (target) window.open(target, '_blank', 'noopener,noreferrer');
+    if (target) {
+      window.open(target, '_blank', 'noopener,noreferrer');
+      const result = await ForeignAccess.markShare(platform);
+      if (!result.ok) {
+        toast(result.error || 'ثبت مرحله اشتراک‌گذاری ناموفق بود.', 'error');
+        return;
+      }
+      toast('مرحله اشتراک‌گذاری ثبت شد. ✅', 'success');
+      renderPricing();
+      renderSubscriptionBanner();
+    }
   },
 
   async copyLink() {
