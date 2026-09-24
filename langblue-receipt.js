@@ -27,7 +27,7 @@
       return;
     }
 
-    var isBundle = selectedPlan() === "irt_12m" && ids.length === 4;
+    var isBundle = window.LangBlueCommerce.isAllProducts12M(ids, selectedPlan());
     var discount = isBundle
       ? (window.LangBlueCommerce.ALL_PRODUCTS_12M_DISCOUNT || 15)
       : 0;
@@ -49,7 +49,7 @@
       return;
     }
 
-    var order = window.LangBlueCommerce.buildOrder(ids, selectedPlan());
+    var order = window.LangBlueCommerce.buildOrder(ids, selectedPlan());\n    if (!order) {\n      renderSummary();\n      return;\n    }
     var output = document.getElementById("receiptOutput");
     var date = new Date(order.createdAt).toLocaleString("fa-IR");
 
