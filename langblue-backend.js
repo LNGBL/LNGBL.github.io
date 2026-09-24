@@ -30,17 +30,20 @@ async function invoke(name, body) {
 
     alert("CALLING_FUNCTION");
 
-    const { data, error } = await sb.functions.invoke(name, {
-      body: body
-    });
+console.log("BEFORE INVOKE:", name, body);
 
-    console.log("FUNCTION RESULT:", {
-      name,
-      body,
-      data,
-      error
-    });
+const { data, error } = await sb.functions.invoke(name, {
+  body: body
+});
 
+console.log("AFTER INVOKE:", { data, error });
+
+console.log("FUNCTION RESULT:", {
+  name,
+  body,
+  data,
+  error
+});
     alert(
       error
         ? "FUNCTION_ERROR: " + error.message
