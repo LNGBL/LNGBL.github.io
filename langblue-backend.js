@@ -1,6 +1,7 @@
 /* LangBlue backend bridge. No secret keys are stored here. */
 (function(window){'use strict';
  const CONFIG=Object.assign({enabled:false,supabaseUrl:'https://ocxeyponzzcvlrvwndji.supabase.co'},window.LangBlueBackendConfig||{});
+ window.LangBlueBackendConfig=CONFIG;
  async function invoke(name,body){
   if(!CONFIG.enabled)return{ok:false,error:'BACKEND_NOT_ENABLED'};
   const sb=window.LangBlueSupabase&&window.LangBlueSupabase.getClient?window.LangBlueSupabase.getClient():null;
