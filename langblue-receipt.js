@@ -49,7 +49,11 @@
       return;
     }
 
-    var order = window.LangBlueCommerce.buildOrder(ids, selectedPlan());\n    if (!order) {\n      renderSummary();\n      return;\n    }
+    var order = window.LangBlueCommerce.buildOrder(ids, selectedPlan());
+    if (!order) {
+      renderSummary();
+      return;
+    }
     var output = document.getElementById("receiptOutput");
     var date = new Date(order.createdAt).toLocaleString("fa-IR");
 
