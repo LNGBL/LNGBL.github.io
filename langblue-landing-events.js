@@ -154,9 +154,11 @@
 
   function row(e,active=false){
     const shared=window.LangBlueCommerce&&window.LangBlueCommerce.FESTIVALS.find(x=>x.key===e.key);
+    const wiki=WIKI[e.key] || '#';
+    const date=e.date || '';
     const discount=shared?shared.discount:0;
     const badge=discount?'<span class="event-badge">'+discount+'٪ تخفیف</span>':'';
-    return '<div class="event-row'+(active?' active':'')+'"><div class="event-main"><a class="event-name" href="'+e.wiki+'" target="_blank" rel="noopener noreferrer">'+e.title+'</a><span class="event-date">'+e.date+'</span></div>'+badge+'</div>';
+    return '<div class="event-row'+(active?' active':'')+'"><div class="event-main"><a class="event-name" href="'+wiki+'" target="_blank" rel="noopener noreferrer">'+e.title+'</a><span class="event-date">'+e.date+'</span></div>'+badge+'</div>';
   }
 
   function renderLists(now){
