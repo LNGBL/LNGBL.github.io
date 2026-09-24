@@ -3051,7 +3051,7 @@
                 },
                 activate:function(){
                     var code=document.getElementById('vocabVerifyCode').value.trim(), status=document.getElementById('vocabVerifyStatus');
-                    var result=window.LangBlueCore.subscription.activate(code);
+                    var result=await window.LangBlueCore.subscription.activateAsync(code, ['vocabulary']);
                     if(!result.ok){status.innerHTML='<span style="color:var(--danger)">❌ '+result.error+'.</span>';return;}
                     status.innerHTML='<span style="color:var(--success)">✅ اشتراک فعال شد.</span>';
                     this.open(this.pending);
