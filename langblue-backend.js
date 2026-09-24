@@ -1,6 +1,5 @@
 /* LangBlue backend bridge. No secret keys are stored here. */
 (function(window){'use strict';
-                  alert("langblue-backend loaded");
  const CONFIG=Object.assign({enabled:true,supabaseUrl:'https://ocxeyponzzcvlrvwndji.supabase.co'},window.LangBlueBackendConfig||{});
  window.LangBlueBackendConfig=CONFIG;
  async function invoke(name,body){
@@ -14,6 +13,5 @@
  async function activateCode(code,productIds){return invoke('activate-code',{code:String(code||'').trim(),productIds:Array.isArray(productIds)?productIds:[]});}
  window.LangBlueBackend={CONFIG,invoke,activateCode};
                   setTimeout(()=>alert(typeof window.LangBlueBackend),1000);
-                  alert("before export");
                   console.log("LangBlueBackend exporting", window.LangBlueBackend);
 })(window);
