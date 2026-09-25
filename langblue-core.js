@@ -1831,30 +1831,13 @@
    */
 
 
-  window.LangBlueCore =
-    LangBlueCore;
+window.LangBlueSubscription = subscription;
 
-
-
-  window.Store =
-    Store;
-
-
-
-  window.Auth =
-    Auth;
-
-
-
-  window.LangBlueSubscription =
-    LangBlueSubscription;
-
-
-
-  window.LangBlueStorage =
-    storage;
-
-
+window.LangBlueCore = {
+  Store: Store,
+  Auth: Auth,
+  Subscription: window.LangBlueSubscription
+};
 
   /*
    * Optional aliases for old code
