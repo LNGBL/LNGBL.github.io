@@ -290,9 +290,10 @@
 
   function subscriptionKey(){ return 'subscription'; }
 
-  const subscription = {
+ const subscription = {
 
   validateCode(code){
+
     const normalized = String(code || '').trim();
 
     const commerce = window.LangBlueCommerce;
@@ -307,12 +308,14 @@
         ? commerce.PLANS[planId]
         : null;
 
-    if (!plan) {
+
+    if(!plan){
       return {
         ok:false,
-        error:'کد فعال‌سازی نامعتبر است.'
+        error:"کد فعال‌سازی نامعتبر است."
       };
     }
+
 
     return {
       ok:true,
@@ -320,6 +323,181 @@
       plan:Object.assign({}, plan)
     };
   },
+
+
+  activate(code, productIds){
+
+    if(!hasPermission()){
+      return {
+        ok:false,
+        error:"ACCOUNT_REQUIRED"
+      };
+    }
+
+
+    const result=this.validateCode(code);
+
+    if(!result.ok){
+      return result;
+    }
+
+
+    const now=Date.now();
+
+    const ids =
+      Array.isArray(productIds)
+      ? productIds.filter(Boolean)
+      : [];
+
+
+    const subscriptionData={
+
+      planId:result.plan.id,
+
+      plan:result.plan,
+
+      productIds:ids,
+
+      verifiedByCode:true,
+
+      verifiedAt:now,
+
+      activatedAt:now,
+
+      expiresAt:
+        now +
+        Number(result.plan.days || 0) * 86400000
+    };
+
+
+    storage.set(
+      subscriptionKey(),
+      subscriptionData
+    );
+
+
+    return {
+      ok:true,
+      plan:result.plan,
+      productIds:ids,
+      expiresAt:subscriptionData.expiresAt,
+      subscription:subscriptionData
+    };
+
+  },
+
+
+  async activateAsync(code, productIds){
+
+    if(!hasPermission()){
+      return {
+        ok:false,
+        error:"ACCOUNT_REQUIRED"
+      };
+    }
+
+
+    const ids =
+      Array.isArray(productIds)
+      ? productIds.filter(Boolean)
+      : [];
+
+
+    const backend =
+      window.LangBlueBackend;
+
+
+    if(
+      backend &&
+      typeof backend.activateCode === "function" &&
+      backend.CONFIG &&
+      backend.CONFIG.enabled
+    ){
+
+      console.log(
+        "CALLING BACKEND",
+        code,
+        ids
+      );
+
+
+      try {
+
+        const remote =
+          await backend.activateCode(code, ids);
+
+
+        console.log(
+          "BACKEND RESULT",
+          remote
+        );
+
+
+        if(remote && remote.ok){
+
+          storage.set(
+            subscriptionKey(),
+            remote.subscription || remote
+          );
+
+
+          return remote;
+        }
+
+
+        if(remote && remote.error){
+          return remote;
+        }
+
+
+      } catch(error){
+
+        console.error(
+          "BACKEND ACTIVATION ERROR",
+          error
+        );
+
+        return {
+          ok:false,
+          error:error.message
+        };
+      }
+
+    }
+
+
+    return this.activate(code, ids);
+
+  },
+
+
+  current(){
+
+    const sub =
+      storage.get(
+        subscriptionKey(),
+        null
+      );
+
+
+    if(!sub){
+      return null;
+    }
+
+
+    return Object.assign(
+      {},
+      sub,
+      {
+        expired:
+          sub.expiresAt &&
+          Date.now() >= Number(sub.expiresAt)
+      }
+    );
+
+  }
+
+};
 
 
   activate(code, productIds){
@@ -546,7 +724,7 @@
     typeof backend.activateCode === 'function' &&
     backend.CONFIG &&
     backend.CONFIG.enabled
-  ) {
+  ) async activateAsync(code, productIds) {{
 
     const remote = await backend.activateCode(code, ids);
 
@@ -630,29 +808,7 @@ alert(JSON.stringify(remote));
     }
   };
 
-const subscription = {
 
-  validateCode(code) {
-    const normalized = String(code || '').trim();
-
-    const commerce = window.LangBlueCommerce;
-
-    const planId =
-      commerce && commerce.CODES
-        ? commerce.CODES[normalized]
-        : null;
-
-    const plan =
-      planId && commerce.PLANS
-        ? commerce.PLANS[planId]
-        : null;
-
-    if (!plan) {
-      return {
-        ok: false,
-        error: 'کد فعال‌سازی نامعتبر است.'
-      };
-    }
 
     return {
       ok: true,
