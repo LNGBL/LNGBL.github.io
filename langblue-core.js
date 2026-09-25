@@ -1836,6 +1836,14 @@ window.LangBlueSubscription = subscription;
 window.LangBlueCore = {
   Store: Store,
   Auth: Auth,
+  storage: storage,
+
+  addWord: addWord,
+  updateWord: updateWord,
+  deleteWord: deleteWord,
+  words: words,
+
+  subscription: window.LangBlueSubscription,
   Subscription: window.LangBlueSubscription
 };
 
