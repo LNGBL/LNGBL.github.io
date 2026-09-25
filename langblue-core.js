@@ -291,48 +291,249 @@
   function subscriptionKey(){ return 'subscription'; }
 
   const subscription = {
-    validateCode(code){
-      const normalized = String(code || '').trim();
-      const commerce = window.LangBlueCommerce;
-      const planId = commerce && commerce.CODES ? commerce.CODES[normalized] : null;
-      const plan = planId && commerce.PLANS ? commerce.PLANS[planId] : null;
-      if (!plan) return {ok:false, error:'کد فعال‌سازی نامعتبر است.'};
-      return {ok:true, code:normalized, plan:Object.assign({}, plan)};
-    },
 
-    activate(code, productIds){
-      if (!hasPermission()) return {ok:false, error:'ACCOUNT_REQUIRED'};
-      const result = this.validateCode(code);
-      if (!result.ok) return result;
+  validateCode(code){
+    const normalized = String(code || '').trim();
 
-      const now = Date.now();
-      const ids = Array.isArray(productIds) ? productIds.filter(Boolean) : [];
-      const sub = {
-        planId: result.plan.id,
-        plan: result.plan,
-        productIds: ids,
-        verifiedByCode: true,
-        verifiedAt: now,
-        activatedAt: now,
-        expiresAt: now + Number(result.plan.days || 0) * 86400000,
-        expired: false
+    const commerce = window.LangBlueCommerce;
+
+    const planId =
+      commerce && commerce.CODES
+        ? commerce.CODES[normalized]
+        : null;
+
+    const plan =
+      planId && commerce.PLANS
+        ? commerce.PLANS[planId]
+        : null;
+
+    if (!plan) {
+      return {
+        ok:false,
+        error:'کد فعال‌سازی نامعتبر است.'
       };
+    }
 
-      storage.set(subscriptionKey(), sub);
-      storage.set('used_codes', Object.assign(storage.get('used_codes', {}), {
-        [result.code]: {planId: sub.planId, productIds: ids, usedAt: now}
-      }));
-
-      return {ok:true, plan:result.plan, productIds:ids, expiresAt:sub.expiresAt, subscription:sub};
-    },
-
-   async activateAsync(code, productIds){
-  if (!hasPermission()) {
     return {
-      ok:false,
-      error:'ACCOUNT_REQUIRED'
+      ok:true,
+      code:normalized,
+      plan:Object.assign({}, plan)
     };
+  },
+
+
+  activate(code, productIds){
+
+    if (!hasPermission()) {
+      return {
+        ok:false,
+        error:'ACCOUNT_REQUIRED'
+      };
+    }
+
+
+    const result = this.validateCode(code);
+
+    if (!result.ok) {
+      return result;
+    }
+
+
+    const now = Date.now();
+
+    const ids = Array.isArray(productIds)
+      ? productIds.filter(Boolean)
+      : [];
+
+
+    const sub = {
+
+      planId:result.plan.id,
+
+      plan:result.plan,
+
+      productIds:ids,
+
+      verifiedByCode:true,
+
+      verifiedAt:now,
+
+      activatedAt:now,
+
+      expiresAt:
+        now + Number(result.plan.days || 0) * 86400000,
+
+      expired:false
+    };
+
+
+    storage.set(subscriptionKey(), sub);
+
+
+    storage.set(
+      'used_codes',
+      Object.assign(
+        storage.get('used_codes', {}),
+        {
+          [result.code]:{
+            planId:sub.planId,
+            productIds:ids,
+            usedAt:now
+          }
+        }
+      )
+    );
+
+
+    return {
+      ok:true,
+      plan:result.plan,
+      productIds:ids,
+      expiresAt:sub.expiresAt,
+      subscription:sub
+    };
+  },
+
+
+  async activateAsync(code, productIds){
+
+    if (!hasPermission()) {
+      return {
+        ok:false,
+        error:'ACCOUNT_REQUIRED'
+      };
+    }
+
+
+    const ids = Array.isArray(productIds)
+      ? productIds.filter(Boolean)
+      : [];
+
+
+    const backend = window.LangBlueBackend;
+
+
+    if (
+      backend &&
+      typeof backend.activateCode === 'function' &&
+      backend.CONFIG &&
+      backend.CONFIG.enabled
+    ){
+
+      const remote =
+        await backend.activateCode(code, ids);
+
+
+      console.log(
+        "BACKEND ACTIVATION RESULT:",
+        remote
+      );
+
+
+      if (remote && remote.ok){
+
+        const remoteSub =
+          remote.subscription || {};
+
+
+        const localSub = Object.assign(
+          {},
+          remoteSub,
+          {
+
+            planId:
+              remote.plan && remote.plan.id
+                ? remote.plan.id
+                : remoteSub.planId,
+
+
+            plan:
+              remote.plan ||
+              remoteSub.plan ||
+              null,
+
+
+            productIds:
+              Array.isArray(remoteSub.product_ids)
+                ? remoteSub.product_ids
+                :
+                (
+                  Array.isArray(remoteSub.productIds)
+                    ? remoteSub.productIds
+                    : ids
+                ),
+
+
+            verifiedByCode:true,
+
+            verifiedAt:Date.now()
+          }
+        );
+
+
+        storage.set(
+          subscriptionKey(),
+          localSub
+        );
+
+
+        return Object.assign(
+          {},
+          remote,
+          {
+            subscription:localSub,
+
+            plan:localSub.plan,
+
+            expiresAt:localSub.expiresAt,
+
+            productIds:localSub.productIds
+          }
+        );
+      }
+
+
+      if (
+        remote &&
+        remote.error &&
+        remote.error !== 'BACKEND_NOT_ENABLED'
+      ){
+        return remote;
+      }
+    }
+
+
+    // اگر Backend در دسترس نبود، فعال‌سازی محلی
+    return this.activate(code, ids);
+  },
+
+
+  current(){
+
+    const sub =
+      storage.get(subscriptionKey(), null);
+
+
+    if (!sub) {
+      return null;
+    }
+
+
+    const expired =
+      !sub.expiresAt ||
+      Date.now() >= Number(sub.expiresAt);
+
+
+    return Object.assign(
+      {},
+      sub,
+      {
+        expired
+      }
+    );
   }
+
+};
 
   const ids = Array.isArray(productIds)
     ? productIds.filter(Boolean)
