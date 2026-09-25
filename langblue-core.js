@@ -326,21 +326,87 @@
       return {ok:true, plan:result.plan, productIds:ids, expiresAt:sub.expiresAt, subscription:sub};
     },
 
-    async activateAsync(code, productIds){
-      if (!hasPermission()) return {ok:false, error:'ACCOUNT_REQUIRED'};
-      const ids = Array.isArray(productIds) ? productIds.filter(Boolean) : [];
-      const backend = window.LangBlueBackend;
-      if (backend && typeof backend.activateCode === 'function' && backend.CONFIG && backend.CONFIG.enabled) {
-        const remote = await backend.activateCode(code, ids);
-        if (remote && remote.ok) {
-          const remoteSub = remote.subscription || {};
-          const localSub = Object.assign({}, remoteSub, {
-            planId: remote.plan && remote.plan.id ? remote.plan.id : remoteSub.planId,
-            plan: remote.plan || remoteSub.plan || null,
-            productIds: Array.isArray(remoteSub.product_ids) ? remoteSub.product_ids : (Array.isArray(remoteSub.productIds) ? remoteSub.productIds : ids),
-            verifiedByCode: true,
-            verifiedAt: Date.now()
-          });
+   async activateAsync(code, productIds){
+  if (!hasPermission()) {
+    return {
+      ok:false,
+      error:'ACCOUNT_REQUIRED'
+    };
+  }
+
+  const ids = Array.isArray(productIds)
+    ? productIds.filter(Boolean)
+    : [];
+
+  const backend = window.LangBlueBackend;
+
+  if (
+    backend &&
+    typeof backend.activateCode === 'function' &&
+    backend.CONFIG &&
+    backend.CONFIG.enabled
+  ) {
+
+    const remote = await backend.activateCode(code, ids);
+
+    console.log("BACKEND ACTIVATION RESULT:", remote);
+
+
+    if (remote && remote.ok) {
+
+      const remoteSub = remote.subscription || {};
+
+      const localSub = Object.assign({}, remoteSub, {
+
+        planId:
+          remote.plan && remote.plan.id
+            ? remote.plan.id
+            : remoteSub.planId,
+
+        plan:
+          remote.plan ||
+          remoteSub.plan ||
+          null,
+
+        productIds:
+          Array.isArray(remoteSub.product_ids)
+            ? remoteSub.product_ids
+            : (
+                Array.isArray(remoteSub.productIds)
+                  ? remoteSub.productIds
+                  : ids
+              ),
+
+        verifiedByCode:true,
+        verifiedAt:Date.now()
+      });
+
+
+      storage.set(subscriptionKey(), localSub);
+
+
+      return Object.assign({}, remote, {
+        subscription:localSub,
+        plan:localSub.plan,
+        expiresAt:localSub.expiresAt,
+        productIds:localSub.productIds
+      });
+    }
+
+
+    if (
+      remote &&
+      remote.error &&
+      remote.error !== 'BACKEND_NOT_ENABLED'
+    ) {
+      return remote;
+    }
+  }
+
+
+  // fallback local activation
+  return this.activate(code, ids);
+},);
           storage.set(subscriptionKey(), localSub);
 return Object.assign({}, remote, {
   subscription: localSub,
