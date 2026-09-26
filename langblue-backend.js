@@ -147,10 +147,23 @@
 
 
 
+  async function signOut(){
+    const sb =
+      window.LangBlueSupabase &&
+      typeof window.LangBlueSupabase.getClient === "function"
+        ? window.LangBlueSupabase.getClient()
+        : null;
+    if(sb){
+      try{ await sb.auth.signOut(); }catch(e){}
+    }
+    return true;
+  }
+
   window.LangBlueBackend = {
     CONFIG,
     invoke,
-    activateCode
+    activateCode,
+    signOut
   };
 
 
