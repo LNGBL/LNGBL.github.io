@@ -10,40 +10,45 @@ function authEmail(username){
   const token=btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   return 'u-'+token+'@accounts.langblue.local';
 }
-async function signUpLocal(username,password){
+async function invokeAuth(action, username, password, profile){
   const sb=getClient();
   if(!sb)return {ok:false,error:'SUPABASE_CLIENT_UNAVAILABLE'};
-  const email=authEmail(username);
-  const {data,error}=await sb.auth.signUp({email,password});
-  if(error)return {ok:false,error:error.message||'BACKEND_SIGNUP_FAILED'};
-  return {ok:true,session:data&&data.session||null,user:data&&data.user||null,confirmationRequired:!!(data&&data.user&&!data.session)};
-}
-async function signInLocal(username,password){
-  const sb=getClient();
-  if(!sb)return {ok:false,error:'SUPABASE_CLIENT_UNAVAILABLE'};
-  const email=authEmail(username);
-  const {data,error}=await sb.auth.signInWithPassword({email,password});
-  if(!error){
-    return {ok:true,session:data&&data.session||null,user:data&&data.user||null,created:false};
-  }
-
-  // Existing LangBlue local accounts predate Supabase Auth. On their first
-  // backend login, create the matching internal Auth identity automatically.
-  // The local password has already been verified by Auth.login().
-  const message=String(error.message||'');
-  if(/invalid login credentials/i.test(message)){
-    const created=await sb.auth.signUp({email,password});
-    if(!created.error){
-      return {
-        ok:true,
-        session:created.data&&created.data.session||null,
-        user:created.data&&created.data.user||null,
-        created:true
-      };
+  const url=URL + '/functions/v1/langblue-auth';
+  try{
+    const response=await fetch(url,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':KEY
+      },
+      body:JSON.stringify({
+        action,
+        username,
+        password,
+        profile:profile || {}
+      })
+    });
+    const data=await response.json().catch(()=>null);
+    if(!response.ok || !data || !data.ok){
+      return {ok:false,error:data&&data.error || 'BACKEND_AUTH_FAILED'};
     }
+    if(data.session && data.session.access_token && data.session.refresh_token){
+      const {error}=await sb.auth.setSession({
+        access_token:data.session.access_token,
+        refresh_token:data.session.refresh_token
+      });
+      if(error)return {ok:false,error:error.message||'SESSION_SETUP_FAILED'};
+    }
+    return data;
+  }catch(error){
+    return {ok:false,error:error.message||'BACKEND_AUTH_FAILED'};
   }
-
-  return {ok:false,error:message||'BACKEND_LOGIN_FAILED'};
+}
+async function signUpLocal(username,password,profile){
+  return invokeAuth('signup',username,password,profile);
+}
+async function signInLocal(username,password,profile){
+  return invokeAuth('login',username,password,profile);
 }
 async function signOut(){const sb=getClient();if(!sb)return false;await sb.auth.signOut();return true}
 async function getAuthSession(){const sb=getClient();if(!sb)return null;const {data}=await sb.auth.getSession();return data&&data.session||null}
