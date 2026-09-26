@@ -734,24 +734,20 @@ const RateLimit = {
    ============================================================ */
 const Subscription = {
   validateCode(code) {
-    const result = window.LangBlueCore.subscription.validateCode(code);
-    if (!result.ok) {
-      Audit.log('invalid_code_attempt', { code: String(code || '').trim().slice(0, 10) + '...' });
-      return result;
-    }
-    const plan = { ...result.plan, features: 'دسترسی کامل به Grammar + Vocabulary' };
-    return { ...result, plan };
+    const normalized = String(code || '').trim();
+    if (!normalized) return { ok:false, error:'CODE_REQUIRED' };
+    return { ok:true, code:normalized };
   },
   async activate(code) {
     const lockedMin = RateLimit.isLocked('verify_code');
     if (lockedMin > 0) return { ok:false, error:`به دلیل تلاش‌های ناموفق، ${lockedMin} دقیقه‌ی دیگه دوباره امتحان کن`, locked:true, lockedMin };
-    const result = this.validateCode(code);
-    if (!result.ok) {
+    const normalized = String(code || '').trim();
+    if (!normalized) {
       RateLimit.recordFailure('verify_code');
-      Audit.log('verify_failed', { reason: result.error });
-      return result;
+      Audit.log('verify_failed', { reason:'CODE_REQUIRED' });
+      return {ok:false,error:'CODE_REQUIRED'};
     }
-    const activated = await window.LangBlueCore.subscription.activateAsync(result.code, ['grammar']);
+    const activated = await window.LangBlueCore.subscription.activateAsync(normalized, ['grammar']);
     if (!activated.ok) return activated;
     RateLimit.reset('verify_code');
     Audit.log('subscription_activated', { planId: activated.plan.id, expiresAt: activated.expiresAt });
