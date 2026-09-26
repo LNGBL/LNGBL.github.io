@@ -261,19 +261,6 @@ url:'LangBlue-De.html'
 
 
 
-kurmanci:{
-
-id:'kurmanci',
-
-label:'LangBlue Kurmancî',
-
-icon:'🟦',
-
-url:'Kurmanci.html'
-
-}
-
-
 };
 
 
