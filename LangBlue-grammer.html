@@ -2192,7 +2192,8 @@ function renderPricingIRT(grid, intro, howToBox, verifyBox, geo) {
   document.getElementById('btnVerify').onclick = async () => {
     const code = document.getElementById('verifyCode').value;
     const status = document.getElementById('verifyStatus');
-    const res = Subscription.activate(code);
+    const selected = ['grammar'];
+    const res = await window.LangBlueCore.subscription.activateAsync(code, selected);
     if (!res.ok) {
       status.innerHTML = `<span style="color:var(--danger);">❌ ${res.error}</span>`;
       toast(res.error, 'error');
