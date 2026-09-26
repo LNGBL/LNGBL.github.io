@@ -12,7 +12,7 @@ days:7,
 label:'۷ روز',
 price:201998,
 priceStr:'201,998 T',
-feature:'دسترسی کامل به Grammar + Vocabulary + Deutsch + Kurmancî'
+feature:'دسترسی کامل به Grammar + Vocabulary + Deutsch'
 },
 
 
@@ -43,7 +43,7 @@ days:90,
 label:'۳ ماه',
 price:1469998,
 priceStr:'1,469,998 T',
-feature:'Grammar + Vocabulary + Deutsch + Kurmancî بدون محدودیت'
+feature:'Grammar + Vocabulary + Deutsch بدون محدودیت'
 },
 
 
@@ -306,17 +306,7 @@ url:'Kurmanci.html'
 
 
 
-var ALL_PRODUCT_IDS=[
-
-'grammar',
-
-'vocabulary',
-
-'deutsch',
-
-'kurmanci'
-
-];
+var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch'];
 
 
 
@@ -496,15 +486,7 @@ bundleDiscount:bundleDiscount,
 
 
 
-verificationCode:
-
-isAllProducts12M(ids,planId)
-
-?
-ALL_PRODUCTS_12M_VERIFY_CODE
-
-:
-null,
+verificationCode:null,
 
 
 
