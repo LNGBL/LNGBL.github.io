@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.admin-create-code]
 verify_jwt = false
+
+[functions.langblue-auth]
+verify_jwt = false
