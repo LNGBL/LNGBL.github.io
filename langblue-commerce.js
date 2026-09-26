@@ -216,30 +216,6 @@ comma(finalPrice)+' T'
 
 
 
-var CODES={
-
-
-'Verify_mU#2292':'irt_7d',
-
-'Verify_m!!2992':'irt_14d',
-
-'Verify_I@112':'irt_21d',
-
-'Verify_MIR_ss1':'irt_3m',
-
-'Verify_ll39332':'irt_6m',
-
-'Verify_311012':'irt_12m'
-
-
-};
-
-
-
-
-
-
-
 var PRODUCTS={
 
 
@@ -314,15 +290,6 @@ var ALL_PRODUCTS_12M_DISCOUNT=15;
 
 
 var ALL_PRODUCTS_12M_PLAN_ID='irt_12m';
-
-
-var ALL_PRODUCTS_12M_VERIFY_CODE='Verify_311012';
-
-
-
-
-
-
 
 
 function isAllProducts12M(productIds,planId){
@@ -547,9 +514,6 @@ PLANS:PLANS,
 
 
 PRODUCTS:PRODUCTS,
-
-
-CODES:CODES,
 
 
 FESTIVALS:FESTIVALS,
