@@ -3018,7 +3018,6 @@
             var PaidAccess = {
                 FREE_LIMIT:35,
                 get PLANS(){ return Object.values(window.LangBlueCommerce.PLANS).map(function(p){ return {id:p.id,days:p.days,label:p.label,price:p.priceStr,feature:p.feature}; }); },
-                get CODES(){ return window.LangBlueCommerce.CODES; },
                 pending:null,
                 current:function(){return window.LangBlueCore.subscription.current();},
                 isActive:function(){return !!this.current();},
