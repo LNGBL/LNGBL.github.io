@@ -356,14 +356,9 @@
   const LangBlueSubscription = {
     validateCode(code){
       const normalized = String(code || '').trim();
-      const commerce = window.LangBlueCommerce;
-      const planId = commerce && commerce.CODES ? commerce.CODES[normalized] : null;
-      const plan = planId && commerce && commerce.PLANS ? commerce.PLANS[planId] : null;
-
-      if(!plan){
-        return { ok: false, error: 'کد فعال‌سازی نامعتبر است.' };
-      }
-      return { ok: true, code: normalized, plan: Object.assign({}, plan) };
+      if(!normalized) return { ok:false, error:'CODE_REQUIRED' };
+      // Codes are verified only by the Supabase backend.
+      return { ok:true, code:normalized };
     },
 
     activate(code, productIds){
