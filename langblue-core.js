@@ -84,6 +84,51 @@
         Store.set('session', { userId: legacy.id, username: legacy.username || '' });
         Store.set('user', legacy);
       }
+
+      // Central account authority: when a Supabase session exists, hydrate the
+      // same account into the shared LangBlue store used by every product.
+      try{
+        const sb = window.LangBlueSupabase;
+        if(sb && typeof sb.getAuthSession === 'function'){
+          const remoteSession = await sb.getAuthSession();
+          if(remoteSession && remoteSession.user){
+            const remoteUser = remoteSession.user;
+            const meta = remoteUser.user_metadata || {};
+            let username = String(meta.username || '').trim();
+            if(!username){
+              const email = String(remoteUser.email || '');
+              const token = email.startsWith('u-') ? email.split('@')[0].slice(2) : '';
+              if(token){
+                try{
+                  username = decodeURIComponent(escape(atob(token.replace(/-/g,'+').replace(/_/g,'/') + '==')));
+                }catch(e){}
+              }
+            }
+            const current = Store.get('user', {}) || {};
+            const user = {
+              id: remoteUser.id,
+              name: String(meta.name || meta.fullName || current.name || '').trim(),
+              sex: meta.sex || meta.gender || current.sex || '',
+              username: username || current.username || '',
+              country: meta.country || current.country || null,
+              countryName: meta.countryName || current.countryName || null,
+              currency: meta.currency || current.currency || null,
+              at: current.at || new Date(remoteUser.created_at || Date.now()).getTime()
+            };
+            Store.set('session', { userId: user.id, username: user.username });
+            Store.set('user', user);
+            const accounts = Store.get('accounts', {});
+            if(user.username){
+              const key = user.username.toLowerCase();
+              accounts[key] = Object.assign({}, accounts[key] || {}, user);
+              Store.set('accounts', accounts);
+            }
+            return user;
+          }
+        }
+      }catch(error){
+        console.warn('LangBlue central session hydration skipped:', error);
+      }
       return this._currentUser();
     },
 
@@ -241,6 +286,9 @@
       if(backend && typeof backend.signOut === 'function'){
         try { await backend.signOut(); } catch(e){}
       }
+      try{
+        document.cookie='lb_central_session=; Max-Age=0; Path=/; SameSite=Lax; Secure';
+      }catch(e){}
       Store.remove('session');
       Store.remove('user');
       return true;
@@ -258,7 +306,6 @@
     const db = {
       users: [],
       languages: {
-        kurmanci: { words: [] },
         vocabulary: { words: [] },
         deutsch: { words: [] }
       },
