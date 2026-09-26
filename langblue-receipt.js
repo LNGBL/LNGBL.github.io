@@ -6,8 +6,8 @@ document.getElementById("activateReceipt").onclick = async function () {
     return;
   }
 
-  if (typeof window.LangBlueCore.hasPermission === "function" &&
-      !window.LangBlueCore.hasPermission()) {
+  if (typeof window.LangBlueCore.subscription.current === "function" &&
+      !window.LangBlueCore.Auth.isLoggedIn()) {
     alert("ابتدا وارد حساب LangBlue شوید.");
     return;
   }
