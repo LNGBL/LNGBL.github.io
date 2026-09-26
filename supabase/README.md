@@ -4,9 +4,11 @@ This directory contains the first backend layer for LangBlue. It is intentionall
 
 ## Database
 
-Run:
+Current backend migration:
 
-- `supabase/migrations/001_langblue_backend.sql`
+- `supabase/migrations/20260926154258_harden_backend_and_indexes.sql`
+
+The production project already contains the backend tables and redemption function. Keep this migration in version control so the security/index hardening is reproducible.
 
 It creates the product catalog, plans, profiles, hashed activation-code store, subscriptions, and usage-session tables. Activation codes are never readable by the browser through RLS.
 
@@ -14,6 +16,7 @@ It creates the product catalog, plans, profiles, hashed activation-code store, s
 
 - `activate-code`: authenticated users redeem a code; the code is hashed server-side and the subscription is written server-side.
 - `admin-create-code`: admin-only code generation. Set `LANGBLUE_ADMIN_SECRET` as a Supabase secret. The generated plaintext code is returned only to the admin request that created it.
+- `langblue-auth`: username/password bridge that creates/confirms the internal Supabase Auth identity and returns a normal Supabase session; no user email is required.
 
 Required Supabase secrets for `activate-code` are provided automatically by Supabase:
 
