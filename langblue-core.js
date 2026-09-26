@@ -142,16 +142,34 @@
         return { ok: false, error: 'این نام کاربری قبلاً استفاده شده است' };
       }
 
-      const hashed = await this.hashPassword(data.password);
-      const id = crypto.randomUUID ? crypto.randomUUID() : 'lb-' + Date.now();
-      const user = {
-        id,
-        name: String(data.name || '').trim(),
-        sex: data.sex || '',
-        username,
+      const profile = {
+        name: String(data.name || data.fullName || '').trim(),
+        sex: data.sex || data.gender || '',
         country: data.country || null,
         countryName: data.countryName || null,
-        currency: data.currency || null,
+        currency: data.currency || null
+      };
+
+      const backend = window.LangBlueSupabase;
+      let remote = null;
+      if(backend && typeof backend.signUpLocal === 'function'){
+        remote = await backend.signUpLocal(username, String(data.password || ''), profile);
+        if(!remote || !remote.ok) return remote || {ok:false,error:'BACKEND_SIGNUP_FAILED'};
+      }
+
+      const hashed = await this.hashPassword(data.password);
+      const id = remote && remote.user && remote.user.id
+        ? remote.user.id
+        : (crypto.randomUUID ? crypto.randomUUID() : 'lb-' + Date.now());
+
+      const user = {
+        id,
+        name: profile.name,
+        sex: profile.sex,
+        username,
+        country: profile.country,
+        countryName: profile.countryName,
+        currency: profile.currency,
         at: Date.now()
       };
 
@@ -160,7 +178,7 @@
       Store.set('session', { userId: id, username });
       Store.set('user', user);
 
-      return { ok: true, user };
+      return { ok: true, user, session: remote && remote.session || null };
     },
 
     async login(username, password){
@@ -168,25 +186,54 @@
       const accounts = Store.get('accounts', {});
       const account = accounts[key];
 
-      if(!account || !(await this.verifyPassword(password, account))){
+      if(account && !(await this.verifyPassword(password, account))){
+        return { ok: false, error: 'نام کاربری یا رمز عبور نادرست است' };
+      }
+
+      const profile = account ? {
+        name: account.name || '',
+        sex: account.sex || '',
+        country: account.country || null,
+        countryName: account.countryName || null,
+        currency: account.currency || null
+      } : {};
+
+      const backend = window.LangBlueSupabase;
+      let remote = null;
+      if(backend && typeof backend.signInLocal === 'function'){
+        remote = await backend.signInLocal(username, password, profile);
+        if(!remote || !remote.ok){
+          if(account && /INVALID_CREDENTIALS|BACKEND_AUTH_FAILED/i.test(String(remote && remote.error || ''))){
+            remote = await backend.signUpLocal(username, password, profile);
+          }
+          if(!remote || !remote.ok) return remote || {ok:false,error:'BACKEND_LOGIN_FAILED'};
+        }
+      } else if(!account || !(await this.verifyPassword(password, account))){
         return { ok: false, error: 'نام کاربری یا رمز عبور نادرست است' };
       }
 
       const user = {
-        id: account.id,
-        name: account.name || '',
-        sex: account.sex || '',
-        username: account.username || username,
-        country: account.country || null,
-        countryName: account.countryName || null,
-        currency: account.currency || null,
-        at: account.at || Date.now()
+        id: remote && remote.user && remote.user.id ? remote.user.id : (account && account.id),
+        name: profile.name || (account && account.name) || '',
+        sex: profile.sex || (account && account.sex) || '',
+        username: account && account.username ? account.username : username,
+        country: profile.country || (account && account.country) || null,
+        countryName: profile.countryName || (account && account.countryName) || null,
+        currency: profile.currency || (account && account.currency) || null,
+        at: account && account.at || Date.now()
       };
 
+      if(!user.id) return {ok:false,error:'BACKEND_LOGIN_FAILED'};
+
+      const hashed = account
+        ? {hash:account.passwordHash,salt:account.salt}
+        : await this.hashPassword(password);
+      accounts[key] = {...(account || {}), ...user, passwordHash:hashed.hash, salt:hashed.salt};
+      Store.set('accounts', accounts);
       Store.set('session', { userId: user.id, username: user.username });
       Store.set('user', user);
 
-      return { ok: true, user };
+      return { ok: true, user, session: remote && remote.session || null };
     },
 
     async logout(){
@@ -346,31 +393,35 @@
       const ids = Array.isArray(productIds) ? productIds.filter(Boolean) : [];
       const backend = window.LangBlueBackend;
 
-      if(backend && backend.CONFIG && backend.CONFIG.enabled && typeof backend.activateCode === 'function'){
-        try {
-          const remote = await backend.activateCode(code, ids);
-          if(remote && remote.ok){
-            const remoteSub = remote.subscription || remote;
-            const localSub = Object.assign({}, remoteSub, {
-              verifiedByCode: true,
-              verifiedAt: Date.now(),
-              productIds: Array.isArray(remoteSub.productIds) ? remoteSub.productIds : ids
-            });
-            storage.set('subscription', localSub);
-            return {
-              ok: true,
-              subscription: localSub,
-              plan: remote.plan || localSub.plan || null,
-              expiresAt: localSub.expiresAt,
-              productIds: localSub.productIds
-            };
-          }
-          if(remote && remote.error) return remote;
-        } catch(error){
-          console.error('Activation backend error:', error);
-        }
+      if(!backend || !backend.CONFIG || !backend.CONFIG.enabled || typeof backend.activateCode !== 'function'){
+        return {ok:false,error:'BACKEND_NOT_ENABLED'};
       }
-      return this.activate(code, ids);
+
+      try {
+        const remote = await backend.activateCode(code, ids);
+        if(remote && remote.ok){
+          const remoteSub = remote.subscription || remote;
+          const localSub = Object.assign({}, remoteSub, {
+            verifiedByCode: true,
+            verifiedAt: Date.now(),
+            productIds: Array.isArray(remoteSub.product_ids)
+              ? remoteSub.product_ids
+              : (Array.isArray(remoteSub.productIds) ? remoteSub.productIds : ids)
+          });
+          storage.set('subscription', localSub);
+          return {
+            ok: true,
+            subscription: localSub,
+            plan: remote.plan || localSub.plan || null,
+            expiresAt: localSub.expires_at || localSub.expiresAt,
+            productIds: localSub.productIds
+          };
+        }
+        return remote || {ok:false,error:'EMPTY_BACKEND_RESPONSE'};
+      } catch(error){
+        console.error('Activation backend error:', error);
+        return {ok:false,error:error.message||'FUNCTION_ERROR'};
+      }
     },
 
     current(){
