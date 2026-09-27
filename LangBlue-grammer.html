@@ -1816,35 +1816,13 @@ function renderTable() {
 }
 
 window.__practice = (id) => {
-  const activity = Orchestrator.nextActivity(id, getLearnerId());
+  if (window.LangBlueGrammarEngine && typeof window.LangBlueGrammarEngine.startPractice === 'function') {
+    window.LangBlueGrammarEngine.startPractice(id);
+    return;
+  }
   const c = Graph.nodes[id];
-  alert(`
-🎯 تمرین «${c.label}»
-
-نقش: ${activity.role}
-${activity.roleTask}
-
-📐 فرمول: ${c.grammar.formula || '—'}
-💡 کاربرد: ${c.grammar.how || '—'}
-📝 مثال: ${c.grammar.examples[0] || '—'}
-
-پیشرفت فعلی: ${Graph.validDepth(id)}/4
-  `);
-  Orchestrator.completeCycle({
-    conceptId: id, learnerId: getLearnerId(),
-    payload: {
-      role: activity.role, phase: activity.cycle.phases[0],
-      contradictionId: activity.contradiction?.contradictionId,
-      layer: activity.cycle.targetLayer,
-      synthesisText: '', oldThesis: c.grammar.note || '',
-      antithesis: activity.roleTask || '',
-      triadicMode: activity.repetition.triadic.mode,
-      reflection: 'تمرین تعاملی'
-    }
-  });
-  toast(`تمرین ثبت شد — پیشرفت: ${Graph.validDepth(id)}/4`, 'success');
-  renderTable();
-  renderHome();
+  if (!c) return;
+  toast('موتور مرور هوشمند هنوز آماده نشده است.', 'warn');
 };
 
 window.__edit = (id) => {
