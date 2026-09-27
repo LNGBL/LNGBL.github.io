@@ -232,6 +232,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
         <div class="actions">
           <a class="btn btn-primary" href="#products">محصولات LangBlue ←</a>
           <a class="btn btn-secondary" href="#receipt">ساخت فیش خرید ←</a>
+          <a class="btn btn-secondary" href="#activation">🔑 فعال‌سازی کد</a>
           <a class="btn btn-secondary" href="#features">آشنایی با امکانات</a>
         </div>
       </div>
@@ -292,7 +293,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
             <div class="card-icon">⚙️</div>
             <h3>پروفایل و تنظیمات</h3>
             <p>
-              حساب محلی، نام کاربری، رمز عبور، وضعیت اشتراک و اطلاعات پروفایل را از یک بخش مدیریت کن.
+              حساب مرکزی، نام کاربری، رمز عبور، وضعیت اشتراک و اطلاعات پروفایل را از یک بخش مدیریت کن.
             </p>
           </article>
         </div>
@@ -417,7 +418,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     <h2 class="section-title">ساخت فیش خرید LangBlue</h2>
     <p class="section-lead">
       یک یا چند محصول را انتخاب کن، مدت اشتراک را مشخص کن و فیش درخواست را بساز.
-      سپس شناسه فیش را برای ادمین LangBlue در تلگرام بفرست تا پرداخت و فعال‌سازی از مسیر رسمی انجام شود.
+      سپس شناسه فیش را برای ادمین LangBlue در تلگرام بفرست. پس از تأیید، کد فعال‌سازی را دریافت می‌کنی و آن را در بخش «فعال‌سازی اشتراک» همین صفحه، داخل حساب مرکزی وارد می‌کنی.
     </p>
     <div class="receipt-builder">
       <div class="receipt-grid">
@@ -475,6 +476,28 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     </div>
   </div>
 </section>
+
+    <section class="central-activation-section" id="activation">
+      <div class="wrap">
+        <div class="central-activation-card">
+          <div class="central-activation-icon">🔑</div>
+          <div class="central-activation-copy">
+            <span class="product-badge">LANGBLUE · CENTRAL ACCESS</span>
+            <h2>فعال‌سازی اشتراک</h2>
+            <p>کد فعال‌سازی فقط در <strong>حساب مرکزی LangBlue</strong> وارد می‌شود. اگر کد را از ادمین دریافت کرده‌ای، از همین‌جا وارد حساب شو و کد را ثبت کن.</p>
+            <div class="central-activation-flow">
+              <span>۱. حساب مرکزی</span><b>←</b><span>۲. دریافت کد از @LangBlue</span><b>←</b><span>۳. وارد کردن کد</span><b>←</b><span>۴. فعال‌شدن محصولات کد</span>
+            </div>
+            <div class="central-activation-actions">
+              <button class="btn btn-primary" type="button" onclick="window.LangBlueCentralAccount&&window.LangBlueCentralAccount.open()">🔐 ورود به حساب و فعال‌سازی کد</button>
+              <a class="btn btn-secondary" href="https://t.me/LangBlue" target="_blank" rel="noopener">💬 دریافت راهنمای کد از @LangBlue</a>
+            </div>
+            <div class="central-activation-note">کد داخل سایت تولید یا نمایش داده نمی‌شود. پس از دریافت کد، آن را فقط در حساب مرکزی وارد کن؛ همان حساب برای Grammar، Vocabulary و Deutsch استفاده می‌شود.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="research">
       <div class="wrap">
         <div class="eyebrow"><span class="eyebrow-cloud" aria-hidden="true"><span></span><span></span><span></span></span>LANGUAGE LEARNING · RESEARCH &amp; REFERENCES</div>
@@ -579,7 +602,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
             امکاناتی مانند جدول گرامرها، فلش‌کارت، پروفایل و پشتیبان‌گیری از داده‌ها را ارائه می‌کند.
           </p>
           <p>
-            برای شروع، کافی است وارد پلتفرم شوید و یک حساب محلی بسازید. ایمیل برای ثبت‌نام لازم نیست.
+            برای شروع، یک حساب مرکزی بساز. ایمیل برای ثبت‌نام لازم نیست؛ همین حساب برای هر سه محصول و فعال‌سازی اشتراک استفاده می‌شود.
           </p>
         </div>
       </div>
@@ -589,12 +612,12 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 
 <section class="cta">
       <div class="wrap">
-        <h2>می‌خواهی LangBlue را امتحان کنی؟</h2>
+        <h2>حساب مرکزی LangBlue</h2>
         <p>
-          می‌توانی قبل از هر چیز با امکانات پلتفرم آشنا شوی و اگر مناسب کار توست،
-          وارد برنامه شوی و حساب خودت را ایجاد کنی.
+          یک حساب مرکزی برای هر سه محصول داشته باش. ورود، وضعیت اشتراک و فعال‌سازی کد از همین حساب مدیریت می‌شود.
         </p>
-        <a class="btn btn-primary" href="?account=required">ورود و ساخت حساب مرکزی</a>
+        <button class="btn btn-primary" type="button" onclick="window.LangBlueCentralAccount&&window.LangBlueCentralAccount.open()">👤 ورود / ساخت حساب مرکزی</button>
+        <a class="btn btn-secondary" href="#activation">🔑 فعال‌سازی اشتراک</a>
       </div>
     </section>
   </main>
