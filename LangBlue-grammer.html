@@ -308,7 +308,7 @@
       <button class="tab" data-tab="add">➕ افزودن گرامر</button>
       <button class="tab" data-tab="table">📊 جدول</button>
       <button class="tab" data-tab="flashcard">🎴 فلش‌کارت</button>
-      <button class="tab" data-tab="pricing">🔓 دسترسی</button>
+      <button class="tab" data-tab="pricing">🔑 اشتراک مرکزی</button>
       <button class="tab" data-tab="profile">⚙️ پروفایل</button>
     </div>
 
@@ -466,21 +466,14 @@
         <div class="pricing-grid" id="pricingGrid"></div>
         <div class="how-to-box" id="howToBox"></div>
         <div class="verify-box hidden" id="verifyBox">
-          <h3 style="color: var(--accent);" id="verifyTitle">🔑 فعال‌سازی اشتراک</h3>
-          <p style="color: var(--muted); font-size: 13px; line-height: 1.8;" id="verifyDesc">
-            کد تاییدی که از ادمین دریافت کردی رو اینجا وارد کن:
+          <h3 style="color: var(--accent);">🔐 مدیریت اشتراک مرکزی</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.8;">
+            فعال‌سازی اشتراک دیگر از داخل Grammar انجام نمی‌شود. حساب مرکزی LangBlue
+            مرجع واحد فعال‌سازی Grammar، Vocabulary و Deutsch است.
           </p>
-          <div class="row" style="margin-top:12px;">
-            <div style="flex: 2;">
-              <input id="verifyCode" placeholder="Verify_XXXXX" autocomplete="off"
-                     style="direction:ltr; text-align:left; font-family:monospace;">
-            </div>
-            <div style="flex: 1;">
-              <button id="btnVerify" style="width:100%;">✅ فعال‌سازی</button>
-            </div>
+          <div style="margin-top:14px;">
+            <a class="btn" href="/?account=required" style="display:inline-flex;text-decoration:none;">👤 رفتن به حساب مرکزی</a>
           </div>
-          <div id="verifyStatus" style="margin-top:12px; font-size: 13px;"></div>
-          <div id="lockWarning" class="lock-warn hidden"></div>
         </div>
       </div>
     </div>
@@ -2105,98 +2098,30 @@ document.addEventListener('change', (event) => {
 });
 
 function renderPricing() {
-  const geo = Store.get('geo:country', {});
-  const grid = document.getElementById('pricingGrid');
-  const intro = document.getElementById('pricingIntro');
-  const howToBox = document.getElementById('howToBox');
-  const verifyBox = document.getElementById('verifyBox');
-  if (!grid || !intro || !howToBox || !verifyBox) return;
+  const grid=document.getElementById('pricingGrid');
+  const intro=document.getElementById('pricingIntro');
+  const howToBox=document.getElementById('howToBox');
+  const verifyBox=document.getElementById('verifyBox');
+  if(!grid||!intro||!howToBox||!verifyBox)return;
 
-  if (geo.unknown === true) {
-    intro.innerHTML = '<p style="color:var(--warn);line-height:1.9;">تشخیص کشور در حال حاضر در دسترس نیست. لطفاً اتصال اینترنت را بررسی و صفحه را دوباره بارگذاری کن.</p>';
-    grid.innerHTML = '';
-    howToBox.innerHTML = '<strong>⚠️ دسترسی موقتاً متوقف است</strong><div style="margin-top:8px;color:var(--muted);">تا زمانی که کشور IP تشخیص داده نشود، قوانین پرداخت یا دسترسی اجتماعی اعمال نمی‌شود.</div>';
-    verifyBox.classList.add('hidden');
-  } else if (geo.isIran === true) {
-    renderPricingIRT(grid, intro, howToBox, verifyBox, geo);
-  } else {
-    renderForeignAccess(grid, intro, howToBox, verifyBox);
-  }
-}
+  intro.innerHTML='<p style="color:var(--muted);font-size:13px;line-height:1.9;">اشتراک Grammar زیرمجموعه حساب مرکزی LangBlue است. برای خرید، رسید و فعال‌سازی به صفحه اصلی برو؛ هیچ کد فعالی در Grammar وارد نمی‌شود.</p>';
 
-function renderPricingIRT(grid, intro, howToBox, verifyBox, geo) {
-  intro.innerHTML = `
-    <p style="color: var(--muted); font-size: 13px; line-height: 1.8;">
-      LangBlue تا <strong>${FREE_LIMIT} گرامر</strong> رایگان در اختیارت می‌ذاره.
-      برای افزودن بیشتر، یکی از پلن‌های تومانی زیر رو تهیه کن.
-    </p>`;
-
-  grid.innerHTML = Object.values(window.LangBlueCommerce.PLANS).map(p => {
-    let daysLabel;
-    if (p.id === 'irt_3m') daysLabel = '۳ ماه';
-    else if (p.id === 'irt_6m') daysLabel = '۶ ماه';
-    else if (p.id === 'irt_12m') daysLabel = '۱۲ ماه';
-    else daysLabel = `${p.days} روز`;
+  grid.innerHTML=Object.values(window.LangBlueCommerce.PLANS).map(p=>{
+    let daysLabel=p.id==='irt_3m'?'۳ ماه':p.id==='irt_6m'?'۶ ماه':p.id==='irt_12m'?'۱۲ ماه':p.days+' روز';
     const shared=window.LangBlueCommerce.displayPlan(p.id);
-    const priceHtml=shared.discount ? `<span style="text-decoration:line-through;opacity:.55;margin-left:6px;">${p.priceStr.replace(' T','')}</span> <strong>${shared.finalPriceStr.replace(' T','')}</strong>` : p.price;
-    const discountHtml=shared.discount ? `<div style="margin-top:5px;color:var(--success);font-weight:800;">${shared.discount}٪ تخفیف جشنواره‌ای</div>` : '';
-    return `
-      <div class="price-card">
-        <div class="duration">${daysLabel}</div>
-        <div class="price">${priceHtml} <small>تومان</small></div>
-        ${discountHtml}
-        <div class="features">${p.feature}</div>
-        <button onclick="window.__requestPlanIRT('${p.id}')">💳 درخواست این پلن</button>
-      </div>`;
+    const priceHtml=shared.discount?'<span style="text-decoration:line-through;opacity:.55;margin-left:6px;">'+p.priceStr.replace(' T','')+'</span> <strong>'+shared.finalPriceStr.replace(' T','')+'</strong>':p.price;
+    return '<div class="price-card"><div class="duration">'+daysLabel+'</div><div class="price">'+priceHtml+' <small>تومان</small></div>'+(shared.discount?'<div style="margin-top:5px;color:var(--success);font-weight:800;">'+shared.discount+'٪ تخفیف جشنواره‌ای</div>':'')+'<div class="features">'+p.feature+'</div><button onclick="window.__openCentralSubscription(\''+p.id+'\')">🧾 ادامه در حساب مرکزی</button></div>';
   }).join('');
 
-  howToBox.innerHTML = `
-    <strong>📖 مراحل تهیه اشتراک (تومانی):</strong>
-    <ol>
-      <li>به کانال تلگرام <a href="https://t.me/langBlue" class="tg-link" target="_blank">@langBlue</a> مراجعه کن</li>
-      <li>به ادمین دایرکت پیام بده و بگو کدوم پلن رو می‌خوای</li>
-      <li>ادمین شماره کارت بانکی رو برات می‌فرسته</li>
-      <li>بعد از پرداخت، از رسید عکس بگیر و برای ادمین بفرست</li>
-      <li>پس از تایید، ادمین <strong>کد تایید</strong> رو برات می‌فرسته</li>
-      <li>کد رو در بخش «فعال‌سازی اشتراک» وارد کن</li>
-    </ol>
-    <div style="margin-top:10px;color:var(--warn);">⚠️ کد تایید <strong>فقط از طریق ادمین @langBlue</strong> صادر می‌شه.</div>`;
-
+  howToBox.innerHTML='<strong>🔐 مسیر واحد اشتراک:</strong><ol><li>در صفحه اصلی محصول و مدت را انتخاب کن.</li><li>فیش درخواست اشتراک را بساز و برای ادمین <a href="https://t.me/LangBlue" class="tg-link" target="_blank">@langBlue</a> ارسال کن.</li><li>پس از تأیید، کد فعال‌سازی را دریافت می‌کنی.</li><li>کد را فقط در «حساب مرکزی» وارد کن.</li></ol><div style="margin-top:10px;color:var(--muted);">این بخش در Grammar عمداً کد دریافت یا ثبت نمی‌کند.</div>';
   verifyBox.classList.remove('hidden');
-  document.getElementById('verifyTitle').textContent = '🔑 فعال‌سازی اشتراک (تومانی)';
-  document.getElementById('verifyDesc').textContent = 'کد تاییدی که از ادمین دریافت کردی رو اینجا وارد کن:';
-  const input = document.getElementById('verifyCode');
-  input.placeholder = 'Verify_XXXXX';
-  input.value = '';
-
-  const lockWarning = document.getElementById('lockWarning');
-  const lockedMin = RateLimit.isLocked('verify_code');
-  if (lockedMin > 0) {
-    lockWarning.classList.remove('hidden');
-    lockWarning.textContent = `🔒 به دلیل تلاش‌های ناموفق، ${lockedMin} دقیقه‌ی دیگه دوباره امتحان کن.`;
-  } else {
-    lockWarning.classList.add('hidden');
-  }
-
-  document.getElementById('btnVerify').onclick = async () => {
-    const code = document.getElementById('verifyCode').value;
-    const status = document.getElementById('verifyStatus');
-    const selected = ['grammar'];
-    const res = await window.LangBlueCore.subscription.activateAsync(code, selected);
-    if (!res.ok) {
-      status.innerHTML = `<span style="color:var(--danger);">❌ ${res.error}</span>`;
-      toast(res.error, 'error');
-      renderPricing();
-      return;
-    }
-    status.innerHTML = `<span style="color:var(--success);">✅ اشتراک فعال شد تا ${formatDate(res.expiresAt)}</span>`;
-    toast('اشتراک فعال شد ✅', 'success');
-    document.getElementById('verifyCode').value = '';
-    renderSubscriptionBanner();
-    renderPricing();
-    renderProfile();
-  };
 }
+
+window.__openCentralSubscription=function(planId){
+  try{localStorage.setItem('lb:receipt:selectedPlan',planId);}catch(e){}
+  location.href='/?account=required';
+};
+
 
 window.__requestPlanIRT = (planId) => {
   const plan = window.LangBlueCommerce.PLANS[planId];
