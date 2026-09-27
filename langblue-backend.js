@@ -94,11 +94,16 @@
 
 
       if (error) {
+        let serverMessage = "";
+        try {
+          if (error.context && typeof error.context.json === "function") {
+            const payload = await error.context.json();
+            serverMessage = payload && (payload.error || payload.message) || "";
+          }
+        } catch (_) {}
         return {
           ok: false,
-          error:
-            error.message ||
-            "FUNCTION_ERROR"
+          error: serverMessage || error.message || "FUNCTION_ERROR"
         };
       }
 
