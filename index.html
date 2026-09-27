@@ -201,7 +201,9 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   transform:translateY(-2px);
   background:rgba(255,255,255,.12);
 }
-  </style>
+  
+.lb-leaderboard-section{padding:72px 0}.lb-leaderboard-card{max-width:1000px;margin:28px auto 0;padding:24px;background:var(--glass);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.lb-leaderboard-table-wrap{overflow:auto}.lb-leaderboard-table{width:100%;border-collapse:collapse;min-width:680px}.lb-leaderboard-table th,.lb-leaderboard-table td{padding:13px 12px;text-align:right;border-bottom:1px solid var(--line)}.lb-leaderboard-table th{color:#9de3ff;font-size:12px}.lb-leaderboard-table td{color:#e9f7fb;font-size:13px}.lb-leaderboard-table td small{display:block;color:var(--muted);font-size:10px;direction:ltr;text-align:right;margin-top:2px}.lb-leaderboard-table tbody tr:first-child td{background:rgba(69,183,200,.07)}.lb-leaderboard-loading,.lb-leaderboard-empty{text-align:center;color:var(--muted);padding:30px 12px}.lb-leaderboard-note{text-align:center;color:var(--muted);font-size:11px;margin-top:14px}
+</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
 <script src="langblue-backend.js"></script>
@@ -420,7 +422,19 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
       </div>
     </section>
     
-   <section class="receipt-section" id="receipt">
+   
+<section class="lb-leaderboard-section" id="leaderboard">
+  <div class="wrap">
+    <h2 class="section-title">🏆 برترین زبان‌آموزان LangBlue</h2>
+    <p class="section-lead">جدول برترین زبان‌آموزان براساس امتیاز ثبت‌شده در حساب مرکزی، توکن‌های واژگان و پیشرفت گرامر به‌روزرسانی می‌شود.</p>
+    <div class="lb-leaderboard-card">
+      <div id="langblueLeaderboardBody" aria-live="polite"></div>
+      <div class="lb-leaderboard-note">امتیاز کل = توکن‌های ثبت‌شده + مجموع امتیازهای تسلط گرامر. نام کاربری هر حساب یکتا است.</div>
+    </div>
+  </div>
+</section>
+
+<section class="receipt-section" id="receipt">
   <div class="wrap">
     <h2 class="section-title">ساخت فیش خرید LangBlue</h2>
     <p class="section-lead">
@@ -649,6 +663,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   animateLogo();
 })();
 </script>
+<script src="langblue-leaderboard.js"></script>
 <script src="langblue-receipt.js"></script>
 
   <footer>
