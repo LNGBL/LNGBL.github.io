@@ -6,6 +6,25 @@
   function setCentralCookie(active){try{document.cookie=active?'lb_central_session=1; Max-Age=2592000; Path=/; SameSite=Lax; Secure':'lb_central_session=; Max-Age=0; Path=/; SameSite=Lax; Secure';}catch(e){}}
   function escapeHtml(value){return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch];});}
   async function session(){try{const sb=window.LangBlueSupabase;if(sb&&typeof sb.getAuthSession==='function')return await sb.getAuthSession();}catch(e){}return null;}
+  let activityTimer=null;
+  let activityStopped=false;
+  async function activityHeartbeat(){
+    if(activityStopped||document.visibilityState==='hidden')return;
+    try{
+      const result=await window.LangBlueBackend.invoke('langblue-activity',{});
+      if(result&&result.ok){
+        window.dispatchEvent(new CustomEvent('lb:activity-updated',{detail:result}));
+      }else if(result&&result.error==='ACCOUNT_NOT_REGISTERED'){
+        activityStopped=true;
+      }
+    }catch(e){}
+  }
+  function startActivityHeartbeat(){
+    if(activityTimer||!window.LangBlueBackend)return;
+    activityStopped=false;
+    activityHeartbeat();
+    activityTimer=setInterval(activityHeartbeat,300000);
+  }
   function returnPath(){const value=sessionStorage.getItem(RETURN_KEY)||'';sessionStorage.removeItem(RETURN_KEY);return value;}
   async function hydrate(){if(window.LangBlueCore&&window.LangBlueCore.Auth&&typeof window.LangBlueCore.Auth.init==='function')await window.LangBlueCore.Auth.init();const s=await session();setCentralCookie(!!s);return s;}
   function injectLandingStyles(){
@@ -53,8 +72,8 @@
     window.dispatchEvent(new CustomEvent('lb:central-session-ready',{detail:{user:window.LangBlueCore.Auth.current()}}));
   }
   async function init(){
-    if(isLanding()){await hydrate();renderLandingAccount();const params=new URLSearchParams(location.search);if(params.get('account')==='required')setTimeout(openAccount,80);}
-    else await gateProduct();
+    if(isLanding()){const s=await hydrate();renderLandingAccount();if(s)startActivityHeartbeat();const params=new URLSearchParams(location.search);if(params.get('account')==='required')setTimeout(openAccount,80);}
+    else {await gateProduct();if(window.LangBlueCore&&window.LangBlueCore.Auth&&window.LangBlueCore.Auth.current())startActivityHeartbeat();}
   }
   window.LangBlueCentralAccount={open:openAccount,refresh:renderLandingAccount,session,logout:async function(){if(window.LangBlueCore&&window.LangBlueCore.Auth)await window.LangBlueCore.Auth.logout();setCentralCookie(false);}};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
