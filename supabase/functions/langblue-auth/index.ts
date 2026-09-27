@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
   let body: { action?: string; username?: string; password?: string; profile?: Record<string, unknown> };
   try { body = await req.json(); } catch { return json({ ok: false, error: "INVALID_JSON" }, 400); }
 
-  const username = String(body.username || "").trim();
+  const username = String(body.username || "").trim().toLowerCase();
   const password = String(body.password || "");
   const action = String(body.action || "").trim().toLowerCase();
 
@@ -53,6 +53,13 @@ Deno.serve(async (req) => {
     if ((existing?.users || []).some((u) => String(u.email || "").toLowerCase() === email)) {
       return json({ ok: false, error: "USERNAME_EXISTS" }, 409);
     }
+    const { data: existingProfile, error: profileLookupError } = await admin
+      .from("profiles")
+      .select("id")
+      .ilike("username", username)
+      .maybeSingle();
+    if (profileLookupError) return json({ ok: false, error: "USERNAME_LOOKUP_FAILED" }, 500);
+    if (existingProfile) return json({ ok: false, error: "USERNAME_EXISTS" }, 409);
 
     const { data: created, error: createError } = await admin.auth.admin.createUser({
       email,
