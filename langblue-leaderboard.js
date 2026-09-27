@@ -66,7 +66,7 @@
     try{
       const client=sb.getClient();
       if(!client){root.innerHTML='<div class="lb-leaderboard-empty">اتصال به حساب مرکزی برقرار نیست.</div>';return}
-      const {data,error}=await client.from(TABLE).select('username,display_name,points,tokens,grammar_score,vocabulary_count,grammar_count').order('points',{ascending:false}).order('tokens',{ascending:false}).limit(10);
+      const {data,error}=await client.from(TABLE).select('username,display_name,points,tokens,grammar_score,vocabulary_count,grammar_count').order('points',{ascending:false}).order('tokens',{ascending:false}).limit(8);
       if(error){root.innerHTML='<div class="lb-leaderboard-empty">فعلاً داده‌ای برای نمایش وجود ندارد.</div>';return}
       if(!data||!data.length){root.innerHTML='<div class="lb-leaderboard-empty">هنوز زبان‌آموزی در جدول ثبت نشده است.</div>';return}
       root.innerHTML='<div class="lb-leaderboard-table-wrap"><table class="lb-leaderboard-table"><thead><tr><th>#</th><th>زبان‌آموز</th><th>امتیاز</th><th>🪙 توکن</th><th>گرامر</th><th>واژه</th></tr></thead><tbody>'+
