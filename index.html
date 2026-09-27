@@ -178,7 +178,14 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     .receipt-note{margin-top:14px;color:#61717d;font-size:11px;line-height:1.8}
     @media(max-width:720px){.receipt-grid{grid-template-columns:1fr}.receipt-builder{padding:16px}}
     @media print{body *{visibility:hidden!important}.receipt-output,.receipt-output *{visibility:visible!important}.receipt-output{display:block!important;position:absolute;left:0;top:0;width:100%;margin:0;box-shadow:none;border-radius:0}}
-.telegram-footer{
+    .central-activation-section{padding:34px 0 70px}
+    .central-activation-card{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start;max-width:980px;margin:0 auto;padding:28px;border:1px solid rgba(91,192,255,.28);border-radius:22px;background:rgba(8,24,38,.68);box-shadow:var(--shadow);backdrop-filter:blur(16px)}
+    .central-activation-icon{width:58px;height:58px;display:flex;align-items:center;justify-content:center;border-radius:17px;background:rgba(34,158,217,.14);border:1px solid rgba(91,192,255,.28);font-size:27px}
+    .central-activation-copy h2{margin:8px 0 8px;font-size:30px}.central-activation-copy p{margin:0;color:var(--muted);font-size:14px;line-height:1.95}
+    .central-activation-flow{display:flex;align-items:center;justify-content:flex-start;gap:8px;flex-wrap:wrap;margin:18px 0 4px}.central-activation-flow span{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:11px;color:#dceff4}.central-activation-flow b{color:var(--blue3);font-size:13px}
+    .central-activation-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.central-activation-note{margin-top:14px;color:#9fb5bd;font-size:11px;line-height:1.9}
+    @media(max-width:650px){.central-activation-card{grid-template-columns:1fr;padding:20px}.central-activation-icon{width:50px;height:50px}.central-activation-copy h2{font-size:25px}.central-activation-flow{gap:6px}.central-activation-flow b{display:none}}
+    .telegram-footer{
   display:inline-flex;
   align-items:center;
   gap:8px;
