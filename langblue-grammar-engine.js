@@ -208,7 +208,7 @@
   }
 
   window.LangBlueGrammarEngine={
-    KEY,get,all,review,due,pick,stats,masteryLabel,renderPanel,decorateTable,syncRemote
+    KEY,get,all,review,due,pick,stats,masteryLabel,renderPanel,decorateTable,syncRemote,startPractice
   };
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
