@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex,nofollow">
 <title>LangBlue — آزمون سالانه</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-client.js"></script><script src="langblue-backend.js"></script><script src="langblue-core.js"></script><script src="langblue-central-account.js"></script>
+<script src="supabase-client.js"></script><script src="langblue-backend.js"></script><script src="langblue-core.js"></script><script src="langblue-central-account.js"></script><script src="langblue-seasonal.js"></script>
 <style>
 :root{--bg:#f5f1e9;--panel:#fff;--ink:#20282b;--blue:#168aad;--sand:#e8dfd2;--coral:#d9826b;--muted:#68757a}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -24,8 +24,9 @@ select,textarea{width:100%;padding:11px;border:1px solid #d7cec1;border-radius:1
 <main>
 <div class="top"><div><div class="brand">🔷 LangBlue</div><h1>📝 آزمون سالانه زبان</h1></div><a href="index.html">بازگشت به خانه</a></div>
 <section id="statusCard" class="card"><h2>وضعیت آزمون</h2><div id="statusText" class="muted">در حال بارگذاری…</div><div id="periodGrid" class="grid" style="margin-top:14px"></div></section>
-<section id="setup" class="card hidden"><h2>آماده‌سازی</h2>
+<section id="setup" class="card hidden"><h2>آماده‌سازی آزمون</h2><div class="notice" style="margin-bottom:14px">در این سامانه، انگلیسی یک آزمون واحد است و لغات و گرامر انگلیسی از هم جدا نمی‌شوند. آلمانی آزمون و بانک سؤال مستقل خودش را دارد و هر رکورد آموزشی با زبان مربوط به خودش ذخیره می‌شود.</div>
 <div class="grid">
+<div><label>زبان آزمون</label><select id="examLanguage"><option value="english">🇬🇧 English — انگلیسی</option><option value="german">🇩🇪 Deutsch — آلمانی</option></select></div>
 <div><label>سطح زبان</label><select id="level"><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></div>
 <div><label>رضایت استفاده ناشناس از محتوای آموزشی</label><select id="consent"><option value="yes">اجازه می‌دهم</option><option value="no">اجازه نمی‌دهم</option></select></div>
 </div>
@@ -38,7 +39,7 @@ select,textarea{width:100%;padding:11px;border:1px solid #d7cec1;border-radius:1
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-let state={periods:[],session:null,question:null,qStarted:0,timer:null,locked:false};
+let state={periods:[],session:null,question:null,qStarted:0,timer:null,locked:false,language:localStorage.getItem("lb_exam_language")||"english"};
 function fmt(x){try{return new Date(x).toLocaleString('fa-IR',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Tehran'})}catch(e){return x}}
 function toast(t){alert(t)}
 async function api(action,body={}){return await window.LangBlueBackend.invoke('langblue-exam',{action,...body})}
@@ -48,7 +49,7 @@ function localItems(){
   if(out.length>=500||v==null)return;
   if(Array.isArray(v)){for(const x of v)walk(x);return}
   if(typeof v!=='object')return;
-  const source=String(v.word||v.grammar||v.title||'').trim();
+  const source=String(v.word||v.en||v.english||v.de||v.german||v.grammar||v.title||'').trim();
   const fa=String(v.persian||v.translation||v.meaning||v.explanation||'').trim();
   const ex=String(v.example||v.exampleText||v.sentence||'').trim();
   const isGrammar=!!(v.grammar||v.grammarName||v.formula||v.grammarExplanation);
@@ -64,12 +65,12 @@ function localItems(){
 async function syncContent(){
  const consent=$('consent').value==='yes'; if(!consent)return;
  const level=$('level').value; const items=localItems(); if(!items.length)return;
- const r=await api('contribute',{level,items}); if(!r.ok&&r.error!=='CONTRIBUTION_CONSENT_REQUIRED')console.warn(r.error);
+ const r=await api('contribute',{language:state.language,level,items}); if(!r.ok&&r.error!=='CONTRIBUTION_CONSENT_REQUIRED')console.warn(r.error);
 }
 function renderPeriods(){
  const g=$('periodGrid');g.innerHTML='';
  for(const p of state.periods.slice(0,6)){
-  const d=document.createElement('div');d.className='stat';d.innerHTML='<b>'+p.level+'</b><div>'+fmt(p.start_at)+'</div><div class="muted">ظرفیت: '+p.capacity+' · '+p.status+'</div>';
+  const d=document.createElement('div');d.className='stat';d.innerHTML='<b>'+(p.exam_language==='german'?'🇩🇪 Deutsch':'🇬🇧 English')+' · '+p.level+'</b><div>'+fmt(p.start_at)+'</div><div class="muted">ظرفیت: '+p.capacity+' · '+p.status+'</div>';
   g.appendChild(d);
  }
 }
@@ -77,24 +78,26 @@ async function load(){
  const r=await api('status');if(!r.ok){$('statusText').textContent='برای ورود به آزمون باید وارد حساب مرکزی LangBlue باشی.';return}
  state.periods=r.periods||[];renderPeriods();$('setup').classList.remove('hidden');
  if(r.profile.language_level)$('level').value=r.profile.language_level;
+ $('examLanguage').value=state.language;
  $('consent').value=r.profile.exam_contribution_consent?'yes':'no';
  $('eligibility').textContent='واژه‌های ثبت‌شده برای بانک آزمون: '+r.eligibility.vocabulary_count+' · گرامرها: '+r.eligibility.grammar_count+' · معیار عادی: حداقل ۷ هفته حساب، ۵۰ واژه و ۲۵ گرامر. در غیر این صورت مسیر دسترسی آموزشی همچنان قابل بررسی است.';
  const registered=(r.registrations||[]).find(x=>x.status==='registered');
- if(registered){$('statusText').innerHTML='ثبت‌نام فعلی: <b>'+registered.level+'</b> · وضعیت: '+registered.status;const p=state.periods.find(x=>x.id===registered.period_id);if(p&&Date.now()>=new Date(p.start_at).getTime()&&Date.now()<new Date(p.start_at).getTime()+55*60000)startExam(p)}
+ if(registered){state.language=registered.exam_language||state.language;$('examLanguage').value=state.language;$('statusText').innerHTML='ثبت‌نام فعلی: <b>'+(state.language==='german'?'🇩🇪 Deutsch':'🇬🇧 English')+' · '+registered.level+'</b> · وضعیت: '+registered.status;const p=state.periods.find(x=>x.id===registered.period_id);if(p&&Date.now()>=new Date(p.start_at).getTime()&&Date.now()<new Date(p.start_at).getTime()+55*60000)startExam(p)}
  else $('statusText').textContent='سطح را انتخاب کن و در دوره‌ی باز ثبت‌نام کن.';
 }
 $('saveSetup').onclick=async()=>{
+ const language=$('examLanguage').value; state.language=language; localStorage.setItem('lb_exam_language',language);
  const level=$('level').value,consent=$('consent').value==='yes';
  let r=await api('set_level',{level});if(!r.ok){toast(r.error);return}
  r=await api('contribution_consent',{consent});if(!r.ok){toast(r.error);return}
  if(consent)await syncContent();
- const p=state.periods.find(x=>x.level===level);
+ const p=state.periods.find(x=>x.level===level&&x.exam_language===language);
  if(!p){toast('دوره‌ای برای این سطح پیدا نشد.');return}
  const now=Date.now(),open=new Date(p.registration_open_at).getTime(),close=new Date(p.registration_close_at).getTime();
  if(now>=open&&now<=close){
-  r=await api('register',{period_id:p.id});
+  r=await api('register',{period_id:p.id,exam_language:language});
   if(!r.ok){toast(r.error);return}
-  $('statusText').textContent='ثبت‌نام با موفقیت انجام شد. آزمون در زمان ثابت همین دوره برگزار می‌شود.';
+  $('statusText').textContent='ثبت‌نام با موفقیت انجام شد. آزمون '+(language==='german'?'آلمانی':'انگلیسی')+' در زمان ثابت همین دوره برگزار می‌شود.';
  }else $('statusText').textContent='ثبت‌نام این دوره هنوز باز نیست؛ زمان باز شدن را در کارت بالا ببین.';
 };
 async function startExam(p){
