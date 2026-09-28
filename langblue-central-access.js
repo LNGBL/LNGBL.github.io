@@ -11,7 +11,7 @@ async function refreshSubscription(){
 function centralUrl(){return '/?account=required';}
 function hidePricing(){
   ['pricingGrid','pricing-grid','paidPlanGrid','vocabGatePlans'].forEach(id=>{const e=document.getElementById(id);if(e){e.innerHTML='';e.style.display='none';}});
-  document.querySelectorAll('.pricing-grid,.paid-plan-grid,.vocab-plan-grid,.price-card,.vocab-plan-card').forEach(e=>e.style.display='none');
+  document.querySelectorAll('.pricing-grid,.paid-plan-grid,.vocab-plan-grid,.price-card,.vocab-plan-card,.pricing-note,.paid-howto,.vocab-telegram-box,.vocab-verify-box,.invoice-overlay,#code-form').forEach(e=>e.style.display='none');
 }
 function centralNotice(host){
   if(!host||host.dataset.lbCentralNotice)return;
