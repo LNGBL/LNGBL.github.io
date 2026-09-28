@@ -448,7 +448,9 @@
             verifiedAt: Date.now(),
             productIds: Array.isArray(remoteSub.product_ids)
               ? remoteSub.product_ids
-              : (Array.isArray(remoteSub.productIds) ? remoteSub.productIds : ids)
+              : (Array.isArray(remoteSub.productIds) ? remoteSub.productIds : ['grammar','vocabulary','deutsch']),
+            expiresAt: remoteSub.expires_at || remoteSub.expiresAt || null,
+            planId: remoteSub.plan_id || remoteSub.planId || null
           });
           storage.set('subscription', localSub);
           return {
@@ -466,11 +468,44 @@
       }
     },
 
+    async refresh(){
+      const sb = window.LangBlueSupabase;
+      if(!sb || typeof sb.getClient!=='function') return this.current();
+      try{
+        const client = sb.getClient();
+        if(!client) return this.current();
+        const {data,error}=await client
+          .from('subscriptions')
+          .select('id,plan_id,product_ids,status,starts_at,expires_at,created_at,updated_at')
+          .eq('status','active')
+          .gt('expires_at',new Date().toISOString())
+          .order('expires_at',{ascending:false})
+          .limit(1);
+        if(error) throw error;
+        if(data&&data[0]){
+          const row=data[0];
+          storage.set('subscription',Object.assign({},row,{
+            planId:row.plan_id,
+            productIds:Array.isArray(row.product_ids)?row.product_ids:['grammar','vocabulary','deutsch'],
+            expiresAt:row.expires_at,
+            verifiedByCode:true
+          }));
+        }else{
+          storage.remove('subscription');
+        }
+        return this.current();
+      }catch(error){
+        console.warn('LangBlue subscription refresh failed:',error);
+        return this.current();
+      }
+    },
     current(){
       const sub = storage.get('subscription', null);
       if(!sub) return null;
+      const expiresAt=sub.expiresAt || sub.expires_at || null;
       return Object.assign({}, sub, {
-        expired: !sub.expiresAt || Date.now() >= Number(sub.expiresAt)
+        expiresAt,
+        expired: !expiresAt || Date.now() >= Number(new Date(expiresAt).getTime())
       });
     }
   };
