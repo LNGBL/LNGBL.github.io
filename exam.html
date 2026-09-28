@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>LangBlue — آزمون سالانه</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script><script src="langblue-backend.js"></script><script src="langblue-core.js"></script><script src="langblue-central-account.js"></script>
+<style>
+:root{--bg:#f5f1e9;--panel:#fff;--ink:#20282b;--blue:#168aad;--sand:#e8dfd2;--coral:#d9826b;--muted:#68757a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:auto;padding:28px 18px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:20px}.brand{font-weight:850;color:var(--blue)}.card{background:var(--panel);border:1px solid #ddd5c8;border-radius:20px;padding:22px;margin-bottom:16px;box-shadow:0 8px 30px rgba(32,40,43,.05)}
+h1{margin:0 0 8px;font-size:28px}h2{margin:0 0 10px}.muted{color:var(--muted);line-height:1.8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.stat{padding:15px;background:#faf7f1;border:1px solid var(--sand);border-radius:14px}.stat b{display:block;font-size:22px;color:var(--blue);margin-top:4px}
+button,select,textarea{font:inherit}button{border:0;border-radius:12px;padding:11px 16px;background:var(--blue);color:white;font-weight:750;cursor:pointer}button.secondary{background:#fff;color:var(--ink);border:1px solid #d7cec1}button.danger{background:#b94e45}button:disabled{opacity:.45;cursor:not-allowed}
+select,textarea{width:100%;padding:11px;border:1px solid #d7cec1;border-radius:12px;background:#fff;color:var(--ink)}label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.hidden{display:none!important}.pill{display:inline-block;padding:5px 10px;border-radius:999px;background:#edf7f8;color:var(--blue);font-size:12px;font-weight:700}
+.question{font-size:21px;line-height:1.9;margin:22px 0}.options{display:grid;gap:10px}.option{text-align:right;background:#fff;color:var(--ink);border:2px solid #ded6ca}.option:hover{border-color:var(--blue)}.progress{height:8px;background:#e8dfd2;border-radius:99px;overflow:hidden}.progress div{height:100%;background:var(--blue)}
+.timer{font-size:25px;font-weight:850;color:var(--coral)}.notice{padding:13px 15px;border-radius:12px;background:#fff7ef;border-right:4px solid var(--coral);line-height:1.8}.success{background:#eef9f1;border-right-color:#39a66a}
+#shield{position:fixed;inset:0;background:rgba(246,232,197,.96);z-index:99999;display:none;align-items:center;justify-content:center;text-align:center;padding:30px}#shield.on{display:flex}#shield .box{max-width:600px}
+@media(max-width:650px){main{padding:18px 12px}.top{align-items:flex-start;flex-direction:column}.question{font-size:18px}}
+</style></head>
+<body>
+<div id="shield"><div class="box"><h2>🌙 حالت آرامش چشم</h2><p>LangBlue بعد از ۲۱:۵۰ به وقت ایران، رابط خود را گرم‌تر و کم‌نورتر می‌کند. این فقط فیلتر داخل سایت است و تنظیم Night Light سیستم‌عامل را تغییر نمی‌دهد.</p><button onclick="document.getElementById('shield').classList.remove('on')">ادامه</button></div></div>
+<main>
+<div class="top"><div><div class="brand">🔷 LangBlue</div><h1>📝 آزمون سالانه زبان</h1></div><a href="index.html">بازگشت به خانه</a></div>
+<section id="statusCard" class="card"><h2>وضعیت آزمون</h2><div id="statusText" class="muted">در حال بارگذاری…</div><div id="periodGrid" class="grid" style="margin-top:14px"></div></section>
+<section id="setup" class="card hidden"><h2>آماده‌سازی</h2>
+<div class="grid">
+<div><label>سطح زبان</label><select id="level"><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></div>
+<div><label>رضایت استفاده ناشناس از محتوای آموزشی</label><select id="consent"><option value="yes">اجازه می‌دهم</option><option value="no">اجازه نمی‌دهم</option></select></div>
+</div>
+<div class="notice" style="margin-top:14px">برای ثبت‌نام، محتوای آموزشی شخصی تو فقط در صورت رضایت وارد بانک آزمون می‌شود و پس از حداکثر ۵ ماه از بانک آزمون حذف می‌شود. هویت نویسنده در سؤال آزمون نمایش داده نمی‌شود.</div>
+<div id="eligibility" class="muted" style="margin-top:12px"></div><div class="actions"><button id="saveSetup">ذخیره سطح و رضایت</button></div></section>
+<section id="examCard" class="card hidden"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><span class="pill" id="examProgress">سؤال 1 از 54</span><span class="timer" id="timer">01:05</span></div><div class="progress" style="margin-top:12px"><div id="bar" style="width:1.85%"></div></div><div class="question" id="questionText"></div><div class="options" id="options"></div><div class="actions"><button class="secondary" id="reportBtn">گزارش ایراد سؤال</button></div></section>
+<section id="resultCard" class="card hidden"><h2>نتیجه آزمون</h2><div id="resultText" class="muted"></div></section>
+</main>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+let state={periods:[],session:null,question:null,qStarted:0,timer:null,locked:false};
+function fmt(x){try{return new Date(x).toLocaleString('fa-IR',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Tehran'})}catch(e){return x}}
+function toast(t){alert(t)}
+async function api(action,body={}){return await window.LangBlueBackend.invoke('langblue-exam',{action,...body})}
+function localItems(){
+ const out=[], seen=new Set();
+ const walk=(v)=>{
+  if(out.length>=500||v==null)return;
+  if(Array.isArray(v)){for(const x of v)walk(x);return}
+  if(typeof v!=='object')return;
+  const source=String(v.word||v.grammar||v.title||'').trim();
+  const fa=String(v.persian||v.translation||v.meaning||v.explanation||'').trim();
+  const ex=String(v.example||v.exampleText||v.sentence||'').trim();
+  const isGrammar=!!(v.grammar||v.grammarName||v.formula||v.grammarExplanation);
+  if(source&&(fa||ex)){
+   const key=(isGrammar?'grammar':'vocabulary')+'|'+source.toLowerCase()+'|'+fa;
+   if(!seen.has(key)){seen.add(key);out.push({source_type:isGrammar?'grammar':'vocabulary',source_content:source,translation_fa:fa,word_type:v.type||v.partOfSpeech||'',grammar_explanation_fa:v.grammarExplanation||v.explanation||'',example_text:ex,sticker_ref:Array.isArray(v.stickers)?v.stickers.join(','):String(v.sticker||'')})}
+  }
+  for(const k of Object.keys(v).slice(0,30))if(!['state','backup','history'].includes(k))walk(v[k]);
+ };
+ for(let i=0;i<localStorage.length&&out.length<500;i++){const k=localStorage.key(i);try{const v=JSON.parse(localStorage.getItem(k));walk(v)}catch(e){}}
+ return out;
+}
+async function syncContent(){
+ const consent=$('consent').value==='yes'; if(!consent)return;
+ const level=$('level').value; const items=localItems(); if(!items.length)return;
+ const r=await api('contribute',{level,items}); if(!r.ok&&r.error!=='CONTRIBUTION_CONSENT_REQUIRED')console.warn(r.error);
+}
+function renderPeriods(){
+ const g=$('periodGrid');g.innerHTML='';
+ for(const p of state.periods.slice(0,6)){
+  const d=document.createElement('div');d.className='stat';d.innerHTML='<b>'+p.level+'</b><div>'+fmt(p.start_at)+'</div><div class="muted">ظرفیت: '+p.capacity+' · '+p.status+'</div>';
+  g.appendChild(d);
+ }
+}
+async function load(){
+ const r=await api('status');if(!r.ok){$('statusText').textContent='برای ورود به آزمون باید وارد حساب مرکزی LangBlue باشی.';return}
+ state.periods=r.periods||[];renderPeriods();$('setup').classList.remove('hidden');
+ if(r.profile.language_level)$('level').value=r.profile.language_level;
+ $('consent').value=r.profile.exam_contribution_consent?'yes':'no';
+ $('eligibility').textContent='واژه‌های ثبت‌شده برای بانک آزمون: '+r.eligibility.vocabulary_count+' · گرامرها: '+r.eligibility.grammar_count+' · معیار عادی: حداقل ۷ هفته حساب، ۵۰ واژه و ۲۵ گرامر. در غیر این صورت مسیر دسترسی آموزشی همچنان قابل بررسی است.';
+ const registered=(r.registrations||[]).find(x=>x.status==='registered');
+ if(registered){$('statusText').innerHTML='ثبت‌نام فعلی: <b>'+registered.level+'</b> · وضعیت: '+registered.status;const p=state.periods.find(x=>x.id===registered.period_id);if(p&&Date.now()>=new Date(p.start_at).getTime()&&Date.now()<new Date(p.start_at).getTime()+55*60000)startExam(p)}
+ else $('statusText').textContent='سطح را انتخاب کن و در دوره‌ی باز ثبت‌نام کن.';
+}
+$('saveSetup').onclick=async()=>{
+ const level=$('level').value,consent=$('consent').value==='yes';
+ let r=await api('set_level',{level});if(!r.ok){toast(r.error);return}
+ r=await api('contribution_consent',{consent});if(!r.ok){toast(r.error);return}
+ if(consent)await syncContent();
+ const p=state.periods.find(x=>x.level===level);
+ if(!p){toast('دوره‌ای برای این سطح پیدا نشد.');return}
+ const now=Date.now(),open=new Date(p.registration_open_at).getTime(),close=new Date(p.registration_close_at).getTime();
+ if(now>=open&&now<=close){
+  r=await api('register',{period_id:p.id});
+  if(!r.ok){toast(r.error);return}
+  $('statusText').textContent='ثبت‌نام با موفقیت انجام شد. آزمون در زمان ثابت همین دوره برگزار می‌شود.';
+ }else $('statusText').textContent='ثبت‌نام این دوره هنوز باز نیست؛ زمان باز شدن را در کارت بالا ببین.';
+};
+async function startExam(p){
+ const r=await api('start',{period_id:p.id});if(!r.ok){toast(r.error);return}
+ state.session=r.session;state.question=r.question;state.qStarted=Date.now();$('examCard').classList.remove('hidden');$('setup').classList.add('hidden');renderQ();startTimer();
+}
+function renderQ(){
+ const q=state.question;if(!q)return;$('examProgress').textContent='سؤال '+q.order_index+' از 54';$('questionText').textContent=q.question_text;
+ const o=$('options');o.innerHTML='';q.options.forEach((v,i)=>{const b=document.createElement('button');b.className='option';b.textContent=v;b.onclick=()=>answer(i);o.appendChild(b)});
+ $('bar').style.width=(q.order_index/54*100)+'%';
+}
+function startTimer(){clearInterval(state.timer);state.timer=setInterval(()=>{const left=Math.max(0,65000-(Date.now()-state.qStarted));$('timer').textContent=String(Math.floor(left/60000)).padStart(2,'0')+':'+String(Math.floor(left%60000/1000)).padStart(2,'0');if(left<=0){clearInterval(state.timer);answer(-1)}},200)}
+async function answer(i){
+ if(!state.session||state.locked)return;state.locked=true;clearInterval(state.timer);
+ const r=await api('answer',{session_id:state.session.id,question_id:state.question.id,selected_option:i<0?0:i});
+ if(!r.ok){toast(r.error);state.locked=false;return}
+ if(r.finished){$('examCard').classList.add('hidden');$('resultCard').classList.remove('hidden');$('resultText').textContent='آزمون تمام شد. گزارش ۴۸ ساعت بعد منتشر می‌شود و فقط ۱۰ ساعت در دسترس خواهد بود.';return}
+ state.question=r.next_question;state.qStarted=Date.now();state.locked=false;renderQ();startTimer();
+}
+document.addEventListener('visibilitychange',async()=>{if(document.hidden&&state.session&&!state.locked){state.locked=true;await api('incident',{session_id:state.session.id,incident_type:'tab_switch'});clearInterval(state.timer);toast('به‌دلیل خروج از تب آزمون، این آزمون لغو شد.');}});
+$('reportBtn').onclick=async()=>{const reason=prompt('دلیل ایراد سؤال را بنویس:');if(!reason)return;const evidence=prompt('اگر مدرکی داری، توضیح کوتاه بده:')||'';const r=await api('report_question',{question_id:state.question.id,reason,evidence});toast(r.ok?'گزارش ثبت شد و برای بررسی ارسال شد.':r.error)};
+function night(){const now=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Tehran'}));if(now.getHours()>21||(now.getHours()===21&&now.getMinutes()>=50))document.body.style.filter='sepia(.12) brightness(.93)';}
+night();setInterval(night,60000);load();
+})();
+</script></body></html>
