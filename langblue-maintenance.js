@@ -6,16 +6,18 @@ function tehranParts(){
   const o={};p.forEach(x=>o[x.type]=x.value);return o;
 }
 function active(){
-  const p=tehranParts(), h=Number(p.hour), m=Number(p.minute), min=h*60+m;
   const now=new Date();
-  const week=Number(new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Tehran',year:'numeric'}).format(now));
-  // ISO week is calculated from the Tehran calendar date to avoid browser-local timezone drift.
-  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Tehran',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
-  const date=new Date(Date.UTC(Number(parts.find(x=>x.type==='year').value),Number(parts.find(x=>x.type==='month').value)-1,Number(parts.find(x=>x.type==='day').value)));
-  const thurs=new Date(date); thurs.setUTCDate(date.getUTCDate()-((date.getUTCDay()+6)%7));
-  const isoWeek=Math.ceil((((date-thurs)/86400000)+1)/7)+Math.floor((thurs.getUTCMonth()+1)/12);
-  const dow=(date.getUTCDay()===0?7:date.getUTCDay());
-  return (dow===4 && isoWeek%2===0 && min>=1410) || (dow===5 && isoWeek%2===0 && min<360);
+  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Tehran',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',weekday:'short',hour12:false}).formatToParts(now);
+  const p={};parts.forEach(x=>p[x.type]=x.value);
+  const y=Number(p.year), mo=Number(p.month), da=Number(p.day), h=Number(p.hour), min=Number(p.minute);
+  const utcDate=new Date(Date.UTC(y,mo-1,da));
+  const dayNum=utcDate.getUTCDay()||7;
+  const isoThursday=new Date(utcDate);
+  isoThursday.setUTCDate(utcDate.getUTCDate()+4-dayNum);
+  const yearStart=new Date(Date.UTC(isoThursday.getUTCFullYear(),0,1));
+  const isoWeek=Math.ceil((((isoThursday-yearStart)/86400000)+1)/7);
+  const dow=dayNum, minutes=h*60+min;
+  return (dow===4 && isoWeek%2===0 && minutes>=1410) || (dow===5 && isoWeek%2===0 && minutes<360);
 }
 function overlay(){
   if(document.getElementById('lbMaintenanceOverlay'))return;
