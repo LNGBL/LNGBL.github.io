@@ -80,7 +80,7 @@ async function load(){
  if(r.profile.language_level)$('level').value=r.profile.language_level;
  $('examLanguage').value=state.language;
  $('consent').value=r.profile.exam_contribution_consent?'yes':'no';
- $('eligibility').textContent='واژه‌های ثبت‌شده برای بانک آزمون: '+r.eligibility.vocabulary_count+' · گرامرها: '+r.eligibility.grammar_count+' · معیار عادی: حداقل ۷ هفته حساب، ۵۰ واژه و ۲۵ گرامر. در غیر این صورت مسیر دسترسی آموزشی همچنان قابل بررسی است.';
+ const ec=(r.eligibility.by_language&&r.eligibility.by_language[state.language])||r.eligibility; $('eligibility').textContent='بانک '+(state.language==='german'?'آلمانی':'انگلیسی')+': '+ec.vocabulary_count+' واژه · '+ec.grammar_count+' گرامر · معیار عادی: حداقل ۷ هفته حساب، ۵۰ واژه و ۲۵ گرامر.';
  const registered=(r.registrations||[]).find(x=>x.status==='registered');
  if(registered){state.language=registered.exam_language||state.language;$('examLanguage').value=state.language;$('statusText').innerHTML='ثبت‌نام فعلی: <b>'+(state.language==='german'?'🇩🇪 Deutsch':'🇬🇧 English')+' · '+registered.level+'</b> · وضعیت: '+registered.status;const p=state.periods.find(x=>x.id===registered.period_id);if(p&&Date.now()>=new Date(p.start_at).getTime()&&Date.now()<new Date(p.start_at).getTime()+55*60000)startExam(p)}
  else $('statusText').textContent='سطح را انتخاب کن و در دوره‌ی باز ثبت‌نام کن.';
