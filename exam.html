@@ -49,7 +49,7 @@ function localItems(){
   if(out.length>=500||v==null)return;
   if(Array.isArray(v)){for(const x of v)walk(x);return}
   if(typeof v!=='object')return;
-  const source=String(v.word||v.en||v.english||v.de||v.german||v.grammar||v.title||'').trim();
+  const source=String(v.word||v.en||v.english||v.de||v.german||v.grammar||v.grammarName||v.title||'').trim();
   const fa=String(v.persian||v.translation||v.meaning||v.explanation||'').trim();
   const ex=String(v.example||v.exampleText||v.sentence||'').trim();
   const isGrammar=!!(v.grammar||v.grammarName||v.formula||v.grammarExplanation);
@@ -69,7 +69,7 @@ async function syncContent(){
 }
 function renderPeriods(){
  const g=$('periodGrid');g.innerHTML='';
- for(const p of state.periods.slice(0,6)){
+ for(const p of state.periods.slice(0,24)){
   const d=document.createElement('div');d.className='stat';d.innerHTML='<b>'+(p.exam_language==='german'?'🇩🇪 Deutsch':'🇬🇧 English')+' · '+p.level+'</b><div>'+fmt(p.start_at)+'</div><div class="muted">ظرفیت: '+p.capacity+' · '+p.status+'</div>';
   g.appendChild(d);
  }
