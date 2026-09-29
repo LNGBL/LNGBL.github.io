@@ -45,6 +45,15 @@
     try{
       const client=sb.getClient();
       if(!client)return null;
+
+      // The RPC is intentionally executable only by authenticated users.
+      // On initial page load the local LangBlue session can exist briefly
+      // before Supabase Auth has restored its JWT. Do not call the RPC with
+      // the publishable/anon role in that window; it produces a misleading
+      // 401 "permission denied for function" response.
+      const {data:sessionData,error:sessionError}=await client.auth.getSession();
+      if(sessionError||!sessionData||!sessionData.session)return null;
+
       const {data,error}=await client.rpc('sync_leaderboard',{
         p_points:m.points,p_tokens:m.tokens,p_grammar_score:m.grammarScore,
         p_vocabulary_count:m.vocabularyCount,p_grammar_count:m.grammarCount
