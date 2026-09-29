@@ -35,7 +35,7 @@
     const tokens=Math.max(0,Number(tokensData&&tokensData.tokens)||0);
     const vocabularyCount=Array.isArray(words)?words.length:0;
     const points=Math.max(0,Math.round(tokens+grammarScore));
-    return {userId:id,username:String(u.username||'').trim(),displayName:String(u.name||u.fullName||u.username||'').trim(),points,tokens,grammarScore,vocabularyCount,grammarCount};
+    return {userId:id,username:String(u.username||'').trim(),displayName:String(u.name||u.fullName||u.username||'').trim(),points:Number.isFinite(points)?points:0,tokens:Number.isFinite(tokens)?tokens:0,grammarScore:Number.isFinite(grammarScore)?grammarScore:0,vocabularyCount:Number.isFinite(vocabularyCount)?vocabularyCount:0,grammarCount:Number.isFinite(grammarCount)?grammarCount:0};
   }
 
   async function sync(){
