@@ -1,4 +1,4 @@
-/* LangBlue server-authoritative engagement + anonymous Markov peer learning. */
+/* LangBlue daily learning rewards + anonymous Markov peer learning. */
 (function(window,document){
   'use strict';
   const URL_BASE='https://ocxeyponzzcvlrvwndji.supabase.co/functions/v1/';
@@ -40,15 +40,8 @@
     const key='spin_'+crypto.randomUUID().replace(/-/g,'');
     return invoke('langblue-spin',{idempotency_key:key,reroll:!!reroll});
   }
-  function spinText(r){
-    const map={
-      token_150:'🎉 ۱۵۰ توکن دریافت کردی.',
-      extension_21d:'🎁 اشتراک/دورهٔ فعال تو ۲۱ روز تمدید شد.',
-      nothing:'امروز جایزه‌ای نصیب نشد؛ فردا دوباره می‌توانی امتحان کنی.',
-      reroll:'🔁 یک چرخهٔ مجدد داری.',
-      learning_tokens_25:'📚 ۲۵ توکن آموزشی دریافت کردی.'
-    };
-    return map[r]||'نتیجه ثبت شد.';
+  function spinText(){
+    return '📚 ۲۵ توکن آموزشی روزانه دریافت کردی.';
   }
   function injectStyles(){
     if(document.getElementById('lb-engagement-style'))return;
@@ -61,18 +54,13 @@
     injectStyles();
     if(document.getElementById('lbDailySpinPanel'))return;
     const panel=document.createElement('section');panel.id='lbDailySpinPanel';panel.className='lb-engagement-panel';
-    panel.innerHTML='<strong>🎯 پاداش روزانه</strong><div class="lb-engagement-note">هر ۲۴ ساعت یک بار. نتیجه روی سرور تعیین می‌شود و فقط یک چرخهٔ مجدد مجاز است.</div><div class="lb-engagement-actions"><button class="btn btn-primary" type="button" id="lbDailySpinBtn">چرخش روزانه</button></div><div id="lbDailySpinResult" class="lb-central-error"></div>';
+    panel.innerHTML='<strong>🎯 پاداش روزانه</strong><div class="lb-engagement-note">هر ۲۴ ساعت یک بار؛ پاداش ثابت آموزشی روی سرور ثبت می‌شود.</div><div class="lb-engagement-actions"><button class="btn btn-primary" type="button" id="lbDailySpinBtn">دریافت پاداش روزانه</button></div><div id="lbDailySpinResult" class="lb-central-error"></div>';
     body.querySelector('.lb-central-actions')?.before(panel);
     panel.querySelector('#lbDailySpinBtn').onclick=async function(){
       const btn=this,out=panel.querySelector('#lbDailySpinResult');btn.disabled=true;out.textContent='در حال ثبت…';
       let r=await spin(false);
       if(!r.ok){out.textContent=r.error==='SPIN_COOLDOWN'?'هنوز ۲۴ ساعت کامل نشده است.':r.error;btn.disabled=false;return;}
-      out.style.color='#9be7b4';out.textContent=spinText(r.outcome);
-      if(r.reroll_available){
-        const again=document.createElement('button');again.className='btn btn-secondary';again.textContent='🔁 استفاده از چرخهٔ مجدد';
-        panel.querySelector('.lb-engagement-actions').appendChild(again);
-        again.onclick=async function(){again.disabled=true;const rr=await spin(true);if(rr.ok){out.textContent=spinText(rr.outcome);again.remove();}else{out.textContent=rr.error||'چرخهٔ مجدد در دسترس نیست.';again.disabled=false;}};
-      }
+      out.style.color='#9be7b4';out.textContent=spinText();
     };
   }
   function installMarkovInVocab(){
