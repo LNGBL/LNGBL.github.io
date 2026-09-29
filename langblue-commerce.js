@@ -10,8 +10,8 @@ irt_7d:{
 id:'irt_7d',
 days:7,
 label:'۷ روز',
-price:550000,
-priceStr:'550,000 T',
+price:330000,
+priceStr:'330,000 T',
 feature:'دسترسی کامل به Grammar + Vocabulary + Deutsch'
 },
 
@@ -20,8 +20,8 @@ irt_14d:{
 id:'irt_14d',
 days:14,
 label:'۱۴ روز',
-price:550000,
-priceStr:'550,000 T',
+price:440000,
+priceStr:'440,000 T',
 feature:'دسترسی کامل به محصولات LangBlue'
 },
 
