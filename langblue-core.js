@@ -488,7 +488,8 @@
             planId:row.plan_id,
             productIds:Array.isArray(row.product_ids)?row.product_ids:['grammar','vocabulary','deutsch'],
             expiresAt:row.expires_at,
-            verifiedByCode:true
+            verifiedByCode:row.plan_id!=='trial_48h',
+            trial:row.plan_id==='trial_48h'
           }));
         }else{
           storage.remove('subscription');
