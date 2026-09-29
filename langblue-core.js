@@ -192,7 +192,12 @@
         sex: data.sex || data.gender || '',
         country: data.country || null,
         countryName: data.countryName || null,
-        currency: data.currency || null
+        currency: data.currency || null,
+        english_level: data.english_level || null,
+        german_level: data.german_level || null,
+        peer_learning_consent: data.peer_learning_consent === true,
+        peer_learning_notifications: data.peer_learning_notifications !== false,
+        favorite_artists: Array.isArray(data.favorite_artists) ? data.favorite_artists.slice(0,2) : []
       };
 
       const backend = window.LangBlueSupabase;
