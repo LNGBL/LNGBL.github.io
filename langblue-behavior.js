@@ -60,6 +60,43 @@
     }
   }
 
+  function trackUiEvent(target){
+    if(!target || !target.closest) return;
+    const path=String(window.location.pathname||'').toLowerCase();
+    const el=target.closest('button,select,[data-plan],.main-tab,.tab,.price-card');
+    if(!el) return;
+
+    let eventName=null, contextId=null, payload={};
+
+    if(path.includes('vocab')){
+      if(el.id==='openFlashcardBtn'){ eventName='learning_started'; contextId='flashcard'; }
+      else if(el.id==='openWeaknessBtn' || el.id==='weaknessStartBtn'){ eventName='weakness_mode_opened'; contextId='weakness'; }
+      else if(el.matches('#flashcardOptions .option-btn')){ eventName='content_answered'; contextId='flashcard'; payload={option_index:Number(el.dataset.index||-1)}; }
+      else if(el.matches('#weaknessOptions .option-btn')){ eventName='content_answered'; contextId='weakness'; payload={option_index:Number(el.dataset.index||-1)}; }
+      else if(el.matches('[data-srs]')){ eventName='content_repeated'; contextId=el.getAttribute('data-srs'); payload={status:el.getAttribute('data-status')}; }
+      else if(el.matches('.main-tab')){ eventName='content_seen'; contextId=el.getAttribute('data-tab'); }
+      else if(el.matches('[data-plan],.price-card')){ eventName='subscription_selected'; contextId=el.getAttribute('data-plan'); }
+    }else if(path.includes('grammer') || path.includes('grammar')){
+      if(el.matches('.tab[data-tab="flashcard"]')){ eventName='learning_started'; contextId='flashcard'; }
+      else if(el.matches('.flashcard .option')){ eventName='content_answered'; contextId='flashcard'; payload={option:el.dataset.opt||null}; }
+      else if(el.matches('[data-plan],.price-card')){ eventName='subscription_selected'; contextId=el.getAttribute('data-plan'); }
+    }else if(path.includes('langblue-de') || path.includes('deutsch')){
+      if(el.id==='btn-next'){ eventName='learning_started'; contextId='flashcard'; }
+      else if(el.matches('.options-grid .option')){ eventName='content_answered'; contextId='flashcard'; payload={option_index:Number(el.dataset.idx||-1)}; }
+      else if(el.matches('[data-plan],.price-card')){ eventName='subscription_selected'; contextId=el.getAttribute('data-plan'); }
+    }else if(path.includes('exam')){
+      if(el.id==='saveSetup'){ eventName='assessment_started'; contextId='annual_exam'; }
+      else if(el.matches('#options .option')){ eventName='content_answered'; contextId='annual_exam'; payload={option_index:Array.from(el.parentElement.children).indexOf(el)}; }
+    }
+
+    if(eventName) send(eventName,{productId:inferProduct(),language:inferLanguage(),contextId,payload});
+  }
+
+  function inferLanguage(){
+    const product=inferProduct();
+    return product==='deutsch'?'german':(product?'english':null);
+  }
+
   function pageView(productId, language){
     return send('page_view',{productId,language});
   }
@@ -81,7 +118,7 @@
 
   function boot(){
     const product=inferProduct();
-    const language=product==='deutsch'?'german':(product?'english':null);
+    const language=inferLanguage();
     pageView(product,language);
     try{
       if(!sessionStorage.getItem('lb:behavior:started')){
@@ -91,6 +128,10 @@
     }catch(_){}
   }
 
+  document.addEventListener('click',function(e){trackUiEvent(e.target);},true);
+  document.addEventListener('change',function(e){
+    if(e.target && e.target.id==='receiptPlan') send('subscription_selected',{productId:null,language:null,contextId:e.target.value,payload:{source:'receipt_builder'}});
+  },true);
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
 })(window);
