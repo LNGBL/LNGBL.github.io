@@ -70,4 +70,27 @@
     send,
     pageView
   };
+
+  function inferProduct(){
+    const path=String(window.location.pathname||'').toLowerCase();
+    if(path.includes('vocab')) return 'vocabulary';
+    if(path.includes('grammer') || path.includes('grammar')) return 'grammar';
+    if(path.includes('langblue-de') || path.includes('deutsch')) return 'deutsch';
+    return null;
+  }
+
+  function boot(){
+    const product=inferProduct();
+    const language=product==='deutsch'?'german':(product?'english':null);
+    pageView(product,language);
+    try{
+      if(!sessionStorage.getItem('lb:behavior:started')){
+        sessionStorage.setItem('lb:behavior:started','1');
+        send('session_started',{productId:product,language});
+      }
+    }catch(_){}
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
 })(window);
