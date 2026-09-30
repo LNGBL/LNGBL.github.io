@@ -80,7 +80,7 @@
     $('loginBtn').hidden=true;
     setStatus('در حال دریافت داده‌های پژوهشی…','loading');
 
-    const {data,error}=await sb.functions.invoke('langblue-research-dashboard',{body:{}});
+    const {data,error}=await sb.functions.invoke('langblue-research-dashboard',{body:{},headers:{Authorization:'Bearer '+session.access_token}});
     if(error || !data || !data.ok){
       const code=(data&&data.error)||'DASHBOARD_LOAD_FAILED';
       if(code==='RESEARCH_ADMIN_REQUIRED'){
