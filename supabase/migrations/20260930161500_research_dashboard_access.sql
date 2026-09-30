@@ -3,12 +3,15 @@ create table if not exists public.research_admins (
   created_at timestamptz not null default now()
 );
 alter table public.research_admins enable row level security;
+drop policy if exists research_admins_no_direct_select on public.research_admins;
+create policy research_admins_no_direct_select on public.research_admins for select to authenticated using (false);
 revoke all on public.research_admins from anon, authenticated;
 grant all on public.research_admins to service_role;
 create index if not exists research_admins_created_idx on public.research_admins(created_at desc);
 
 create or replace function public.research_dashboard_summary()
 returns jsonb language sql stable
+set search_path = public
 as $$
   select jsonb_build_object(
     'total_events', count(*)::bigint,
