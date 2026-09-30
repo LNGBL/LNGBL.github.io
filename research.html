@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; connect-src 'self' https://ocxeyponzzcvlrvwndji.supabase.co; img-src 'self' data:; font-src 'self';">
 <title>LangBlue · Research Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
@@ -45,6 +47,6 @@ header{display:flex;justify-content:space-between;gap:18px;align-items:center;ma
   <p class="note">این داشبورد برای توصیف الگوهای استفاده و یادگیری است. داده خام <code>behavior_events</code> منبع اصلی است و aggregateها قابل بازسازی‌اند.</p>
 </section>
 </div>
-<script src="langblue-research-dashboard.js"></script>
+<script src="langblue-research-dashboard.js" defer></script>
 </body>
 </html>
