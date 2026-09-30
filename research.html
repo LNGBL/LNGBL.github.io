@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>LangBlue · Research Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="langblue-backend.js"></script>
+<script src="langblue-core.js"></script>
+<script src="langblue-central-account.js"></script>
+<style>
+:root{--bg:#071521;--panel:#0e2233;--panel2:#122c40;--line:rgba(255,255,255,.1);--text:#edf7fa;--muted:#9db4bd;--blue:#168aad;--ok:#43c59e;--warn:#f2b84b;--bad:#ef7777}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,rgba(22,138,173,.22),transparent 34%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.7}.wrap{width:min(1180px,calc(100% - 30px));margin:auto;padding:28px 0 60px}
+header{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:22px}h1{margin:0;font-size:clamp(25px,4vw,42px)}h2{font-size:19px;margin:0 0 14px}.sub{color:var(--muted);margin:6px 0 0}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);padding:9px 14px;border-radius:10px;cursor:pointer;font-weight:700}.btn.primary{background:var(--blue);border-color:transparent}.status{padding:12px 15px;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:12px;margin:18px 0}.status[data-type=ok]{border-color:rgba(67,197,158,.4)}.status[data-type=warn]{border-color:rgba(242,184,75,.4)}.status[data-type=error]{border-color:rgba(239,119,119,.4)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.kpi{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}.kpi .label{color:var(--muted);font-size:12px}.kpi .value{font-size:29px;font-weight:850;margin-top:4px}.grid{display:grid;grid-template-columns:1fr;gap:16px}.card{background:rgba(14,34,51,.84);border:1px solid var(--line);border-radius:16px;padding:18px;overflow:hidden}.meta{font-size:12px;color:var(--muted)}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:700px}th,td{text-align:right;padding:10px 9px;border-bottom:1px solid var(--line);font-size:13px}th{color:#c7e2e8;font-size:12px;position:sticky;top:0;background:var(--panel2)}.empty{text-align:center;color:var(--muted);padding:24px}.note{font-size:12px;color:var(--muted);margin-top:12px}#dashboard[hidden],#loginBtn[hidden]{display:none}
+@media(max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}header{align-items:flex-start;flex-direction:column}}
+@media(max-width:480px){.kpis{grid-template-columns:1fr 1fr}.kpi .value{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><h1>Research Dashboard</h1><p class="sub">لایه پژوهشی LangBlue · داده‌های توصیفی رفتار یادگیری</p></div>
+  <div class="actions"><button class="btn" id="refreshBtn">↻ به‌روزرسانی</button><button class="btn primary" id="loginBtn" hidden>🔐 ورود به حساب مرکزی</button></div>
+</header>
+<div class="status" id="researchStatus">در حال بررسی نشست حساب…</div>
+<section id="dashboard" hidden>
+  <div class="kpis">
+    <div class="kpi"><div class="label">کل رویدادها</div><div class="value" id="kpiEvents">0</div></div>
+    <div class="kpi"><div class="label">زبان‌آموز یکتا</div><div class="value" id="kpiUsers">0</div></div>
+    <div class="kpi"><div class="label">نشست یکتا</div><div class="value" id="kpiSessions">0</div></div>
+    <div class="kpi"><div class="label">روزهای فعال</div><div class="value" id="kpiDays">0</div></div>
+  </div>
+  <div class="card" style="margin-bottom:16px"><span class="meta" id="lastEvent">—</span><span class="meta" id="generatedAt" style="margin-right:18px">—</span></div>
+  <div class="card">
+    <h2>قیف محصول</h2>
+    <div class="table-wrap"><table><thead><tr><th>محصول</th><th>مشاهده</th><th>شروع یادگیری</th><th>تکمیل یادگیری</th><th>Weakness</th><th>انتخاب اشتراک</th><th>فعال‌سازی</th></tr></thead><tbody id="funnelBody"></tbody></table></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h2>رویدادهای روزانه</h2>
+    <div class="table-wrap"><table><thead><tr><th>تاریخ</th><th>محصول</th><th>رویداد</th><th>تعداد</th><th>کاربر یکتا</th><th>نشست یکتا</th></tr></thead><tbody id="dailyBody"></tbody></table></div>
+  </div>
+  <p class="note">این داشبورد برای توصیف الگوهای استفاده و یادگیری است. داده خام <code>behavior_events</code> منبع اصلی است و aggregateها قابل بازسازی‌اند.</p>
+</section>
+</div>
+<script src="langblue-research-dashboard.js"></script>
+</body>
+</html>
