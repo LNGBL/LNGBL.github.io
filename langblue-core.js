@@ -458,6 +458,16 @@
             planId: remoteSub.plan_id || remoteSub.planId || null
           });
           storage.set('subscription', localSub);
+          try{
+            if(window.LangBlueBehavior && typeof window.LangBlueBehavior.send === 'function'){
+              window.LangBlueBehavior.send('activation_completed',{
+                productId:null,
+                language:null,
+                contextId:localSub.plan_id || localSub.planId || null,
+                payload:{product_ids:Array.isArray(localSub.product_ids)?localSub.product_ids:localSub.productIds||[]}
+              });
+            }
+          }catch(_){}
           return {
             ok: true,
             subscription: localSub,
