@@ -155,6 +155,31 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     @media (max-width:900px){.research-grid{grid-template-columns:1fr 1fr}}
     @media (max-width:620px){.research{padding:58px 0}.research-grid{grid-template-columns:1fr}.research-levels{justify-content:flex-start}}
     .receipt-section{padding:70px 0}
+    .receipt-section{
+      background:
+        radial-gradient(circle at 50% 8%,rgba(212,175,55,.13),transparent 34%),
+        linear-gradient(145deg,rgba(61,43,31,.10),rgba(196,168,130,.08),rgba(245,230,211,.04));
+      border-top:1px solid rgba(212,175,55,.18);
+      border-bottom:1px solid rgba(196,168,130,.16);
+    }
+    .receipt-builder{background:rgba(61,43,31,.52);border-color:rgba(212,175,55,.28)}
+    .receipt-panel{background:rgba(245,230,211,.045);border-color:rgba(196,168,130,.24)}
+    .receipt-panel h3{color:#f5e6d3}
+    .receipt-option{background:rgba(245,230,211,.035);border-color:rgba(196,168,130,.25)}
+    .receipt-option:hover{border-color:rgba(212,175,55,.52);background:rgba(212,175,55,.08)}
+    .receipt-option input{accent-color:#d4af37}
+    .receipt-option small{color:#d8c7b2}
+    .receipt-select{background:#2d1f14;color:#f5e6d3;border-color:rgba(196,168,130,.35)}
+    .receipt-summary{background:rgba(212,175,55,.08);border-color:rgba(212,175,55,.26)}
+    .receipt-summary-total{color:#f5e6d3;border-color:rgba(196,168,130,.22)}
+    .receipt-section .btn-primary{background:#2c5f2d;border-color:rgba(212,175,55,.42);box-shadow:0 10px 35px rgba(44,95,45,.25)}
+    .receipt-section .btn-primary:hover{background:#1f4d22}
+    .receipt-output{background:#f5f0e8;color:#3d2b1f;border:1px solid #c4a882}
+    .receipt-head{border-color:#c4a882}
+    .receipt-line{border-color:#e8d5b7}
+    .receipt-total{color:#2c5f2d}
+    .receipt-note{color:#6b5a4a}
+
     .receipt-builder{max-width:980px;margin:28px auto 0;padding:24px;background:var(--glass);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}
     .receipt-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
     .receipt-panel{padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035)}
@@ -423,6 +448,19 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
             </ul>
             <a class="btn btn-primary" href="LangBlue-De.html">ورود به Deutsch ←</a>
           </article>
+
+          <article class="product-card">
+            <span class="product-badge">LANGDESERT · ARABIC</span>
+            <div class="product-icon">🌵</div>
+            <h3>LangDesert Arabic</h3>
+            <p>ماژول یادگیری عربی LangBlue برای تعیین سطح، یادگیری واژگان و گرامر و تمرین متناسب با سطح A1 تا C2.</p>
+            <ul class="product-list">
+              <li>تعیین سطح عربی A1 تا C2</li>
+              <li>واژگان و گرامر سطح‌بندی‌شده</li>
+              <li>تمرین و تحلیل پیشرفت</li>
+            </ul>
+            <a class="btn btn-primary" href="LangDesert.html">ورود به LangDesert ←</a>
+          </article>
           
         </div>
       </div>
@@ -444,7 +482,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   <div class="wrap">
     <h2 class="section-title">ساخت فیش خرید LangBlue</h2>
     <p class="section-lead">
-      یک یا چند محصول را انتخاب کن، مدت اشتراک را مشخص کن و فیش درخواست را بساز.
+      یک یا چند محصول را انتخاب کن، مدت اشتراک را مشخص کن و فیش درخواست را بساز. اگر هر ۴ محصول را یک‌جا با مدت ۱۲ ماهه انتخاب کنی، ۱۵٪ تخفیف بسته اعمال می‌شود.
       سپس شناسه فیش را برای ادمین LangBlue در تلگرام بفرست. پس از تأیید، کد فعال‌سازی را دریافت می‌کنی و آن را در بخش «فعال‌سازی اشتراک» همین صفحه، داخل حساب مرکزی وارد می‌کنی.
     </p>
     <div class="receipt-builder">
@@ -471,6 +509,13 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
               <span>
                 <strong>🇩🇪 LangBlue Deutsch</strong>
                 <small>یادگیری و فلش‌کارت آلمانی</small>
+              </span>
+            </label>
+            <label class="receipt-option">
+              <input type="checkbox" value="arabic">
+              <span>
+                <strong>🌵 LangDesert Arabic</strong>
+                <small>یادگیری عربی، تعیین سطح و تمرین</small>
               </span>
             </label>
             
@@ -519,7 +564,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 <button class="btn btn-primary" type="button" onclick="window.LangBlueCentralAccount&&window.LangBlueCentralAccount.open()">🔐 ورود به حساب و فعال‌سازی کد</button>
               <a class="btn btn-secondary" href="https://t.me/LangBlue" target="_blank" rel="noopener">💬 دریافت راهنمای کد از @LangBlue</a>
             </div>
-            <div class="central-activation-note">کد داخل سایت تولید یا نمایش داده نمی‌شود. پس از دریافت کد، آن را فقط در حساب مرکزی وارد کن؛ همان حساب برای Grammar، Vocabulary و Deutsch استفاده می‌شود.</div>
+            <div class="central-activation-note">کد داخل سایت تولید یا نمایش داده نمی‌شود. پس از دریافت کد، آن را فقط در حساب مرکزی وارد کن؛ همان حساب برای Grammar، Vocabulary، Deutsch و LangDesert استفاده می‌شود.</div>
           </div>
         </div>
       </div>
@@ -629,7 +674,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
             امکاناتی مانند جدول گرامرها، فلش‌کارت، پروفایل و پشتیبان‌گیری از داده‌ها را ارائه می‌کند.
           </p>
           <p>
-            برای شروع، یک حساب مرکزی بساز. ایمیل برای ثبت‌نام لازم نیست؛ همین حساب برای هر سه محصول و فعال‌سازی اشتراک استفاده می‌شود.
+            برای شروع، یک حساب مرکزی بساز. ایمیل برای ثبت‌نام لازم نیست؛ همین حساب برای هر چهار محصول و فعال‌سازی اشتراک استفاده می‌شود.
           </p>
         </div>
       </div>
@@ -641,7 +686,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
       <div class="wrap">
         <h2>حساب مرکزی LangBlue</h2>
         <p>
-          یک حساب مرکزی برای هر سه محصول داشته باش. ورود، وضعیت اشتراک و فعال‌سازی کد از همین حساب مدیریت می‌شود.
+          یک حساب مرکزی برای هر چهار محصول داشته باش. ورود، وضعیت اشتراک و فعال‌سازی کد از همین حساب مدیریت می‌شود.
         </p>
         <button class="btn btn-primary" type="button" onclick="window.LangBlueCentralAccount&&window.LangBlueCentralAccount.open()">👤 ورود / ساخت حساب مرکزی</button>
         <a class="btn btn-secondary" href="#activation">🔑 فعال‌سازی اشتراک</a>
