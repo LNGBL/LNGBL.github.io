@@ -435,7 +435,7 @@
             verifiedAt: Date.now(),
             productIds: Array.isArray(remoteSub.product_ids)
               ? remoteSub.product_ids
-              : (Array.isArray(remoteSub.productIds) ? remoteSub.productIds : ['grammar','vocabulary','deutsch']),
+              : (Array.isArray(remoteSub.productIds) ? remoteSub.productIds : ['grammar','vocabulary','deutsch','arabic']),
             expiresAt: remoteSub.expires_at || remoteSub.expiresAt || null,
             planId: remoteSub.plan_id || remoteSub.planId || null
           });
