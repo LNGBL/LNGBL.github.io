@@ -1,0 +1,69 @@
+/* LangDesert ↔ LangBlue central integration. Arabic is an educational module connected to the central account. */
+(function(window,document){
+'use strict';
+const LEVELS=['A1','A2','B1','B2','C1','C2'],WKEY='langDesert_words',VKEY='langDesert_verbs',OWNER='langDesert_owner_user_id';
+let uid=null,timer=null;
+const api=(action,body={})=>window.LangBlueBackend.invoke('langblue-arabic',{action,...body});
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+function user(){return window.LangBlueCore?.Auth?.current?.()||null}
+function level(){return window.__LangDesertArabic?.level||'A1'}
+function schedule(){clearTimeout(timer);timer=setTimeout(sync,800)}
+async function sync(){
+ if(!uid||!window.LangBlueSupabase)return;
+ try{
+  const words=window.getWords?window.getWords():[];
+  const verbs=window.getVerbs?window.getVerbs():[];
+  const state=await window.LangBlueSupabase.getUserState()||{};
+  state.langDesert={version:2,level:level(),words,verbs,updatedAt:new Date().toISOString()};
+  await window.LangBlueSupabase.saveUserState(state);
+  const items=[];
+  words.forEach(w=>items.push({source_type:'vocabulary',source_content:w.word,translation_fa:w.persianTranslation,word_type:w.categories?.mainType,example_text:w.sentences?.[0]?.arabic}));
+  verbs.forEach(v=>items.push({source_type:'grammar',source_content:v.past||v.root,translation_fa:v.meaning,grammar_explanation_fa:[v.babName,v.babPattern,v.features?.join('، ')].filter(Boolean).join(' · '),example_text:v.example}));
+  if(items.length)await api('contribute',{level:level(),items});
+ }catch(e){console.warn('[LangDesert] sync skipped',e)}
+}
+function migrate(state){
+ const owner=localStorage.getItem(OWNER),remote=state.langDesert||{};
+ let oldW=[],oldV=[];
+ try{oldW=JSON.parse(localStorage.getItem(WKEY)||'[]')||[]}catch(_){}
+ try{oldV=JSON.parse(localStorage.getItem(VKEY)||'[]')||[]}catch(_){}
+ const words=Array.isArray(remote.words)?remote.words:(owner&&owner===uid?oldW:(!owner?oldW:[]));
+ const verbs=Array.isArray(remote.verbs)?remote.verbs:(owner&&owner===uid?oldV:(!owner?oldV:[]));
+ localStorage.setItem(WKEY,JSON.stringify(words));localStorage.setItem(VKEY,JSON.stringify(verbs));localStorage.setItem(OWNER,uid);
+}
+function panel(u){
+ if(document.getElementById('lbDesertCentralPanel'))return;
+ const header=document.querySelector('.desert-header');if(!header)return;
+ const p=document.createElement('div');p.id='lbDesertCentralPanel';p.className='desert-card';p.style.cssText='margin-top:18px;padding:18px 22px;max-width:1400px';
+ p.innerHTML='<div style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap"><div><strong>🔷 حساب مرکزی LangBlue</strong><div style="font-size:.9em;color:#6b5a4a;margin-top:4px">'+esc(u.name||u.username||'کاربر')+' · داده‌های عربی به همین حساب متصل است.</div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label style="font-size:.9em">سطح عربی:</label><select id="lbDesertLevel" style="padding:8px 12px;border:1px solid #C4A882;border-radius:10px;background:#fff;font:inherit">'+LEVELS.map(x=>'<option value="'+x+'" '+(x===level()?'selected':'')+'>'+x+'</option>').join('')+'</select><a href="/?account=required" style="padding:8px 13px;border-radius:10px;background:#2C5F2D;color:#fff;text-decoration:none;font-weight:700">حساب مرکزی</a></div></div><div id="lbDesertSyncStatus" style="margin-top:9px;font-size:.82em;color:#6b5a4a">در حال اتصال…</div>';
+ header.insertAdjacentElement('afterend',p);
+ p.querySelector('#lbDesertLevel').addEventListener('change',async e=>{const r=await api('set_level',{level:e.target.value});if(r.ok){window.__LangDesertArabic.level=e.target.value;await loadContent();if(window.renderAll)window.renderAll();}});
+}
+async function loadContent(){
+ const r=await api('bootstrap',{level:level()});if(!r.ok)return;
+ const s=document.getElementById('lbDesertSyncStatus');if(s)s.textContent='اتصال مرکزی فعال · '+r.counts.vocabulary+' واژه و '+r.counts.grammar+' محتوای گرامری برای سطح '+r.level+'.';
+ window.__LangDesertArabic.remote=r;
+ const words=window.getWords?window.getWords():[],seen=new Set(words.map(x=>String(x.word||'').trim().toLowerCase()));
+ (r.vocabulary||[]).forEach(x=>{const k=String(x.source_content||'').trim().toLowerCase();if(!k||seen.has(k))return;words.push({id:'remote-'+x.id,word:x.source_content,persianTranslation:x.translation_fa||'',categories:{mainType:x.word_type||'اسم'},sentences:x.example_text?[{arabic:x.example_text,persian:''}]:[],status:0,lastReviewed:null,correctCount:0,wrongCount:0,createdAt:x.created_at||new Date().toISOString(),source:'langblue-central',level:x.level});seen.add(k)});
+ if(window.saveWords)window.saveWords(words);
+}
+function patch(){
+ if(window.__LangDesertPersistencePatched)return;
+ if(typeof window.saveWords==='function'){const f=window.saveWords;window.saveWords=function(v){const r=f.apply(this,arguments);schedule();return r}}
+ if(typeof window.saveVerbs==='function'){const f=window.saveVerbs;window.saveVerbs=function(v){const r=f.apply(this,arguments);schedule();return r}}
+ window.__LangDesertPersistencePatched=true;
+}
+async function boot(){
+ if(window.__LangDesertBridgeBooted)return;window.__LangDesertBridgeBooted=true;
+ const u=user();if(!u||!window.LangBlueSupabase)return;
+ uid=u.id;
+ const state=await window.LangBlueSupabase.getUserState()||{};
+ const initial=await api('bootstrap',{});
+ if(!initial.ok)return;
+ window.__LangDesertArabic={version:2,userId:uid,level:initial.level||state.langDesert?.level||'A1'};
+ migrate(state);panel(u);patch();
+ await loadContent();if(window.renderAll)window.renderAll();await sync();
+}
+window.LangDesertBridge={boot,sync,schedule,loadContent};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})(window);
