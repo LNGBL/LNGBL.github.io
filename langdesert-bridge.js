@@ -57,6 +57,9 @@ async function loadContent(){
  const r=await api('bootstrap',{level:level()});if(!r.ok)return;
  const s=document.getElementById('lbDesertSyncStatus');if(s)s.textContent='اتصال مرکزی فعال · '+(r.vocabulary||[]).length+' واژه و '+(r.grammar||[]).length+' محتوای گرامری برای سطح '+r.level+'.';
  window.__LangDesertArabic.remote=r;
+ let gp=document.getElementById('lbDesertGrammarPanel');
+ if(!gp){gp=document.createElement('div');gp.id='lbDesertGrammarPanel';gp.className='desert-card';gp.style.cssText='margin-top:14px;padding:22px;max-width:1400px';const anchor=document.getElementById('lbDesertCentralPanel');if(anchor)anchor.insertAdjacentElement('afterend',gp);}
+ gp.innerHTML='<h3 style="margin-top:0">📚 قواعد عربی · سطح '+esc(r.level)+'</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">'+(r.grammar||[]).slice(0,12).map(x=>'<article style="padding:14px;border:1px solid rgba(196,168,130,.35);border-radius:16px;background:rgba(255,255,255,.35)"><strong>'+esc(x.source_content)+'</strong><div style="margin-top:6px;color:#6b5a4a">'+esc(x.translation_fa||'')+'</div>'+(x.example_text?'<div style="margin-top:8px">'+esc(x.example_text)+'</div>':'')+'</article>').join('')+'</div>';
  const words=window.getWords?window.getWords():[],seen=new Set(words.map(x=>String(x.word||'').trim().toLowerCase()));
  (r.vocabulary||[]).forEach(x=>{const k=String(x.source_content||'').trim().toLowerCase();if(!k||seen.has(k))return;words.push({id:'remote-'+x.id,word:x.source_content,persianTranslation:x.translation_fa||'',categories:{mainType:x.word_type||'اسم'},sentences:x.example_text?[{arabic:x.example_text,persian:''}]:[],status:0,lastReviewed:null,correctCount:0,wrongCount:0,createdAt:x.created_at||new Date().toISOString(),source:'langblue-central',level:x.level});seen.add(k)});
  if(window.saveWords)window.saveWords(words);
