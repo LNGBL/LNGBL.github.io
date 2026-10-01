@@ -56,7 +56,7 @@ function patch(){
 async function boot(){
  if(window.__LangDesertBridgeBooted)return;window.__LangDesertBridgeBooted=true;
  if(!window.LangBlueBackend||!window.LangBlueSupabase)return;
- const u=user();if(!u||!window.LangBlueSupabase)return;
+ const u=user();if(!u||!window.LangBlueSupabase){window.addEventListener('lb:central-session-ready',()=>boot(),{once:true});return;}
  uid=u.id;
  const state=await window.LangBlueSupabase.getUserState()||{};
  const initial=await api('bootstrap',{});
