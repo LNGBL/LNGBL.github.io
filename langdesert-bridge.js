@@ -31,12 +31,26 @@ function migrate(state){
  const verbs=Array.isArray(remote.verbs)?remote.verbs:(owner&&owner===uid?oldV:(!owner?oldV:[]));
  localStorage.setItem(WKEY,JSON.stringify(words));localStorage.setItem(VKEY,JSON.stringify(verbs));localStorage.setItem(OWNER,uid);
 }
+let assessmentState=null;
+function assessmentPanel(p){
+ const old=document.getElementById('lbDesertAssessment');if(old)old.remove();
+ const a=document.createElement('div');a.id='lbDesertAssessment';a.className='desert-card';a.style.cssText='margin-top:14px;padding:22px;max-width:1400px';
+ a.innerHTML='<h3 style="margin-top:0">🧭 آزمون تعیین سطح عربی</h3><div id="lbArabicAssessmentBody">آزمون، سطح واقعی کاربر را از A1 تا C2 برآورد می‌کند و نتیجه را به حساب مرکزی و لایه پژوهشی می‌فرستد.</div><button id="lbArabicAssessmentStart" class="btn-desert-secondary" style="margin-top:12px">شروع آزمون</button>';
+ p.insertAdjacentElement('afterend',a);
+ a.querySelector('#lbArabicAssessmentStart').onclick=async()=>{const r=await api('placement_start');if(!r.ok){a.querySelector('#lbArabicAssessmentBody').textContent='آزمون در حال حاضر قابل شروع نیست: '+r.error;return}assessmentState={session_id:r.session_id,questions:r.questions,index:0,answers:[]};renderAssessment(a)};
+}
+function renderAssessment(a){
+ const q=assessmentState.questions[assessmentState.index],body=a.querySelector('#lbArabicAssessmentBody'),total=assessmentState.questions.length;
+ body.innerHTML='<div style="margin-bottom:10px;color:#6b5a4a">سؤال '+(assessmentState.index+1)+' از '+total+' · سطح آزمایشی '+esc(q.level)+'</div><div style="font-size:1.6em;font-weight:700;margin-bottom:12px">'+esc(q.prompt)+'</div>'+(q.example_text?'<div style="margin-bottom:12px;color:#6b5a4a">'+esc(q.example_text)+'</div>':'')+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+q.options.map((o,i)=>'<button data-i="'+i+'" class="btn-desert-secondary" style="background:#fff;color:#3d2b1f;border:2px solid #C4A882">'+esc(o)+'</button>').join('')+'</div>';
+ body.querySelectorAll('[data-i]').forEach(btn=>btn.onclick=async()=>{assessmentState.answers.push({question_id:q.id,selected_index:Number(btn.dataset.i)});if(assessmentState.index<total-1){assessmentState.index++;renderAssessment(a)}else{const res=await api('placement_submit',{session_id:assessmentState.session_id,answers:assessmentState.answers});if(res.ok){body.innerHTML='<strong>نتیجه تعیین سطح: '+esc(res.detected_level)+'</strong><br>امتیاز: '+esc(res.percent)+'٪<br><span style="color:#6b5a4a">این سطح اکنون مبنای دریافت محتوای عربی شخصی‌سازی‌شده است.</span>';window.__LangDesertArabic.level=res.detected_level;await loadContent();if(window.renderAll)window.renderAll()}else body.textContent='ثبت نتیجه انجام نشد: '+res.error}});
+}
 function panel(u){
  if(document.getElementById('lbDesertCentralPanel'))return;
  const header=document.querySelector('.desert-header');if(!header)return;
  const p=document.createElement('div');p.id='lbDesertCentralPanel';p.className='desert-card';p.style.cssText='margin-top:18px;padding:18px 22px;max-width:1400px';
  p.innerHTML='<div style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap"><div><strong>🔷 حساب مرکزی LangBlue</strong><div style="font-size:.9em;color:#6b5a4a;margin-top:4px">'+esc(u.name||u.username||'کاربر')+' · داده‌های عربی به همین حساب متصل است.</div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label style="font-size:.9em">سطح عربی:</label><select id="lbDesertLevel" style="padding:8px 12px;border:1px solid #C4A882;border-radius:10px;background:#fff;font:inherit">'+LEVELS.map(x=>'<option value="'+x+'" '+(x===level()?'selected':'')+'>'+x+'</option>').join('')+'</select><a href="/?account=required" style="padding:8px 13px;border-radius:10px;background:#2C5F2D;color:#fff;text-decoration:none;font-weight:700">حساب مرکزی</a></div></div><div id="lbDesertSyncStatus" style="margin-top:9px;font-size:.82em;color:#6b5a4a">در حال اتصال…</div>';
  header.insertAdjacentElement('afterend',p);
+ p.querySelector('#lbArabicAssessmentBtn').addEventListener('click',()=>assessmentPanel(p));
  p.querySelector('#lbDesertLevel').addEventListener('change',async e=>{const r=await api('set_level',{level:e.target.value});if(r.ok){window.__LangDesertArabic.level=e.target.value;await loadContent();if(window.renderAll)window.renderAll();}});
 }
 async function loadContent(){
@@ -66,6 +80,6 @@ async function boot(){
  const reg=document.getElementById('registerSection'),app=document.getElementById('mainApp'),name=document.getElementById('userNameDisplay');if(reg)reg.classList.add('hidden');if(app)app.classList.remove('hidden');if(name)name.textContent=u.name||u.username||'';
  await loadContent();if(window.renderAll)window.renderAll();await sync();
 }
-window.LangDesertBridge={boot,sync,schedule,loadContent};
+window.LangDesertBridge={boot,sync,schedule,loadContent,assessmentPanel};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })(window);
