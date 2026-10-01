@@ -414,25 +414,7 @@
     },
 
     activate(code, productIds){
-      if(!hasPermission()) return { ok: false, error: 'ACCOUNT_REQUIRED' };
-      const result = this.validateCode(code);
-      if(!result.ok) return result;
-
-      const now = Date.now();
-      const ids = Array.isArray(productIds) ? productIds.filter(Boolean) : [];
-
-      const sub = {
-        planId: result.plan.id,
-        plan: result.plan,
-        productIds: ids,
-        verifiedByCode: true,
-        verifiedAt: now,
-        activatedAt: now,
-        expiresAt: now + Number(result.plan.days || 0) * 86400000
-      };
-
-      storage.set('subscription', sub);
-      return { ok: true, subscription: sub, plan: result.plan, productIds: ids, expiresAt: sub.expiresAt };
+      return {ok:false,error:'BACKEND_ACTIVATION_REQUIRED'};
     },
 
     async activateAsync(code, productIds){
