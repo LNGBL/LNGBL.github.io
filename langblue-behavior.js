@@ -5,7 +5,7 @@
   const FUNCTION_NAME = 'langblue-behavior';
   const SCHEMA_VERSION = 1;
   const SESSION_KEY = 'lb:behavior:session';
-  const VALID_PRODUCTS = new Set(['grammar','vocabulary','deutsch']);
+  const VALID_PRODUCTS = new Set(['grammar','vocabulary','deutsch','arabic']);
 
   function uuid(){
     if(window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
@@ -118,7 +118,7 @@
 
   function inferProduct(){
     const path=String(window.location.pathname||'').toLowerCase();
-    if(path.includes('langdesert')) return 'vocabulary';
+    if(path.includes('langdesert')) return 'arabic';
     if(path.includes('vocab')) return 'vocabulary';
     if(path.includes('grammer') || path.includes('grammar')) return 'grammar';
     if(path.includes('langblue-de') || path.includes('deutsch')) return 'deutsch';
