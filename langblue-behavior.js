@@ -68,7 +68,13 @@
 
     let eventName=null, contextId=null, payload={};
 
-    if(path.includes('vocab')){
+    if(path.includes('langdesert')){
+      if(el.matches('.tab-btn[data-tab="flashcard"]')){ eventName='learning_started'; contextId='flashcard'; }
+      else if(el.matches('.tab-btn[data-tab="quiz"]')){ eventName='assessment_started'; contextId='arabic_quiz'; }
+      else if(el.matches('.cat-btn') || el.matches('#lbDesertLevel')){ eventName='level_selected'; contextId='arabic_level'; payload={level:el.value||el.dataset.value||null}; }
+      else if(el.matches('.btn-known-shadow,.btn-unknown-shadow,.quiz-option-shadow')){ eventName='content_answered'; contextId='arabic_learning'; }
+      else if(el.matches('.btn-listen')){ eventName='content_seen'; contextId='arabic_shadowing'; }
+    }else if(path.includes('vocab')){
       if(el.id==='openFlashcardBtn'){ eventName='learning_started'; contextId='flashcard'; }
       else if(el.id==='openWeaknessBtn' || el.id==='weaknessStartBtn'){ eventName='weakness_mode_opened'; contextId='weakness'; }
       else if(el.matches('#flashcardOptions .option-btn')){ eventName='content_answered'; contextId='flashcard'; payload={option_index:Number(el.dataset.index||-1)}; }
