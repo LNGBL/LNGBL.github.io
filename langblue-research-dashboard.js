@@ -96,7 +96,8 @@
     $('dashboard').hidden=false;
     setStatus('داده‌ها با موفقیت از Supabase دریافت شد.','ok');
     $('generatedAt').textContent='آخرین به‌روزرسانی: '+fmtDate(data.generated_at);
-    renderSummary(data.summary||{});\n    renderArabicCaseStudy(data.arabic_case_study||{});
+    renderSummary(data.summary||{});
+    renderArabicCaseStudy(data.arabic_case_study||{});
     renderFunnel(data.funnel||[]);
     renderDaily(data.daily||[]);
   }
