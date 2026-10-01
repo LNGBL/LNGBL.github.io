@@ -55,6 +55,7 @@ function patch(){
 }
 async function boot(){
  if(window.__LangDesertBridgeBooted)return;window.__LangDesertBridgeBooted=true;
+ if(!window.LangBlueBackend||!window.LangBlueSupabase)return;
  const u=user();if(!u||!window.LangBlueSupabase)return;
  uid=u.id;
  const state=await window.LangBlueSupabase.getUserState()||{};
@@ -62,6 +63,7 @@ async function boot(){
  if(!initial.ok)return;
  window.__LangDesertArabic={version:2,userId:uid,level:initial.level||state.langDesert?.level||'A1'};
  migrate(state);panel(u);patch();
+ const reg=document.getElementById('registerSection'),app=document.getElementById('mainApp'),name=document.getElementById('userNameDisplay');if(reg)reg.classList.add('hidden');if(app)app.classList.remove('hidden');if(name)name.textContent=u.name||u.username||'';
  await loadContent();if(window.renderAll)window.renderAll();await sync();
 }
 window.LangDesertBridge={boot,sync,schedule,loadContent};
