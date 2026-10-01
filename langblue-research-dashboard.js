@@ -50,7 +50,7 @@
     }).join('');
   }
 
-  function renderDaily(rows){
+  function renderArabicCaseStudy(c){const el=$('arabicCaseStudy');if(!el)return;const a=c?.assessment||{};const levels=c?.content_by_level||[];const det=c?.detected_levels||{};const beh=c?.behavior||{};const rows=levels.map(x=>x.level+': '+fmtNumber(x.vocabulary)+' واژه / '+fmtNumber(x.grammar)+' گرامر').join(' · ');const detected=Object.entries(det).map(([k,v])=>k+': '+fmtNumber(v)).join(' · ')||'هنوز نتیجه‌ای ثبت نشده';el.innerHTML='<strong>محتوای فعال:</strong> '+esc(rows||'—')+'<br><strong>آزمون:</strong> '+fmtNumber(a.completed_count)+' تکمیل‌شده از '+fmtNumber(a.assessment_count)+' نشست · میانگین '+esc(a.avg_percent)+'٪<br><strong>سطوح تشخیص‌داده‌شده:</strong> '+esc(detected)+'<br><strong>رویدادهای عربی:</strong> '+esc(Object.entries(beh).map(([k,v])=>k+': '+fmtNumber(v.events)+' رویداد / '+fmtNumber(v.users)+' کاربر').join(' · ')||'—');}\n\n  function renderDaily(rows){
     const body=$('dailyBody');
     if(!rows.length){
       body.innerHTML='<tr><td colspan="6" class="empty">هنوز رویدادی ثبت نشده است. بعد از ورود یک کاربر به LangBlue، داده‌های واقعی اینجا ظاهر می‌شوند.</td></tr>';
@@ -96,7 +96,7 @@
     $('dashboard').hidden=false;
     setStatus('داده‌ها با موفقیت از Supabase دریافت شد.','ok');
     $('generatedAt').textContent='آخرین به‌روزرسانی: '+fmtDate(data.generated_at);
-    renderSummary(data.summary||{});
+    renderSummary(data.summary||{});\n    renderArabicCaseStudy(data.arabic_case_study||{});
     renderFunnel(data.funnel||[]);
     renderDaily(data.daily||[]);
   }
