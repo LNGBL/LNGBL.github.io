@@ -93,6 +93,8 @@
   }
 
   function inferLanguage(){
+    const path=String(window.location.pathname||'').toLowerCase();
+    if(path.includes('langdesert')) return 'arabic';
     const product=inferProduct();
     return product==='deutsch'?'german':(product?'english':null);
   }
@@ -110,6 +112,7 @@
 
   function inferProduct(){
     const path=String(window.location.pathname||'').toLowerCase();
+    if(path.includes('langdesert')) return 'vocabulary';
     if(path.includes('vocab')) return 'vocabulary';
     if(path.includes('grammer') || path.includes('grammar')) return 'grammar';
     if(path.includes('langblue-de') || path.includes('deutsch')) return 'deutsch';
