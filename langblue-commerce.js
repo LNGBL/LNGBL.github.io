@@ -269,7 +269,7 @@ url:'LangBlue-De.html'
 
 
 
-var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch'];
+var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic'];
 
 
 
