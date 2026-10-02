@@ -2393,9 +2393,23 @@
         // ================================================================
         //  CONSTANTS
         // ================================================================
-        const STORAGE_KEY = 'langDesert_words';
-        const VERB_STORAGE_KEY = 'langDesert_verbs';
+        const LEGACY_STORAGE_KEY = 'langDesert_words';
+        const LEGACY_VERB_STORAGE_KEY = 'langDesert_verbs';
         const STATUS = { NEW: 0, LEARNING: 1, MASTERED: 2 };
+
+        // LangDesert learning data is scoped to the authenticated central account.
+        // The legacy keys are read only during the one-time migration handled by langdesert-bridge.js.
+        function desertUserId() {
+            try {
+                const session = JSON.parse(localStorage.getItem('lb:session') || 'null');
+                return session && session.userId ? String(session.userId) : 'anonymous';
+            } catch (_) {
+                return 'anonymous';
+            }
+        }
+        function desertStorageKey(base) {
+            return 'lb:user:' + desertUserId() + ':' + base;
+        }
 
         // ================================================================
         //  VERB BABS
@@ -2469,16 +2483,16 @@
         //  DATA HELPERS
         // ================================================================
         function getWords() {
-            try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; }
+            try { return JSON.parse(localStorage.getItem(desertStorageKey('LangDesert_words'))) || []; } catch { return []; }
         }
 
-        function saveWords(words) { localStorage.setItem(STORAGE_KEY, JSON.stringify(words)); }
+        function saveWords(words) { localStorage.setItem(desertStorageKey('LangDesert_words'), JSON.stringify(words)); }
 
         function getVerbs() {
-            try { return JSON.parse(localStorage.getItem(VERB_STORAGE_KEY)) || []; } catch { return []; }
+            try { return JSON.parse(localStorage.getItem(desertStorageKey('LangDesert_verbs'))) || []; } catch { return []; }
         }
 
-        function saveVerbs(verbs) { localStorage.setItem(VERB_STORAGE_KEY, JSON.stringify(verbs)); }
+        function saveVerbs(verbs) { localStorage.setItem(desertStorageKey('LangDesert_verbs'), JSON.stringify(verbs)); }
 
         // ================================================================
         //  SPEECH
@@ -3250,8 +3264,8 @@
             if (!word) return;
 
             // ذخیره در لیست برای آزمون 50/50
-            let knownIds = JSON.parse(localStorage.getItem('shadow_known') || '[]');
-            let unknownIds = JSON.parse(localStorage.getItem('shadow_unknown') || '[]');
+            let knownIds = JSON.parse(localStorage.getItem(desertStorageKey('shadow_known')) || '[]');
+            let unknownIds = JSON.parse(localStorage.getItem(desertStorageKey('shadow_unknown')) || '[]');
 
             if (known) {
                 if (!knownIds.includes(word.id)) knownIds.push(word.id);
@@ -3261,8 +3275,8 @@
                 knownIds = knownIds.filter(id => id !== word.id);
             }
 
-            localStorage.setItem('shadow_known', JSON.stringify(knownIds));
-            localStorage.setItem('shadow_unknown', JSON.stringify(unknownIds));
+            localStorage.setItem(desertStorageKey('shadow_known'), JSON.stringify(knownIds));
+            localStorage.setItem(desertStorageKey('shadow_unknown'), JSON.stringify(unknownIds));
 
             updateWordStatus(word.id, known);
 
@@ -3471,8 +3485,8 @@
             quizShadowCorrect = 0;
             quizShadowWrong = 0;
             quizShadowAnswered = false;
-            localStorage.removeItem('shadow_known');
-            localStorage.removeItem('shadow_unknown');
+            localStorage.removeItem(desertStorageKey('shadow_known'));
+            localStorage.removeItem(desertStorageKey('shadow_unknown'));
             renderQuiz();
         }
 
