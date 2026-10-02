@@ -3314,8 +3314,8 @@
             const container = document.getElementById('quizContainer');
             const words = getWords();
 
-            let knownIds = JSON.parse(localStorage.getItem('shadow_known') || '[]');
-            let unknownIds = JSON.parse(localStorage.getItem('shadow_unknown') || '[]');
+            let knownIds = JSON.parse(localStorage.getItem(desertStorageKey('shadow_known')) || '[]');
+            let unknownIds = JSON.parse(localStorage.getItem(desertStorageKey('shadow_unknown')) || '[]');
 
             let quizPool = [];
 
