@@ -22,14 +22,24 @@ async function sync(){
   if(items.length)await api('contribute',{level:level(),items});
  }catch(e){console.warn('[LangDesert] sync skipped',e)}
 }
+function mergeUnique(primary,legacy,key){
+ const out=Array.isArray(primary)?primary.slice():[];
+ const seen=new Set(out.map(x=>String(key(x))));
+ legacy.forEach(x=>{const k=String(key(x));if(!seen.has(k)){seen.add(k);out.push(x)}});
+ return out;
+}
 function migrate(state){
  const owner=localStorage.getItem(OWNER),remote=state.langDesert||{};
  let oldW=[],oldV=[];
  try{oldW=JSON.parse(localStorage.getItem(WKEY)||'[]')||[]}catch(_){}
  try{oldV=JSON.parse(localStorage.getItem(VKEY)||'[]')||[]}catch(_){}
- const words=Array.isArray(remote.words)?remote.words:(owner&&owner===uid?oldW:(!owner?oldW:[]));
- const verbs=Array.isArray(remote.verbs)?remote.verbs:(owner&&owner===uid?oldV:(!owner?oldV:[]));
+ const canMigrateLegacy=!owner||owner===uid;
+ const remoteWords=Array.isArray(remote.words)?remote.words:[];
+ const remoteVerbs=Array.isArray(remote.verbs)?remote.verbs:[];
+ const words=canMigrateLegacy?mergeUnique(remoteWords,oldW,x=>x?.id??x?.word??''):remoteWords;
+ const verbs=canMigrateLegacy?mergeUnique(remoteVerbs,oldV,x=>x?.id??x?.root??x?.past??''):remoteVerbs;
  localStorage.setItem(WKEY,JSON.stringify(words));localStorage.setItem(VKEY,JSON.stringify(verbs));localStorage.setItem(OWNER,uid);
+ localStorage.removeItem('langDesert_user');
 }
 let assessmentState=null;
 function assessmentPanel(p){
