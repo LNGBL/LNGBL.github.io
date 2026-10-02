@@ -483,7 +483,7 @@
           const row=data[0];
           storage.set('subscription',Object.assign({},row,{
             planId:row.plan_id,
-            productIds:Array.isArray(row.product_ids)?row.product_ids:['grammar','vocabulary','deutsch'],
+            productIds:Array.isArray(row.product_ids)?row.product_ids:['grammar','vocabulary','deutsch','arabic'],
             expiresAt:row.expires_at,
             verifiedByCode:row.plan_id!=='trial_48h',
             trial:row.plan_id==='trial_48h'
