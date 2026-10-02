@@ -13,7 +13,7 @@ const ALLOWED_EVENTS = new Set([
   "content_seen","content_answered","content_repeated","content_skipped",
   "weakness_mode_opened","weakness_mode_completed",
   "assessment_started","assessment_completed",
-  "subscription_viewed","subscription_selected","activation_completed"
+  "subscription_viewed","subscription_selected","activation_completed","level_selected"
 ]);
 const MAX_PAYLOAD_BYTES = 4096;
 const MAX_EVENTS_PER_MINUTE = 120;
