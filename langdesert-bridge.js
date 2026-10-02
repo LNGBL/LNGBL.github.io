@@ -38,7 +38,9 @@ function migrate(state){
  const remoteVerbs=Array.isArray(remote.verbs)?remote.verbs:[];
  const words=canMigrateLegacy?mergeUnique(remoteWords,oldW,x=>x?.id??x?.word??''):remoteWords;
  const verbs=canMigrateLegacy?mergeUnique(remoteVerbs,oldV,x=>x?.id??x?.root??x?.past??''):remoteVerbs;
- localStorage.setItem(WKEY,JSON.stringify(words));localStorage.setItem(VKEY,JSON.stringify(verbs));localStorage.setItem(OWNER,uid);
+ const userWordKey='lb:user:'+uid+':LangDesert_words',userVerbKey='lb:user:'+uid+':LangDesert_verbs';
+ localStorage.setItem(userWordKey,JSON.stringify(words));localStorage.setItem(userVerbKey,JSON.stringify(verbs));
+ localStorage.removeItem(WKEY);localStorage.removeItem(VKEY);localStorage.setItem(OWNER,uid);
  localStorage.removeItem('langDesert_user');
 }
 let assessmentState=null;
