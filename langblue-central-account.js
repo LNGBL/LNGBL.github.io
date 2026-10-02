@@ -68,7 +68,6 @@
   }
   async function gateProduct(){
     if(isLanding())return;injectLandingStyles();const s=await hydrate();
-    if(s && !(await ensureProfileComplete())){try{sessionStorage.setItem(RETURN_KEY,location.pathname+location.search+location.hash);}catch(e){}location.replace('/?account=profile');return;}
     if(!s){try{sessionStorage.setItem(RETURN_KEY,location.pathname+location.search+location.hash);}catch(e){}location.replace('/?account=required');return;}
     document.documentElement.classList.add('lb-central-ready');
     ['btnAccount','btnSwitchAccount','vocabCreateAccountBtn','userModal','overlay-signup'].forEach(function(id){const el=document.getElementById(id);if(el)el.classList.add('lb-central-legacy-hidden');});
