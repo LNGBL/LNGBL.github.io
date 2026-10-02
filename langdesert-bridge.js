@@ -95,4 +95,4 @@ async function boot(){
 }
 window.LangDesertBridge={boot,sync,schedule,loadContent,assessmentPanel};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
-})(window);
+})(window,document);
