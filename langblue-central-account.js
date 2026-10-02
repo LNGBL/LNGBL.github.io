@@ -1,4 +1,4 @@
-/* LangBlue Central Account — one account for Landing, Grammar, Vocabulary and Deutsch. */
+/* LangBlue Central Account — one account for Landing, Grammar, Vocabulary, Deutsch and LangDesert. */
 (function(window, document){
   'use strict';
   const RETURN_KEY='lb:return_after_account';
@@ -25,7 +25,18 @@
     activityHeartbeat();
     activityTimer=setInterval(activityHeartbeat,300000);
   }
-  function returnPath(){const value=sessionStorage.getItem(RETURN_KEY)||'';sessionStorage.removeItem(RETURN_KEY);return value;}
+  function returnPath(){
+  const value=sessionStorage.getItem(RETURN_KEY)||'';
+  sessionStorage.removeItem(RETURN_KEY);
+  if(!value)return '';
+  try{
+    const u=new URL(value,location.origin);
+    if(u.origin!==location.origin)return '';
+    if(u.pathname==='/'&&u.searchParams.get('account')==='profile')return '';
+    if(u.pathname==='/'&&u.searchParams.get('account')==='required')return '';
+    return u.pathname+u.search+u.hash;
+  }catch(e){return '';}
+}
   async function hydrate(){if(window.LangBlueCore&&window.LangBlueCore.Auth&&typeof window.LangBlueCore.Auth.init==='function')await window.LangBlueCore.Auth.init();const s=await session();setCentralCookie(!!s);return s;}
   function injectLandingStyles(){
     if(document.getElementById('lb-central-account-style'))return;
@@ -76,7 +87,7 @@
     window.dispatchEvent(new CustomEvent('lb:central-session-ready',{detail:{user:window.LangBlueCore.Auth.current()}}));
   }
   async function init(){
-    if(isLanding()){const s=await hydrate();renderLandingAccount();if(s)startActivityHeartbeat();const params=new URLSearchParams(location.search);if(params.get('account')==='required'||params.get('account')==='profile')setTimeout(openAccount,80);}
+    if(isLanding()){const s=await hydrate();renderLandingAccount();if(s)startActivityHeartbeat();const params=new URLSearchParams(location.search);if(params.get('account')==='required')setTimeout(openAccount,80);}
     else {await gateProduct();if(window.LangBlueCore&&window.LangBlueCore.Auth&&window.LangBlueCore.Auth.current())startActivityHeartbeat();}
   }
   window.LangBlueCentralAccount={open:openAccount,refresh:renderLandingAccount,session,logout:async function(){if(window.LangBlueCore&&window.LangBlueCore.Auth)await window.LangBlueCore.Auth.logout();setCentralCookie(false);}};
