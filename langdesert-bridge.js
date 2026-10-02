@@ -30,23 +30,7 @@ async function sync(){
    ...words.map(w=>({source_type:'vocabulary',source_content:w.word,translation_fa:w.persianTranslation,word_type:w.categories?.mainType,example_text:w.sentences?.[0]?.arabic})),
    ...verbs.map(v=>({source_type:'grammar',source_content:v.past||v.root,translation_fa:v.meaning,grammar_explanation_fa:[v.babName,v.babPattern,v.features?.join('، ')].filter(Boolean).join(' · '),example_text:v.example}))
   ].filter(x=>String(x.source_content||'').trim());
-  if(!items.length)return;
-
-  const prepared=[];
-  for(const item of items){
-   const canonical=JSON.stringify({language:'arabic',level:level(),source_type:item.source_type,source_content:String(item.source_content).trim(),translation_fa:item.translation_fa||'',word_type:item.word_type||'',grammar_explanation_fa:item.grammar_explanation_fa||'',example_text:item.example_text||''});
-   prepared.push({item,hash:await sha256(canonical)});
-  }
-  const hashes=prepared.map(x=>x.hash);
-  const {data:existing}=await client.from('content_contributions').select('source_hash').eq('user_id',uid).in('source_hash',hashes);
-  const seen=new Set((existing||[]).map(x=>x.source_hash));
-  const rows=prepared.filter(x=>!seen.has(x.hash)).map(x=>({
-   user_id:uid,source_type:x.item.source_type,language:'arabic',language_level:level(),
-   payload:x.item,source_hash:x.hash,consent_snapshot:true,
-   exam_eligible:profile.exam_contribution_consent===true
-  }));
-  if(rows.length)await client.from('content_contributions').insert(rows);
- }catch(e){console.warn('[LangDesert] sync skipped',e)}
+  if(items.length)await api('contribute',{level:level(),items}); }catch(e){console.warn('[LangDesert] sync skipped',e)}
 }
 function mergeUnique(primary,legacy,key){
  const out=Array.isArray(primary)?primary.slice():[];
