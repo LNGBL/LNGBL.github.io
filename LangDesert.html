@@ -1568,52 +1568,17 @@
     </header>
 
     <!-- ============================================================
-    REGISTER SECTION
+    CENTRAL ACCOUNT GATE
     ============================================================ -->
     <section id="registerSection" class="desert-card">
-        <h2>📝 التسجيل</h2>
-        <form id="registerForm">
-            <div class="register-grid">
-                <div class="form-group">
-                    <label>الاسم الكامل (نام کامل)</label>
-                    <input type="text" id="fullName" placeholder="مثال: أحمد محمد" required class="arabic-input" data-keyboard="true">
-                </div>
-                <div class="form-group">
-                    <label>العمر (سن)</label>
-                    <input type="number" id="age" min="10" max="80" placeholder="مثال: 25" required>
-                </div>
-                <div class="form-group">
-                    <label>الجنس (جنسیت)</label>
-                    <select id="gender">
-                        <option value="ذكر">ذكر (مرد)</option>
-                        <option value="أنثى">أنثى (زن)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>الدولة (کشور)</label>
-                    <select id="country">
-                        <option value="إيران">إيران</option>
-                        <option value="العراق">العراق</option>
-                        <option value="السعودية">السعودية</option>
-                        <option value="مصر">مصر</option>
-                        <option value="سوريا">سوريا</option>
-                        <option value="لبنان">لبنان</option>
-                        <option value="الأردن">الأردن</option>
-                        <option value="الإمارات">الإمارات</option>
-                        <option value="الكويت">الكويت</option>
-                        <option value="قطر">قطر</option>
-                        <option value="عمان">عمان</option>
-                        <option value="اليمن">اليمن</option>
-                        <option value="فلسطين">فلسطين</option>
-                        <option value="ليبيا">ليبيا</option>
-                        <option value="تونس">تونس</option>
-                        <option value="الجزائر">الجزائر</option>
-                        <option value="المغرب">المغرب</option>
-                    </select>
-                </div>
-            </div>
-            <button type="submit" class="btn-desert">🚀 ابدأ رحلة الصحراء</button>
-        </form>
+        <h2>🔷 حساب مرکزی LangBlue</h2>
+        <p style="line-height:1.9;color:#6b5a4a;">
+            LangDesert از حساب داخلی استفاده نمی‌کند. هویت کاربر، اشتراک و داده‌های یادگیری
+            از حساب مرکزی LangBlue می‌آیند و همین حساب بین Grammar، Vocabulary، Deutsch و LangDesert مشترک است.
+        </p>
+        <button type="button" class="btn-desert" id="centralAccountOpenBtn">
+            👤 ورود / ساخت حساب مرکزی
+        </button>
     </section>
 
     <!-- ============================================================
@@ -2430,7 +2395,6 @@
         // ================================================================
         const STORAGE_KEY = 'langDesert_words';
         const VERB_STORAGE_KEY = 'langDesert_verbs';
-        const USER_KEY = 'langDesert_user';
         const STATUS = { NEW: 0, LEARNING: 1, MASTERED: 2 };
 
         // ================================================================
@@ -2515,12 +2479,6 @@
         }
 
         function saveVerbs(verbs) { localStorage.setItem(VERB_STORAGE_KEY, JSON.stringify(verbs)); }
-
-        function getUser() {
-            try { return JSON.parse(localStorage.getItem(USER_KEY)) || null; } catch { return null; }
-        }
-
-        function saveUser(user) { localStorage.setItem(USER_KEY, JSON.stringify(user)); }
 
         // ================================================================
         //  SPEECH
@@ -3643,43 +3601,12 @@
         });
 
         // ================================================================
-        //  REGISTRATION
+        //  CENTRAL ACCOUNT
         // ================================================================
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const fullName = document.getElementById('fullName').value.trim();
-            if (!fullName) { alert('الرجاء إدخال الاسم الكامل'); return; }
-
-            const user = {
-                fullName,
-                age: document.getElementById('age').value.trim(),
-                gender: document.getElementById('gender').value,
-                country: document.getElementById('country').value,
-                registeredAt: new Date().toISOString()
-            };
-            saveUser(user);
-
-            document.getElementById('userNameDisplay').textContent = fullName;
-            document.getElementById('registerSection').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-
-            renderAll();
-            pronounceArabic(`مرحباً ${fullName}، أهلاً بك في صحراء اللغة`);
+        document.getElementById('centralAccountOpenBtn')?.addEventListener('click', function() {
+            if (window.LangBlueCentralAccount?.open) window.LangBlueCentralAccount.open();
+            else location.href = '/?account=required';
         });
-
-        // ================================================================
-        //  CHECK USER
-        // ================================================================
-        (function initApp() {
-            const user = getUser();
-            if (user) {
-                document.getElementById('userNameDisplay').textContent = user.fullName;
-                document.getElementById('registerSection').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                renderAll();
-                setTimeout(() => { pronounceArabic(`أهلاً بعودتك ${user.fullName}`); }, 500);
-            }
-        })();
 
         // ================================================================
         //  SAVE BUTTONS
