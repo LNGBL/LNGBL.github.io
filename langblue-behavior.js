@@ -5,7 +5,7 @@
   const FUNCTION_NAME = 'langblue-behavior';
   const SCHEMA_VERSION = 1;
   const SESSION_KEY = 'lb:behavior:session';
-  const VALID_PRODUCTS = new Set(['grammar','vocabulary','deutsch','arabic']);
+  const VALID_PRODUCTS = new Set(['grammar','vocabulary','deutsch','arabic','langjp']);
 
   function uuid(){
     if(window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
