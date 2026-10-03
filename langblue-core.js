@@ -406,6 +406,23 @@
   /*
    * Subscription Module
    */
+  function publicActivationError(code){
+    const safe = String(code || '').trim().toUpperCase();
+    const messages = {
+      ACCOUNT_REQUIRED: 'برای فعال‌سازی ابتدا وارد حساب مرکزی شو.',
+      BACKEND_NOT_ENABLED: 'سرویس فعال‌سازی موقتاً در دسترس نیست.',
+      CODE_REQUIRED: 'کد فعال‌سازی را وارد کن.',
+      INVALID_OR_USED_CODE: 'کد فعال‌سازی نامعتبر، منقضی یا قبلاً استفاده شده است.',
+      PRODUCT_NOT_INCLUDED: 'این کد برای محصول انتخاب‌شده معتبر نیست.',
+      SERVER_MAINTENANCE: 'سرویس فعال‌سازی موقتاً در حال نگهداری است.',
+      AUTH_REQUIRED: 'نشست حساب معتبر نیست؛ دوباره وارد شو.',
+      ACTIVATION_FAILED: 'فعال‌سازی انجام نشد. لطفاً دوباره تلاش کن.',
+      CODE_LOOKUP_FAILED: 'بررسی کد فعال‌سازی انجام نشد. لطفاً دوباره تلاش کن.',
+      PLAN_NOT_FOUND: 'اطلاعات اشتراک قابل دریافت نیست. لطفاً دوباره تلاش کن.'
+    };
+    return messages[safe] || 'فعال‌سازی انجام نشد. لطفاً دوباره تلاش کن.';
+  }
+
   const LangBlueSubscription = {
     validateCode(code){
       const normalized = String(code || '').trim();
@@ -459,10 +476,13 @@
             productIds: localSub.productIds
           };
         }
-        return remote || {ok:false,error:'EMPTY_BACKEND_RESPONSE'};
+        return {
+          ok: false,
+          error: publicActivationError(remote && remote.error)
+        };
       } catch(error){
         console.error('Activation backend error:', error);
-        return {ok:false,error:error.message||'FUNCTION_ERROR'};
+        return {ok:false,error:publicActivationError('ACTIVATION_FAILED')};
       }
     },
 
@@ -497,6 +517,9 @@
         console.warn('LangBlue subscription refresh failed:',error);
         return this.current();
       }
+    },
+    publicError(code){
+      return publicActivationError(code);
     },
     current(){
       const sub = storage.get('subscription', null);
