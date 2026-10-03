@@ -89,6 +89,16 @@ Deno.serve(async (req) => {
       currency: body.profile.currency ? String(body.profile.currency) : null,
       updated_at: new Date().toISOString(),
     }, { onConflict: "id" });
+
+    if (action === "signup") {
+      const { error: trialError } = await admin.rpc("grant_4d_trial", {
+        p_user_id: signed.user.id,
+      });
+      if (trialError) {
+        console.error("4-day trial grant failed:", trialError);
+        return json({ ok: false, error: "TRIAL_GRANT_FAILED" }, 500);
+      }
+    }
   }
 
   return json({
