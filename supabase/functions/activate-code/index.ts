@@ -14,6 +14,21 @@ async function sha256(value: string) {
     .join("");
 }
 
+function publicActivationError(code: unknown) {
+  const safe = String(code || "").trim().toUpperCase();
+  const allowed = new Set([
+    "AUTH_REQUIRED",
+    "CODE_REQUIRED",
+    "INVALID_OR_USED_CODE",
+    "PRODUCT_NOT_INCLUDED",
+    "SERVER_MAINTENANCE",
+    "CODE_LOOKUP_FAILED",
+    "ACTIVATION_FAILED",
+    "PLAN_NOT_FOUND",
+  ]);
+  return allowed.has(safe) ? safe : "ACTIVATION_FAILED";
+}
+
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -92,7 +107,7 @@ Deno.serve(async (req) => {
   }
 
   if (!redeemed?.ok) {
-    return json(redeemed || { ok: false, error: "ACTIVATION_FAILED" }, 400);
+    return json({ ok: false, error: publicActivationError(redeemed?.error) }, 400);
   }
 
   const subscription = redeemed.subscription;
