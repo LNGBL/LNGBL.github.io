@@ -33,7 +33,7 @@ function makeRuntime(activateCode) {
     clearTimeout
   };
   vm.runInNewContext(coreSource, context, { filename: "langblue-core.js" });
-  localStorage.setItem("lb:user:test:session", JSON.stringify({ userId: "test", username: "test" }));
+  localStorage.setItem("lb:session", JSON.stringify({ userId: "test", username: "test" }));
   localStorage.setItem("lb:user:test:user", JSON.stringify({ id: "test", username: "test" }));
   return { window, localStorage };
 }
@@ -78,7 +78,7 @@ test("integration contract: Edge Function whitelists RPC error codes", () => {
 test("integration contract: frontend does not return raw activation error.message", () => {
   const activationSection = coreSource.slice(
     coreSource.indexOf("const LangBlueSubscription"),
-    coreSource.indexOf("/*\\n   * Unified Public API")
+    coreSource.indexOf("  /*\n   * Unified Public API")
   );
   assert.doesNotMatch(activationSection, /error\.message\|\|'FUNCTION_ERROR'/);
   assert.match(activationSection, /publicActivationError\(remote && remote\.error\)/);
