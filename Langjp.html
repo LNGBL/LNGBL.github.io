@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="langblue-backend.js"></script>
+<script src="langblue-commerce.js"></script>
+<script src="langblue-behavior.js"></script>
+<script src="langblue-core.js"></script>
+<script src="langblue-central-access.js"></script>
+<script src="langblue-maintenance.js"></script>
+<script src="langblue-onboarding.js"></script>
+<script src="langblue-engagement.js"></script>
 <title>Lang jp</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,6 +55,11 @@
     margin-top: 6px;
     direction: ltr;
   }
+  .product-sticker { color: var(--accent2); font-size: 13px; margin-top: 4px; letter-spacing: 2px; }
+  .access-lock { max-width: 900px; margin: 0 auto 16px; }
+  .access-lock .panel { text-align: center; }
+  .access-lock a { color: var(--warn); }
+
   .tabs {
     display: flex;
     gap: 8px;
@@ -321,7 +336,8 @@
 <body>
 
 <header>
-  <h1>Lang jp</h1>
+  <h1>🌸 Lang jp</h1>
+  <div class="product-sticker" aria-label="درخت ساکورا">🌸 日本語</div>
   <p>言葉は、繰り返すほど、深くなる。</p>
 </header>
 
@@ -467,17 +483,71 @@
    ===================================================== */
 
 const STORAGE_KEY = 'langjp_words_v1';
+const PRODUCT_ID = 'langjp';
 const SESSION_KEY = 'langjp_session_v1';
 
 /* ---------- Data Layer ---------- */
+function centralStorage() {
+  return window.LangBlueCore && window.LangBlueCore.storage
+    ? window.LangBlueCore.storage : null;
+}
 function loadWords() {
   try {
+    const store = centralStorage();
+    if (store) return store.get(STORAGE_KEY, []);
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch(e) { return []; }
 }
 function saveWords(words) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+  try {
+    const store = centralStorage();
+    if (store) store.set(STORAGE_KEY, words);
+    else localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+    queueLangjpSync();
+  } catch(e) { console.warn('[Langjp] save failed', e); }
+}
+let langjpSyncTimer = null;
+function queueLangjpSync() {
+  clearTimeout(langjpSyncTimer);
+  langjpSyncTimer = setTimeout(syncLangjpState, 500);
+}
+async function syncLangjpState() {
+  try {
+    const sb = window.LangBlueSupabase;
+    if (!sb || typeof sb.getUserState !== 'function') return;
+    const state = await sb.getUserState();
+    if (!state && !sb.localUserId()) return;
+    const next = Object.assign({}, state || {}, {
+      langjp: {
+        version: 1,
+        words: loadWords(),
+        session: loadSession(),
+        updatedAt: new Date().toISOString()
+      }
+    });
+    await sb.saveUserState(next);
+  } catch (e) {
+    console.warn('[Langjp] remote sync skipped:', e);
+  }
+}
+async function hydrateLangjpState() {
+  try {
+    const sb = window.LangBlueSupabase;
+    if (!sb || typeof sb.getUserState !== 'function' || !sb.localUserId()) return;
+    const state = await sb.getUserState();
+    const remote = state && state.langjp;
+    if (remote && Array.isArray(remote.words) && loadWords().length === 0) {
+      const store = centralStorage();
+      if (store) store.set(STORAGE_KEY, remote.words);
+      else localStorage.setItem(STORAGE_KEY, JSON.stringify(remote.words));
+    }
+    if (remote && remote.session && !localStorage.getItem(SESSION_KEY)) {
+      saveSession(remote.session);
+    }
+  } catch (e) {
+    console.warn('[Langjp] remote hydration skipped:', e);
+  }
 }
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -694,6 +764,14 @@ document.getElementById('btn-add').addEventListener('click', () => {
   });
   words.push(w);
   saveWords(words);
+  try {
+    window.LangBlueBehavior?.send?.('content_seen', {
+      productId: PRODUCT_ID,
+      language: 'japanese',
+      contextId: 'add_word',
+      payload: { type }
+    });
+  } catch (_) {}
 
   msg.innerHTML = '<div class="notice notice-ok">✅ لغت با موفقیت ذخیره شد.</div>';
   document.getElementById('in-jp').value = '';
@@ -974,6 +1052,14 @@ function answerFlash(id) {
   if (idx !== -1) {
     applyAnswerResult(words[idx], isCorrect);
     saveWords(words);
+    try {
+      window.LangBlueBehavior?.send?.('content_answered', {
+        productId: PRODUCT_ID,
+        language: 'japanese',
+        contextId: currentFlash.word.id,
+        payload: { correct: isCorrect }
+      });
+    } catch (_) {}
 
     // ثبت در session روزانه
     const session = loadSession();
@@ -1069,8 +1155,31 @@ function renderStats() {
 /* =====================================================
    INIT
    ===================================================== */
-(function init() {
-  // migrate defaults
+async function ensureLangjpAccess() {
+  try {
+    if (window.LangBlueCore?.Auth?.init) await window.LangBlueCore.Auth.init();
+    if (window.LangBlueCore?.subscription?.refresh) await window.LangBlueCore.subscription.refresh();
+    const sub = window.LangBlueCore?.subscription?.current?.();
+    const allowed = !!(sub && !sub.expired &&
+      Array.isArray(sub.productIds) && sub.productIds.includes(PRODUCT_ID));
+    if (!allowed) {
+      const lock = document.createElement('div');
+      lock.className = 'access-lock';
+      lock.innerHTML = '<div class="panel"><h2>🔐 دسترسی ژاپنی</h2><div class="notice notice-warn">دورهٔ آزمایشی یا اشتراک این محصول فعال نیست.</div><a href="/?account=required">ورود به حساب مرکزی LangBlue و فعال‌سازی اشتراک</a></div>';
+      document.body.insertBefore(lock, document.querySelector('.tabs'));
+      document.querySelectorAll('.tabs,.page').forEach(el => el.style.display = 'none');
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.warn('[Langjp] access check failed:', e);
+    return true;
+  }
+}
+(async function init() {
+  const allowed = await ensureLangjpAccess();
+  if (!allowed) return;
+  await hydrateLangjpState();
   const words = loadWords().map(ensureWordDefaults);
   saveWords(words);
   renderList();
