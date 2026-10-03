@@ -85,6 +85,14 @@
     font-weight: bold;
   }
   .tab:hover:not(.active) { background: var(--card2); }
+  .phonetic-table-wrap { overflow-x:auto; }
+  .phonetic-table { width:100%; border-collapse:collapse; min-width:680px; direction:ltr; }
+  .phonetic-table th,.phonetic-table td { border:1px solid var(--border); padding:10px 8px; text-align:center; }
+  .phonetic-table th { background:var(--card2); color:var(--accent2); }
+  .phonetic-table td.kana { font-size:25px; font-weight:800; }
+  .phonetic-table td.ipa,.phonetic-table td.romaji,.phonetic-table td.pron { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.3px; }
+  .phonetic-note { color:var(--muted); font-size:13px; margin-bottom:14px; direction:rtl; }
+
 
   .page { display: none; max-width: 900px; margin: 0 auto; }
   .page.active { display: block; }
@@ -347,6 +355,7 @@
   <div class="tab active" data-page="add">➕ افزودن لغت</div>
   <div class="tab" data-page="list">📚 جدول لغات</div>
   <div class="tab" data-page="flash">🎴 فلش‌کارت</div>
+  <div class="tab" data-page="phonetic">🔤 فونتیک ژاپنی</div>
   <div class="tab" data-page="stats">📊 آمار</div>
 </div>
 
@@ -725,6 +734,7 @@ const pages = {
   add: document.getElementById('page-add'),
   list: document.getElementById('page-list'),
   flash: document.getElementById('page-flash'),
+  phonetic: document.getElementById('page-phonetic'),
   stats: document.getElementById('page-stats'),
 };
 
@@ -737,8 +747,25 @@ document.querySelectorAll('.tab').forEach(tab => {
     if (tab.dataset.page === 'list') renderList();
     if (tab.dataset.page === 'stats') renderStats();
     if (tab.dataset.page === 'flash') renderFlashInfo();
+    if (tab.dataset.page === 'phonetic') renderPhonetics();
   });
 });
+
+async function renderPhonetics() {
+  const body = document.getElementById('phonetic-body');
+  if (!body) return;
+  try {
+    const sb = window.LangBlueSupabase;
+    if (sb?.client) {
+      const { data, error } = await sb.client.from('japanese_phonetics').select('sort_order,hiragana,katakana,romaji,ipa,pronunciation_latin').order('sort_order');
+      if (!error && Array.isArray(data)) {
+        body.innerHTML = data.map((r,i) => '<tr><td>'+(i+1)+'</td><td class="kana">'+escapeHtml(r.hiragana)+'</td><td class="kana">'+escapeHtml(r.katakana)+'</td><td class="romaji">'+escapeHtml(r.romaji)+'</td><td class="ipa">'+escapeHtml(r.ipa)+'</td><td class="pron">'+escapeHtml(r.pronunciation_latin)+'</td></tr>').join('');
+        return;
+      }
+    }
+  } catch (_) {}
+  body.innerHTML = '<tr><td colspan="6">جدول فونتیک در حال بارگذاری است.</td></tr>';
+}
 
 /* ---------- Add Word ---------- */
 document.getElementById('btn-add').addEventListener('click', () => {
@@ -1186,6 +1213,7 @@ async function ensureLangjpAccess() {
   saveWords(words);
   renderList();
   renderFlashInfo();
+  renderPhonetics();
   renderStats();
 })();
 
