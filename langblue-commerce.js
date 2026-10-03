@@ -12,7 +12,7 @@ days:7,
 label:'۷ روز',
 price:150999,
 priceStr:'150,999 T',
-feature:'دسترسی کامل به ۴ محصول LangBlue'
+feature:'دسترسی کامل به ۵ محصول LangBlue'
 },
 
 
@@ -43,7 +43,7 @@ days:90,
 label:'۳ ماه',
 price:784999,
 priceStr:'784,999 T',
-feature:'دسترسی کامل ۴ محصول LangBlue بدون محدودیت'
+feature:'دسترسی کامل ۵ محصول LangBlue بدون محدودیت'
 },
 
 
@@ -54,7 +54,7 @@ days:180,
 label:'۶ ماه',
 price:880999,
 priceStr:'880,999 T',
-feature:'دسترسی کامل اکوسیستم ۴ محصولی LangBlue'
+feature:'دسترسی کامل اکوسیستم ۵ محصولی LangBlue'
 },
 
 
@@ -65,7 +65,7 @@ days:365,
 label:'۱۲ ماه',
 price:1000999,
 priceStr:'1,000,999 T',
-feature:'دسترسی کامل ۴ محصول + مدیریت داده + پرینت اطلاعات'
+feature:'دسترسی کامل ۵ محصول + مدیریت داده + پرینت اطلاعات'
 }
 
 
