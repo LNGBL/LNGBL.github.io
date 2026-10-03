@@ -86,6 +86,12 @@
       if(el.matches('.tab[data-tab="flashcard"]')){ eventName='learning_started'; contextId='flashcard'; }
       else if(el.matches('.flashcard .option')){ eventName='content_answered'; contextId='flashcard'; payload={option:el.dataset.opt||null}; }
       else if(el.matches('[data-plan],.price-card')){ eventName='subscription_selected'; contextId=el.getAttribute('data-plan'); }
+    }else if(path.includes('langjp')){
+      if(el.matches('#btn-start-flash')){ eventName='learning_started'; contextId='flashcard'; }
+      else if(el.matches('#flash-options .option')){ eventName='content_answered'; contextId='flashcard'; }
+      else if(el.matches('.tab')){ eventName='content_seen'; contextId=el.getAttribute('data-page'); }
+      else if(el.matches('#btn-add')){ eventName='content_added'; contextId='vocabulary_item'; }
+      else if(el.matches('#btn-save-edit')){ eventName='content_edited'; contextId='vocabulary_item'; }
     }else if(path.includes('langblue-de') || path.includes('deutsch')){
       if(el.id==='btn-next'){ eventName='learning_started'; contextId='flashcard'; }
       else if(el.matches('.options-grid .option')){ eventName='content_answered'; contextId='flashcard'; payload={option_index:Number(el.dataset.idx||-1)}; }
@@ -101,6 +107,7 @@
   function inferLanguage(){
     const path=String(window.location.pathname||'').toLowerCase();
     if(path.includes('langdesert')) return 'arabic';
+    if(path.includes('langjp')) return 'japanese';
     const product=inferProduct();
     return product==='deutsch'?'german':(product?'english':null);
   }
@@ -119,6 +126,7 @@
   function inferProduct(){
     const path=String(window.location.pathname||'').toLowerCase();
     if(path.includes('langdesert')) return 'arabic';
+    if(path.includes('langjp')) return 'langjp';
     if(path.includes('vocab')) return 'vocabulary';
     if(path.includes('grammer') || path.includes('grammar')) return 'grammar';
     if(path.includes('langblue-de') || path.includes('deutsch')) return 'deutsch';
