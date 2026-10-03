@@ -10,8 +10,8 @@ irt_7d:{
 id:'irt_7d',
 days:7,
 label:'۷ روز',
-price:100999,
-priceStr:'100,999 T',
+price:150999,
+priceStr:'150,999 T',
 feature:'دسترسی کامل به ۴ محصول LangBlue'
 },
 
@@ -20,8 +20,8 @@ irt_14d:{
 id:'irt_14d',
 days:14,
 label:'۱۴ روز',
-price:263999,
-priceStr:'263,999 T',
+price:313999,
+priceStr:'313,999 T',
 feature:'دسترسی کامل به محصولات LangBlue'
 },
 
@@ -30,8 +30,8 @@ irt_21d:{
 id:'irt_21d',
 days:21,
 label:'۲۱ روز',
-price:456999,
-priceStr:'456,999 T',
+price:506999,
+priceStr:'506,999 T',
 feature:'دسترسی کامل به محصولات LangBlue'
 },
 
@@ -41,8 +41,8 @@ id:'irt_3m',
 months:3,
 days:90,
 label:'۳ ماه',
-price:734999,
-priceStr:'734,999 T',
+price:784999,
+priceStr:'784,999 T',
 feature:'دسترسی کامل ۴ محصول LangBlue بدون محدودیت'
 },
 
@@ -52,8 +52,8 @@ id:'irt_6m',
 months:6,
 days:180,
 label:'۶ ماه',
-price:830999,
-priceStr:'830,999 T',
+price:880999,
+priceStr:'880,999 T',
 feature:'دسترسی کامل اکوسیستم ۴ محصولی LangBlue'
 },
 
@@ -63,8 +63,8 @@ id:'irt_12m',
 months:12,
 days:365,
 label:'۱۲ ماه',
-price:950999,
-priceStr:'950,999 T',
+price:1000999,
+priceStr:'1,000,999 T',
 feature:'دسترسی کامل ۴ محصول + مدیریت داده + پرینت اطلاعات'
 }
 
@@ -273,6 +273,15 @@ url:'LangDesert.html'
 
 },
 
+langjp:{
+
+id:'langjp',
+label:'LangBlue Japanese',
+icon:'🌸',
+url:'Langjp.html'
+
+},
+
 
 
 };
@@ -283,7 +292,7 @@ url:'LangDesert.html'
 
 
 
-var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic'];
+var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic','langjp'];
 
 
 
