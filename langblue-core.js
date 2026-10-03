@@ -312,7 +312,8 @@
       users: [],
       languages: {
         vocabulary: { words: [] },
-        deutsch: { words: [] }
+        deutsch: { words: [] },
+        langjp: { words: [] }
       },
       settings: { version: '3.0.0' }
     };
