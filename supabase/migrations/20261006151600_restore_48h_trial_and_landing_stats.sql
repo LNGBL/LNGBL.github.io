@@ -13,6 +13,7 @@ on conflict(id) do update set label=excluded.label,days=excluded.days,months=exc
 update public.plans set active=false where id='trial_4d';
 update public.profiles set trial_expires_at=case when trial_started_at is null then null else trial_started_at+interval '48 hours' end,updated_at=now() where trial_started_at is not null;
 update public.subscriptions set plan_id='trial_48h',expires_at=starts_at+interval '48 hours',updated_at=now() where plan_id in('trial_4d','trial_48h') and status='active';
+update public.subscriptions set status='expired',updated_at=now() where plan_id='trial_48h' and status='active' and expires_at<=now();
 create or replace function public.grant_48h_trial(p_user_id uuid) returns void language plpgsql security definer set search_path=public as $$ declare v_start timestamptz; v_exp timestamptz; begin select trial_started_at,trial_expires_at into v_start,v_exp from public.profiles where id=p_user_id for update; if not found then raise exception 'PROFILE_NOT_FOUND'; end if; if v_start is null then v_start=now();v_exp=v_start+interval '48 hours';update public.profiles set trial_started_at=v_start,trial_expires_at=v_exp,updated_at=now() where id=p_user_id;insert into public.subscriptions(user_id,plan_id,product_ids,status,starts_at,expires_at) values(p_user_id,'trial_48h',array['grammar','vocabulary','deutsch','arabic','langjp'],'active',v_start,v_exp);end if;end; $$;
 revoke execute on function public.grant_48h_trial(uuid) from public,anon,authenticated;
 grant execute on function public.grant_48h_trial(uuid) to service_role;
