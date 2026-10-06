@@ -8,6 +8,11 @@ async function refreshSubscription(){
   }catch(e){console.warn('[LangBlue] central subscription refresh failed',e)}
   return null;
 }
+<style id="lb-subscription-gate-style">
+.lb-subscription-gate{position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(3,12,20,.82);backdrop-filter:blur(14px)}
+.lb-subscription-gate-card{width:min(560px,100%);padding:28px;border:1px solid rgba(91,192,255,.28);border-radius:22px;background:#0b2235;color:#fff;box-shadow:0 30px 100px rgba(0,0,0,.45);text-align:center}
+.lb-subscription-gate-card h2{margin:0 0 8px}.lb-subscription-gate-card p{color:#b8cdd3;line-height:1.9;margin:0 0 18px}
+</style>
 function centralUrl(){return '/?account=required';}
 function hidePricing(){
   ['pricingGrid','pricing-grid','paidPlanGrid','vocabGatePlans'].forEach(id=>{const e=document.getElementById(id);if(e){e.innerHTML='';e.style.display='none';}});
@@ -47,12 +52,43 @@ function patchVocab(){
   }
   const gatePlans=document.getElementById('vocabGatePlans');if(gatePlans)centralNotice(gatePlans);
 }
+function productIdForPage(){
+  const p=location.pathname.toLowerCase();
+  if(p.indexOf('langblue-grammer')!==-1)return 'grammar';
+  if(p.indexOf('vocab')!==-1)return 'vocabulary';
+  if(p.indexOf('langblue-de')!==-1)return 'deutsch';
+  if(p.indexOf('langdesert')!==-1)return 'arabic';
+  if(p.indexOf('langjp')!==-1)return 'langjp';
+  return null;
+}
+function hasProductAccess(productId){
+  const s=window.LangBlueCore&&window.LangBlueCore.subscription&&window.LangBlueCore.subscription.current();
+  if(!s||s.expired)return false;
+  const ids=Array.isArray(s.productIds)?s.productIds:(Array.isArray(s.product_ids)?s.product_ids:null);
+  if(!productId||!ids||!ids.length)return true;
+  return ids.indexOf(productId)!==-1;
+}
+function showSubscriptionGate(productId){
+  if(document.getElementById('lbSubscriptionGate'))return;
+  const root=document.createElement('div');root.id='lbSubscriptionGate';root.className='lb-subscription-gate';
+  root.innerHTML='<div class="lb-subscription-gate-card"><div style="font-size:42px">🔒</div><h2>دوره رایگان ۴۸ ساعته تمام شده است</h2><p>برای ادامه استفاده از این محصول، یک اشتراک فعال لازم است. دسترسی از حساب مرکزی LangBlue مدیریت می‌شود.</p><div class="lb-central-actions" style="justify-content:center"><a class="btn btn-primary" href="/?account=required">🔑 ورود به حساب مرکزی</a><button class="btn btn-secondary" type="button" id="lbGateBack">بازگشت</button></div></div>';
+  document.body.appendChild(root);
+  document.getElementById('lbGateBack').onclick=()=>history.back();
+}
+function enforceProductAccess(){
+  if(location.pathname==='/'||location.pathname.endsWith('/index.html'))return true;
+  const product=productIdForPage();
+  if(!product)return true;
+  if(hasProductAccess(product))return true;
+  showSubscriptionGate(product);
+  return false;
+}
 async function init(){
   if(window.LangBlueMaintenance&&window.LangBlueMaintenance.active())return;
   await refreshSubscription();
-  patchGrammar();patchGerman();patchVocab();
+  patchGrammar();patchGerman();patchVocab();enforceProductAccess();
   setTimeout(function(){hidePricing();if(window.PaidAccess&&window.PaidAccess.refreshButtons)window.PaidAccess.refreshButtons();},300);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-window.LangBlueCentralAccess={refreshSubscription,patchGrammar,patchGerman,patchVocab};
+window.LangBlueCentralAccess={refreshSubscription,patchGrammar,patchGerman,patchVocab,enforceProductAccess,hasProductAccess};
 })(window,document);
