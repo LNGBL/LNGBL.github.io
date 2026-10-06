@@ -8,11 +8,12 @@ async function refreshSubscription(){
   }catch(e){console.warn('[LangBlue] central subscription refresh failed',e)}
   return null;
 }
-<style id="lb-subscription-gate-style">
-.lb-subscription-gate{position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(3,12,20,.82);backdrop-filter:blur(14px)}
-.lb-subscription-gate-card{width:min(560px,100%);padding:28px;border:1px solid rgba(91,192,255,.28);border-radius:22px;background:#0b2235;color:#fff;box-shadow:0 30px 100px rgba(0,0,0,.45);text-align:center}
-.lb-subscription-gate-card h2{margin:0 0 8px}.lb-subscription-gate-card p{color:#b8cdd3;line-height:1.9;margin:0 0 18px}
-</style>
+function ensureGateStyles(){
+  if(document.getElementById('lb-subscription-gate-style'))return;
+  const style=document.createElement('style');style.id='lb-subscription-gate-style';
+  style.textContent='.lb-subscription-gate{position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(3,12,20,.82);backdrop-filter:blur(14px)}.lb-subscription-gate-card{width:min(560px,100%);padding:28px;border:1px solid rgba(91,192,255,.28);border-radius:22px;background:#0b2235;color:#fff;box-shadow:0 30px 100px rgba(0,0,0,.45);text-align:center}.lb-subscription-gate-card h2{margin:0 0 8px}.lb-subscription-gate-card p{color:#b8cdd3;line-height:1.9;margin:0 0 18px}';
+  document.head.appendChild(style);
+}
 function centralUrl(){return '/?account=required';}
 function hidePricing(){
   ['pricingGrid','pricing-grid','paidPlanGrid','vocabGatePlans'].forEach(id=>{const e=document.getElementById(id);if(e){e.innerHTML='';e.style.display='none';}});
@@ -69,6 +70,7 @@ function hasProductAccess(productId){
   return ids.indexOf(productId)!==-1;
 }
 function showSubscriptionGate(productId){
+  ensureGateStyles();
   if(document.getElementById('lbSubscriptionGate'))return;
   const root=document.createElement('div');root.id='lbSubscriptionGate';root.className='lb-subscription-gate';
   root.innerHTML='<div class="lb-subscription-gate-card"><div style="font-size:42px">🔒</div><h2>دوره رایگان ۴۸ ساعته تمام شده است</h2><p>برای ادامه استفاده از این محصول، یک اشتراک فعال لازم است. دسترسی از حساب مرکزی LangBlue مدیریت می‌شود.</p><div class="lb-central-actions" style="justify-content:center"><a class="btn btn-primary" href="/?account=required">🔑 ورود به حساب مرکزی</a><button class="btn btn-secondary" type="button" id="lbGateBack">بازگشت</button></div></div>';
