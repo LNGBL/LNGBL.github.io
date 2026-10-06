@@ -69,7 +69,7 @@
 <div class="lb-central-field" id="lbCentralConfirmWrap"><label>تکرار رمز عبور</label><input id="lbCentralConfirm" type="password" autocomplete="new-password"></div>
 <div id="lbInitialLearningSetup" style="margin-top:14px;padding:14px;border:1px solid rgba(255,255,255,.12);border-radius:15px;background:rgba(255,255,255,.035)">
 <strong>اطلاعات شروع یادگیری</strong>
-<div class="lb-central-muted" style="margin-top:4px">این موارد فقط در زمان ساخت حساب ثبت می‌شوند و بعداً در صفحه حساب نمایش داده نمی‌شوند.</div>
+<div class="lb-central-muted" style="margin-top:4px">این موارد فقط در زمان ساخت حساب ثبت می‌شوند و بعداً در صفحه حساب نمایش داده نمی‌شوند. حساب جدید ۴۸ ساعت دسترسی آزمایشی کامل دارد.</div>
 <div class="lb-profile-grid" style="margin-top:10px">
 <div><label for="lbTargetLanguage">زبان موردنظر</label><select id="lbTargetLanguage"><option value="">انتخاب</option><option value="english">English</option><option value="german">Deutsch</option><option value="arabic">العربية</option></select></div>
 <div><label for="lbTargetLevel">سطح</label><select id="lbTargetLevel"><option value="">انتخاب سطح</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></div>
@@ -79,8 +79,8 @@
 <div class="lb-central-error" id="lbCentralError"></div>
 <div class="lb-central-actions"><button class="btn btn-primary" type="submit" id="lbCentralSubmit">ساخت حساب</button><button class="btn btn-secondary" type="button" id="lbCentralClose">انصراف</button></div>
 </form>`;
-      let register=true;const form=body.querySelector('#lbCentralForm'),nameWrap=body.querySelector('#lbCentralNameWrap'),confirmWrap=body.querySelector('#lbCentralConfirmWrap'),submit=body.querySelector('#lbCentralSubmit'),error=body.querySelector('#lbCentralError');
-      const syncMode=()=>{nameWrap.style.display=register?'grid':'none';confirmWrap.style.display=register?'grid':'none';submit.textContent=register?'ساخت حساب':'ورود';body.querySelector('#lbCentralRegisterTab').className='btn '+(register?'btn-primary':'btn-secondary');body.querySelector('#lbCentralLoginTab').className='btn '+(!register?'btn-primary':'btn-secondary');body.querySelector('#lbCentralPassword').autocomplete=register?'new-password':'current-password';error.textContent='';};
+      let register=true;const form=body.querySelector('#lbCentralForm'),nameWrap=body.querySelector('#lbCentralNameWrap'),confirmWrap=body.querySelector('#lbCentralConfirmWrap'),setup=body.querySelector('#lbInitialLearningSetup'),submit=body.querySelector('#lbCentralSubmit'),error=body.querySelector('#lbCentralError');
+      const syncMode=()=>{nameWrap.style.display=register?'grid':'none';confirmWrap.style.display=register?'grid':'none';if(setup)setup.style.display=register?'block':'none';submit.textContent=register?'ساخت حساب':'ورود';body.querySelector('#lbCentralRegisterTab').className='btn '+(register?'btn-primary':'btn-secondary');body.querySelector('#lbCentralLoginTab').className='btn '+(!register?'btn-primary':'btn-secondary');body.querySelector('#lbCentralPassword').autocomplete=register?'new-password':'current-password';error.textContent='';};
       body.querySelector('#lbCentralRegisterTab').onclick=()=>{register=true;syncMode();};body.querySelector('#lbCentralLoginTab').onclick=()=>{register=false;syncMode();};body.querySelector('#lbCentralClose').onclick=()=>root.classList.remove('open');
       form.onsubmit=async function(e){
 e.preventDefault();error.textContent='';
