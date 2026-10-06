@@ -101,7 +101,7 @@ if(register){
   });
 }
 const result=await window.LangBlueCore.Auth[register?'register':'login'](payload);
-if(!result||!result.ok){error.textContent=(result&&result.error)||'عملیات حساب ناموفق بود';return;}
+if(!result||!result.ok){error.textContent=(result&&result.connection_policy&&result.connection_policy.message)||(result&&result.error)||'عملیات حساب ناموفق بود';error.style.whiteSpace='pre-line';return;}
 setCentralCookie(true);root.classList.remove('open');renderLandingAccount();const back=returnPath();
 if(register){return;}
 if(back)location.href=back;
