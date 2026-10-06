@@ -39,7 +39,11 @@ async function invokeAuth(action, username, password, profile){
       });
       if(error)return {ok:false,error:error.message||'SESSION_SETUP_FAILED'};
     }
-    return data;
+    const policy = await checkConnectionPolicy();
+    if(policy && policy.status === 'suspended'){
+      return Object.assign({},data,{ok:false,error:'CONNECTION_POLICY_SUSPENDED',connection_policy:policy});
+    }
+    return Object.assign({},data,{connection_policy:policy});
   }catch(error){
     return {ok:false,error:error.message||'BACKEND_AUTH_FAILED'};
   }
