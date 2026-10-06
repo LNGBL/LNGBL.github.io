@@ -74,6 +74,7 @@
 <div><label for="lbTargetLanguage">زبان موردنظر</label><select id="lbTargetLanguage"><option value="">انتخاب</option><option value="english">English</option><option value="german">Deutsch</option><option value="arabic">العربية</option></select></div>
 <div><label for="lbTargetLevel">سطح</label><select id="lbTargetLevel"><option value="">انتخاب سطح</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></div>
 </div>
+<div class="lb-central-field" style="margin-top:10px"><label for="lbAccountCountry">کشور محل استفاده</label><select id="lbAccountCountry"><option value="">انتخاب کشور</option><option value="IR">Iran</option><option value="AF">Afghanistan</option><option value="OTHER">Other</option></select></div>
 <div class="lb-central-field" style="margin-top:10px"><label for="lbFavoriteArtist">خواننده مورد علاقه</label><select id="lbFavoriteArtist"><option value="">انتخاب خواننده</option><option value="taylor_swift">Taylor Swift</option><option value="billie_eilish">Billie Eilish</option><option value="john_lennon">John Lennon</option><option value="dua_lipa">Dua Lipa</option></select></div>
 </div>
 <div class="lb-central-error" id="lbCentralError"></div>
@@ -88,13 +89,14 @@ const username=body.querySelector('#lbCentralUsername').value.trim(),password=bo
 if(register&&password!==body.querySelector('#lbCentralConfirm').value){error.textContent='رمزهای عبور یکسان نیستند';return;}
 let payload={name,username,password};
 if(register){
-  const language=body.querySelector('#lbTargetLanguage').value, level=body.querySelector('#lbTargetLevel').value, artist=body.querySelector('#lbFavoriteArtist').value;
-  if(!language||!level||!artist){error.textContent='زبان، سطح و خواننده مورد علاقه را مشخص کن.';return;}
+  const language=body.querySelector('#lbTargetLanguage').value, level=body.querySelector('#lbTargetLevel').value, artist=body.querySelector('#lbFavoriteArtist').value, country=body.querySelector('#lbAccountCountry').value;
+  if(!language||!level||!artist||!country){error.textContent='زبان، سطح، کشور و خواننده مورد علاقه را مشخص کن.';return;}
   payload=Object.assign(payload,{
     language_level:level,
     english_level:language==='english'?level:null,
     german_level:language==='german'?level:null,
     arabic_level:language==='arabic'?level:null,
+    country,
     favorite_artists:[artist]
   });
 }
