@@ -506,8 +506,8 @@
             planId:row.plan_id,
             productIds:Array.isArray(row.product_ids)?row.product_ids:['grammar','vocabulary','deutsch','arabic','langjp'],
             expiresAt:row.expires_at,
-            verifiedByCode:row.plan_id!=='trial_4d',
-            trial:row.plan_id==='trial_4d'
+            verifiedByCode:row.plan_id!=='trial_48h',
+            trial:row.plan_id==='trial_48h'
           }));
         }else{
           storage.remove('subscription');
