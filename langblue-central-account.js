@@ -94,6 +94,7 @@ if(register){
     language_level:level,
     english_level:language==='english'?level:null,
     german_level:language==='german'?level:null,
+    arabic_level:language==='arabic'?level:null,
     favorite_artists:[artist]
   });
 }
