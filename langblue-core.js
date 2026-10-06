@@ -195,6 +195,8 @@
         currency: data.currency || null,
         english_level: data.english_level || null,
         german_level: data.german_level || null,
+        arabic_level: data.arabic_level || null,
+        language_level: data.language_level || null,
         peer_learning_consent: data.peer_learning_consent === true,
         peer_learning_notifications: data.peer_learning_notifications !== false,
         favorite_artists: Array.isArray(data.favorite_artists) ? data.favorite_artists.slice(0,2) : []
