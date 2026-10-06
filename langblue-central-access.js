@@ -53,6 +53,24 @@ function patchVocab(){
   }
   const gatePlans=document.getElementById('vocabGatePlans');if(gatePlans)centralNotice(gatePlans);
 }
+function showConnectionSuspension(result){
+  if(document.getElementById('lbConnectionSuspension'))return;
+  const username=String(result&&result.username||window.LangBlueCore?.Auth?.current?.()?.username||'USER');
+  const message=String(result&&result.message||'Dear User\\n\\nYou did not follow the restrictions regarding your connection type to the platform, our team has decided to keep your account suspended until you log in with a local IP.\\nTherefore, until this happens, unfortunately, you will be suspended.\\nThe reason for this is so that we can provide the best services to Iranians inside and outside the country.\\nPlease accept our apologies for such a message.\\nFROM: Langblue Team\\nTO: ('+username+')');
+  const lines=message.split('\\n').map(function(x){return x?'<div style="margin:7px 0">'+x.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})+'</div>':'<div style="height:8px"></div>';}).join('');
+  const root=document.createElement('div');root.id='lbConnectionSuspension';root.className='lb-subscription-gate';
+  root.innerHTML='<div class="lb-subscription-gate-card" style="max-width:700px;text-align:left"><div style="font-size:38px;text-align:center">⛔</div><div style="font-family:Arial,sans-serif;line-height:1.65">'+lines+'</div><div style="text-align:center;margin-top:22px;color:#9fb4bd;font-size:12px">Access will be restored after a verified local IP is detected.</div></div>';
+  document.body.appendChild(root);
+}
+async function enforceConnectionPolicy(){
+  try{
+    if(!window.LangBlueSupabase||typeof window.LangBlueSupabase.checkConnectionPolicy!=='function')return true;
+    const result=await window.LangBlueSupabase.checkConnectionPolicy();
+    if(result&&result.status==='suspended'){showConnectionSuspension(result);return false;}
+    return true;
+  }catch(e){return true;}
+}
+
 function productIdForPage(){
   const p=location.pathname.toLowerCase();
   if(p.indexOf('langblue-grammer')!==-1)return 'grammar';
@@ -88,9 +106,11 @@ function enforceProductAccess(){
 async function init(){
   if(window.LangBlueMaintenance&&window.LangBlueMaintenance.active())return;
   await refreshSubscription();
+  if(!(await enforceConnectionPolicy()))return;
   patchGrammar();patchGerman();patchVocab();enforceProductAccess();
+  setInterval(enforceConnectionPolicy,300000);
   setTimeout(function(){hidePricing();if(window.PaidAccess&&window.PaidAccess.refreshButtons)window.PaidAccess.refreshButtons();},300);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-window.LangBlueCentralAccess={refreshSubscription,patchGrammar,patchGerman,patchVocab,enforceProductAccess,hasProductAccess};
+window.LangBlueCentralAccess={refreshSubscription,patchGrammar,patchGerman,patchVocab,enforceProductAccess,hasProductAccess,enforceConnectionPolicy};
 })(window,document);
