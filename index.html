@@ -124,7 +124,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     .products{padding:70px 0}
     .products-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:1120px;margin:30px auto 0}
     .product-card{position:relative;display:flex;flex-direction:column;min-height:270px;padding:28px;background:var(--glass);border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 45px rgba(0,0,0,.14);backdrop-filter:blur(14px);transition:transform .2s,border-color .2s,box-shadow .2s}
-    .product-card:hover{transform:translateY(-5px);border-color:rgba(91,192,255,.36);box-shadow:0 20px 55px rgba(0,0,0,.2)}
+    .product-card:hover{transform:translateY(-5px);border-color:var(--product-accent,rgba(91,192,255,.36));box-shadow:0 20px 55px rgba(0,0,0,.2)}.product-card{overflow:hidden}.product-card:before{content:"";position:absolute;inset:-40% auto auto -25%;width:190px;height:190px;border-radius:50%;background:var(--product-accent,rgba(91,192,255,.22));filter:blur(34px);opacity:0;transition:opacity .35s,transform .35s;pointer-events:none}.product-card:hover:before{opacity:.34;transform:translate(18px,18px)}.product-card:hover .product-badge{border-color:var(--product-accent,rgba(91,192,255,.45));box-shadow:0 0 18px var(--product-accent,rgba(91,192,255,.18))}.product-card[data-accent="grammar"]{--product-accent:rgba(69,183,200,.45)}.product-card[data-accent="vocabulary"]{--product-accent:rgba(91,192,255,.45)}.product-card[data-accent="deutsch"]{--product-accent:rgba(255,211,93,.42)}.product-card[data-accent="japanese"]{--product-accent:rgba(255,126,180,.42)}.product-card[data-accent="arabic"]{--product-accent:rgba(240,185,90,.42)}
     .product-badge{display:inline-flex;align-self:flex-start;padding:5px 10px;border-radius:999px;background:rgba(34,158,217,.12);border:1px solid rgba(91,192,255,.24);color:#9de3ff;font-size:11px;font-weight:800;margin-bottom:16px}
     .product-icon{font-size:34px;line-height:1;margin-bottom:14px}
     .product-card h3{margin:0 0 9px;font-size:22px;color:#fff}
@@ -228,6 +228,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 }
   
 .lb-leaderboard-section{padding:72px 0}.lb-leaderboard-card{max-width:1000px;margin:28px auto 0;padding:24px;background:var(--glass);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.lb-leaderboard-table-wrap{overflow:auto}.lb-leaderboard-table{width:100%;border-collapse:collapse;min-width:680px}.lb-leaderboard-table th,.lb-leaderboard-table td{padding:13px 12px;text-align:right;border-bottom:1px solid var(--line)}.lb-leaderboard-table th{color:#9de3ff;font-size:12px}.lb-leaderboard-table td{color:#e9f7fb;font-size:13px}.lb-leaderboard-table td small{display:block;color:var(--muted);font-size:10px;direction:ltr;text-align:right;margin-top:2px}.lb-leaderboard-table tbody tr:first-child td{background:rgba(69,183,200,.07)}.lb-leaderboard-loading,.lb-leaderboard-empty{text-align:center;color:var(--muted);padding:30px 12px}.lb-leaderboard-note{text-align:center;color:var(--muted);font-size:11px;margin-top:14px}
+.lb-public-stats{padding:28px 0 52px}.lb-public-stats-card{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:980px;margin:0 auto;padding:18px;background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.lb-stat{text-align:center;padding:16px;border-radius:15px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025)}.lb-stat-number{font-size:clamp(28px,5vw,46px);font-weight:900;letter-spacing:-1px;color:#fff;font-variant-numeric:tabular-nums}.lb-stat-label{margin-top:3px;color:var(--muted);font-size:12px}.lb-stat-note{margin-top:14px;text-align:center;color:#8faab2;font-size:11px}@media(max-width:650px){.lb-public-stats-card{grid-template-columns:1fr}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
@@ -278,6 +279,16 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
       </div>
     </section>
 
+<section class="lb-public-stats" id="langblue-stats" aria-label="آمار LangBlue">
+  <div class="wrap">
+    <div class="lb-public-stats-card">
+      <div class="lb-stat"><div class="lb-stat-number" id="lbStatViews">—</div><div class="lb-stat-label">بار دیده‌شدن این صفحه</div></div>
+      <div class="lb-stat"><div class="lb-stat-number" id="lbStatUsers">—</div><div class="lb-stat-label">حساب کاربری</div></div>
+      <div class="lb-stat"><div class="lb-stat-number" id="lbStatWords">—</div><div class="lb-stat-label">واژه و کلمه</div></div>
+    </div>
+    <div class="lb-stat-note">آمار واژه‌ها به‌صورت یکپارچه محاسبه می‌شود و زبان‌ها جداگانه شمرده نمی‌شوند.</div>
+  </div>
+</section>
     <section id="features">
       <div class="wrap">
         <h2 class="section-title">LangBlue چه کاری انجام می‌دهد؟</h2>
@@ -409,7 +420,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
           ابزارهای اصلی LangBlue در کنار یکدیگر قرار گرفته‌اند؛ از گرامر و واژگان تا آلمانی، عربی و ژاپنی، با مسیرهای اختصاصی برای یادگیری و تمرین.
         </p>
         <div class="products-grid">
-          <article class="product-card">
+          <article class="product-card" data-accent="grammar">
             <span class="product-badge">LANGBLUE · GRAMMAR</span>
             <div class="product-icon">📐</div>
             <h3>LangBlue Grammar</h3>
@@ -422,7 +433,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
             <a class="btn btn-primary" href="LangBlue-grammer.html">ورود به Grammar ←</a>
           </article>
 
-          <article class="product-card">
+          <article class="product-card" data-accent="vocabulary">
             <span class="product-badge">LANGBLUE · VOCABULARY</span>
             <div class="product-icon">📚</div>
             <h3>LangBlue Vocabulary</h3>
@@ -435,7 +446,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
             <a class="btn btn-primary" href="vocab.html">ورود به Vocabulary ←</a>
           </article>
 
-          <article class="product-card">
+          <article class="product-card" data-accent="deutsch">
             <span class="product-badge">LANGBLUE · DEUTSCH</span>
             <div class="product-icon">🇩🇪</div>
             <h3>LangBlue Deutsch</h3>
@@ -448,7 +459,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
             <a class="btn btn-primary" href="LangBlue-De.html">ورود به Deutsch ←</a>
           </article>
 
-          <article class="product-card">
+          <article class="product-card" data-accent="japanese">
             <span class="product-badge">LANGBLUE · JAPANESE</span>
             <div class="product-icon">🌸</div>
             <h3>LangBlue Japanese</h3>
@@ -461,7 +472,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
             <a class="btn btn-primary" href="Langjp.html">ورود به Japanese ←</a>
           </article>
 
-          <article class="product-card">
+          <article class="product-card" data-accent="arabic">
             <span class="product-badge">LANGDESERT · ARABIC</span>
             <div class="product-icon">🌵</div>
             <h3>LangDesert Arabic</h3>
@@ -716,6 +727,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 <script src="langblue-commerce.js"></script>
 <script src="langblue-notifications.js"></script>
 <script src="langblue-landing-events.js"></script>
+<script src="langblue-public-stats.js"></script>
 <script>
 (function(){
 'use strict';
