@@ -43,6 +43,21 @@ Deno.serve(async (req) => {
   if (password.length < 6 || password.length > 200) return json({ ok: false, error: "INVALID_PASSWORD" }, 400);
   if (!["login", "signup"].includes(action)) return json({ ok: false, error: "INVALID_ACTION" }, 400);
 
+  const profile = body.profile && typeof body.profile === "object" ? body.profile : {};
+  const levels = ["A1","A2","B1","B2","C1","C2"];
+  const artists = ["taylor_swift","billie_eilish","john_lennon","dua_lipa"];
+  for (const key of ["language_level","english_level","german_level","arabic_level"]) {
+    if (profile[key] != null && !levels.includes(String(profile[key]))) {
+      return json({ ok: false, error: "INVALID_LANGUAGE_LEVEL" }, 400);
+    }
+  }
+  if (Array.isArray(profile.favorite_artists) && profile.favorite_artists.some((x) => !artists.includes(String(x)))) {
+    return json({ ok: false, error: "INVALID_FAVORITE_ARTIST" }, 400);
+  }
+  if (Array.isArray(profile.favorite_artists) && profile.favorite_artists.length > 2) {
+    return json({ ok: false, error: "MAX_TWO_FAVORITES" }, 400);
+  }
+
   const email = authEmail(username);
   const admin = createClient(url, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
   const client = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
@@ -79,7 +94,7 @@ Deno.serve(async (req) => {
   }
 
   if (body.profile && typeof body.profile === "object") {
-    await admin.from("profiles").upsert({
+    const { error: profileSaveError } = await admin.from("profiles").upsert({
       id: signed.user.id,
       name: String(body.profile.name || body.profile.fullName || "").trim(),
       username,
@@ -89,7 +104,10 @@ Deno.serve(async (req) => {
       currency: body.profile.currency ? String(body.profile.currency) : null,
       updated_at: new Date().toISOString(),
     }, { onConflict: "id" });
-
+    if (profileSaveError) {
+      console.error("profile save failed", profileSaveError);
+      return json({ ok: false, error: "PROFILE_SAVE_FAILED" }, 500);
+    }
   }
 
   if (action === "signup") {
