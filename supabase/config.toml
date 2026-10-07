@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.langblue-auth]
 verify_jwt = false
+
+[functions.langblue-android-handoff]
+verify_jwt = false
