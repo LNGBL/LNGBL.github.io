@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.lifecycle.lifecycleScope
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,6 +23,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.UUID
 import kotlin.math.max
 import kotlin.math.min
 
@@ -75,9 +77,17 @@ class Repository(private val context:Context) {
     fun setToken(t:String)=prefs.edit().putString("token",t).apply()
     fun clearToken()=prefs.edit().remove("token").apply()
 
+    private fun deviceKey():String = prefs.getString("device_key",null) ?: UUID.randomUUID().toString().replace("-","").also { prefs.edit().putString("device_key",it).apply() }
+    private fun deviceLabel():String = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}".trim().ifBlank{"Android device"}
+    private fun appVersion():String = "1.0.2"
     fun openBrowser(){
-        context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://lngbl.github.io/android-auth.html")))
+        val pair=UUID.randomUUID().toString().replace("-","")+UUID.randomUUID().toString().replace("-","")
+        prefs.edit().putString("pair_code",pair).apply()
+        val url="https://lngbl.github.io/android-auth.html?pair="+Uri.encode(pair)+"&dk="+Uri.encode(deviceKey())+"&device="+Uri.encode(deviceLabel())+"&version="+Uri.encode(appVersion())
+        context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(url)))
     }
+    fun pollPairing(pairingId:String,pairCode:String):JSONObject? =
+        request(JSONObject().put("action","poll_pairing").put("pairing_id",pairingId).put("pair_code",pairCode).put("device_key",deviceKey()).put("device_label",deviceLabel()).put("app_version",appVersion()))
 
     fun bootstrap():JSONObject?=request(JSONObject().put("action","bootstrap").put("token",token()))
     fun saveReview(states:Map<String,ReviewState>){
@@ -130,7 +140,17 @@ class MainActivity:ComponentActivity(){
     override fun onNewIntent(i:Intent){super.onNewIntent(i);handle(i);recreate()}
     private fun handle(i:Intent?){
         val u=i?.data ?: return
-        if(u.scheme=="langblue"&&u.host=="auth")u.getQueryParameter("token")?.let{if(it.length==64)repo.setToken(it)}
+        if(u.scheme!="langblue"||u.host!="auth") return
+        u.getQueryParameter("token")?.takeIf{it.length==64}?.let{repo.setToken(it);return}
+        val pairingId=u.getQueryParameter("pairing_id") ?: return
+        val pairCode=u.getQueryParameter("pair_code") ?: return
+        lifecycleScope.launch(Dispatchers.IO){
+            val result=repo.pollPairing(pairingId,pairCode)
+            if(result?.optBoolean("ok")==true && result.optString("token").length==64){
+                repo.setToken(result.optString("token"))
+                withContext(Dispatchers.Main){recreate()}
+            }
+        }
     }
 }
 
@@ -140,7 +160,7 @@ fun App(repo: Repository) {
     var screen by remember{mutableStateOf("home")}
     var connected by remember{mutableStateOf(repo.token()!=null)}
     var profile by remember{mutableStateOf<JSONObject?>(null)}
-    LaunchedEffect(connected){if(connected)withContext(Dispatchers.IO){repo.bootstrap()}?.let{profile=it.optJSONObject("profile")}}
+    LaunchedEffect(connected){if(connected){val result=withContext(Dispatchers.IO){repo.bootstrap()};if(result?.optBoolean("ok")==true)profile=result.optJSONObject("profile") else {repo.clearToken();connected=false}}}
     Scaffold(topBar={TopAppBar(title={Text("🔷 LangBlue Native")})},bottomBar={
         NavigationBar{listOf("home" to "خانه","grammar" to "Grammar","vocab" to "Vocabulary","account" to "حساب").forEach{(id,label)->NavigationBarItem(selected=screen==id,onClick={screen=id},icon={},label={Text(label)})}}
     }){p->Column(Modifier.padding(p).padding(16.dp).fillMaxSize()){
