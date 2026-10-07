@@ -134,7 +134,9 @@ class MainActivity:ComponentActivity(){
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)\n@Composable\nfun App(repo: Repository) {
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun App(repo: Repository) {
     var screen by remember{mutableStateOf("home")}
     var connected by remember{mutableStateOf(repo.token()!=null)}
     var profile by remember{mutableStateOf<JSONObject?>(null)}
