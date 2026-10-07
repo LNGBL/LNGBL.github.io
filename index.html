@@ -231,15 +231,15 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 .lb-public-stats{padding:28px 0 52px}.lb-public-stats-card{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:980px;margin:0 auto;padding:18px;background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.lb-stat{text-align:center;padding:16px;border-radius:15px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025)}.lb-stat-number{font-size:clamp(28px,5vw,46px);font-weight:900;letter-spacing:-1px;color:#fff;font-variant-numeric:tabular-nums}.lb-stat-label{margin-top:3px;color:var(--muted);font-size:12px}.lb-stat-note{margin-top:14px;text-align:center;color:#8faab2;font-size:11px}@media(max-width:650px){.lb-public-stats-card{grid-template-columns:1fr}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-client.js?v=20261006-connection"></script>
-<script src="langblue-backend.js"></script>
-<script src="langblue-behavior.js"></script>
-<script src="langblue-core.js"></script>
-<script src="langblue-central-account.js?v=20261006-connection"></script>
-<script src="langblue-engagement.js"></script>
-<script src="langblue-onboarding.js"></script>
-<script src="langblue-seasonal.js"></script>
-<script src="langblue-maintenance.js"></script><script src="langblue-central-access.js?v=20261006-connection"></script>
+<script src="assets/js/supabase-client.js?v=20261006-connection"></script>
+<script src="assets/js/langblue-backend.js"></script>
+<script src="assets/js/langblue-behavior.js"></script>
+<script src="assets/js/langblue-core.js"></script>
+<script src="assets/js/langblue-central-account.js?v=20261006-connection"></script>
+<script src="assets/js/langblue-engagement.js"></script>
+<script src="assets/js/langblue-onboarding.js"></script>
+<script src="assets/js/langblue-seasonal.js"></script>
+<script src="assets/js/langblue-maintenance.js"></script><script src="assets/js/langblue-central-access.js?v=20261006-connection"></script>
 </head>
 
 <body>
@@ -273,7 +273,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
           <a class="btn btn-primary" href="#products">محصولات LangBlue ←</a>
           <a class="btn btn-secondary" href="#receipt">ساخت فیش خرید ←</a>
           <a class="btn btn-secondary" href="#activation">🔑 فعال‌سازی کد</a>
-          <a class="btn btn-secondary" href="exam.html">📝 آزمون سالانه</a>
+          <a class="btn btn-secondary" href="pages/exam.html">📝 آزمون سالانه</a>
           <a class="btn btn-secondary" href="#features">آشنایی با امکانات</a>
         </div>
       </div>
@@ -432,7 +432,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
               <li>فرمول، مثال، یادداشت و سطح</li>
               <li>فلش‌کارت و تمرین</li>
             </ul>
-            <a class="btn btn-primary" href="LangBlue-grammer.html">ورود به Grammar ←</a>
+            <a class="btn btn-primary" href="pages/LangBlue-grammer.html">ورود به Grammar ←</a>
           </article>
 
           <article class="product-card" data-accent="vocabulary">
@@ -445,7 +445,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
               <li>مثال و اطلاعات کاربردی</li>
               <li>مرور و تمرین واژگان</li>
             </ul>
-            <a class="btn btn-primary" href="vocab.html">ورود به Vocabulary ←</a>
+            <a class="btn btn-primary" href="pages/vocab.html">ورود به Vocabulary ←</a>
           </article>
 
           <article class="product-card" data-accent="deutsch">
@@ -458,7 +458,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
               <li>تلفظ و جست‌وجوی سریع</li>
               <li>فلش‌کارت و تمرین مرور</li>
             </ul>
-            <a class="btn btn-primary" href="LangBlue-De.html">ورود به Deutsch ←</a>
+            <a class="btn btn-primary" href="pages/LangBlue-De.html">ورود به Deutsch ←</a>
           </article>
 
           <article class="product-card" data-accent="japanese">
@@ -471,7 +471,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
               <li>Romaji و IPA برای کمک به تلفظ</li>
               <li>ثبت واژگان، فلش‌کارت و مرور</li>
             </ul>
-            <a class="btn btn-primary" href="Langjp.html">ورود به Japanese ←</a>
+            <a class="btn btn-primary" href="pages/Langjp.html">ورود به Japanese ←</a>
           </article>
 
           <article class="product-card" data-accent="arabic">
@@ -484,7 +484,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
               <li>واژگان و گرامر سطح‌بندی‌شده</li>
               <li>تمرین و تحلیل پیشرفت</li>
             </ul>
-            <a class="btn btn-primary" href="LangDesert.html">ورود به LangDesert ←</a>
+            <a class="btn btn-primary" href="pages/LangDesert.html">ورود به LangDesert ←</a>
           </article>
           
         </div>
@@ -714,20 +714,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 
         
 
-<section id="android-download" style="padding:40px 0">
-  <div class="wrap">
-    <div class="card" style="text-align:center">
-      <div class="product-badge">LANGBLUE · ANDROID</div>
-      <h2 class="section-title">اپلیکیشن مستقل LangBlue</h2>
-      <p class="section-lead">نسخه Android با Grammar و Vocabulary بومی Kotlin. حساب مرکزی ابتدا در مرورگر تأیید می‌شود و سپس همان حساب به دستگاه متصل می‌شود.</p>
-      <div class="actions">
-        <a class="btn btn-primary" href="https://github.com/LNGBL/LNGBL.github.io/releases/latest/download/app-debug.apk">📱 دانلود مستقیم APK</a>
-        
-      </div>
-      <p style="font-size:12px;color:var(--muted);margin-top:14px">برای امنیت، اتصال حساب و تأیید دستگاه از طریق مرورگر انجام می‌شود. آزمون‌های سالانه در نسخه وب باقی می‌مانند.</p>
-    </div>
-  </div>
-</section>
+
 
 <section class="cta">
       <div class="wrap">
@@ -741,10 +728,10 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     </section>
   </main>
 
-<script src="langblue-commerce.js"></script>
-<script src="langblue-notifications.js"></script>
-<script src="langblue-landing-events.js"></script>
-<script src="langblue-public-stats.js"></script>
+<script src="assets/js/langblue-commerce.js"></script>
+<script src="assets/js/langblue-notifications.js"></script>
+<script src="assets/js/langblue-landing-events.js"></script>
+<script src="assets/js/langblue-public-stats.js"></script>
 <script>
 (function(){
 'use strict';
@@ -762,8 +749,8 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   animateLogo();
 })();
 </script>
-<script src="langblue-leaderboard.js"></script>
-<script src="langblue-receipt.js"></script>
+<script src="assets/js/langblue-leaderboard.js"></script>
+<script src="assets/js/langblue-receipt.js"></script>
 
   <footer>
     <div class="wrap">

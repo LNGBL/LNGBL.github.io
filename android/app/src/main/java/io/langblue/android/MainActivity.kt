@@ -83,7 +83,7 @@ class Repository(private val context:Context) {
     fun openBrowser(){
         val pair=UUID.randomUUID().toString().replace("-","")+UUID.randomUUID().toString().replace("-","")
         prefs.edit().putString("pair_code",pair).apply()
-        val url="https://lngbl.github.io/android-auth.html?pair="+Uri.encode(pair)+"&dk="+Uri.encode(deviceKey())+"&device="+Uri.encode(deviceLabel())+"&version="+Uri.encode(appVersion())
+        val url="https://lngbl.github.io/pages/android-auth.html?pair="+Uri.encode(pair)+"&dk="+Uri.encode(deviceKey())+"&device="+Uri.encode(deviceLabel())+"&version="+Uri.encode(appVersion())
         context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(url)))
     }
     fun pollPairing(pairingId:String,pairCode:String):JSONObject? =

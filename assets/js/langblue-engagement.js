@@ -64,7 +64,7 @@
     };
   }
   function installMarkovInVocab(){
-    if(!/vocab\.html$/i.test(location.pathname))return;
+    if(!/\/pages\/vocab\.html$/i.test(location.pathname))return;
     injectStyles();
     if(document.getElementById('lbMarkovPanel'))return;
     const panel=document.createElement('section');panel.id='lbMarkovPanel';panel.className='lb-markov-card';
