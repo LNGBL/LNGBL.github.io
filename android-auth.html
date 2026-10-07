@@ -1,16 +1,28 @@
-<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LangBlue · اتصال اپ</title></head><body style="font-family:system-ui;max-width:620px;margin:50px auto;padding:20px;line-height:2"><h1>🔷 اتصال LangBlue Android</h1><p id="status">در حال بررسی حساب مرورگر…</p><button id="connect" hidden style="padding:12px 18px">اتصال این حساب به اپ</button><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-client.js?v=20261008"></script><script>
-const status=document.getElementById('status'),btn=document.getElementById('connect');
+<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LangBlue · تأیید دستگاه</title><style>body{font-family:system-ui;max-width:680px;margin:50px auto;padding:20px;line-height:2;background:#071521;color:#f7fbff}main{border:1px solid #315060;border-radius:18px;padding:24px;background:#0b2334}button{padding:12px 18px;margin:5px;border-radius:10px;border:1px solid #456;cursor:pointer}#yes{background:#168AAD;color:white}</style></head><body><main><h1>🔷 تأیید اتصال LangBlue</h1><p id="status">در حال بررسی حساب مرورگر…</p><div id="confirm" hidden><h2>آیا شما هستید؟</h2><p>کاربر گرامی، آیا شما از دستگاه <strong id="device"></strong> برای ثبت حساب‌تان در اپلیکیشن LangBlue اقدام کرده‌اید؟</p><button id="yes">بله، خودم هستم</button><button id="no">خیر، من نیستم</button></div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-client.js?v=20261008"></script><script>
+const status=document.getElementById('status'),confirmBox=document.getElementById('confirm'),deviceEl=document.getElementById('device');
+const qs=new URLSearchParams(location.search),pair=qs.get('pair')||'',dk=qs.get('dk')||'',device=qs.get('device')||'Android device',version=qs.get('version')||'';
+deviceEl.textContent=device;
+function goBack(state){location.href='langblue://auth?pairing_id='+encodeURIComponent(window.pairingId||'')+'&pair_code='+encodeURIComponent(pair)+'&state='+encodeURIComponent(state)}
 (async()=>{
- const sb=window.LangBlueSupabase?.getClient?.();
- if(!sb){status.textContent='اتصال Supabase آماده نیست.';return}
+ const sb=window.LangBlueSupabase?.getClient?.(); if(!sb){status.textContent='اتصال Supabase آماده نیست.';return}
+ if(!pair){status.textContent='درخواست اتصال دستگاه ناقص است. از داخل اپ دوباره تلاش کن.';return}
  const {data}=await sb.auth.getSession();
- if(!data?.session){status.innerHTML='ابتدا در LangBlue وارد حساب شو؛ سپس این صفحه را دوباره باز کن.';return}
- status.textContent='حساب مرورگر پیدا شد. برای ادامه دکمه زیر را بزن.';btn.hidden=false;
- btn.onclick=async()=>{
-  btn.disabled=true;status.textContent='در حال ساخت اتصال امن…';
-  const {data,error}=await sb.functions.invoke('langblue-android-handoff',{body:{action:'create_session'}});
-  if(error||!data?.ok){status.textContent='اتصال ساخته نشد؛ دوباره تلاش کن.';btn.disabled=false;return}
-  location.href='langblue://auth?token='+encodeURIComponent(data.token);
+ if(!data?.session){status.textContent='ابتدا در مرورگر وارد حساب مرکزی LangBlue شو، سپس اتصال دستگاه را دوباره آغاز کن.';return}
+ status.textContent='حساب مرورگر پیدا شد. در حال آماده‌سازی تأیید دستگاه…';
+ const {data:created,error}=await sb.functions.invoke('langblue-android-handoff',{body:{action:'create_pairing',pair_code:pair,device_key:dk,device_label:device,app_version:version}});
+ if(error||!created?.ok){status.textContent='اتصال امن ساخته نشد. دوباره از داخل اپ اقدام کن.';return}
+ window.pairingId=created.pairing_id;
+ confirmBox.hidden=false;status.textContent='لطفاً مشخص کن آیا این دستگاه متعلق به خودت است یا خیر.';
+ document.getElementById('yes').onclick=async()=>{
+   document.getElementById('yes').disabled=true;document.getElementById('no').disabled=true;status.textContent='در حال ثبت تأیید…';
+   const {data:x,error:e}=await sb.functions.invoke('langblue-android-handoff',{body:{action:'decide_pairing',pairing_id:window.pairingId,pair_code:pair,decision:'approve'}});
+   if(e||!x?.ok){status.textContent='تأیید ثبت نشد؛ دوباره تلاش کن.';return}
+   status.textContent='تأیید شد. در حال بازگشت به اپ…';goBack('approved');
+ };
+ document.getElementById('no').onclick=async()=>{
+   document.getElementById('yes').disabled=true;document.getElementById('no').disabled=true;
+   await sb.functions.invoke('langblue-android-handoff',{body:{action:'decide_pairing',pairing_id:window.pairingId,pair_code:pair,decision:'reject'}});
+   status.textContent='این دستگاه تأیید نشد و سرور اتصال آن را رد کرد.';goBack('rejected');
  };
 })();
 </script></body></html>

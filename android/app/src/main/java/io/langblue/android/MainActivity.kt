@@ -127,7 +127,7 @@ class MainActivity:ComponentActivity(){
         super.onCreate(savedInstanceState);repo=Repository(this);handle(intent)
         setContent{CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl){MaterialTheme{App(repo)}}}
     }
-    override fun onNewIntent(i:Intent){super.onNewIntent(i);handle(i)}
+    override fun onNewIntent(i:Intent){super.onNewIntent(i);handle(i);recreate()}
     private fun handle(i:Intent?){
         val u=i?.data ?: return
         if(u.scheme=="langblue"&&u.host=="auth")u.getQueryParameter("token")?.let{if(it.length==64)repo.setToken(it)}
