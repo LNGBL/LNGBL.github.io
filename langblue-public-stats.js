@@ -14,17 +14,15 @@ function animate(el,target){
 async function load(){
   if(!document.getElementById('lbStatViews'))return;
   try{
-    const dayKey='lb:landing-view:'+new Date().toISOString().slice(0,10);
-    const counted=localStorage.getItem(dayKey)==='1';
-    const res=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:counted?'stats':'view'}),cache:'no-store'});
+    const res=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'view'}),cache:'no-store'});
     const data=await res.json();
     if(!data||!data.ok)throw new Error('stats');
-    if(!counted)try{localStorage.setItem(dayKey,'1');}catch(_){}
     animate(document.getElementById('lbStatViews'),data.page_views);
     animate(document.getElementById('lbStatUsers'),data.user_accounts);
     animate(document.getElementById('lbStatWords'),data.vocabulary_count);
+    animate(document.getElementById('lbStatGoogle'),data.google_users);
   }catch(e){
-    ['lbStatViews','lbStatUsers','lbStatWords'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    ['lbStatViews','lbStatUsers','lbStatWords','lbStatGoogle'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
   }
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load);else load();
