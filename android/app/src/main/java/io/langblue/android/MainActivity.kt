@@ -134,7 +134,7 @@ class MainActivity:ComponentActivity(){
     }
 }
 
-@Composable fun App(repo:Repository){
+@OptIn(ExperimentalMaterial3Api::class)\n@Composable\nfun App(repo: Repository) {
     var screen by remember{mutableStateOf("home")}
     var connected by remember{mutableStateOf(repo.token()!=null)}
     var profile by remember{mutableStateOf<JSONObject?>(null)}
@@ -174,14 +174,150 @@ class MainActivity:ComponentActivity(){
     }
 }
 
-@Composable fun GrammarScreen(repo:Repository){
-    val states=remember{mutableStateOf(repo.loadReview())};var current by remember{mutableStateOf<GrammarItem?>(null)};var answered by remember{mutableStateOf(false)};var options by remember{mutableStateOf(emptyList<String>())}
-    if(current==null)LazyColumn(verticalArrangement=Arrangement.spacedBy(8.dp)){item{Text("Grammar",style=MaterialTheme.typography.headlineSmall);Text("موتور تمرین و SRS کاملاً Native Kotlin است.")};items(Content.grammar){g->val s=states.value[g.id];Card{Row(Modifier.fillMaxWidth().padding(12.dp),verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(g.title);Text((s?.score?:0).toString()+"% • "+g.use,fontSize=12.sp)}Button(onClick={current=g;answered=false;options=(listOf(g.formula)+Content.grammar.filter{it.id!=g.id}.shuffled().take(3).map{it.formula}).shuffled())}{Text("تمرین")}}}}}
-    else{val g=current!!;Column(horizontalAlignment=Alignment.CenterHorizontally){Text(g.title,style=MaterialTheme.typography.headlineSmall);Spacer(Modifier.height(8.dp));Text(g.use);Spacer(Modifier.height(14.dp));Text("فرمول درست را انتخاب کن");options.forEach{o->OutlinedButton(onClick={if(!answered){answered=true;val ok=o==g.formula;val s=states.value.getOrPut(g.id){ReviewState()};Srs.review(s,ok);repo.saveReview(states.value);repo.event("content_answered","grammar",ok,g.id)}},Modifier.fillMaxWidth().padding(3.dp)){Text(o)}};if(answered){Spacer(Modifier.height(8.dp));Text(g.examples.first());Button(onClick={current=null}){Text("بازگشت")}}}}
+@Composable
+fun GrammarScreen(repo: Repository) {
+    val states = remember { mutableStateOf(repo.loadReview()) }
+    var current by remember { mutableStateOf<GrammarItem?>(null) }
+    var answered by remember { mutableStateOf(false) }
+    var options by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    if (current == null) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            item {
+                Text("Grammar", style = MaterialTheme.typography.headlineSmall)
+                Text("موتور تمرین و SRS کاملاً Native Kotlin است.")
+            }
+            items(Content.grammar) { g ->
+                val score = states.value[g.id]?.score ?: 0
+                Card {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(g.title)
+                            Text(score.toString() + "% • " + g.use, fontSize = 12.sp)
+                        }
+                        Button(onClick = {
+                            current = g
+                            answered = false
+                            val distractors = Content.grammar
+                                .filter { it.id != g.id }
+                                .shuffled()
+                                .take(3)
+                                .map { it.formula }
+                            options = (listOf(g.formula) + distractors).shuffled()
+                        }) {
+                            Text("تمرین")
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        val g = current!!
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(g.title, style = MaterialTheme.typography.headlineSmall)
+            Spacer(Modifier.height(8.dp))
+            Text(g.use)
+            Spacer(Modifier.height(14.dp))
+            Text("فرمول درست را انتخاب کن")
+            Spacer(Modifier.height(8.dp))
+            options.forEach { option ->
+                OutlinedButton(
+                    onClick = {
+                        if (!answered) {
+                            answered = true
+                            val ok = option == g.formula
+                            val state = states.value.getOrPut(g.id) { ReviewState() }
+                            Srs.review(state, ok)
+                            repo.saveReview(states.value)
+                            repo.event("content_answered", "grammar", ok, g.id)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(3.dp)
+                ) {
+                    Text(option)
+                }
+            }
+            if (answered) {
+                Spacer(Modifier.height(8.dp))
+                Text(g.examples.first())
+                Button(onClick = { current = null }) { Text("بازگشت") }
+            }
+        }
+    }
 }
 
-@Composable fun VocabScreen(repo:Repository){
-    val states=remember{mutableStateOf(repo.loadReview())};var current by remember{mutableStateOf<VocabularyItem?>(null)};var answered by remember{mutableStateOf(false)};var options by remember{mutableStateOf(emptyList<String>())}
-    if(current==null)LazyColumn(verticalArrangement=Arrangement.spacedBy(8.dp)){item{Text("Vocabulary",style=MaterialTheme.typography.headlineSmall);Text("فلش‌کارت چهارگزینه‌ای با مرور فاصله‌دار.")};items(Content.vocabulary){v->Card{Row(Modifier.fillMaxWidth().padding(12.dp),verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(v.word);Text(v.meaning+" • "+(states.value[v.id]?.score?:0)+"%",fontSize=12.sp)}Button(onClick={current=v;answered=false;options=(listOf(v.meaning)+Content.vocabulary.filter{it.id!=v.id}.shuffled().take(3).map{it.meaning}).shuffled())}{Text("مرور")}}}}}
-    else{val v=current!!;Column(horizontalAlignment=Alignment.CenterHorizontally){Text(v.word,style=MaterialTheme.typography.headlineLarge);Spacer(Modifier.height(10.dp));Text("معنی درست را انتخاب کن");options.forEach{o->OutlinedButton(onClick={if(!answered){answered=true;val ok=o==v.meaning;val s=states.value.getOrPut(v.id){ReviewState()};Srs.review(s,ok);repo.saveReview(states.value);repo.event("content_answered","vocabulary",ok,v.id)}},Modifier.fillMaxWidth().padding(3.dp)){Text(o)}};if(answered){Spacer(Modifier.height(8.dp));Text(v.example);Button(onClick={current=null}){Text("بازگشت")}}}}
+@Composable
+fun VocabScreen(repo: Repository) {
+    val states = remember { mutableStateOf(repo.loadReview()) }
+    var current by remember { mutableStateOf<VocabularyItem?>(null) }
+    var answered by remember { mutableStateOf(false) }
+    var options by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    if (current == null) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            item {
+                Text("Vocabulary", style = MaterialTheme.typography.headlineSmall)
+                Text("فلش‌کارت چهارگزینه‌ای با مرور فاصله‌دار.")
+            }
+            items(Content.vocabulary) { v ->
+                val score = states.value[v.id]?.score ?: 0
+                Card {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(v.word)
+                            Text(v.meaning + " • " + score + "%", fontSize = 12.sp)
+                        }
+                        Button(onClick = {
+                            current = v
+                            answered = false
+                            val distractors = Content.vocabulary
+                                .filter { it.id != v.id }
+                                .shuffled()
+                                .take(3)
+                                .map { it.meaning }
+                            options = (listOf(v.meaning) + distractors).shuffled()
+                        }) {
+                            Text("مرور")
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        val v = current!!
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(v.word, style = MaterialTheme.typography.headlineLarge)
+            Spacer(Modifier.height(10.dp))
+            Text("معنی درست را انتخاب کن")
+            Spacer(Modifier.height(8.dp))
+            options.forEach { option ->
+                OutlinedButton(
+                    onClick = {
+                        if (!answered) {
+                            answered = true
+                            val ok = option == v.meaning
+                            val state = states.value.getOrPut(v.id) { ReviewState() }
+                            Srs.review(state, ok)
+                            repo.saveReview(states.value)
+                            repo.event("content_answered", "vocabulary", ok, v.id)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(3.dp)
+                ) {
+                    Text(option)
+                }
+            }
+            if (answered) {
+                Spacer(Modifier.height(8.dp))
+                Text(v.example)
+                Button(onClick = { current = null }) { Text("بازگشت") }
+            }
+        }
+    }
 }
