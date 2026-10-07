@@ -227,7 +227,7 @@ label:'LangBlue Grammar',
 
 icon:'📐',
 
-url:'LangBlue-grammer.html'
+url:'pages/LangBlue-grammer.html'
 
 },
 
@@ -241,7 +241,7 @@ label:'LangBlue Vocabulary',
 
 icon:'📚',
 
-url:'vocab.html'
+url:'pages/vocab.html'
 
 },
 
@@ -255,7 +255,7 @@ label:'LangBlue Deutsch',
 
 icon:'🇩🇪',
 
-url:'LangBlue-De.html'
+url:'pages/LangBlue-De.html'
 
 },
 
@@ -269,7 +269,7 @@ label:'LangDesert Arabic',
 
 icon:'🌵',
 
-url:'LangDesert.html'
+url:'pages/LangDesert.html'
 
 },
 
@@ -278,7 +278,7 @@ langjp:{
 id:'langjp',
 label:'LangBlue Japanese',
 icon:'🌸',
-url:'Langjp.html'
+url:'pages/Langjp.html'
 
 },
 
