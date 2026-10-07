@@ -58,6 +58,10 @@ Deno.serve(async(req)=>{
  const {data:p,error:pError}=await admin.from("profiles").select("id,username,country,connection_policy_status,connection_grace_started_at,connection_grace_expires_at").eq("id",user.id).maybeSingle();
  if(pError||!p)return json({ok:false,error:"PROFILE_NOT_FOUND"},404);
  const connection=await inspect(req);
+ if(connection.configured && connection.tor){
+   await admin.from("profiles").update({connection_policy_status:"suspended",connection_suspended_at:new Date().toISOString(),connection_last_country:connection.country||null,connection_last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq("id",user.id);
+   return json({ok:false,status:"suspended",username:p.username,message:message(p.username),reason:"TOR_NOT_ALLOWED"},403);
+ }
  if(String(p.country||"").toUpperCase()!=="IR"||!connection.configured){
    return json({ok:true,status:p.connection_policy_status||"normal",configured:connection.configured});
  }
