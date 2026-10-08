@@ -298,6 +298,8 @@ fun VocabScreen(repo: Repository) {
             item {
                 Text("Vocabulary", style = MaterialTheme.typography.headlineSmall)
                 Text("فلش‌کارت چهارگزینه‌ای با مرور فاصله‌دار.")
+                Spacer(Modifier.height(8.dp))
+                VoiceInputButton{ /* recognized speech can be used as the next lookup */ }
             }
             items(Content.vocabulary) { v ->
                 val score = states.value[v.id]?.score ?: 0
