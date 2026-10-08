@@ -10,8 +10,8 @@ android {
         applicationId = "io.langblue.android"
         minSdk = 31
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.2"
+        versionCode = 3
+        versionName = "1.0.3"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
