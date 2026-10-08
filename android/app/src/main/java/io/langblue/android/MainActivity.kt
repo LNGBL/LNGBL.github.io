@@ -89,13 +89,13 @@ class Repository(private val context:Context) {
     private fun deviceKey():String = prefs.getString("device_key",null) ?: UUID.randomUUID().toString().replace("-","").also { prefs.edit().putString("device_key",it).apply() }
     private fun deviceLabel():String = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}".trim().ifBlank{"Android device"}
     private fun appVersion():String = "1.0.3"
-    fun requestPairing(username:String):JSONObject?{
+    suspend fun requestPairing(username:String):JSONObject? = withContext(Dispatchers.IO){
         val pair=UUID.randomUUID().toString().replace("-","")+UUID.randomUUID().toString().replace("-","")
         prefs.edit().putString("pair_code",pair).apply()
         val result=request(JSONObject().put("action","request_pairing").put("username",username.trim())
             .put("pair_code",pair).put("device_key",deviceKey()).put("device_label",deviceLabel()).put("app_version",appVersion()))
         if(result?.optBoolean("ok")==true) prefs.edit().putString("pairing_id",result.optString("pairing_id")).apply()
-        return result
+        result
     }
     fun pollPairing(pairingId:String,pairCode:String):JSONObject? =
         request(JSONObject().put("action","poll_pairing").put("pairing_id",pairingId).put("pair_code",pairCode).put("device_key",deviceKey()).put("device_label",deviceLabel()).put("app_version",appVersion()))
@@ -216,7 +216,7 @@ fun App(repo: Repository) {
     }
 }
 
-@Composable @Composable
+@Composable
 fun AccountScreen(repo:Repository,profile:JSONObject?,disconnect:()->Unit,onPaired:()->Unit){
     var username by remember { mutableStateOf(profile?.optString("username","") ?: "") }
     var status by remember { mutableStateOf(if(profile==null) "نام کاربری حساب اصلی را وارد کن." else "") }
@@ -253,11 +253,15 @@ fun AccountScreen(repo:Repository,profile:JSONObject?,disconnect:()->Unit,onPair
         Spacer(Modifier.height(8.dp))
         Button(enabled=username.trim().length>=3 && pairingId==null,onClick={
             status="در حال ارسال درخواست به حساب اصلی…"
-            val result=repo.requestPairing(username)
+            lifecycleScope.launch(Dispatchers.IO) {
+                val result=repo.requestPairing(username)
+                withContext(Dispatchers.Main){
             if(result?.optBoolean("ok")==true){
                 pairingId=result.optString("pairing_id");pairCode=repo.currentPairCode()
                 status="درخواست ثبت شد. اکنون در لپ‌تاپ/دستگاه اصلی، داخل حساب LangBlue، درخواست این گوشی را تأیید کن."
             }else status=when(result?.optString("error")){"USERNAME_NOT_FOUND"->"این نام کاربری پیدا نشد." else->"ارسال درخواست اتصال ناموفق بود؛ دوباره تلاش کن."}
+                }
+            }
         },modifier=Modifier.fillMaxWidth()){Text("📱 درخواست اتصال به حساب")}
         if(status.isNotBlank()){Spacer(Modifier.height(10.dp));Text(status)}
         if(profile!=null){Spacer(Modifier.height(10.dp));OutlinedButton(onClick=disconnect,Modifier.fillMaxWidth()){Text("قطع اتصال این دستگاه")}}
