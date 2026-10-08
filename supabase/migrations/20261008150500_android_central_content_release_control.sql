@@ -18,6 +18,7 @@ create table if not exists public.android_maintenance_windows (
  end_time time not null default '00:05',
  message text not null default 'LangBlue برای تعمیرات کوتاه‌مدت در دسترس نیست.',
  enabled boolean not null default true,
+ timezone text not null default 'Asia/Tehran',
  created_at timestamptz not null default now()
 );
 create unique index if not exists android_maintenance_windows_date_uidx on public.android_maintenance_windows(maintenance_date);
