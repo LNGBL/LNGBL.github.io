@@ -98,6 +98,17 @@ class Repository(private val context:Context) {
 
     fun bootstrap():JSONObject?=request(JSONObject().put("action","bootstrap").put("token",token()).put("device_key",deviceKey()))
     fun appStatus():JSONObject?=request(JSONObject().put("action","app_status").put("version_code",3))
+    fun saveCentralContent(kind:String,itemId:String,content:JSONObject){
+        prefs.edit().putString("central_"+kind+"_"+itemId,content.toString()).apply()
+        request(JSONObject().put("action","content_upsert").put("token",token()).put("kind",kind).put("item_id",itemId).put("content",content).put("language","english"))
+    }
+    fun syncCentralContent(result:JSONObject?){
+        val arr=result?.optJSONArray("content") ?: return
+        for(i in 0 until arr.length()){
+            val x=arr.optJSONObject(i) ?: continue
+            prefs.edit().putString("central_"+x.optString("kind")+"_"+x.optString("item_id"),x.optJSONObject("content")?.toString() ?: "{}").apply()
+        }
+    }
     fun saveReview(states:Map<String,ReviewState>){
         val root=JSONObject()
         states.forEach{ (id,s)->root.put(id,JSONObject().put("score",s.score).put("streak",s.streak).put("reps",s.reps).put("lapses",s.lapses).put("correct",s.correct).put("wrong",s.wrong).put("total",s.total).put("interval",s.interval).put("next",s.next).put("ease",s.ease)) }
@@ -170,7 +181,7 @@ fun App(repo: Repository) {
     var profile by remember{mutableStateOf<JSONObject?>(null)}
     var appStatus by remember{mutableStateOf<JSONObject?>(null)}
     LaunchedEffect(Unit){appStatus=withContext(Dispatchers.IO){repo.appStatus()}}
-    LaunchedEffect(connected){if(connected){val result=withContext(Dispatchers.IO){repo.bootstrap()};if(result?.optBoolean("ok")==true)profile=result.optJSONObject("profile") else {repo.clearToken();connected=false}}}
+    LaunchedEffect(connected){if(connected){val result=withContext(Dispatchers.IO){repo.bootstrap()};if(result?.optBoolean("ok")==true){profile=result.optJSONObject("profile");repo.syncCentralContent(result)} else {repo.clearToken();connected=false}}}
     Scaffold(topBar={TopAppBar(title={Text("🔷 LangBlue Native")})},bottomBar={
         NavigationBar{listOf("home" to "خانه","grammar" to "Grammar","vocab" to "Vocabulary","account" to "حساب").forEach{(id,label)->NavigationBarItem(selected=screen==id,onClick={screen=id},icon={},label={Text(label)})}}
     }){p->Column(Modifier.padding(p).padding(16.dp).fillMaxSize()){
