@@ -82,6 +82,7 @@ class Repository(private val context:Context) {
     private val endpoint="https://ocxeyponzzcvlrvwndji.supabase.co/functions/v1/langblue-android-handoff"
 
     fun token():String?=prefs.getString("token",null)
+    fun currentPairCode():String=prefs.getString("pair_code","") ?: ""
     fun setToken(t:String)=prefs.edit().putString("token",t).apply()
     fun clearToken()=prefs.edit().remove("token").apply()
 
@@ -254,7 +255,7 @@ fun AccountScreen(repo:Repository,profile:JSONObject?,disconnect:()->Unit,onPair
             status="در حال ارسال درخواست به حساب اصلی…"
             val result=repo.requestPairing(username)
             if(result?.optBoolean("ok")==true){
-                pairingId=result.optString("pairing_id");pairCode=repoPairCode(repo)
+                pairingId=result.optString("pairing_id");pairCode=repo.currentPairCode()
                 status="درخواست ثبت شد. اکنون در لپ‌تاپ/دستگاه اصلی، داخل حساب LangBlue، درخواست این گوشی را تأیید کن."
             }else status=when(result?.optString("error")){"USERNAME_NOT_FOUND"->"این نام کاربری پیدا نشد." else->"ارسال درخواست اتصال ناموفق بود؛ دوباره تلاش کن."}
         },modifier=Modifier.fillMaxWidth()){Text("📱 درخواست اتصال به حساب")}
@@ -262,8 +263,6 @@ fun AccountScreen(repo:Repository,profile:JSONObject?,disconnect:()->Unit,onPair
         if(profile!=null){Spacer(Modifier.height(10.dp));OutlinedButton(onClick=disconnect,Modifier.fillMaxWidth()){Text("قطع اتصال این دستگاه")}}
     }
 }
-
-fun repoPairCode(repo:Repository):String = repo.javaClass.getDeclaredField("prefs").let{it.isAccessible=true;(it.get(repo) as android.content.SharedPreferences).getString("pair_code","") ?: ""}
 
 @Composable
 fun GrammarScreen(repo: Repository) {
