@@ -342,6 +342,7 @@ fun GrammarScreen(repo: Repository) {
 @Composable
 fun VocabScreen(repo: Repository) {
     val states = remember { mutableStateOf(repo.loadReview()) }
+    var customEnglishText by remember { mutableStateOf("") }
     var current by remember { mutableStateOf<VocabularyItem?>(null) }
     var answered by remember { mutableStateOf(false) }
     var options by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -352,7 +353,10 @@ fun VocabScreen(repo: Repository) {
                 Text("Vocabulary", style = MaterialTheme.typography.headlineSmall)
                 Text("فلش‌کارت چهارگزینه‌ای با مرور فاصله‌دار.")
                 Spacer(Modifier.height(8.dp))
-                VoiceInputButton{ /* recognized speech can be used as the next lookup */ }
+                OutlinedTextField(value=customEnglishText,onValueChange={customEnglishText=it},label={Text("متن انگلیسی خودت را بنویس")},modifier=Modifier.fillMaxWidth(),minLines=2)
+                Spacer(Modifier.height(6.dp))
+                SpeakEnglishButton(customEnglishText)
+                Spacer(Modifier.height(10.dp))
             }
             items(Content.vocabulary) { v ->
                 val score = states.value[v.id]?.score ?: 0
