@@ -88,11 +88,13 @@ class Repository(private val context:Context) {
     private fun deviceKey():String = prefs.getString("device_key",null) ?: UUID.randomUUID().toString().replace("-","").also { prefs.edit().putString("device_key",it).apply() }
     private fun deviceLabel():String = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}".trim().ifBlank{"Android device"}
     private fun appVersion():String = "1.0.3"
-    fun openBrowser(){
+    fun requestPairing(username:String):JSONObject?{
         val pair=UUID.randomUUID().toString().replace("-","")+UUID.randomUUID().toString().replace("-","")
         prefs.edit().putString("pair_code",pair).apply()
-        val url="https://lngbl.github.io/android-auth.html?pair="+Uri.encode(pair)+"&dk="+Uri.encode(deviceKey())+"&device="+Uri.encode(deviceLabel())+"&version="+Uri.encode(appVersion())
-        context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(url)))
+        val result=request(JSONObject().put("action","request_pairing").put("username",username.trim())
+            .put("pair_code",pair).put("device_key",deviceKey()).put("device_label",deviceLabel()).put("app_version",appVersion()))
+        if(result?.optBoolean("ok")==true) prefs.edit().putString("pairing_id",result.optString("pairing_id")).apply()
+        return result
     }
     fun pollPairing(pairingId:String,pairCode:String):JSONObject? =
         request(JSONObject().put("action","poll_pairing").put("pairing_id",pairingId).put("pair_code",pairCode).put("device_key",deviceKey()).put("device_label",deviceLabel()).put("app_version",appVersion()))
@@ -189,7 +191,7 @@ fun App(repo: Repository) {
         when(screen){
             "grammar"->GrammarScreen(repo)
             "vocab"->VocabScreen(repo)
-            "account"->AccountScreen(repo,profile,{repo.clearToken();connected=false;profile=null})
+            "account"->AccountScreen(repo,profile,{repo.clearToken();connected=false;profile=null}){connected=true}
             else->Home(connected,profile,appStatus){screen=it}
         }
     }}
@@ -213,15 +215,55 @@ fun App(repo: Repository) {
     }
 }
 
-@Composable fun AccountScreen(repo:Repository,profile:JSONObject?,disconnect:()->Unit){
-    Column{Text("حساب مرورگر",style=MaterialTheme.typography.headlineSmall);Spacer(Modifier.height(12.dp))
-        Text("نام: "+(profile?.optString("name","—")?:"—"))
-        Text("نام کاربری: "+(profile?.optString("username","—")?:"—"))
-        Text("سطح انگلیسی: "+(profile?.optString("english_level","—")?:"—"))
-        Spacer(Modifier.height(18.dp));Button(onClick={repo.openBrowser()},Modifier.fillMaxWidth()){Text("بازکردن اتصال مرورگر")}
-        Spacer(Modifier.height(8.dp));OutlinedButton(onClick=disconnect,Modifier.fillMaxWidth()){Text("قطع اتصال این دستگاه")}
+@Composable @Composable
+fun AccountScreen(repo:Repository,profile:JSONObject?,disconnect:()->Unit,onPaired:()->Unit){
+    var username by remember { mutableStateOf(profile?.optString("username","") ?: "") }
+    var status by remember { mutableStateOf(if(profile==null) "نام کاربری حساب اصلی را وارد کن." else "") }
+    var pairingId by remember { mutableStateOf<String?>(null) }
+    var pairCode by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(pairingId,pairCode){
+        val id=pairingId ?: return@LaunchedEffect
+        val code=pairCode ?: return@LaunchedEffect
+        while(true){
+            val result=withContext(Dispatchers.IO){repo.pollPairing(id,code)}
+            when(result?.optString("status")){
+                "approved"->{
+                    val token=result.optString("token")
+                    if(token.length==64){repo.setToken(token);status="اتصال تأیید شد.";onPaired();break}
+                }
+                "rejected"->{status="درخواست اتصال توسط دستگاه اصلی رد شد.";break}
+                "expired"->{status="درخواست اتصال منقضی شد.";break}
+            }
+            kotlinx.coroutines.delay(3000)
+        }
+    }
+    Column{
+        Text("حساب LangBlue",style=MaterialTheme.typography.headlineSmall)
+        Spacer(Modifier.height(12.dp))
+        if(profile!=null){
+            Text("نام: "+profile.optString("name","—"))
+            Text("نام کاربری: @"+profile.optString("username","—"))
+            Text("سطح انگلیسی: "+profile.optString("english_level","—"))
+            Spacer(Modifier.height(18.dp))
+        }
+        Text("اتصال این گوشی فقط از طریق حساب اصلی انجام می‌شود؛ مرورگر گوشی دیگر مرحله تأیید نیست.",fontSize=13.sp)
+        Spacer(Modifier.height(10.dp))
+        OutlinedTextField(value=username,onValueChange={username=it},label={Text("نام کاربری حساب اصلی")},singleLine=true,modifier=Modifier.fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
+        Button(enabled=username.trim().length>=3 && pairingId==null,onClick={
+            status="در حال ارسال درخواست به حساب اصلی…"
+            val result=repo.requestPairing(username)
+            if(result?.optBoolean("ok")==true){
+                pairingId=result.optString("pairing_id");pairCode=repoPairCode(repo)
+                status="درخواست ثبت شد. اکنون در لپ‌تاپ/دستگاه اصلی، داخل حساب LangBlue، درخواست این گوشی را تأیید کن."
+            }else status=when(result?.optString("error")){"USERNAME_NOT_FOUND"->"این نام کاربری پیدا نشد." else->"ارسال درخواست اتصال ناموفق بود؛ دوباره تلاش کن."}
+        },modifier=Modifier.fillMaxWidth()){Text("📱 درخواست اتصال به حساب")}
+        if(status.isNotBlank()){Spacer(Modifier.height(10.dp));Text(status)}
+        if(profile!=null){Spacer(Modifier.height(10.dp));OutlinedButton(onClick=disconnect,Modifier.fillMaxWidth()){Text("قطع اتصال این دستگاه")}}
     }
 }
+
+fun repoPairCode(repo:Repository):String = repo.javaClass.getDeclaredField("prefs").let{it.isAccessible=true;(it.get(repo) as android.content.SharedPreferences).getString("pair_code","") ?: ""}
 
 @Composable
 fun GrammarScreen(repo: Repository) {
