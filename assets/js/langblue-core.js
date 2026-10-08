@@ -364,6 +364,11 @@
     const item = { ...word, id: word.id || now, createdAt: word.createdAt || now };
     db.languages[language].words.push(item);
     saveDB(db);
+    try{
+      if(String(language).toLowerCase()==='vocabulary' && window.LangBlueSupabase && typeof window.LangBlueSupabase.saveAndroidContent==='function'){
+        window.LangBlueSupabase.saveAndroidContent('vocabulary',String(item.id),item,'english');
+      }
+    }catch(e){ console.warn('[LangBlue] central vocabulary sync skipped:',e); }
 
     return { ok: true, word: item };
   }
