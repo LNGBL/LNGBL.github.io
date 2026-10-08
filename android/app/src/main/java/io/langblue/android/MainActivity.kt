@@ -184,6 +184,7 @@ fun App(repo: Repository) {
 }
 
 @Composable fun Home(connected:Boolean,profile:JSONObject?,appStatus:JSONObject?,go:(String)->Unit){
+    val context=LocalContext.current
     Column{Text("اپلیکیشن مستقل LangBlue",style=MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(8.dp))
         Text("برای شروع، حساب مرورگر LangBlue را متصل کن.")
@@ -193,6 +194,9 @@ fun App(repo: Repository) {
         Button(onClick={go("grammar")},Modifier.fillMaxWidth()){Text("🧠 Grammar")}
         Spacer(Modifier.height(8.dp))
         Button(onClick={go("vocab")},Modifier.fillMaxWidth()){Text("📚 Vocabulary")}
+        Spacer(Modifier.height(8.dp))
+        OutlinedButton(onClick={context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://lngbl.github.io/#leaderboard")))},Modifier.fillMaxWidth()){Text("🏆 معرفی و دیدن رقابت‌ها")}
+        appStatus?.optJSONObject("maintenance")?.let{m->Spacer(Modifier.height(12.dp));Text("🛠 "+m.optString("message","LangBlue برای تعمیرات کوتاه‌مدت در دسترس نیست."),color=MaterialTheme.colorScheme.error)}
         if(!connected){Spacer(Modifier.height(12.dp));Text("اتصال حساب از طریق مرورگر انجام می‌شود.",fontSize=12.sp)}
     }
 }
