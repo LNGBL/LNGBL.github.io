@@ -4,7 +4,7 @@ import fs from "node:fs";
 import vm from "node:vm";
 import { webcrypto } from "node:crypto";
 
-const coreSource = fs.readFileSync("langblue-core.js", "utf8");
+const coreSource = fs.readFileSync("assets/js/langblue-core.js", "utf8");
 const edgeSource = fs.readFileSync("supabase/functions/activate-code/index.ts", "utf8");
 
 function makeRuntime(activateCode) {
