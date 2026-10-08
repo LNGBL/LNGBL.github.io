@@ -17,10 +17,10 @@ Deno.serve(async req=>{
  const authUser=async()=>{const bearer=(req.headers.get("Authorization")||"").replace(/^Bearer\s+/i,"");if(!bearer)return null;const c=createClient(url,anon,{auth:{persistSession:false}});const r=await c.auth.getUser(bearer);return r.error||!r.data.user?null:r.data.user};
 
  if(action==="app_status"){
-  const today=new Date();
+  const tz=String(body.timezone||"Asia/Tehran"); const localDate=new Intl.DateTimeFormat("en-CA",{timeZone:tz}).format(new Date()); const today=new Date();
   const [release,maintenance]=await Promise.all([
    admin.from("android_app_releases").select("version_code,version_name,min_version_code,apk_path,apk_sha256,release_notes,force_update,published_at").order("version_code",{ascending:false}).limit(1).maybeSingle(),
-   admin.from("android_maintenance_windows").select("maintenance_date,start_time,end_time,message,enabled").eq("maintenance_date",today.toISOString().slice(0,10)).eq("enabled",true).maybeSingle()
+   admin.from("android_maintenance_windows").select("maintenance_date,start_time,end_time,message,enabled,timezone").eq("maintenance_date",localDate).eq("enabled",true).maybeSingle()
   ]);
   let signed_url=null;
   if(release.data?.apk_path){
