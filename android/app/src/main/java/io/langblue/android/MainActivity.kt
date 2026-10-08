@@ -1,10 +1,15 @@
 package io.langblue.android
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.speech.RecognizerIntent
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
 import androidx.compose.foundation.layout.*
@@ -14,12 +19,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.core.content.ContextCompat
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -79,17 +86,18 @@ class Repository(private val context:Context) {
 
     private fun deviceKey():String = prefs.getString("device_key",null) ?: UUID.randomUUID().toString().replace("-","").also { prefs.edit().putString("device_key",it).apply() }
     private fun deviceLabel():String = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}".trim().ifBlank{"Android device"}
-    private fun appVersion():String = "1.0.2"
+    private fun appVersion():String = "1.0.3"
     fun openBrowser(){
         val pair=UUID.randomUUID().toString().replace("-","")+UUID.randomUUID().toString().replace("-","")
         prefs.edit().putString("pair_code",pair).apply()
-        val url="https://lngbl.github.io/pages/android-auth.html?pair="+Uri.encode(pair)+"&dk="+Uri.encode(deviceKey())+"&device="+Uri.encode(deviceLabel())+"&version="+Uri.encode(appVersion())
+        val url="https://lngbl.github.io/android-auth.html?pair="+Uri.encode(pair)+"&dk="+Uri.encode(deviceKey())+"&device="+Uri.encode(deviceLabel())+"&version="+Uri.encode(appVersion())
         context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(url)))
     }
     fun pollPairing(pairingId:String,pairCode:String):JSONObject? =
         request(JSONObject().put("action","poll_pairing").put("pairing_id",pairingId).put("pair_code",pairCode).put("device_key",deviceKey()).put("device_label",deviceLabel()).put("app_version",appVersion()))
 
-    fun bootstrap():JSONObject?=request(JSONObject().put("action","bootstrap").put("token",token()))
+    fun bootstrap():JSONObject?=request(JSONObject().put("action","bootstrap").put("token",token()).put("device_key",deviceKey()))
+    fun appStatus():JSONObject?=request(JSONObject().put("action","app_status").put("version_code",3))
     fun saveReview(states:Map<String,ReviewState>){
         val root=JSONObject()
         states.forEach{ (id,s)->root.put(id,JSONObject().put("score",s.score).put("streak",s.streak).put("reps",s.reps).put("lapses",s.lapses).put("correct",s.correct).put("wrong",s.wrong).put("total",s.total).put("interval",s.interval).put("next",s.next).put("ease",s.ease)) }
@@ -160,6 +168,8 @@ fun App(repo: Repository) {
     var screen by remember{mutableStateOf("home")}
     var connected by remember{mutableStateOf(repo.token()!=null)}
     var profile by remember{mutableStateOf<JSONObject?>(null)}
+    var appStatus by remember{mutableStateOf<JSONObject?>(null)}
+    LaunchedEffect(Unit){appStatus=withContext(Dispatchers.IO){repo.appStatus()}}
     LaunchedEffect(connected){if(connected){val result=withContext(Dispatchers.IO){repo.bootstrap()};if(result?.optBoolean("ok")==true)profile=result.optJSONObject("profile") else {repo.clearToken();connected=false}}}
     Scaffold(topBar={TopAppBar(title={Text("🔷 LangBlue Native")})},bottomBar={
         NavigationBar{listOf("home" to "خانه","grammar" to "Grammar","vocab" to "Vocabulary","account" to "حساب").forEach{(id,label)->NavigationBarItem(selected=screen==id,onClick={screen=id},icon={},label={Text(label)})}}
@@ -168,15 +178,16 @@ fun App(repo: Repository) {
             "grammar"->GrammarScreen(repo)
             "vocab"->VocabScreen(repo)
             "account"->AccountScreen(repo,profile,{repo.clearToken();connected=false;profile=null})
-            else->Home(connected,profile){screen=it}
+            else->Home(connected,profile,appStatus){screen=it}
         }
     }}
 }
 
-@Composable fun Home(connected:Boolean,profile:JSONObject?,go:(String)->Unit){
+@Composable fun Home(connected:Boolean,profile:JSONObject?,appStatus:JSONObject?,go:(String)->Unit){
     Column{Text("اپلیکیشن مستقل LangBlue",style=MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(8.dp))
-        Text(if(connected)"حساب مرورگر متصل است؛ داده‌ها از همان حساب دریافت می‌شوند." else "برای شروع، حساب مرورگر LangBlue را متصل کن.")
+        Text("برای شروع، حساب مرورگر LangBlue را متصل کن.")
+        Text(if(connected)"حساب مرکزی متصل است؛ داده‌ها با همان حساب همگام می‌شوند." else "اتصال حساب از طریق مرورگر انجام می‌شود.")
         profile?.optString("name")?.takeIf{it.isNotBlank()}?.let{Spacer(Modifier.height(12.dp));Text("سلام "+it)}
         Spacer(Modifier.height(20.dp))
         Button(onClick={go("grammar")},Modifier.fillMaxWidth()){Text("🧠 Grammar")}
