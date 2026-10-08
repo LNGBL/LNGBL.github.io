@@ -229,7 +229,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   
 .lb-leaderboard-section{padding:72px 0}.lb-leaderboard-card{max-width:1000px;margin:28px auto 0;padding:24px;background:var(--glass);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.lb-leaderboard-table-wrap{overflow:auto}.lb-leaderboard-table{width:100%;border-collapse:collapse;min-width:680px}.lb-leaderboard-table th,.lb-leaderboard-table td{padding:13px 12px;text-align:right;border-bottom:1px solid var(--line)}.lb-leaderboard-table th{color:#9de3ff;font-size:12px}.lb-leaderboard-table td{color:#e9f7fb;font-size:13px}.lb-leaderboard-table td small{display:block;color:var(--muted);font-size:10px;direction:ltr;text-align:right;margin-top:2px}.lb-leaderboard-table tbody tr:first-child td{background:rgba(69,183,200,.07)}.lb-leaderboard-loading,.lb-leaderboard-empty{text-align:center;color:var(--muted);padding:30px 12px}.lb-leaderboard-note{text-align:center;color:var(--muted);font-size:11px;margin-top:14px}
 .lb-public-stats{padding:28px 0 52px}.lb-public-stats-card{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:980px;margin:0 auto;padding:18px;background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.lb-stat{text-align:center;padding:16px;border-radius:15px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025)}.lb-stat-number{font-size:clamp(28px,5vw,46px);font-weight:900;letter-spacing:-1px;color:#fff;font-variant-numeric:tabular-nums}.lb-stat-label{margin-top:3px;color:var(--muted);font-size:12px}.lb-stat-note{margin-top:14px;text-align:center;color:#8faab2;font-size:11px}@media(max-width:650px){.lb-public-stats-card{grid-template-columns:1fr}}
-</style>
+    .android-download-mini{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.06);text-decoration:none;color:#e9f8ff;font-size:12px;font-weight:750;transition:.2s;white-space:nowrap}.android-download-mini:hover{transform:translateY(-1px);background:rgba(34,158,217,.13);border-color:rgba(91,192,255,.35)}.android-download-mini img{width:22px;height:22px;border-radius:50%;display:block;box-shadow:0 0 12px rgba(91,192,255,.35)}@media(max-width:600px){.android-download-mini span{display:none}.android-download-mini{padding:5px}.android-download-mini img{width:24px;height:24px}}\n</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/supabase-client.js?v=20261006-connection"></script>
 <script src="assets/js/langblue-backend.js"></script>
@@ -250,6 +250,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   <span class="logo-word" aria-label="LangBlue">LangBlue</span>
   <span class="brand-sub">Language Grammar Platform</span>
 </a>
+      <a class="android-download-mini" href="/android-download.html" aria-label="دانلود اپلیکیشن اندروید LangBlue" title="دانلود اپلیکیشن اندروید LangBlue"><img src="/favicon.svg" alt="" aria-hidden="true"><span>دانلود اپ اندروید</span></a>
     </div>
   </header>
 
