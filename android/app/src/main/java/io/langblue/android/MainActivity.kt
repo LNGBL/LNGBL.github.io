@@ -222,6 +222,7 @@ fun AccountScreen(repo:Repository,profile:JSONObject?,disconnect:()->Unit,onPair
     var status by remember { mutableStateOf(if(profile==null) "نام کاربری حساب اصلی را وارد کن." else "") }
     var pairingId by remember { mutableStateOf<String?>(null) }
     var pairCode by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
     LaunchedEffect(pairingId,pairCode){
         val id=pairingId ?: return@LaunchedEffect
         val code=pairCode ?: return@LaunchedEffect
@@ -253,7 +254,7 @@ fun AccountScreen(repo:Repository,profile:JSONObject?,disconnect:()->Unit,onPair
         Spacer(Modifier.height(8.dp))
         Button(enabled=username.trim().length>=3 && pairingId==null,onClick={
             status="در حال ارسال درخواست به حساب اصلی…"
-            lifecycleScope.launch(Dispatchers.IO) {
+            scope.launch(Dispatchers.IO) {
                 val result=repo.requestPairing(username)
                 withContext(Dispatchers.Main){
             if(result?.optBoolean("ok")==true){
