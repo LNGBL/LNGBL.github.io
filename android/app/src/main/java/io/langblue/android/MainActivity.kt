@@ -408,6 +408,7 @@ fun VocabScreen(repo: Repository) {
             if (answered) {
                 Spacer(Modifier.height(8.dp))
                 Text(v.example)
+                SpeakEnglishButton(v.example)
                 Button(onClick = { current = null }) { Text("بازگشت") }
             }
         }
