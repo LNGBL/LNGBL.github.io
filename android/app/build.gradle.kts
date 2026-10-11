@@ -10,8 +10,22 @@ android {
         applicationId = "io.langblue.android"
         minSdk = 31
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.0.4"
+        versionCode = 5
+        versionName = "1.0.5"
+    }
+    signingConfigs {
+        create("release") {
+            storeFile = file(System.getenv("LANGBLUE_KEYSTORE_PATH") ?: "langblue-release.jks")
+            storePassword = System.getenv("LANGBLUE_KEYSTORE_PASSWORD") ?: ""
+            keyAlias = System.getenv("LANGBLUE_KEY_ALIAS") ?: ""
+            keyPassword = System.getenv("LANGBLUE_KEY_PASSWORD") ?: ""
+        }
+    }
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
