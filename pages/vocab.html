@@ -2138,7 +2138,35 @@
                     return this.state;
                 },
 
-                saveWords: function() { Storage.set(KEYS.WORDS, this.state.words); },
+                syncCentralWords: async function() {
+                    try {
+                        var backend=window.LangBlueSupabase;
+                        if(!backend||!backend.getAndroidContent||!backend.getAuthSession)return;
+                        var session=await backend.getAuthSession();
+                        if(!session||!session.user)return;
+                        var remote=await backend.getAndroidContent();
+                        if(!remote||!remote.ok||!Array.isArray(remote.content))return;
+                        var byId=new Map((this.state.words||[]).map(function(w){return [String(w.id||('vocab:'+String(w.word||'').toLowerCase()+'|'+String(w.persian||''))),w];}));
+                        remote.content.filter(function(x){return x.kind==='vocabulary'&&x.content;}).forEach(function(x){
+                            byId.set(String(x.item_id),Object.assign({},x.content,{id:x.item_id}));
+                        });
+                        this.state.words=Array.from(byId.values());
+                        Storage.set(KEYS.WORDS,this.state.words);
+                        if(typeof this.renderAll==='function')this.renderAll();
+                    } catch(e) { console.warn('[LangBlue] vocabulary hydration skipped:',e); }
+                },
+                saveWords: function() {
+                    Storage.set(KEYS.WORDS, this.state.words);
+                    try {
+                        var backend=window.LangBlueSupabase;
+                        if(backend&&typeof backend.saveAndroidContent==='function') {
+                            this.state.words.forEach(function(item) {
+                                if(!item.id) item.id='vocab:'+String(item.word||'').trim().toLowerCase()+'|'+String(item.persian||'').trim();
+                                backend.saveAndroidContent('vocabulary',String(item.id),item,'english');
+                            });
+                        }
+                    } catch(e) { console.warn('[LangBlue] central vocabulary sync skipped:',e); }
+                },
                 savePhrasal: function() { Storage.set(KEYS.PHRASAL, this.state.phrasal); },
                 saveSentences: function() { Storage.set(KEYS.SENTENCES, this.state.sentences); },
                 saveGrammar: function() { Storage.set(KEYS.GRAMMAR, this.state.grammar); },
@@ -4331,6 +4359,7 @@
                 // داده‌ها فقط برای تعیین وضعیت حساب/سقف رایگان بارگذاری می‌شوند؛
                 // تا قبل از ورود، رابط اصلی Vocabulary همچنان کاملاً مخفی است.
                 Core.load();
+                setTimeout(function(){Core.syncCentralWords();},1000);
 
                 if(!enforceVocabularyAccess()) {
                     console.log('🔒 Vocabulary UI hidden until account/login.');
