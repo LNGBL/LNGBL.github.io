@@ -117,6 +117,7 @@
             };
             Store.set('session', { userId: user.id, username: user.username });
             Store.set('user', user);
+            setTimeout(() => syncCentralVocabulary(), 900);
             const accounts = Store.get('accounts', {});
             if(user.username){
               const key = user.username.toLowerCase();
@@ -365,10 +366,11 @@
     db.languages[language].words.push(item);
     saveDB(db);
     try{
-      if(String(language).toLowerCase()==='vocabulary' && window.LangBlueSupabase && typeof window.LangBlueSupabase.saveAndroidContent==='function'){
-        window.LangBlueSupabase.saveAndroidContent('vocabulary',String(item.id),item,'english');
+      const kind=String(language).toLowerCase();
+      if((kind==='vocabulary'||kind==='grammar') && window.LangBlueSupabase && typeof window.LangBlueSupabase.saveAndroidContent==='function'){
+        window.LangBlueSupabase.saveAndroidContent(kind,String(item.id),item,'english');
       }
-    }catch(e){ console.warn('[LangBlue] central vocabulary sync skipped:',e); }
+    }catch(e){ console.warn('[LangBlue] central learning-content sync skipped:',e); }
 
     return { ok: true, word: item };
   }
@@ -383,6 +385,9 @@
     const db = loadDB();
     db.languages[language].words[index] = lang.words[index];
     saveDB(db);
+    if(String(language).toLowerCase()==='vocabulary' && window.LangBlueSupabase?.saveAndroidContent){
+      window.LangBlueSupabase.saveAndroidContent('vocabulary',String(id),lang.words[index],'english');
+    }
     return true;
   }
 
@@ -393,11 +398,35 @@
 
     db.languages[language].words = db.languages[language].words.filter(w => w.id !== id);
     saveDB(db);
+    if(String(language).toLowerCase()==='vocabulary' && window.LangBlueSupabase?.deleteAndroidContent){
+      window.LangBlueSupabase.deleteAndroidContent('vocabulary',String(id));
+    }
     return true;
   }
 
   function words(language){
     return getLanguage(language).words;
+  }
+
+  async function syncCentralVocabulary(){
+    const backend=window.LangBlueSupabase;
+    if(!backend || typeof backend.getAndroidContent!=='function' || !backend.getAuthSession) return;
+    try{
+      const session=await backend.getAuthSession();
+      if(!session || !session.user) return;
+      const db=loadDB();
+      if(!db.languages.vocabulary) db.languages.vocabulary={words:[]};
+      const local=Array.isArray(db.languages.vocabulary.words)?db.languages.vocabulary.words:[];
+      for(const item of local){
+        if(item && item.id!=null) await backend.saveAndroidContent('vocabulary',String(item.id),item,'english');
+      }
+      const remote=await backend.getAndroidContent();
+      if(!remote || !remote.ok || !Array.isArray(remote.content)) return;
+      const byId=new Map(local.map(item=>[String(item.id),item]));
+      remote.content.filter(x=>x.kind==='vocabulary' && x.content).forEach(x=>byId.set(String(x.item_id),Object.assign({},x.content,{id:x.item_id})));
+      db.languages.vocabulary.words=Array.from(byId.values());
+      saveDB(db);
+    }catch(error){console.warn('[LangBlue] central vocabulary hydration skipped:',error);}
   }
 
   /*
