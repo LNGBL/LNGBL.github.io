@@ -14,6 +14,7 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -177,7 +179,7 @@ fun App(repo: Repository) {
     var appStatus by remember{mutableStateOf<JSONObject?>(null)}
     LaunchedEffect(Unit){appStatus=withContext(Dispatchers.IO){repo.appStatus()}}
     LaunchedEffect(connected){if(connected){val result=withContext(Dispatchers.IO){repo.bootstrap()};if(result?.optBoolean("ok")==true){profile=result.optJSONObject("profile");repo.syncCentralContent(result)} else {repo.clearToken();connected=false}}}
-    Scaffold(topBar={TopAppBar(title={Text("🔷 LangBlue Native")})},bottomBar={
+    Scaffold(topBar={TopAppBar(title={Text("LangBlue")})},bottomBar={
         NavigationBar{listOf("home" to "خانه","grammar" to "Grammar","vocab" to "Vocabulary","account" to "حساب").forEach{(id,label)->NavigationBarItem(selected=screen==id,onClick={screen=id},icon={},label={Text(label)})}}
     }){p->Column(Modifier.padding(p).padding(16.dp).fillMaxSize()){
         when(screen){
@@ -191,7 +193,7 @@ fun App(repo: Repository) {
 
 @Composable fun Home(connected:Boolean,profile:JSONObject?,appStatus:JSONObject?,go:(String)->Unit){
     val context=LocalContext.current
-    Column{Text("اپلیکیشن مستقل LangBlue",style=MaterialTheme.typography.headlineSmall)
+    Column{Image(painter=painterResource(id=R.drawable.ic_langblue_logo),contentDescription="نشان LangBlue",modifier=Modifier.size(112.dp).align(Alignment.CenterHorizontally)); Spacer(Modifier.height(12.dp)); Text("اپلیکیشن مستقل LangBlue",style=MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(8.dp))
         Text("برای شروع، حساب مرورگر LangBlue را متصل کن.")
         Text(if(connected)"حساب مرکزی متصل است؛ داده‌ها با همان حساب همگام می‌شوند." else "اتصال حساب از طریق مرورگر انجام می‌شود.")
