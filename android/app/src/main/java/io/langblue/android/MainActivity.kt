@@ -54,7 +54,7 @@ class Repository(private val context:Context) {
 
     private fun deviceKey():String = prefs.getString("device_key",null) ?: UUID.randomUUID().toString().replace("-","").also { prefs.edit().putString("device_key",it).apply() }
     private fun deviceLabel():String = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}".trim().ifBlank{"Android device"}
-    private fun appVersion():String = "1.0.4"
+    private fun appVersion():String = "1.0.5"
     suspend fun requestPairing(username:String):JSONObject? = withContext(Dispatchers.IO){
         val pair=UUID.randomUUID().toString().replace("-","")+UUID.randomUUID().toString().replace("-","")
         prefs.edit().putString("pair_code",pair).apply()
@@ -67,7 +67,7 @@ class Repository(private val context:Context) {
         request(JSONObject().put("action","poll_pairing").put("pairing_id",pairingId).put("pair_code",pairCode).put("device_key",deviceKey()).put("device_label",deviceLabel()).put("app_version",appVersion()))
 
     fun bootstrap():JSONObject?=request(JSONObject().put("action","bootstrap").put("token",token()).put("device_key",deviceKey()))
-    fun appStatus():JSONObject?=request(JSONObject().put("action","app_status").put("version_code",4))
+    fun appStatus():JSONObject?=request(JSONObject().put("action","app_status").put("version_code",5))
     fun saveCentralContent(kind:String,itemId:String,content:JSONObject):JSONObject?{
         val result=request(JSONObject().put("action","content_upsert").put("token",token()).put("kind",kind).put("item_id",itemId).put("content",content).put("language","english"))
         if(result?.optBoolean("ok")==true) prefs.edit().putString("central_"+kind+"_"+itemId,content.toString()).apply()
