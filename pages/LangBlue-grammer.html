@@ -878,13 +878,14 @@ if (!window.Store) {
 const Graph = {
   nodes: Store.get('graph:nodes', {}),
   edges: Store.get('graph:edges', {}),
-  addNode(node) { this.nodes[node.id] = node; this.save(); },
+  addNode(node) { this.nodes[node.id] = node; this.save(); syncGrammarNode(node); },
   removeNode(id) {
     delete this.nodes[id];
     Object.keys(this.edges).forEach(k => {
       if (this.edges[k].from === id || this.edges[k].to === id) delete this.edges[k];
     });
     this.save();
+    try { window.LangBlueSupabase?.deleteAndroidContent?.('grammar',String(id)); } catch(e) {}
   },
   addEdge(from, to, type = 'related', weight = 1) {
     const id = `${from}->${to}:${type}`;
@@ -917,6 +918,7 @@ const Graph = {
     };
     this.save();
     Audit.log('grammar_content_edited', { id, newVersion: n.contentVersion });
+    syncGrammarNode(n);
   },
   validDepth(id) {
     const n = this.nodes[id];
@@ -929,6 +931,35 @@ const Graph = {
     Store.set('graph:edges', this.edges);
   }
 };
+
+function syncGrammarNode(node) {
+  try {
+    if (!node || !window.LangBlueSupabase?.saveAndroidContent) return;
+    window.LangBlueSupabase.saveAndroidContent('grammar',String(node.id),node,'english');
+  } catch(e) { console.warn('[LangBlue] grammar sync skipped:',e); }
+}
+async function hydrateGrammarFromCentral() {
+  try {
+    const backend=window.LangBlueSupabase;
+    if(!backend?.getAndroidContent) return;
+    const result=await backend.getAndroidContent();
+    if(!result?.ok || !Array.isArray(result.content)) return;
+    result.content.filter(x=>x.kind==='grammar' && x.content).forEach(x=>{
+      if(Graph.nodes[x.item_id]) return;
+      const c=x.content, g=c.grammar || c;
+      Graph.nodes[x.item_id]=c.label ? c : {
+        id:x.item_id,label:c.title || c.name || 'Grammar',
+        layer:c.layer || 'sensory',aspects:[g.how,g.formula].filter(Boolean),
+        contradictions:[],relatedTo:[],
+        grammar:{how:g.how || g.use || g.usage || '',formula:g.formula || '',examples:g.examples || [],note:g.note || ''},
+        contentVersion:1,spiralState:{depth:0,history:[],currentPhase:'exposure'}
+      };
+    });
+    Store.set('graph:nodes',Graph.nodes);
+    Object.values(Graph.nodes).forEach(syncGrammarNode);
+  } catch(e) { console.warn('[LangBlue] grammar hydration skipped:',e); }
+}
+setTimeout(hydrateGrammarFromCentral,1400);
 
 window.LangBlueGrammarRuntime = { Graph };
 
@@ -1746,6 +1777,7 @@ document.getElementById('btnSave').onclick = () => {
       toast('گرامر ویرایش شد. عمقش ریست شد.', 'warn');
     } else {
       Graph.save();
+      syncGrammarNode(node);
       toast('گرامر ذخیره شد ✅', 'success');
     }
     form.reset();
