@@ -260,155 +260,79 @@ fun AccountScreen(repo:Repository,profile:JSONObject?,disconnect:()->Unit,onPair
 }
 
 @Composable
-fun GrammarScreen(repo: Repository) {
-    val states = remember { mutableStateOf(repo.loadReview()) }
-    var current by remember { mutableStateOf<GrammarItem?>(null) }
-    var answered by remember { mutableStateOf(false) }
-    var options by remember { mutableStateOf<List<String>>(emptyList()) }
-
-    if (current == null) {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            item {
-                Text("Grammar", style = MaterialTheme.typography.headlineSmall)
-                Text("موتور تمرین و SRS کاملاً Native Kotlin است.")
-            }
-            items(Content.grammar) { g ->
-                val score = states.value[g.id]?.score ?: 0
-                Card {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(g.title)
-                            Text(score.toString() + "% • " + g.use, fontSize = 12.sp)
-                        }
-                        Button(onClick = {
-                            current = g
-                            answered = false
-                            val distractors = Content.grammar
-                                .filter { it.id != g.id }
-                                .shuffled()
-                                .take(3)
-                                .map { it.formula }
-                            options = (listOf(g.formula) + distractors).shuffled()
-                        }) {
-                            Text("تمرین")
-                        }
-                    }
+fun GrammarScreen(repo:Repository) {
+    var grammar by remember { mutableStateOf(repo.loadCentralGrammar()) }
+    LaunchedEffect(Unit) {
+        while(true) {
+            val result=withContext(Dispatchers.IO){repo.bootstrap()}
+            if(result?.optBoolean("ok")==true){repo.syncCentralContent(result);grammar=repo.loadCentralGrammar()}
+            kotlinx.coroutines.delay(12000)
+        }
+    }
+    LazyColumn(verticalArrangement=Arrangement.spacedBy(10.dp),modifier=Modifier.fillMaxSize()) {
+        item {
+            Card(colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.primaryContainer)) {
+                Column(Modifier.padding(18.dp)) {
+                    Text("گرامرهای حساب تو",style=MaterialTheme.typography.headlineSmall)
+                    Text("فهرست از حساب مرکزی LangBlue دریافت و هر ۱۲ ثانیه تازه می‌شود.")
+                    Text("${grammar.size} مورد")
                 }
             }
         }
-    } else {
-        val g = current!!
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(g.title, style = MaterialTheme.typography.headlineSmall)
-            Spacer(Modifier.height(8.dp))
-            Text(g.use)
-            Spacer(Modifier.height(14.dp))
-            Text("فرمول درست را انتخاب کن")
-            Spacer(Modifier.height(8.dp))
-            options.forEach { option ->
-                OutlinedButton(
-                    onClick = {
-                        if (!answered) {
-                            answered = true
-                            val ok = option == g.formula
-                            val state = states.value.getOrPut(g.id) { ReviewState() }
-                            Srs.review(state, ok)
-                            repo.saveReview(states.value)
-                            repo.event("content_answered", "grammar", ok, g.id)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().padding(3.dp)
-                ) {
-                    Text(option)
+        if(grammar.isEmpty()) item { Text("هنوز گرامری برای این حساب همگام نشده است.") }
+        items(grammar,key={it.id}) { g ->
+            Card {
+                Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(6.dp)) {
+                    Text(g.title,style=MaterialTheme.typography.titleLarge)
+                    if(g.use.isNotBlank()) Text(g.use,color=MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(g.formula,color=MaterialTheme.colorScheme.primary)
+                    g.examples.forEach { Text("• $it") }
                 }
-            }
-            if (answered) {
-                Spacer(Modifier.height(8.dp))
-                Text(g.examples.first())
-                Button(onClick = { current = null }) { Text("بازگشت") }
             }
         }
     }
 }
 
 @Composable
-fun VocabScreen(repo: Repository) {
-    val states = remember { mutableStateOf(repo.loadReview()) }
-    var customEnglishText by remember { mutableStateOf("") }
-    var current by remember { mutableStateOf<VocabularyItem?>(null) }
-    var answered by remember { mutableStateOf(false) }
-    var options by remember { mutableStateOf<List<String>>(emptyList()) }
-
-    if (current == null) {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            item {
-                Text("Vocabulary", style = MaterialTheme.typography.headlineSmall)
-                Text("فلش‌کارت چهارگزینه‌ای با مرور فاصله‌دار.")
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(value=customEnglishText,onValueChange={customEnglishText=it},label={Text("متن انگلیسی خودت را بنویس")},modifier=Modifier.fillMaxWidth(),minLines=2)
-                Spacer(Modifier.height(6.dp))
-                SpeakEnglishButton(customEnglishText)
-                Spacer(Modifier.height(10.dp))
-            }
-            items(Content.vocabulary) { v ->
-                val score = states.value[v.id]?.score ?: 0
-                Card {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(v.word)
-                            Text(v.meaning + " • " + score + "%", fontSize = 12.sp)
-                        }
-                        Button(onClick = {
-                            current = v
-                            answered = false
-                            val distractors = Content.vocabulary
-                                .filter { it.id != v.id }
-                                .shuffled()
-                                .take(3)
-                                .map { it.meaning }
-                            options = (listOf(v.meaning) + distractors).shuffled()
-                        }) {
-                            Text("مرور")
-                        }
-                    }
+fun VocabScreen(repo:Repository) {
+    var vocabulary by remember { mutableStateOf(repo.loadCentralVocabulary()) }
+    LaunchedEffect(Unit) {
+        while(true) {
+            val result=withContext(Dispatchers.IO){repo.bootstrap()}
+            if(result?.optBoolean("ok")==true){repo.syncCentralContent(result);vocabulary=repo.loadCentralVocabulary()}
+            kotlinx.coroutines.delay(12000)
+        }
+    }
+    LazyColumn(verticalArrangement=Arrangement.spacedBy(10.dp),modifier=Modifier.fillMaxSize()) {
+        item {
+            Card(colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.primaryContainer)) {
+                Column(Modifier.padding(18.dp)) {
+                    Text("واژگان حساب تو",style=MaterialTheme.typography.headlineSmall)
+                    Text("جدول حساب مرکزی · تلفظ با صدای سیستم")
+                    Text("${vocabulary.size} واژه")
                 }
             }
         }
-    } else {
-        val v = current!!
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(v.word, style = MaterialTheme.typography.headlineLarge)
-            Spacer(Modifier.height(10.dp))
-            Text("معنی درست را انتخاب کن")
-            Spacer(Modifier.height(8.dp))
-            options.forEach { option ->
-                OutlinedButton(
-                    onClick = {
-                        if (!answered) {
-                            answered = true
-                            val ok = option == v.meaning
-                            val state = states.value.getOrPut(v.id) { ReviewState() }
-                            Srs.review(state, ok)
-                            repo.saveReview(states.value)
-                            repo.event("content_answered", "vocabulary", ok, v.id)
+        item {
+            Card {
+                Column(Modifier.padding(10.dp)) {
+                    Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant).padding(8.dp),verticalAlignment=Alignment.CenterVertically) {
+                        Text("English",Modifier.weight(1.1f),style=MaterialTheme.typography.labelLarge)
+                        Text("فارسی",Modifier.weight(1.1f),style=MaterialTheme.typography.labelLarge)
+                        Text("نوع کلمه",Modifier.weight(.9f),style=MaterialTheme.typography.labelLarge)
+                        Text("صوت",Modifier.weight(.6f),style=MaterialTheme.typography.labelLarge)
+                    }
+                    if(vocabulary.isEmpty()) Text("هنوز واژه‌ای برای این حساب همگام نشده است.",Modifier.padding(16.dp))
+                    vocabulary.forEachIndexed { index,v ->
+                        Row(Modifier.fillMaxWidth().background(if(index%2==0)MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant.copy(alpha=.45f)).padding(6.dp),verticalAlignment=Alignment.CenterVertically) {
+                            Text(v.word,Modifier.weight(1.1f))
+                            Text(v.meaning,Modifier.weight(1.1f))
+                            Text(v.partOfSpeech,Modifier.weight(.9f))
+                            Box(Modifier.weight(.6f),contentAlignment=Alignment.Center){SpeakEnglishButton(v.word)}
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth().padding(3.dp)
-                ) {
-                    Text(option)
+                        HorizontalDivider()
+                    }
                 }
-            }
-            if (answered) {
-                Spacer(Modifier.height(8.dp))
-                Text(v.example)
-                SpeakEnglishButton(v.example)
-                Button(onClick = { current = null }) { Text("بازگشت") }
             }
         }
     }
