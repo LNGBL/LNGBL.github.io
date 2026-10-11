@@ -297,6 +297,10 @@ fun GrammarScreen(repo:Repository) {
 @Composable
 fun VocabScreen(repo:Repository) {
     var vocabulary by remember { mutableStateOf(repo.loadCentralVocabulary()) }
+    var english by remember { mutableStateOf("") }
+    var persian by remember { mutableStateOf("") }
+    var partOfSpeech by remember { mutableStateOf("noun") }
+    val scope=rememberCoroutineScope()
     LaunchedEffect(Unit) {
         while(true) {
             val result=withContext(Dispatchers.IO){repo.bootstrap()}
@@ -311,6 +315,30 @@ fun VocabScreen(repo:Repository) {
                     Text("واژگان حساب تو",style=MaterialTheme.typography.headlineSmall)
                     Text("جدول حساب مرکزی · تلفظ با صدای سیستم")
                     Text("${vocabulary.size} واژه")
+                }
+            }
+        }
+        item {
+            Card {
+                Column(Modifier.padding(12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                    Text("افزودن واژه به حساب",style=MaterialTheme.typography.titleMedium)
+                    OutlinedTextField(value=english,onValueChange={english=it},label={Text("English")},singleLine=true,modifier=Modifier.fillMaxWidth())
+                    OutlinedTextField(value=persian,onValueChange={persian=it},label={Text("ترجمه فارسی")},singleLine=true,modifier=Modifier.fillMaxWidth())
+                    OutlinedTextField(value=partOfSpeech,onValueChange={partOfSpeech=it},label={Text("نوع کلمه")},singleLine=true,modifier=Modifier.fillMaxWidth())
+                    Button(enabled=english.isNotBlank()&&persian.isNotBlank(),onClick={
+                        val id=UUID.randomUUID().toString()
+                        val data=JSONObject().put("word",english.trim()).put("english",english.trim()).put("persian",persian.trim()).put("meaning",persian.trim()).put("partOfSpeech",partOfSpeech.trim())
+                        scope.launch(Dispatchers.IO) {
+                            val saved=repo.saveCentralContent("vocabulary",id,data)
+                            val fresh=repo.bootstrap()
+                            withContext(Dispatchers.Main) {
+                                if(saved?.optBoolean("ok")==true) {
+                                    if(fresh?.optBoolean("ok")==true)repo.syncCentralContent(fresh)
+                                    vocabulary=repo.loadCentralVocabulary();english="";persian="";partOfSpeech="noun"
+                                }
+                            }
+                        }
+                    },modifier=Modifier.fillMaxWidth()){Text("ذخیره واژه")}
                 }
             }
         }
