@@ -938,12 +938,14 @@ function syncGrammarNode(node) {
     window.LangBlueSupabase.saveAndroidContent('grammar',String(node.id),node,'english');
   } catch(e) { console.warn('[LangBlue] grammar sync skipped:',e); }
 }
+let grammarInitialSyncDone=false;
 async function hydrateGrammarFromCentral() {
   try {
     const backend=window.LangBlueSupabase;
     if(!backend?.getAndroidContent) return;
     const result=await backend.getAndroidContent();
     if(!result?.ok || !Array.isArray(result.content)) return;
+    let changed=false;
     result.content.filter(x=>x.kind==='grammar' && x.content).forEach(x=>{
       if(Graph.nodes[x.item_id]) return;
       const c=x.content, g=c.grammar || c;
@@ -954,12 +956,21 @@ async function hydrateGrammarFromCentral() {
         grammar:{how:g.how || g.use || g.usage || '',formula:g.formula || '',examples:Array.isArray(g.examples)?g.examples:[],note:g.note || ''},
         contentVersion:1,spiralState:{depth:0,history:[],currentPhase:'exposure'}
       };
+      changed=true;
     });
-    Store.set('graph:nodes',Graph.nodes);
-    Object.values(Graph.nodes).forEach(syncGrammarNode);
+    if(changed) {
+      Store.set('graph:nodes',Graph.nodes);
+      if(typeof renderTable==='function')renderTable();
+      if(typeof renderHome==='function')renderHome();
+    }
+    if(!grammarInitialSyncDone) {
+      Object.values(Graph.nodes).forEach(syncGrammarNode);
+      grammarInitialSyncDone=true;
+    }
   } catch(e) { console.warn('[LangBlue] grammar hydration skipped:',e); }
 }
 setTimeout(hydrateGrammarFromCentral,1400);
+setInterval(hydrateGrammarFromCentral,12000);
 
 window.LangBlueGrammarRuntime = { Graph };
 
