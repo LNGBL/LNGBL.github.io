@@ -2144,6 +2144,10 @@
                         if(!backend||!backend.getAndroidContent||!backend.getAuthSession)return;
                         var session=await backend.getAuthSession();
                         if(!session||!session.user)return;
+                        for(var localWord of (this.state.words||[])) {
+                            if(!localWord.id) localWord.id='vocab:'+String(localWord.word||'').trim().toLowerCase()+'|'+String(localWord.persian||'').trim();
+                            await backend.saveAndroidContent('vocabulary',String(localWord.id),localWord,'english');
+                        }
                         var remote=await backend.getAndroidContent();
                         if(!remote||!remote.ok||!Array.isArray(remote.content))return;
                         var byId=new Map((this.state.words||[]).map(function(w){return [String(w.id||('vocab:'+String(w.word||'').toLowerCase()+'|'+String(w.persian||''))),w];}));
