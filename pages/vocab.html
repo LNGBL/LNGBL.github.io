@@ -2152,7 +2152,7 @@
                         });
                         this.state.words=Array.from(byId.values());
                         Storage.set(KEYS.WORDS,this.state.words);
-                        if(typeof this.renderAll==='function')this.renderAll();
+                        if(typeof UI!=='undefined'&&UI.renderAll)UI.renderAll();
                     } catch(e) { console.warn('[LangBlue] vocabulary hydration skipped:',e); }
                 },
                 saveWords: function() {
