@@ -947,11 +947,11 @@ async function hydrateGrammarFromCentral() {
     result.content.filter(x=>x.kind==='grammar' && x.content).forEach(x=>{
       if(Graph.nodes[x.item_id]) return;
       const c=x.content, g=c.grammar || c;
-      Graph.nodes[x.item_id]=c.label ? c : {
-        id:x.item_id,label:c.title || c.name || 'Grammar',
+      Graph.nodes[x.item_id]=(c.grammar && c.label) ? c : {
+        id:x.item_id,label:c.label || c.title || c.name || 'Grammar',
         layer:c.layer || 'sensory',aspects:[g.how,g.formula].filter(Boolean),
         contradictions:[],relatedTo:[],
-        grammar:{how:g.how || g.use || g.usage || '',formula:g.formula || '',examples:g.examples || [],note:g.note || ''},
+        grammar:{how:g.how || g.use || g.usage || '',formula:g.formula || '',examples:Array.isArray(g.examples)?g.examples:[],note:g.note || ''},
         contentVersion:1,spiralState:{depth:0,history:[],currentPhase:'exposure'}
       };
     });
