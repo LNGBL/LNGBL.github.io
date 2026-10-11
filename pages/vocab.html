@@ -2156,16 +2156,14 @@
                     } catch(e) { console.warn('[LangBlue] vocabulary hydration skipped:',e); }
                 },
                 saveWords: function() {
-                    Storage.set(KEYS.WORDS, this.state.words);
                     try {
                         var backend=window.LangBlueSupabase;
-                        if(backend&&typeof backend.saveAndroidContent==='function') {
-                            this.state.words.forEach(function(item) {
-                                if(!item.id) item.id='vocab:'+String(item.word||'').trim().toLowerCase()+'|'+String(item.persian||'').trim();
-                                backend.saveAndroidContent('vocabulary',String(item.id),item,'english');
-                            });
-                        }
+                        this.state.words.forEach(function(item) {
+                            if(!item.id) item.id='vocab:'+String(item.word||'').trim().toLowerCase()+'|'+String(item.persian||'').trim();
+                            if(backend&&typeof backend.saveAndroidContent==='function') backend.saveAndroidContent('vocabulary',String(item.id),item,'english');
+                        });
                     } catch(e) { console.warn('[LangBlue] central vocabulary sync skipped:',e); }
+                    Storage.set(KEYS.WORDS, this.state.words);
                 },
                 savePhrasal: function() { Storage.set(KEYS.PHRASAL, this.state.phrasal); },
                 saveSentences: function() { Storage.set(KEYS.SENTENCES, this.state.sentences); },
