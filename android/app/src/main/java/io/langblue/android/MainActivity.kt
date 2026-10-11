@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -39,44 +40,6 @@ data class GrammarItem(val id:String,val title:String,val use:String,val formula
 data class VocabularyItem(val id:String,val word:String,val meaning:String,val partOfSpeech:String,val example:String)
 data class ReviewState(var score:Int=0,var streak:Int=0,var reps:Int=0,var lapses:Int=0,var correct:Int=0,var wrong:Int=0,var total:Int=0,var interval:Double=0.0,var next:Long=0,var ease:Double=2.3)
 
-object Content {
-    val grammar=listOf(
-        GrammarItem("present-simple","Present Simple","عادت و حقیقت","Subject + base verb / s",listOf("I work every day.")),
-        GrammarItem("present-continuous","Present Continuous","عمل در حال انجام","am/is/are + verb-ing",listOf("She is studying now.")),
-        GrammarItem("past-simple","Past Simple","رویداد کامل‌شده در گذشته","Subject + past verb",listOf("They visited London yesterday.")),
-        GrammarItem("present-perfect","Present Perfect","تجربه یا نتیجه مرتبط با اکنون","have/has + past participle",listOf("I have visited Paris.")),
-        GrammarItem("past-continuous","Past Continuous","عمل در جریان در گذشته","was/were + verb-ing",listOf("I was reading at eight.")),
-        GrammarItem("future-will","Future with Will","پیش‌بینی، تصمیم یا وعده","will + base verb",listOf("I will help you.")),
-        GrammarItem("going-to","Be Going To","قصد یا پیش‌بینی مبتنی بر شواهد","am/is/are going to + verb",listOf("We are going to travel.")),
-        GrammarItem("comparatives","Comparatives","مقایسه دو چیز","adj-er / more + adjective",listOf("This book is cheaper.")),
-        GrammarItem("zero-conditional","Zero Conditional","حقیقت عمومی","If + present, present",listOf("If water boils, it evaporates.")),
-        GrammarItem("first-conditional","First Conditional","شرط محتمل آینده","If + present, will + verb",listOf("If it rains, we will stay home.")),
-        GrammarItem("passive","Passive Voice","تمرکز روی عمل","be + past participle",listOf("The book was written in 2020.")),
-        GrammarItem("should","Should","توصیه و پیشنهاد","should + base verb",listOf("You should practice daily."))
-    )
-    val vocabulary=listOf(
-        VocabularyItem("achieve","achieve","به‌دست آوردن","She achieved her goal."),
-        VocabularyItem("adapt","adapt","سازگار شدن","Students adapt to new routines."),
-        VocabularyItem("approach","approach","رویکرد","We need a better approach."),
-        VocabularyItem("benefit","benefit","مزیت","Practice has many benefits."),
-        VocabularyItem("challenge","challenge","چالش","This task is a challenge."),
-        VocabularyItem("compare","compare","مقایسه کردن","Compare the two examples."),
-        VocabularyItem("context","context","بافت / زمینه","Learn the word in context."),
-        VocabularyItem("develop","develop","توسعه دادن","You can develop this skill."),
-        VocabularyItem("exposure","exposure","مواجهه","Regular exposure helps learning."),
-        VocabularyItem("feedback","feedback","بازخورد","Good feedback improves practice."),
-        VocabularyItem("habit","habit","عادت","Reading can become a habit."),
-        VocabularyItem("maintain","maintain","حفظ کردن","Maintain a regular routine."),
-        VocabularyItem("pattern","pattern","الگو","Notice the sentence pattern."),
-        VocabularyItem("progress","progress","پیشرفت","Progress takes time."),
-        VocabularyItem("recall","recall","به یاد آوردن","Try to recall the rule."),
-        VocabularyItem("reinforce","reinforce","تقویت کردن","Reviews reinforce memory."),
-        VocabularyItem("retrieve","retrieve","بازیابی کردن","Retrieve the word before looking."),
-        VocabularyItem("sequence","sequence","توالی","Follow the learning sequence."),
-        VocabularyItem("strategy","strategy","راهبرد","Choose a useful strategy.")
-    )
-}
-
 class Repository(private val context:Context) {
     private val prefs=context.getSharedPreferences("langblue_native",Context.MODE_PRIVATE)
     private val endpoint="https://ocxeyponzzcvlrvwndji.supabase.co/functions/v1/langblue-android-handoff"
@@ -84,7 +47,7 @@ class Repository(private val context:Context) {
     fun token():String?=prefs.getString("token",null)
     fun currentPairCode():String=prefs.getString("pair_code","") ?: ""
     fun setToken(t:String)=prefs.edit().putString("token",t).apply()
-    fun clearToken()=prefs.edit().remove("token").apply()
+    fun clearToken(){ val e=prefs.edit().remove("token"); prefs.all.keys.filter{it.startsWith("central_")}.forEach{e.remove(it)}; e.apply() }
 
     private fun deviceKey():String = prefs.getString("device_key",null) ?: UUID.randomUUID().toString().replace("-","").also { prefs.edit().putString("device_key",it).apply() }
     private fun deviceLabel():String = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}".trim().ifBlank{"Android device"}
@@ -102,17 +65,44 @@ class Repository(private val context:Context) {
 
     fun bootstrap():JSONObject?=request(JSONObject().put("action","bootstrap").put("token",token()).put("device_key",deviceKey()))
     fun appStatus():JSONObject?=request(JSONObject().put("action","app_status").put("version_code",3))
-    fun saveCentralContent(kind:String,itemId:String,content:JSONObject){
-        prefs.edit().putString("central_"+kind+"_"+itemId,content.toString()).apply()
-        request(JSONObject().put("action","content_upsert").put("token",token()).put("kind",kind).put("item_id",itemId).put("content",content).put("language","english"))
+    fun saveCentralContent(kind:String,itemId:String,content:JSONObject):JSONObject?{
+        val result=request(JSONObject().put("action","content_upsert").put("token",token()).put("kind",kind).put("item_id",itemId).put("content",content).put("language","english"))
+        if(result?.optBoolean("ok")==true) prefs.edit().putString("central_"+kind+"_"+itemId,content.toString()).apply()
+        return result
+    }
+    fun deleteCentralContent(kind:String,itemId:String):JSONObject?{
+        val result=request(JSONObject().put("action","content_delete").put("token",token()).put("kind",kind).put("item_id",itemId))
+        if(result?.optBoolean("ok")==true) prefs.edit().remove("central_"+kind+"_"+itemId).apply()
+        return result
     }
     fun syncCentralContent(result:JSONObject?){
         val arr=result?.optJSONArray("content") ?: return
+        val active=mutableSetOf<String>()
         for(i in 0 until arr.length()){
             val x=arr.optJSONObject(i) ?: continue
-            prefs.edit().putString("central_"+x.optString("kind")+"_"+x.optString("item_id"),x.optJSONObject("content")?.toString() ?: "{}").apply()
+            val kind=x.optString("kind"); val itemId=x.optString("item_id")
+            if(kind!="grammar" && kind!="vocabulary" || itemId.isBlank()) continue
+            val key="central_"+kind+"_"+itemId; active.add(key)
+            prefs.edit().putString(key,x.optJSONObject("content")?.toString() ?: "{}").apply()
         }
+        val e=prefs.edit()
+        prefs.all.keys.filter{it.startsWith("central_grammar_")||it.startsWith("central_vocabulary_")}.filter{!active.contains(it)}.forEach{e.remove(it)}
+        e.apply()
     }
+    fun loadCentralGrammar():List<GrammarItem> = prefs.all.entries.filter{it.key.startsWith("central_grammar_")}.mapNotNull{entry->
+        try{
+            val x=JSONObject(entry.value as String); val g=x.optJSONObject("grammar") ?: x
+            val arr=x.optJSONArray("examples") ?: g.optJSONArray("examples"); val ex=mutableListOf<String>()
+            if(arr!=null) for(i in 0 until arr.length()) arr.optString(i).takeIf{it.isNotBlank()}?.let{ex.add(it)}
+            GrammarItem(entry.key.removePrefix("central_grammar_"),x.optString("label",x.optString("title",x.optString("name","گرامر"))),g.optString("how",g.optString("use",g.optString("usage",""))),g.optString("formula",""),ex)
+        }catch(_:Exception){null}
+    }.sortedBy{it.title.lowercase()}
+    fun loadCentralVocabulary():List<VocabularyItem> = prefs.all.entries.filter{it.key.startsWith("central_vocabulary_")}.mapNotNull{entry->
+        try{
+            val x=JSONObject(entry.value as String)
+            VocabularyItem(entry.key.removePrefix("central_vocabulary_"),x.optString("word",x.optString("english",x.optString("term",""))),x.optString("persian",x.optString("meaning",x.optString("translation",""))),x.optString("partOfSpeech",x.optString("type","—")),x.optString("example",""))
+        }catch(_:Exception){null}
+    }.filter{it.word.isNotBlank()}.sortedBy{it.word.lowercase()}
     fun saveReview(states:Map<String,ReviewState>){
         val root=JSONObject()
         states.forEach{ (id,s)->root.put(id,JSONObject().put("score",s.score).put("streak",s.streak).put("reps",s.reps).put("lapses",s.lapses).put("correct",s.correct).put("wrong",s.wrong).put("total",s.total).put("interval",s.interval).put("next",s.next).put("ease",s.ease)) }
@@ -158,7 +148,7 @@ class MainActivity:ComponentActivity(){
     private lateinit var repo:Repository
     override fun onCreate(savedInstanceState:Bundle?){
         super.onCreate(savedInstanceState);repo=Repository(this);handle(intent)
-        setContent{CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl){MaterialTheme{App(repo)}}}
+        setContent{CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl){MaterialTheme(colorScheme=lightColorScheme(primary=Color(0xFF176B87),secondary=Color(0xFF6658D3),tertiary=Color(0xFF238A78),background=Color(0xFFF4F7FB),surface=Color.White,surfaceVariant=Color(0xFFE8EFF6))){App(repo)}}}
     }
     override fun onNewIntent(i:Intent){super.onNewIntent(i);handle(i);recreate()}
     private fun handle(i:Intent?){
