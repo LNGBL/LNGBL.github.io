@@ -263,6 +263,11 @@ fun AccountScreen(repo:Repository,profile:JSONObject?,disconnect:()->Unit,onPair
 @Composable
 fun GrammarScreen(repo:Repository) {
     var grammar by remember { mutableStateOf(repo.loadCentralGrammar()) }
+    var title by remember { mutableStateOf("") }
+    var usage by remember { mutableStateOf("") }
+    var formula by remember { mutableStateOf("") }
+    var examples by remember { mutableStateOf("") }
+    val scope=rememberCoroutineScope()
     LaunchedEffect(Unit) {
         while(true) {
             val result=withContext(Dispatchers.IO){repo.bootstrap()}
@@ -277,6 +282,32 @@ fun GrammarScreen(repo:Repository) {
                     Text("گرامرهای حساب تو",style=MaterialTheme.typography.headlineSmall)
                     Text("فهرست از حساب مرکزی LangBlue دریافت و هر ۱۲ ثانیه تازه می‌شود.")
                     Text("${grammar.size} مورد")
+                }
+            }
+        }
+        item {
+            Card {
+                Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                    Text("افزودن گرامر به حساب",style=MaterialTheme.typography.titleMedium)
+                    OutlinedTextField(value=title,onValueChange={title=it},label={Text("نام گرامر")},singleLine=true,modifier=Modifier.fillMaxWidth())
+                    OutlinedTextField(value=usage,onValueChange={usage=it},label={Text("کاربرد")},modifier=Modifier.fillMaxWidth())
+                    OutlinedTextField(value=formula,onValueChange={formula=it},label={Text("فرمول")},modifier=Modifier.fillMaxWidth())
+                    OutlinedTextField(value=examples,onValueChange={examples=it},label={Text("مثال‌ها، هر خط یک مثال")},minLines=2,modifier=Modifier.fillMaxWidth())
+                    Button(enabled=title.isNotBlank()&&formula.isNotBlank(),onClick={
+                        val id=UUID.randomUUID().toString()
+                        val lines=examples.split("\n").map{it.trim()}.filter{it.isNotBlank()}
+                        val data=JSONObject().put("label",title.trim()).put("how",usage.trim()).put("formula",formula.trim()).put("examples",org.json.JSONArray(lines))
+                        scope.launch(Dispatchers.IO) {
+                            val saved=repo.saveCentralContent("grammar",id,data)
+                            val fresh=repo.bootstrap()
+                            withContext(Dispatchers.Main) {
+                                if(saved?.optBoolean("ok")==true) {
+                                    if(fresh?.optBoolean("ok")==true)repo.syncCentralContent(fresh)
+                                    grammar=repo.loadCentralGrammar();title="";usage="";formula="";examples=""
+                                }
+                            }
+                        }
+                    },modifier=Modifier.fillMaxWidth()){Text("ذخیره گرامر")}
                 }
             }
         }
