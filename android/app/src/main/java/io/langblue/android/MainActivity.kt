@@ -36,7 +36,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 data class GrammarItem(val id:String,val title:String,val use:String,val formula:String,val examples:List<String>)
-data class VocabularyItem(val id:String,val word:String,val meaning:String,val example:String)
+data class VocabularyItem(val id:String,val word:String,val meaning:String,val partOfSpeech:String,val example:String)
 data class ReviewState(var score:Int=0,var streak:Int=0,var reps:Int=0,var lapses:Int=0,var correct:Int=0,var wrong:Int=0,var total:Int=0,var interval:Double=0.0,var next:Long=0,var ease:Double=2.3)
 
 object Content {
