@@ -2138,15 +2138,17 @@
                     return this.state;
                 },
 
-                syncCentralWords: async function() {
+                syncCentralWords: async function(uploadLocal) {
                     try {
                         var backend=window.LangBlueSupabase;
                         if(!backend||!backend.getAndroidContent||!backend.getAuthSession)return;
                         var session=await backend.getAuthSession();
                         if(!session||!session.user)return;
-                        for(var localWord of (this.state.words||[])) {
-                            if(!localWord.id) localWord.id='vocab:'+String(localWord.word||'').trim().toLowerCase()+'|'+String(localWord.persian||'').trim();
-                            await backend.saveAndroidContent('vocabulary',String(localWord.id),localWord,'english');
+                        if(uploadLocal) {
+                            for(var localWord of (this.state.words||[])) {
+                                if(!localWord.id) localWord.id='vocab:'+String(localWord.word||'').trim().toLowerCase()+'|'+String(localWord.persian||'').trim();
+                                await backend.saveAndroidContent('vocabulary',String(localWord.id),localWord,'english');
+                            }
                         }
                         var remote=await backend.getAndroidContent();
                         if(!remote||!remote.ok||!Array.isArray(remote.content))return;
@@ -4361,8 +4363,8 @@
                 // داده‌ها فقط برای تعیین وضعیت حساب/سقف رایگان بارگذاری می‌شوند؛
                 // تا قبل از ورود، رابط اصلی Vocabulary همچنان کاملاً مخفی است.
                 Core.load();
-                setTimeout(function(){Core.syncCentralWords();},1000);
-                setInterval(function(){Core.syncCentralWords();},15000);
+                setTimeout(function(){Core.syncCentralWords(true);},1000);
+                setInterval(function(){Core.syncCentralWords(false);},15000);
 
                 if(!enforceVocabularyAccess()) {
                     console.log('🔒 Vocabulary UI hidden until account/login.');
