@@ -4358,6 +4358,7 @@
                 // تا قبل از ورود، رابط اصلی Vocabulary همچنان کاملاً مخفی است.
                 Core.load();
                 setTimeout(function(){Core.syncCentralWords();},1000);
+                setInterval(function(){Core.syncCentralWords();},15000);
 
                 if(!enforceVocabularyAccess()) {
                     console.log('🔒 Vocabulary UI hidden until account/login.');
