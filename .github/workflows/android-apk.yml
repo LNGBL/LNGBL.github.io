@@ -7,7 +7,7 @@ on:
       - "android/**"
       - ".github/workflows/android-apk.yml"
 permissions:
-  contents: read
+  contents: write
 jobs:
   build-debug:
     runs-on: ubuntu-latest
@@ -37,3 +37,14 @@ jobs:
           path: dist/LangBlue-Android-1.0.5-debug.apk
           if-no-files-found: error
           retention-days: 14
+      - name: Publish direct-download debug APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view android-debug >/dev/null 2>&1; then
+            gh release create android-debug \
+              --title "LangBlue Android Debug 1.0.5" \
+              --notes "Latest publicly downloadable LangBlue Android debug APK. For testing only; not a production-signed release." \
+              --prerelease
+          fi
+          gh release upload android-debug dist/LangBlue-Android-1.0.5-debug.apk --clobber
