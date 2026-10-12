@@ -1,37 +1,19 @@
-# LangBlue Android signed release setup
+# LangBlue Android — Debug build
 
-The release workflow intentionally does not publish a debug APK. Before running it, configure a persistent Android signing key in GitHub Actions secrets.
+The project is currently configured for **debug/testing builds only**. No Android release keystore and no GitHub signing secrets are needed for this workflow.
 
-## 1. Generate the signing key locally
+## Build a debug APK
 
-Run this on a trusted computer and keep the keystore in a safe backup. Never commit the keystore or publish it.
+1. Open [GitHub Actions](https://github.com/LNGBL/LNGBL.github.io/actions/workflows/android-apk.yml).
+2. Choose **Build LangBlue Android Debug APK**.
+3. Select **Run workflow** (or wait for a build triggered by an Android code change on `main`).
+4. Open the completed workflow run and download the artifact named `LangBlue-Android-1.0.5-debug`.
 
-```bash
-keytool -genkeypair -v -keystore langblue-release.jks -alias langblue-release -keyalg RSA -keysize 2048 -validity 10000
-```
+The APK is signed with the standard Gradle debug key, is intended for testing, and is not a production release. GitHub Actions keeps the artifact for 14 days.
 
-Use a strong keystore password and remember the key password and alias. Losing the key can prevent future APK updates from installing over the existing signed app.
+## Important
 
-## 2. Add GitHub repository secrets
-
-Open the repository settings:
-Settings → Secrets and variables → Actions → New repository secret.
-
-Add these four secrets:
-
-- `LANGBLUE_KEYSTORE_BASE64`: the Base64 text of `langblue-release.jks`. On macOS/Linux, print it with `base64 < langblue-release.jks | tr -d '\\n'` and paste the output into GitHub; do not commit it.
-- `LANGBLUE_KEYSTORE_PASSWORD`: the keystore password.
-- `LANGBLUE_KEY_ALIAS`: `langblue-release` (or the alias chosen during key generation).
-- `LANGBLUE_KEY_PASSWORD`: the key password.
-
-## 3. Publish
-
-Open Actions → Build Signed LangBlue Android Release → Run workflow. The workflow builds `assembleRelease`, verifies the APK signature, and publishes `LangBlue-Android-1.0.5.apk` to release tag `android-v1.0.5`.
-
-The public download page intentionally no longer links to the old debug APK. Once the signed release exists, update its link to the release asset.
-
-## Security notes
-
-- Keep the keystore and all passwords private and backed up.
-- Do not rotate the signing key casually; app updates must use the same signing identity.
-- The release workflow is manual-only until signing secrets are configured, so a push cannot accidentally publish a debug build.
+- Do not add release keystore secrets while the project remains in debug mode.
+- Debug APKs are not suitable for public production distribution.
+- If a previously installed app was signed with a different key, Android may refuse to install this debug build as an update. For testing, uninstalling the old app may be necessary; this removes its local app data.
+- This guide replaces the previous release-signing instructions while LangBlue remains in debug mode.
