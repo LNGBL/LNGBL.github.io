@@ -229,7 +229,53 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
   
 .lb-leaderboard-section{padding:72px 0}.lb-leaderboard-card{max-width:1000px;margin:28px auto 0;padding:24px;background:var(--glass);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.lb-leaderboard-table-wrap{overflow:auto}.lb-leaderboard-table{width:100%;border-collapse:collapse;min-width:680px}.lb-leaderboard-table th,.lb-leaderboard-table td{padding:13px 12px;text-align:right;border-bottom:1px solid var(--line)}.lb-leaderboard-table th{color:#9de3ff;font-size:12px}.lb-leaderboard-table td{color:#e9f7fb;font-size:13px}.lb-leaderboard-table td small{display:block;color:var(--muted);font-size:10px;direction:ltr;text-align:right;margin-top:2px}.lb-leaderboard-table tbody tr:first-child td{background:rgba(69,183,200,.07)}.lb-leaderboard-loading,.lb-leaderboard-empty{text-align:center;color:var(--muted);padding:30px 12px}.lb-leaderboard-note{text-align:center;color:var(--muted);font-size:11px;margin-top:14px}
 .lb-public-stats{padding:28px 0 52px}.lb-public-stats-card{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:980px;margin:0 auto;padding:18px;background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.lb-stat{text-align:center;padding:16px;border-radius:15px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025)}.lb-stat-number{font-size:clamp(28px,5vw,46px);font-weight:900;letter-spacing:-1px;color:#fff;font-variant-numeric:tabular-nums}.lb-stat-label{margin-top:3px;color:var(--muted);font-size:12px}.lb-stat-note{margin-top:14px;text-align:center;color:#8faab2;font-size:11px}@media(max-width:650px){.lb-public-stats-card{grid-template-columns:1fr}}
-    .android-download-mini{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.06);text-decoration:none;color:#e9f8ff;font-size:12px;font-weight:750;transition:.2s;white-space:nowrap}.android-download-mini:hover{transform:translateY(-1px);background:rgba(34,158,217,.13);border-color:rgba(91,192,255,.35)}.android-download-mini img{width:22px;height:22px;border-radius:50%;display:block;box-shadow:0 0 12px rgba(91,192,255,.35)}@media(max-width:600px){.android-download-mini span{display:none}.android-download-mini{padding:5px}.android-download-mini img{width:24px;height:24px}}\n</style>
+    .android-download-mini{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.06);text-decoration:none;color:#e9f8ff;font-size:12px;font-weight:750;transition:.2s;white-space:nowrap}.android-download-mini:hover{transform:translateY(-1px);background:rgba(34,158,217,.13);border-color:rgba(91,192,255,.35)}.android-download-mini img{width:22px;height:22px;border-radius:50%;display:block;box-shadow:0 0 12px rgba(91,192,255,.35)}@media(max-width:600px){.android-download-mini span{display:none}.android-download-mini{padding:5px}.android-download-mini img{width:24px;height:24px}}\n
+/* Libertarian gold / obsidian landing refresh */
+:root{
+ --blue:#D4AF37;--blue2:#B88918;--blue3:#F5A623;--deep:#050505;
+ --cream:#F5C451;--text:#F8F4E8;--muted:#B9B2A1;--line:rgba(232,190,69,.22);
+ --glass:rgba(12,11,8,.72);--shadow:0 24px 90px rgba(0,0,0,.52);
+}
+body{
+ background:radial-gradient(ellipse at 50% 15%,rgba(212,175,55,.13),transparent 38%),
+ radial-gradient(ellipse at 8% 80%,rgba(245,166,35,.07),transparent 34%),
+ linear-gradient(145deg,#030303 0%,#100e09 52%,#050505 100%);
+}
+body:before{background:radial-gradient(circle,rgba(212,175,55,.07),transparent 60%);opacity:.42}
+#lb-neural-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.92}
+body>header,body>main,body>footer{position:relative;z-index:1}
+header{background:rgba(5,5,4,.68);border-bottom-color:rgba(212,175,55,.22)}
+.brand-mark{background:linear-gradient(135deg,#F8D878,#B88918);color:#080704;box-shadow:0 0 24px rgba(212,175,55,.38)}
+.brand-sub{color:#D6CBAE}
+.nav-link{border-color:rgba(212,175,55,.24);color:#F0E4C1}
+.nav-link:hover{background:rgba(212,175,55,.1)}
+.hero{padding-top:86px}
+.hero:after{border-color:rgba(212,175,55,.16);box-shadow:0 0 100px rgba(212,175,55,.09)}
+.eyebrow{border-color:rgba(212,175,55,.36);color:#F5DE9B;background:rgba(212,175,55,.07)}
+.eyebrow-cloud span,.eyebrow-cloud:after{background:#D4AF37}
+.hero h1 strong{color:#F5C451;text-shadow:0 0 32px rgba(245,196,81,.2)}
+.hero-lead{color:#C5BDA9}
+.btn-primary{background:linear-gradient(135deg,#F3D16F,#C99A23 65%,#A87312);color:#090806;border-color:rgba(255,224,130,.65);box-shadow:0 10px 36px rgba(212,175,55,.2)}
+.btn-secondary{border-color:rgba(212,175,55,.25);color:#F4E8C7;background:rgba(212,175,55,.045)}
+.btn-secondary:hover{background:rgba(212,175,55,.11)}
+.occasion{border-color:rgba(212,175,55,.24);background:rgba(8,7,5,.72)}
+.occasion:before{background:rgba(212,175,55,.055)}
+.occasion-title{color:#F5C451}
+.occasion-note{color:#C7BFAE}
+.occasion-discount{background:rgba(212,175,55,.12);border-color:rgba(212,175,55,.28);color:#F5C451}
+.card,.step,.about-box,.product-card{background:rgba(12,11,8,.76);border-color:rgba(212,175,55,.17)}
+.card:hover,.product-card:hover{border-color:rgba(245,196,81,.5)}
+.card h3{color:#F0C85B}
+.product-card h3{color:#FFF8E6}
+.product-badge{background:rgba(212,175,55,.1);border-color:rgba(212,175,55,.25);color:#F5D878}
+.step-number{background:rgba(212,175,55,.13);color:#F5D878}
+.cta{border-color:rgba(212,175,55,.3);background:linear-gradient(135deg,rgba(212,175,55,.1),rgba(245,166,35,.035))}
+footer{border-color:rgba(212,175,55,.18)}
+.logo-letter{color:#F5C451;text-shadow:0 0 18px rgba(212,175,55,.18)}
+@media(max-width:600px){.hero{padding-top:58px}}
+@media(prefers-reduced-motion:reduce){#lb-neural-canvas{display:none}}
+
+</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/supabase-client.js?v=20261006-connection"></script>
 <script src="assets/js/langblue-backend.js"></script>
@@ -243,6 +289,8 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 </head>
 
 <body>
+<canvas id="lb-neural-canvas" aria-hidden="true"></canvas>
+
   <header>
     <div class="wrap nav">
       <a class="brand" href="/" aria-label="LangBlue Language Grammar Platform">
@@ -771,5 +819,54 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
 <script>
     if (window.lucide) lucide.createIcons();
   </script>
+
+<script>
+/* Lightweight interactive neural starfield; no external dependencies. */
+(function(){
+  const canvas=document.getElementById('lb-neural-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d',{alpha:true});
+  if(!ctx)return;
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let w=0,h=0,dpr=1,points=[],raf=0,pointer={x:-9999,y:-9999,active:false};
+  const GOLD='212,175,55', ORANGE='245,166,35';
+  function resize(){
+    dpr=Math.min(window.devicePixelRatio||1,1.7);w=innerWidth;h=innerHeight;
+    canvas.width=Math.floor(w*dpr);canvas.height=Math.floor(h*dpr);
+    canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0);
+    const count=Math.max(32,Math.min(100,Math.floor(w*h/14500)));
+    points=Array.from({length:count},()=>({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.18,vy:(Math.random()-.5)*.18,r:Math.random()*1.45+.45,phase:Math.random()*Math.PI*2}));
+    draw();
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    for(let i=0;i<points.length;i++){
+      const p=points[i];
+      if(!reduce){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;}
+      const dx=p.x-pointer.x,dy=p.y-pointer.y,dist=Math.hypot(dx,dy);
+      if(pointer.active&&dist<190&&!reduce){
+        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(pointer.x,pointer.y);
+        ctx.strokeStyle='rgba('+ORANGE+','+(1-dist/190)*.28+')';ctx.lineWidth=.7;ctx.stroke();
+      }
+      for(let j=i+1;j<points.length;j++){
+        const q=points[j],dd=Math.hypot(p.x-q.x,p.y-q.y);
+        if(dd<112){
+          ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
+          ctx.strokeStyle='rgba('+GOLD+','+(1-dd/112)*.13+')';ctx.lineWidth=.55;ctx.stroke();
+        }
+      }
+      const glow=pointer.active&&dist<150?.9:.42+Math.sin(p.phase+(performance.now()*.0004))*.12;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r+(pointer.active&&dist<150?1:0),0,Math.PI*2);
+      ctx.fillStyle='rgba('+((pointer.active&&dist<150)?ORANGE:GOLD)+','+glow+')';ctx.fill();
+    }
+    if(!reduce)raf=requestAnimationFrame(draw);
+  }
+  window.addEventListener('pointermove',e=>{pointer.x=e.clientX;pointer.y=e.clientY;pointer.active=true;if(reduce)draw();},{passive:true});
+  window.addEventListener('pointerleave',()=>{pointer.active=false;},{passive:true});
+  window.addEventListener('resize',resize,{passive:true});
+  if(!reduce)resize();else{resize();cancelAnimationFrame(raf);}
+})();
+</script>
+
 </body>
 </html>
