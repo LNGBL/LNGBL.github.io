@@ -70,7 +70,6 @@ async function enforceConnectionPolicy(){
     return true;
   }catch(e){return true;}
 }
-
 function productIdForPage(){
   const p=location.pathname.toLowerCase();
   if(p.indexOf('langblue-grammer')!==-1)return 'grammar';
@@ -104,7 +103,7 @@ function enforceProductAccess(){
   return false;
 }
 async function init(){
-  if(window.LangBlueMaintenance&&window.LangBlueMaintenance.active())return;
+  // Server Rest is not a client-side gate; server-side policy remains authoritative.
   await refreshSubscription();
   if(!(await enforceConnectionPolicy()))return;
   patchGrammar();patchGerman();patchVocab();enforceProductAccess();
