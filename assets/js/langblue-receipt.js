@@ -39,7 +39,7 @@
     try{
       var result=await client.functions.invoke('langblue-community-access',{body:{action:'status'}});
       var request=result&&result.data&&result.data.request;
-      if(!result.error&&request&&request.status==='approved'){
+      if(!result.error&&request&&request.status==='approved'&&request.discount_active===true){
         var originalSubtotal=order.subtotal;
         order.originalSubtotal=originalSubtotal;
         order.plan=Object.assign({},order.plan);
