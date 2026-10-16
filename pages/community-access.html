@@ -1,59 +1,45 @@
 <!doctype html>
 <html lang="fa" dir="rtl"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>دسترسی منصفانه | LangBlue</title>
-<meta name="description" content="درخواست تخفیف دسترسی اجتماعی LangBlue">
+<title>دسترسی منصفانه به یادگیری | LangBlue</title>
+<meta name="description" content="درخواست داوطلبانه تخفیف اجتماعی LangBlue برای سنین ۱۰ تا ۶۹ سال">
 <link rel="stylesheet" href="../assets/css/langblue-theme.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="../assets/js/supabase-client.js"></script>
 <script type="module">
 import React,{useEffect,useState}from"https://esm.sh/react@18.3.1";
 import{createRoot}from"https://esm.sh/react-dom@18.3.1/client";
-const h=React.createElement,fn="langblue-community-access";
+const h=React.createElement;
 function App(){
- const [session,S]=useState(null),[loading,L]=useState(true),[note,N]=useState(""),[status,T]=useState(null),[message,M]=useState(""),[busy,B]=useState(false),[admin,A]=useState(new URLSearchParams(location.search).get("admin")==="1"),[secret,K]=useState(""),[queue,Q]=useState([]),[notes,NS]=useState({}),[rose,R]=useState(false);
+ const [session,S]=useState(null),[loading,L]=useState(true),[age,A]=useState(""),[note,N]=useState(""),[status,T]=useState(null),[message,M]=useState(""),[busy,B]=useState(false);
  const client=window.LangBlueSupabase?.getClient?.();
  useEffect(()=>{document.body.classList.add("lb-social");if(!client){M("اتصال حساب آماده نیست؛ صفحه را از وب‌سایت LangBlue باز کنید.");L(false);return}client.auth.getSession().then(({data})=>{S(data.session);L(false)});const{data:{subscription}}=client.auth.onAuthStateChange((_e,s)=>S(s));return()=>subscription.unsubscribe()},[]);
- async function invoke(payload,adminMode=false){if(!client)throw Error("اتصال Supabase آماده نیست");const{data:{session:s}}=await client.auth.getSession();if(!s?.access_token)throw Error("ابتدا وارد حساب LangBlue شوید.");const headers={Authorization:"Bearer "+s.access_token,apikey:"sb_publishable_Ciwi3i81I-1_h-rtFF5Djw_ZPthKnRg","Content-Type":"application/json"};if(adminMode)headers["x-langblue-admin-secret"]=secret;const r=await fetch("https://ocxeyponzzcvlrvwndji.supabase.co/functions/v1/"+fn,{method:"POST",headers,body:JSON.stringify(payload)});const d=await r.json();if(!r.ok||!d.ok)throw Error(({ADMIN_UNAUTHORIZED:"رمز مدیر نادرست است یا راز مدیر در Supabase تنظیم نشده است.",AUTH_REQUIRED:"ابتدا وارد حساب LangBlue شوید.",REQUEST_ALREADY_REVIEWED:"این درخواست قبلاً بررسی شده است."})[d.error]||d.error||"خطا در ارتباط با سرور");return d}
- async function refresh(){try{const d=await invoke({action:"status"});T(d.request);if(d.request?.status==="approved"){const w=await invoke({action:"welcome"});if(w.showRoses)R(true)}}catch(e){M(e.message)}}
+ async function invoke(payload){if(!client)throw Error("اتصال حساب آماده نیست");const{data,error}=await client.functions.invoke("langblue-community-access",{body:payload});if(error||!data?.ok)throw Error(({AUTH_REQUIRED:"ابتدا وارد حساب LangBlue شوید.",AGE_NOT_ELIGIBLE:"این برنامه فقط برای سنین ۱۰ تا ۶۹ سال است."})[data?.error]||data?.error||error?.message||"خطا در ارتباط با سرور");return data}
+ async function refresh(){try{const d=await invoke({action:"status"});T(d.request)}catch(e){M(e.message)}}
  useEffect(()=>{if(session)refresh()},[session]);
- async function submit(e){e.preventDefault();const website=String(e.currentTarget.elements.website?.value||"");B(true);M("");try{await invoke({action:"submit",note,website});await refresh();M("درخواست ثبت شد؛ نتیجه پس از بررسی مدیر نمایش داده می‌شود.")}catch(e){M(e.message)}finally{B(false)}}
- async function loadQueue(){B(true);M("");try{const d=await invoke({action:"admin_list"},true);Q(d.requests||[])}catch(e){M(e.message)}finally{B(false)}}
- async function decide(id,decision){B(true);try{await invoke({action:"admin_decide",requestId:id,decision,adminNote:notes[id]||""},true);await loadQueue()}catch(e){M(e.message)}finally{B(false)}}
- async function closeRoses(){try{await invoke({action:"welcome_seen"})}catch(e){}R(false)}
- const reqStatus=status?({pending:"در انتظار بررسی مدیر",approved:"تأیید شده — درخواست تخفیف ثبت شده",rejected:"درخواست قبلی رد شده؛ در صورت تمایل می‌توانید دوباره درخواست دهید"}[status.status]||status.status):"هنوز درخواستی ثبت نشده است.";
+ async function submit(e){e.preventDefault();const website=String(e.currentTarget.elements.website?.value||"");B(true);M("");try{await invoke({action:"submit",age:Number(age),note,website});await refresh();M("درخواست ثبت شد؛ نتیجه پس از بررسی مدیر نمایش داده می‌شود.")}catch(e){M(e.message)}finally{B(false)}}
+ const expiry=status?.discount_expires_at?new Date(status.discount_expires_at).toLocaleDateString("fa-IR"):"";
+ const statusText=!status?"هنوز درخواستی ثبت نشده است.":status.status==="pending"?"درخواست در انتظار بررسی است.":status.discount_active?"تخفیف فعال است و تا "+expiry+" اعتبار دارد.":status.status==="approved"?"اعتبار تخفیف پایان یافته است؛ برای تمدید دوباره درخواست بدهید.":"درخواست قبلی رد شده است؛ می‌توانید دوباره درخواست دهید.";
  return h("main",{className:"lb-wrap"},
   h("div",{className:"lb-brand"},"🌿 LangBlue · دسترسی منصفانه"),
   h("section",{className:"lb-card"},
-   h("div",{className:"lb-meta"},"عدالت اجتماعی · فرصت منصفانه · مالکیت مسئولانه"),
-   h("h1",null,admin?"پنل بررسی درخواست‌ها":"درخواست تخفیف دسترسی"),
-   h("p",null,admin?"درخواست‌ها را بررسی کن و تصمیم را همراه با یادداشت کوتاه ثبت کن.":"کاربرانی که خود را واجد شرایط می‌دانند می‌توانند برای تخفیف ۱۰٪ اشتراک درخواست بدهند. این فرایند داوطلبانه است و نیازی به ارسال تصویر، فیلم یا اطلاعات زیستی ندارد."),
-   loading?h("div",{className:"lb-status"},"در حال بررسی حساب…"):!session?h("div",{className:"lb-status error"},"برای استفاده از این بخش ابتدا وارد حساب LangBlue شوید و سپس صفحه را دوباره باز کنید."):
-   admin?h(React.Fragment,null,
-    h("label",null,"رمز مدیر (فقط در همین نشست)"),
-    h("input",{type:"password",autoComplete:"current-password",value:secret,onChange:e=>K(e.target.value),placeholder:"رمز محرمانه مدیر"}),
-    h("div",{className:"lb-row",style:{marginTop:12}},h("button",{onClick:loadQueue,disabled:busy||!secret},"بارگذاری درخواست‌ها"),h("button",{className:"secondary",onClick:()=>{A(false);history.replaceState(null,"",location.pathname)}},"نمای کاربر")),
-    queue.map(q=>h("article",{className:"lb-request",key:q.id},
-      h("h2",null,(q.profile?.name||"کاربر")+" · @"+(q.profile?.username||"نامشخص")),
-      h("div",{className:"lb-meta"},"شناسه: "+q.user_id+" · وضعیت: "+q.status+" · "+new Date(q.created_at).toLocaleString("fa-IR")),
-      h("p",null,q.user_note||"بدون پیام"),
-      q.status==="pending"?h(React.Fragment,null,h("label",null,"یادداشت مدیر (اختیاری)"),h("textarea",{value:notes[q.id]||"",onChange:e=>NS({...notes,[q.id]:e.target.value}),placeholder:"دلیل تصمیم یا یادداشت مدیریتی"}),
-       h("div",{className:"lb-row",style:{marginTop:10}},h("button",{disabled:busy,onClick:()=>decide(q.id,"approved")},"تأیید تخفیف ۱۰٪"),h("button",{className:"danger",disabled:busy,onClick:()=>decide(q.id,"rejected")},"رد درخواست"))):null
-    ))
-   ):h(React.Fragment,null,
-    h("div",{className:"lb-status"},reqStatus),
-    (!status||status.status==="rejected")?h("form",{onSubmit:submit},
-      h("label",null,"پیام اختیاری برای مدیر"),
-      h("textarea",{value:note,onChange:e=>N(e.target.value),maxLength:500,placeholder:"اگر نکته‌ای برای بررسی دارید، اینجا بنویسید."}),
+   h("div",{className:"lb-meta"},"عدالت اجتماعی · فرصت برابر · احترام به کرامت انسانی"),
+   h("h1",null,"دسترسی منصفانه به یادگیری"),
+   h("p",null,"هر کاربر ۱۰ تا ۶۹ سال می‌تواند داوطلبانه درخواست تخفیف اجتماعی کند. معیار اقتصادی برای همه یکسان است؛ نیازی به مدرک درآمد، عکس، فیلم یا اطلاعات زیستی نیست. در صورت تأیید، تخفیف اجتماعی ۱۰٪ به مدت شش ماه فعال می‌شود. برای بستهٔ واجد شرایطِ همهٔ پنج محصول نیز تخفیف بستهٔ ۱۰٪ جداگانه قابل جمع است؛ دو تخفیف به‌صورت پیاپی محاسبه می‌شوند."),
+   loading?h("div",{className:"lb-status"},"در حال بررسی حساب…"):!session?h("div",{className:"lb-status error"},"برای ثبت یا مشاهدهٔ درخواست ابتدا وارد حساب مرکزی LangBlue شوید و سپس این صفحه را دوباره باز کنید."):h(React.Fragment,null,
+    h("div",{className:"lb-status",role:"status"},statusText),
+    (!status||status.status==="rejected"||(!status.discount_active&&status.status==="approved"))?h("form",{onSubmit:submit},
+      h("label",null,"سن (سال؛ فقط برای بررسی شرط سنی)"),
+      h("input",{type:"number",min:10,max:69,step:1,required:true,value:age,onChange:e=>A(e.target.value),placeholder:"سن بین ۱۰ تا ۶۹"}),
+      h("label",null,"پیام اختیاری"),
+      h("textarea",{value:note,onChange:e=>N(e.target.value),maxLength:500,placeholder:"اگر نکته‌ای برای درخواست دارید، اینجا بنویسید."}),
       h("div",{className:"lb-hidden","aria-hidden":"true"},h("label",null,"وب‌سایت"),h("input",{name:"website",tabIndex:-1,autoComplete:"off"})),
-      h("p",{className:"lb-small"},"با ثبت درخواست، داوطلبانه برای برنامهٔ تخفیف اقدام می‌کنید. تصمیم بر اساس بررسی حساب و نشانه‌های سوءاستفاده انجام می‌شود؛ تشخیص خودکار جنسیت انجام نمی‌شود."),
-      h("button",{type:"submit",disabled:busy},busy?"در حال ثبت…":"ثبت درخواست تخفیف ۱۰٪")
+      h("p",{className:"lb-small"},"سن اعلام‌شده فقط برای بررسی شرط واجدشرایط بودن ذخیره می‌شود. وضعیت مالی خود را لازم نیست توضیح دهید."),
+      h("button",{type:"submit",disabled:busy||!age},busy?"در حال ثبت…":"ثبت درخواست تخفیف اجتماعی ۱۰٪")
     ):null,
-    h("div",{className:"lb-row",style:{marginTop:14}},h("button",{className:"secondary",onClick:refresh},"به‌روزرسانی وضعیت"),h("button",{className:"secondary",onClick:()=>{A(true);history.replaceState(null,"", "?admin=1")} },"پنل مدیر"))
+    h("div",{className:"lb-row",style:{marginTop:14}},h("button",{className:"secondary",onClick:refresh},"به‌روزرسانی وضعیت"),h("a",{className:"lb-button",href:"../index.html"},"بازگشت به LangBlue"))
    ),
    message?h("div",{className:"lb-status error",role:"status"},message):null
-  ),
-  h("p",{className:"lb-small",style:{textAlign:"center",marginTop:18}},"در این فرایند IP، تصویر، فیلم یا دادهٔ زیستی ذخیره نمی‌شود. · ",h("a",{href:"../index.html"},"بازگشت به LangBlue")),
-  rose?h("div",{className:"lb-rose-layer",role:"dialog","aria-modal":"true"},h("div",null,h("div",{className:"roses","aria-hidden":"true"},"🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹"),h("h2",null,"به LangBlue خوش آمدی!"),h("p",null,"مشارکت تو ارزشمند است؛ یادگیری باید برای همه دسترس‌پذیرتر باشد."),h("div",{className:"roses","aria-hidden":"true"},"🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹 🌹"),h("button",{onClick:closeRoses},"ادامه"))):null
+  )
  );
 }
 createRoot(document.getElementById("app")).render(h(App));
