@@ -40,8 +40,8 @@ Deno.serve(async req=>{
   const q=await db.from("community_discount_requests").select("id,user_id,status,declared_age,discount_expires_at,user_note,admin_note,created_at,reviewed_at").order("created_at",{ascending:false}).limit(100);
   if(q.error)return out({ok:false,error:"DATABASE_ERROR"},500);
   const ids=[...new Set((q.data||[]).map((x:any)=>x.user_id))];
-  const ps=ids.length?await db.from("profiles").select("id,username,name").in("id",ids):{data:[]};
-  const map=new Map((ps.data||[]).map((p:any)=>[p.id,p]));
+  const ps=ids.length?await db.from("profiles").select("user_id,username,name").in("user_id",ids):{data:[]};
+  const map=new Map((ps.data||[]).map((p:any)=>[p.user_id,p]));
   return out({ok:true,requests:(q.data||[]).map((x:any)=>({...x,profile:map.get(x.user_id)||null}))});
  }
  if(a==="admin_decide"){
