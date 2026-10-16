@@ -16,7 +16,7 @@ function App(){
  async function invoke(payload,adminMode=false){if(!client)throw Error("اتصال Supabase آماده نیست");const{data:{session:s}}=await client.auth.getSession();if(!s?.access_token)throw Error("ابتدا وارد حساب LangBlue شوید.");const headers={Authorization:"Bearer "+s.access_token,apikey:"sb_publishable_Ciwi3i81I-1_h-rtFF5Djw_ZPthKnRg","Content-Type":"application/json"};if(adminMode)headers["x-langblue-admin-secret"]=secret;const r=await fetch("https://ocxeyponzzcvlrvwndji.supabase.co/functions/v1/"+fn,{method:"POST",headers,body:JSON.stringify(payload)});const d=await r.json();if(!r.ok||!d.ok)throw Error(({ADMIN_UNAUTHORIZED:"رمز مدیر نادرست است یا راز مدیر در Supabase تنظیم نشده است.",AUTH_REQUIRED:"ابتدا وارد حساب LangBlue شوید.",REQUEST_ALREADY_REVIEWED:"این درخواست قبلاً بررسی شده است."})[d.error]||d.error||"خطا در ارتباط با سرور");return d}
  async function refresh(){try{const d=await invoke({action:"status"});T(d.request);if(d.request?.status==="approved"){const w=await invoke({action:"welcome"});if(w.showRoses)R(true)}}catch(e){M(e.message)}}
  useEffect(()=>{if(session)refresh()},[session]);
- async function submit(e){e.preventDefault();B(true);M("");try{await invoke({action:"submit",note,website:""});await refresh();M("درخواست ثبت شد؛ نتیجه پس از بررسی مدیر نمایش داده می‌شود.")}catch(e){M(e.message)}finally{B(false)}}
+ async function submit(e){e.preventDefault();const website=String(e.currentTarget.elements.website?.value||"");B(true);M("");try{await invoke({action:"submit",note,website});await refresh();M("درخواست ثبت شد؛ نتیجه پس از بررسی مدیر نمایش داده می‌شود.")}catch(e){M(e.message)}finally{B(false)}}
  async function loadQueue(){B(true);M("");try{const d=await invoke({action:"admin_list"},true);Q(d.requests||[])}catch(e){M(e.message)}finally{B(false)}}
  async function decide(id,decision){B(true);try{await invoke({action:"admin_decide",requestId:id,decision,adminNote:notes[id]||""},true);await loadQueue()}catch(e){M(e.message)}finally{B(false)}}
  async function closeRoses(){try{await invoke({action:"welcome_seen"})}catch(e){}R(false)}
@@ -44,7 +44,7 @@ function App(){
     (!status||status.status==="rejected")?h("form",{onSubmit:submit},
       h("label",null,"پیام اختیاری برای مدیر"),
       h("textarea",{value:note,onChange:e=>N(e.target.value),maxLength:500,placeholder:"اگر نکته‌ای برای بررسی دارید، اینجا بنویسید."}),
-      h("div",{className:"lb-hidden","aria-hidden":"true"},h("label",null,"وب‌سایت"),h("input",{tabIndex:-1,autoComplete:"off"})),
+      h("div",{className:"lb-hidden","aria-hidden":"true"},h("label",null,"وب‌سایت"),h("input",{name:"website",tabIndex:-1,autoComplete:"off"})),
       h("p",{className:"lb-small"},"با ثبت درخواست، داوطلبانه برای برنامهٔ تخفیف اقدام می‌کنید. تصمیم بر اساس بررسی حساب و نشانه‌های سوءاستفاده انجام می‌شود؛ تشخیص خودکار جنسیت انجام نمی‌شود."),
       h("button",{type:"submit",disabled:busy},busy?"در حال ثبت…":"ثبت درخواست تخفیف ۱۰٪")
     ):null,
