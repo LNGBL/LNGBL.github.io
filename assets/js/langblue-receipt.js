@@ -41,6 +41,7 @@
       var request=result&&result.data&&result.data.request;
       if(!result.error&&request&&request.status==='approved'){
         var originalSubtotal=order.subtotal;
+        order.originalSubtotal=originalSubtotal;
         order.plan=Object.assign({},order.plan);
         order.plan.finalPrice=Math.round(Number(order.plan.finalPrice)*0.9);
         order.plan.finalPriceStr=formatPrice(order.plan.finalPrice);
@@ -66,7 +67,7 @@
     box.innerHTML=
       '<div class="receipt-summary-row"><span>محصولات</span><strong>'+escapeHtml(order.products.map(function(p){return p.label;}).join('، '))+'</strong></div>'+
       '<div class="receipt-summary-row"><span>مدت</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
-      '<div class="receipt-summary-row"><span>جمع اولیه</span><strong>'+formatPrice(order.subtotal)+'</strong></div>'+
+      '<div class="receipt-summary-row"><span>جمع اولیه</span><strong>'+formatPrice(order.communityDiscount?order.originalSubtotal:order.subtotal)+'</strong></div>'+
       (order.communityDiscount ? '<div class="receipt-summary-row"><span>تخفیف اجتماعی</span><strong>'+order.communityDiscount+'٪ (−'+formatPrice(order.communityDiscountAmount)+')</strong></div>' : '')+
       (discount ? '<div class="receipt-summary-row"><span>تخفیف بسته</span><strong>'+discount+'٪</strong></div>' : '')+
       '<div class="receipt-summary-row receipt-summary-total"><span>مبلغ فیش</span><strong>'+formatPrice(order.total)+'</strong></div>';
