@@ -10,8 +10,8 @@ irt_7d:{
 id:'irt_7d',
 days:7,
 label:'۷ روز',
-price:150999,
-priceStr:'150,999 T',
+price:70000,
+priceStr:'70,000 T',
 feature:'دسترسی کامل به ۵ محصول LangBlue'
 },
 
@@ -20,8 +20,8 @@ irt_14d:{
 id:'irt_14d',
 days:14,
 label:'۱۴ روز',
-price:313999,
-priceStr:'313,999 T',
+price:140000,
+priceStr:'140,000 T',
 feature:'دسترسی کامل به محصولات LangBlue'
 },
 
@@ -30,8 +30,8 @@ irt_21d:{
 id:'irt_21d',
 days:21,
 label:'۲۱ روز',
-price:506999,
-priceStr:'506,999 T',
+price:210000,
+priceStr:'210,000 T',
 feature:'دسترسی کامل به محصولات LangBlue'
 },
 
@@ -41,8 +41,8 @@ id:'irt_3m',
 months:3,
 days:90,
 label:'۳ ماه',
-price:784999,
-priceStr:'784,999 T',
+price:900000,
+priceStr:'900,000 T',
 feature:'دسترسی کامل ۵ محصول LangBlue بدون محدودیت'
 },
 
@@ -52,8 +52,8 @@ id:'irt_6m',
 months:6,
 days:180,
 label:'۶ ماه',
-price:880999,
-priceStr:'880,999 T',
+price:1800000,
+priceStr:'1,800,000 T',
 feature:'دسترسی کامل اکوسیستم ۵ محصولی LangBlue'
 },
 
@@ -63,8 +63,8 @@ id:'irt_12m',
 months:12,
 days:365,
 label:'۱۲ ماه',
-price:1000999,
-priceStr:'1,000,999 T',
+price:3650000,
+priceStr:'3,650,000 T',
 feature:'دسترسی کامل ۵ محصول + مدیریت داده + پرینت اطلاعات'
 }
 
