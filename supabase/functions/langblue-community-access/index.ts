@@ -18,7 +18,8 @@ Deno.serve(async req=>{
  if(a==="submit"){
   if(String(b.website||"").trim())return out({ok:false,error:"BOT_CHECK_FAILED"},400);
   const note=String(b.note||"").trim();if(note.length>500)return out({ok:false,error:"NOTE_TOO_LONG"},400);
-  const age=Number(b.age);if(!Number.isInteger(age)||age<10||age>69)return out({ok:false,error:"AGE_NOT_ELIGIBLE"},400);\n  const old=await db.from("community_discount_requests").select("id,status,discount_expires_at").eq("user_id",uid).maybeSingle();
+  const age=Number(b.age);if(!Number.isInteger(age)||age<10||age>69)return out({ok:false,error:"AGE_NOT_ELIGIBLE"},400);
+  const old=await db.from("community_discount_requests").select("id,status,discount_expires_at").eq("user_id",uid).maybeSingle();
   if(old.error)return out({ok:false,error:"DATABASE_ERROR"},500);
   if(old.data?.status==="pending"||(old.data?.status==="approved"&&old.data.discount_expires_at&&new Date(old.data.discount_expires_at).getTime()>Date.now()))return out({ok:true,status:old.data.status,discount_expires_at:old.data.discount_expires_at});
   const q=old.data?await db.from("community_discount_requests").update({status:"pending",self_declared:true,declared_age:age,user_note:note,admin_note:"",created_at:new Date().toISOString(),updated_at:new Date().toISOString(),reviewed_at:null,welcome_seen_at:null,discount_expires_at:null}).eq("id",old.data.id).select("id,status").single():await db.from("community_discount_requests").insert({user_id:uid,self_declared:true,declared_age:age,user_note:note}).select("id,status").single();
@@ -27,7 +28,8 @@ Deno.serve(async req=>{
  if(a==="status"||a==="welcome"){
   const q=await db.from("community_discount_requests").select("status,declared_age,discount_expires_at,created_at,reviewed_at,admin_note,welcome_seen_at").eq("user_id",uid).maybeSingle();
   if(q.error)return out({ok:false,error:"DATABASE_ERROR"},500);
-  const active=!!(q.data?.status==="approved"&&q.data.discount_expires_at&&new Date(q.data.discount_expires_at).getTime()>Date.now());\n  return out(a==="welcome"?{ok:true,showRoses:active&&!q.data.welcome_seen_at}:{ok:true,request:q.data?{...q.data,discount_active:active}:null});
+  const active=!!(q.data?.status==="approved"&&q.data.discount_expires_at&&new Date(q.data.discount_expires_at).getTime()>Date.now());
+  return out(a==="welcome"?{ok:true,showRoses:active&&!q.data.welcome_seen_at}:{ok:true,request:q.data?{...q.data,discount_active:active}:null});
  }
  if(a==="welcome_seen"){
   const q=await db.from("community_discount_requests").update({welcome_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq("user_id",uid).eq("status","approved").is("welcome_seen_at",null);
