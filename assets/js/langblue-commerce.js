@@ -296,7 +296,7 @@ var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic','langjp'];
 
 
 
-var ALL_PRODUCTS_12M_DISCOUNT=15;
+var ALL_PRODUCTS_12M_DISCOUNT=10;
 
 
 var ALL_PRODUCTS_12M_PLAN_ID='irt_12m';
