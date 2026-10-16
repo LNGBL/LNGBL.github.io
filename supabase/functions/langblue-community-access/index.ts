@@ -18,16 +18,16 @@ Deno.serve(async req=>{
  if(a==="submit"){
   if(String(b.website||"").trim())return out({ok:false,error:"BOT_CHECK_FAILED"},400);
   const note=String(b.note||"").trim();if(note.length>500)return out({ok:false,error:"NOTE_TOO_LONG"},400);
-  const old=await db.from("community_discount_requests").select("id,status").eq("user_id",uid).maybeSingle();
+  const age=Number(b.age);if(!Number.isInteger(age)||age<10||age>69)return out({ok:false,error:"AGE_NOT_ELIGIBLE"},400);\n  const old=await db.from("community_discount_requests").select("id,status,discount_expires_at").eq("user_id",uid).maybeSingle();
   if(old.error)return out({ok:false,error:"DATABASE_ERROR"},500);
-  if(old.data?.status==="approved"||old.data?.status==="pending")return out({ok:true,status:old.data.status});
-  const q=old.data?await db.from("community_discount_requests").update({status:"pending",self_declared:true,user_note:note,admin_note:"",created_at:new Date().toISOString(),updated_at:new Date().toISOString(),reviewed_at:null,welcome_seen_at:null}).eq("id",old.data.id).select("id,status").single():await db.from("community_discount_requests").insert({user_id:uid,self_declared:true,user_note:note}).select("id,status").single();
+  if(old.data?.status==="pending"||(old.data?.status==="approved"&&old.data.discount_expires_at&&new Date(old.data.discount_expires_at).getTime()>Date.now()))return out({ok:true,status:old.data.status,discount_expires_at:old.data.discount_expires_at});
+  const q=old.data?await db.from("community_discount_requests").update({status:"pending",self_declared:true,declared_age:age,user_note:note,admin_note:"",created_at:new Date().toISOString(),updated_at:new Date().toISOString(),reviewed_at:null,welcome_seen_at:null,discount_expires_at:null}).eq("id",old.data.id).select("id,status").single():await db.from("community_discount_requests").insert({user_id:uid,self_declared:true,declared_age:age,user_note:note}).select("id,status").single();
   return q.error?out({ok:false,error:"REQUEST_SAVE_FAILED"},500):out({ok:true,request:q.data});
  }
  if(a==="status"||a==="welcome"){
-  const q=await db.from("community_discount_requests").select("status,created_at,reviewed_at,admin_note,welcome_seen_at").eq("user_id",uid).maybeSingle();
+  const q=await db.from("community_discount_requests").select("status,declared_age,discount_expires_at,created_at,reviewed_at,admin_note,welcome_seen_at").eq("user_id",uid).maybeSingle();
   if(q.error)return out({ok:false,error:"DATABASE_ERROR"},500);
-  return out(a==="welcome"?{ok:true,showRoses:q.data?.status==="approved"&&!q.data.welcome_seen_at}:{ok:true,request:q.data||null});
+  const active=!!(q.data?.status==="approved"&&q.data.discount_expires_at&&new Date(q.data.discount_expires_at).getTime()>Date.now());\n  return out(a==="welcome"?{ok:true,showRoses:active&&!q.data.welcome_seen_at}:{ok:true,request:q.data?{...q.data,discount_active:active}:null});
  }
  if(a==="welcome_seen"){
   const q=await db.from("community_discount_requests").update({welcome_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq("user_id",uid).eq("status","approved").is("welcome_seen_at",null);
@@ -35,7 +35,7 @@ Deno.serve(async req=>{
  }
  if(a==="admin_list"){
   if(!isAdmin)return out({ok:false,error:"ADMIN_UNAUTHORIZED"},401);
-  const q=await db.from("community_discount_requests").select("id,user_id,status,user_note,admin_note,created_at,reviewed_at").order("created_at",{ascending:false}).limit(100);
+  const q=await db.from("community_discount_requests").select("id,user_id,status,declared_age,discount_expires_at,user_note,admin_note,created_at,reviewed_at").order("created_at",{ascending:false}).limit(100);
   if(q.error)return out({ok:false,error:"DATABASE_ERROR"},500);
   const ids=[...new Set((q.data||[]).map((x:any)=>x.user_id))];
   const ps=ids.length?await db.from("profiles").select("id,username,name").in("id",ids):{data:[]};
@@ -46,7 +46,7 @@ Deno.serve(async req=>{
   if(!isAdmin)return out({ok:false,error:"ADMIN_UNAUTHORIZED"},401);
   const id=String(b.requestId||""),decision=String(b.decision||""),note=String(b.adminNote||"").trim();
   if(!id||!["approved","rejected"].includes(decision)||note.length>1000)return out({ok:false,error:"INVALID_DECISION"},400);
-  const q=await db.from("community_discount_requests").update({status:decision,admin_note:note,reviewed_at:new Date().toISOString(),updated_at:new Date().toISOString(),welcome_seen_at:null}).eq("id",id).eq("status","pending").select("id").maybeSingle();
+  const q=await db.from("community_discount_requests").update({status:decision,admin_note:note,reviewed_at:new Date().toISOString(),updated_at:new Date().toISOString(),welcome_seen_at:null,discount_expires_at:decision==="approved"?(()=>{const d=new Date();d.setUTCMonth(d.getUTCMonth()+6);return d.toISOString()})():null}).eq("id",id).eq("status","pending").select("id").maybeSingle();
   if(q.error)return out({ok:false,error:"DECISION_SAVE_FAILED"},500);
   if(!q.data)return out({ok:false,error:"REQUEST_NOT_FOUND_OR_REVIEWED"},409);
   return out({ok:true,status:decision});
