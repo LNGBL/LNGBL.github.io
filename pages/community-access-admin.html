@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مدیریت دسترسی منصفانه | LangBlue</title>
+<link rel="stylesheet" href="../assets/css/langblue-theme.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="../assets/js/supabase-client.js"></script>
+<script type="module">
+import React,{useEffect,useState}from"https://esm.sh/react@18.3.1";import{createRoot}from"https://esm.sh/react-dom@18.3.1/client";
+const h=React.createElement;
+function App(){
+ const[session,S]=useState(null),[loading,L]=useState(true),[secret,K]=useState(""),[queue,Q]=useState([]),[notes,N]=useState({}),[message,M]=useState(""),[busy,B]=useState(false);
+ const client=window.LangBlueSupabase?.getClient?.();
+ useEffect(()=>{document.body.classList.add("lb-social");if(!client){M("اتصال حساب آماده نیست.");L(false);return}client.auth.getSession().then(({data})=>{S(data.session);L(false)});const{data:{subscription}}=client.auth.onAuthStateChange((_e,s)=>S(s));return()=>subscription.unsubscribe()},[]);
+ async function invoke(payload){const{data,error}=await client.functions.invoke("langblue-community-access",{body:payload,headers:{"x-langblue-admin-secret":secret}});if(error||!data?.ok)throw Error(data?.error==="ADMIN_UNAUTHORIZED"?"دسترسی مدیر تأیید نشد.":data?.error||error?.message||"خطای سرور");return data}
+ async function load(){B(true);M("");try{const d=await invoke({action:"admin_list"});Q(d.requests||[])}catch(e){M(e.message)}finally{B(false)}}
+ async function decide(q,decision){B(true);M("");try{await invoke({action:"admin_decide",requestId:q.id,decision,adminNote:notes[q.id]||""});await load()}catch(e){M(e.message)}finally{B(false)}}
+ return h("main",{className:"lb-wrap"},h("div",{className:"lb-brand"},"🌿 LangBlue · مدیریت دسترسی منصفانه"),h("section",{className:"lb-card"},h("h1",null,"پنل جداگانهٔ بررسی درخواست‌ها"),h("p",null,"این صفحه از فرم کاربران جداست. کلید مدیر فقط در همین نشست ارسال می‌شود و در فایل یا نشانی صفحه ذخیره نمی‌شود."),loading?h("div",{className:"lb-status"},"در حال بررسی حساب…"):!session?h("div",{className:"lb-status error"},"برای مدیریت درخواست‌ها ابتدا با حساب مدیر وارد LangBlue شوید."):h(React.Fragment,null,h("label",null,"راز مدیر (از متغیر محرمانهٔ Supabase)"),h("input",{type:"password",autoComplete:"current-password",value:secret,onChange:e=>K(e.target.value),placeholder:"راز مدیر"}),h("div",{className:"lb-row",style:{marginTop:12}},h("button",{disabled:busy||!secret,onClick:load},"بارگذاری درخواست‌ها"),h("a",{className:"lb-button",href:"community-access.html"},"صفحهٔ کاربران")),queue.map(q=>h("article",{className:"lb-request",key:q.id},h("h2",null,(q.profile?.name||"کاربر")+" · @"+(q.profile?.username||"نامشخص")),h("div",{className:"lb-meta"},"سن اعلام‌شده: "+(q.declared_age??"ثبت نشده")+" · وضعیت: "+q.status+" · "+new Date(q.created_at).toLocaleString("fa-IR")),h("p",null,q.user_note||"بدون پیام"),h("p",{className:"lb-small"},"پایان اعتبار: "+(q.discount_expires_at?new Date(q.discount_expires_at).toLocaleDateString("fa-IR"):"—")),q.status==="pending"?h(React.Fragment,null,h("label",null,"یادداشت مدیر (اختیاری)"),h("textarea",{value:notes[q.id]||"",onChange:e=>N({...notes,[q.id]:e.target.value}),maxLength:1000}),h("div",{className:"lb-row",style:{marginTop:10}},h("button",{disabled:busy,onClick:()=>decide(q,"approved")},"تأیید برای شش ماه"),h("button",{className:"danger",disabled:busy,onClick:()=>decide(q,"rejected")},"رد درخواست"))):null))),message?h("div",{className:"lb-status error",role:"status"},message):null),h("p",{className:"lb-small",style:{textAlign:"center",marginTop:18}},"این URL به‌تنهایی مجوز مدیریتی ایجاد نمی‌کند؛ مجوز باید توسط تابع سمت سرور تأیید شود."))}
+createRoot(document.getElementById("app")).render(h(App));
+</script></head><body class="lb-social"><div id="app"><main class="lb-wrap">در حال بارگذاری…</main></div></body></html>
