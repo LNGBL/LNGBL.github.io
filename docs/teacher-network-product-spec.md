@@ -70,16 +70,23 @@ Suggested tables:
 
 Use the existing central Supabase Auth identity. Keep all new exposed tables under RLS; use server-side validation for entitlements, milestones, ranks, and token events. Never trust editable user metadata or client-supplied token/count fields. Do not place activation/verification secrets in GitHub Pages JavaScript.
 
-## Navigation placement
-Add the teacher-introduction / teacher-directory section between “About LangBlue” and “Language Learning” on the landing page. Do not treat the teacher content-publishing subscription as a fee for being listed in this directory.
+## Cross-product policy and landing-page visibility
+- Treat the teacher network and referral offer as one platform-wide policy, not a separate benefit limited to a single learning module.
+- The landing page must name all five current focus areas: LangBlue Grammar, LangBlue Vocabulary, LangBlue Deutsch, LangBlue Japanese, and LangDesert Arabic.
+- Show a dedicated teacher-network section directly after the landing-page product grid so visitors can discover the policy from the main page.
+- Explain the free teacher profile/directory and learner connections, the 35-registration / rolling-three-week referral condition, the one-time 5% teacher publishing-subscription reward, and the potential 3% learner discount for eligible products.
+- Distinguish planned functionality from active functionality. Until the server-side referral, eligibility, and checkout rules are implemented and tested, the landing page must say the mechanism is being prepared and must not imply that discounts can already be redeemed.
+- Do not treat the teacher content-publishing subscription as a fee for being listed in the directory.
 
 ## Teacher referral offer
 - Each teacher may have a unique referral link.
 - Attribute a learner to a teacher when the learner completes registration through that teacher’s unique referral link; a click alone does not count.
 - If 35 unique eligible learners register through that link within a rolling three-week window, the teacher earns a 5% discount on their own teacher content-publishing subscription once per teacher (not repeatedly for every later group of 35).
-- Referred learners may receive a 3% discount on eligible LangBlue products. Each teacher can choose which of their own products are eligible for this offer; product eligibility must be explicit and checked server-side at checkout.
+- The offer is a shared platform policy across LangBlue Grammar, LangBlue Vocabulary, LangBlue Deutsch, LangBlue Japanese, and LangDesert Arabic; it is not five separate referral schemes.
+- Referred learners may receive a 3% discount on eligible LangBlue products. Each teacher can choose which of their own teacher-created products/content are eligible for this offer; do not automatically discount every product or subscription. Product eligibility must be explicit and checked server-side at checkout.
 - These referral discounts do not stack with the all-products discount or the 10% 12-month discount. The checkout must apply the non-stacking rule deterministically and show which discount was applied.
 - Count unique eligible registrations server-side; exclude repeated clicks, duplicate accounts, self-referrals, and unverified registrations. Record the referral window, attribution, eligibility, and discount redemption server-side. Do not grant rewards client-side.
+- Until implementation and server-side tests are complete, this offer is a published product plan only and must not be represented as redeemable.
 
 ## Humanity
 The verified-institutions directory is out of scope for now. Do not create or show a Humanity institutions section until the owner provides the institutions to list.
