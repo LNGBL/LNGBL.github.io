@@ -47,35 +47,36 @@ Teachers may select any supported contact methods, such as a work phone number, 
 ### Teacher ranking
 Use aggregate confirmed learner count, verified satisfaction, valid teaching hours and Blue Star status. Keep weights configurable, publish the ranking method, and avoid treating tiny review samples as reliable satisfaction rates. Teaching hours must represent valid educational activity, not simply a page left open.
 
-## Token / trust policy — partially clarified; no implementation yet
-- The stated base rule is 25 tokens per 50 unique confirmed learners.
-- The “half” is intended to represent trust between the teacher and the LangBlue platform; the trusted-teachers section is related to that trust concept, not a paid access tier.
-- The owner clarified that the 100-token threshold is tracked separately for each teacher, not across the entire trusted-teachers section.
-- The precise arithmetic for the “half” allocation associated with each 50-learner token milestone still needs to be written unambiguously before implementation, including whether fractional tokens are allowed.
-- The three-year condition and its start point also need a precise rule.
-- Do not mint, transfer, or spend tokens until the arithmetic, scope of the 100-token threshold, and three-year clock are explicitly resolved. Once defined, token events should be append-only and idempotent.
+## Token / trust policy — clarified; database rule created, full product integration pending
+- The earlier idea of splitting token rewards across three years is replaced by a single direct reward.
+- Each teacher is evaluated separately.
+- The eligibility timestamp is the teacher's central LangBlue account creation timestamp plus exactly three calendar years plus one second.
+- At and after that timestamp, the teacher must have an active teacher profile, a verified email, and an account that is not deleted or currently banned.
+- The reward is exactly 100 tokens, once per teacher. A unique ledger key prevents repeat awards.
+- The database ledger records the eligibility timestamp and grant timestamp. The reward is also reflected in the existing account_annual_rewards source used by leaderboard synchronization.
+- A scheduled database job currently checks once per minute. Eligibility begins at the exact timestamp above, but automatic posting can occur on the first job run after it (up to roughly one minute later); the authenticated claim function can also trigger the check.
+- No proportional or fractional “half” calculation is used for this three-year reward. Other token milestones, if desired, require their own explicit rule.
+- Token grant code exists in Supabase, but teacher onboarding/moderation and the complete teacher-facing UI are not yet finished; do not describe the full teacher system as launched.
 
-## Database and security design (proposed; not yet created)
-Suggested tables:
-- `teacher_profiles`: owner user ID, public profile fields, verification state.
-- `teacher_connections`: teacher ID, learner ID, status, consent timestamps; unique learner/teacher pair.
-- `teacher_content`: authored educational posts, moderation/publishing status.
-- `teacher_content_entitlements`: content-publishing plan, start/end timestamps, payment/admin verification state.
-- `teacher_class_offers`: individual/group pricing, currency, duration, format.
-- `teacher_contact_methods`: explicitly public contact type/value and visibility.
-- `teacher_activity`: validated teaching activity events.
-- `teacher_reviews`: learner feedback, with anti-abuse limits.
-- `teacher_milestones`: server-issued milestone badges.
-- `teacher_token_ledger`: append-only token events, only after the token policy is finalized.
+## Database and security design
+The first Supabase schema migration has created:
+- teacher_profiles: central account ID, profile fields, referral code, active/pending/suspended status and verification flag.
+- teacher_connections: teacher/learner pair, status and consent timestamps.
+- teacher_referrals: unique referred account attribution and eligibility.
+- teacher_content and teacher_content_entitlements: authored educational content and learner entitlements.
+- teacher_class_offers: class offers and explicit per-learner/whole-group pricing basis.
+- teacher_contact_methods: teacher-selected contact methods and public visibility.
+- teacher_activity, teacher_reviews, teacher_milestones, teacher_discount_rewards, and teacher_token_ledger.
+- RLS is enabled on every new teacher table. The initial policies restrict personal data and user writes; public directory delivery, moderation, paid publishing entitlement checks, full review/report handling, and checkout discount redemption still need server-side integration and tests.
 
-Use the existing central Supabase Auth identity. Keep all new exposed tables under RLS; use server-side validation for entitlements, milestones, ranks, and token events. Never trust editable user metadata or client-supplied token/count fields. Do not place activation/verification secrets in GitHub Pages JavaScript.
+Use the existing central Supabase Auth identity. Never trust editable user metadata or client-supplied token/count fields. Do not place activation/verification secrets in GitHub Pages JavaScript.
 
 ## Cross-product policy and landing-page visibility
 - Treat the teacher network and referral offer as one platform-wide policy, not a separate benefit limited to a single learning module.
 - The landing page must name all five current focus areas: LangBlue Grammar, LangBlue Vocabulary, LangBlue Deutsch, LangBlue Japanese, and LangDesert Arabic.
 - Show a dedicated teacher-network section directly after the landing-page product grid so visitors can discover the policy from the main page.
 - Explain the free teacher profile/directory and learner connections, the 35-registration / rolling-three-week referral condition, the one-time 5% teacher publishing-subscription reward, and the potential 3% learner discount for eligible products.
-- Distinguish planned functionality from active functionality. Until the server-side referral, eligibility, and checkout rules are implemented and tested, the landing page must say the mechanism is being prepared and must not imply that discounts can already be redeemed.
+- Distinguish planned functionality from active functionality. Until server-side referral, eligibility, and checkout rules are implemented and tested, the landing page must say the mechanism is being prepared and must not imply that discounts can already be redeemed.
 - Do not treat the teacher content-publishing subscription as a fee for being listed in the directory.
 
 ## Teacher referral offer
@@ -86,19 +87,18 @@ Use the existing central Supabase Auth identity. Keep all new exposed tables und
 - Referred learners may receive a 3% discount on eligible LangBlue products. Each teacher can choose which of their own teacher-created products/content are eligible for this offer; do not automatically discount every product or subscription. Product eligibility must be explicit and checked server-side at checkout.
 - These referral discounts do not stack with the all-products discount or the 10% 12-month discount. The checkout must apply the non-stacking rule deterministically and show which discount was applied.
 - Count unique eligible registrations server-side; exclude repeated clicks, duplicate accounts, self-referrals, and unverified registrations. Record the referral window, attribution, eligibility, and discount redemption server-side. Do not grant rewards client-side.
-- Until implementation and server-side tests are complete, this offer is a published product plan only and must not be represented as redeemable.
+- Database structures and the referral RPC have been created, but the complete signup-link attribution, product checkout validation, and redemption integration are not finished. Until those parts and tests are complete, this offer is a product plan only and must not be represented as redeemable.
 
 ## Humanity
 The verified-institutions directory is out of scope for now. Do not create or show a Humanity institutions section until the owner provides the institutions to list.
 
 ## Explicitly removed
-The social discount / “fair access to learning” program for ages 10–69 is discontinued. Do not reintroduce its page, welcome overlay, checkout discount, or promotional copy. Historical database records should be retained but not used for new discounts unless the owner later requests a data-retention action.
+The social discount / “fair access to learning” program for ages 10–69 is discontinued. Do not reintroduce its page, welcome overlay, checkout discount, or promotional copy. Historical database records should be retained but not used for new discounts unless the owner later requests a data-retention action. The legacy langblue-community-access Edge Function still exists and needs a caller audit before deprecation; its presence does not mean the old program should be promoted.
 
 ## Implementation order
-1. Complete audit of current GitHub pages, Supabase policies, subscriptions and payment-request flow.
-2. Review this specification and confirm the token split and publishing-subscription prices.
-3. Add schema via a reviewed migration; do not rewrite existing central-account tables unnecessarily.
-4. Implement server-validated connections, publishing entitlements, badges and metrics.
-5. Build teacher directory/profile/content/class-offer pages.
-6. Test RLS with anonymous, learner, teacher and admin identities; test duplicates, expiry, revoked connections and forged token/count requests.
-7. Deploy only after tests and a reviewable pull request.
+1. Audit current Supabase RLS, subscription/payment logic and callers of the legacy social-discount Edge Function.
+2. Create the teacher-network schema and base secure referral/anniversary RPCs. Completed in Supabase migrations, but needs end-to-end testing.
+3. Implement server-side profile moderation, public directory projection, verified referral-link attribution, connection workflows, publishing entitlements, and checkout discounts.
+4. Build teacher directory/profile/content/class-offer pages and wire the landing section to real status.
+5. Test RLS with anonymous, learner, teacher and admin identities; test duplicates, expiry, revoked connections and forged token/count requests.
+6. Fix or explicitly accept outstanding security/performance advisories, then deploy only after end-to-end tests and review.
