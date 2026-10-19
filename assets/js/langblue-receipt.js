@@ -32,27 +32,7 @@
   }
 
   async function getDiscountedOrder(){
-    var order=getOrder();
-    if(!order) return null;
-    var client=window.LangBlueSupabase&&window.LangBlueSupabase.getClient?window.LangBlueSupabase.getClient():null;
-    if(!client) return order;
-    try{
-      var result=await client.functions.invoke('langblue-community-access',{body:{action:'status'}});
-      var request=result&&result.data&&result.data.request;
-      if(!result.error&&request&&request.status==='approved'&&request.discount_active===true){
-        var originalSubtotal=order.subtotal;
-        order.originalSubtotal=originalSubtotal;
-        order.plan=Object.assign({},order.plan);
-        order.plan.finalPrice=Math.round(Number(order.plan.finalPrice)*0.9);
-        order.plan.finalPriceStr=formatPrice(order.plan.finalPrice);
-        order.subtotal=order.plan.finalPrice*order.quantity;
-        order.communityDiscount=10;
-        order.communityDiscountAmount=originalSubtotal-order.subtotal;
-        order.total=Math.round(order.subtotal*(100-(order.bundleDiscount||0))/100);
-        order.totalStr=formatPrice(order.total);
-      }
-    }catch(e){console.warn('[LangBlue] community discount status unavailable',e)}
-    return order;
+    return getOrder();
   }
 
   async function renderSummary(){
@@ -67,8 +47,8 @@
     box.innerHTML=
       '<div class="receipt-summary-row"><span>محصولات</span><strong>'+escapeHtml(order.products.map(function(p){return p.label;}).join('، '))+'</strong></div>'+
       '<div class="receipt-summary-row"><span>مدت</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
-      '<div class="receipt-summary-row"><span>جمع اولیه</span><strong>'+formatPrice(order.communityDiscount?order.originalSubtotal:order.subtotal)+'</strong></div>'+
-      (order.communityDiscount ? '<div class="receipt-summary-row"><span>تخفیف اجتماعی</span><strong>'+order.communityDiscount+'٪ (−'+formatPrice(order.communityDiscountAmount)+')</strong></div>' : '')+
+      '<div class="receipt-summary-row"><span>جمع اولیه</span><strong>'+formatPrice(order.subtotal)+'</strong></div>'+
+      
       (discount ? '<div class="receipt-summary-row"><span>تخفیف بسته</span><strong>'+discount+'٪</strong></div>' : '')+
       '<div class="receipt-summary-row receipt-summary-total"><span>مبلغ فیش</span><strong>'+formatPrice(order.total)+'</strong></div>';
   }
@@ -98,7 +78,7 @@
         return '<div class="receipt-line"><span>'+escapeHtml(p.icon+' '+p.label)+'</span><strong>'+formatPrice(order.plan.finalPrice)+'</strong></div>';
       }).join('')+
       '<div class="receipt-line"><span>مدت اشتراک</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
-      (order.communityDiscount ? '<div class="receipt-line"><span>تخفیف اجتماعی</span><strong>'+order.communityDiscount+'٪ (−'+formatPrice(order.communityDiscountAmount)+')</strong></div>' : '')+
+      
       (order.bundleDiscount ? '<div class="receipt-line"><span>تخفیف بسته</span><strong>'+order.bundleDiscount+'٪</strong></div>' : '')+
       '<div class="receipt-total"><span>مبلغ کل</span><strong>'+formatPrice(order.total)+'</strong></div>'+
       '<div class="receipt-note">این فیش «درخواست خرید» است و به معنی پرداخت یا فعال‌شدن اشتراک نیست. شناسه فیش را برای ادمین LangBlue در تلگرام ارسال کن. کد فعال‌سازی فقط از مسیر سرور صادر و بررسی می‌شود و داخل فیش نمایش داده نمی‌شود.</div>';
