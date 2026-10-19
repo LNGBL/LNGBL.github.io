@@ -31,14 +31,14 @@
     return commerce.buildOrder(ids,planId,new Date());
   }
 
-  async function getDiscountedOrder(){
+  async function getOrder(){
     return getOrder();
   }
 
   async function renderSummary(){
     var box=qs('receiptSummary');
     if(!box) return;
-    var order=await getDiscountedOrder();
+    var order=await getOrder();
     if(!order){
       box.innerHTML='<div class="receipt-summary-row"><span>وضعیت</span><strong>حداقل یک محصول را انتخاب کن.</strong></div>';
       return;
@@ -56,7 +56,7 @@
   async function renderReceipt(){
     var output=qs('receiptOutput');
     if(!output) return;
-    var order=await getDiscountedOrder();
+    var order=await getOrder();
     if(!order){
       alert('حداقل یک محصول را انتخاب کن.');
       return;
