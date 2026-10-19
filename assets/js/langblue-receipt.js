@@ -31,14 +31,10 @@
     return commerce.buildOrder(ids,planId,new Date());
   }
 
-  async function getOrder(){
-    return getOrder();
-  }
-
   async function renderSummary(){
     var box=qs('receiptSummary');
     if(!box) return;
-    var order=await getOrder();
+    var order=getOrder();
     if(!order){
       box.innerHTML='<div class="receipt-summary-row"><span>وضعیت</span><strong>حداقل یک محصول را انتخاب کن.</strong></div>';
       return;
@@ -48,7 +44,6 @@
       '<div class="receipt-summary-row"><span>محصولات</span><strong>'+escapeHtml(order.products.map(function(p){return p.label;}).join('، '))+'</strong></div>'+
       '<div class="receipt-summary-row"><span>مدت</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
       '<div class="receipt-summary-row"><span>جمع اولیه</span><strong>'+formatPrice(order.subtotal)+'</strong></div>'+
-      
       (discount ? '<div class="receipt-summary-row"><span>تخفیف بسته</span><strong>'+discount+'٪</strong></div>' : '')+
       '<div class="receipt-summary-row receipt-summary-total"><span>مبلغ فیش</span><strong>'+formatPrice(order.total)+'</strong></div>';
   }
@@ -56,7 +51,7 @@
   async function renderReceipt(){
     var output=qs('receiptOutput');
     if(!output) return;
-    var order=await getOrder();
+    var order=getOrder();
     if(!order){
       alert('حداقل یک محصول را انتخاب کن.');
       return;
@@ -78,7 +73,6 @@
         return '<div class="receipt-line"><span>'+escapeHtml(p.icon+' '+p.label)+'</span><strong>'+formatPrice(order.plan.finalPrice)+'</strong></div>';
       }).join('')+
       '<div class="receipt-line"><span>مدت اشتراک</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
-      
       (order.bundleDiscount ? '<div class="receipt-line"><span>تخفیف بسته</span><strong>'+order.bundleDiscount+'٪</strong></div>' : '')+
       '<div class="receipt-total"><span>مبلغ کل</span><strong>'+formatPrice(order.total)+'</strong></div>'+
       '<div class="receipt-note">این فیش «درخواست خرید» است و به معنی پرداخت یا فعال‌شدن اشتراک نیست. شناسه فیش را برای ادمین LangBlue در تلگرام ارسال کن. کد فعال‌سازی فقط از مسیر سرور صادر و بررسی می‌شود و داخل فیش نمایش داده نمی‌شود.</div>';
