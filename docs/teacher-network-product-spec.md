@@ -50,7 +50,8 @@ Use aggregate confirmed learner count, verified satisfaction, valid teaching hou
 ## Token / trust policy — partially clarified; no implementation yet
 - The stated base rule is 25 tokens per 50 unique confirmed learners.
 - The “half” is intended to represent trust between the teacher and the LangBlue platform; the trusted-teachers section is related to that trust concept, not a paid access tier.
-- The owner clarified that the 100-token threshold is derived from the half-allocation associated with each 50-unit token/learner milestone. The precise arithmetic and accounting unit still need to be written unambiguously before implementation (including whether a half-token is allowed and whether the 100-token threshold is per teacher or section).
+- The owner clarified that the 100-token threshold is tracked separately for each teacher, not across the entire trusted-teachers section.
+- The precise arithmetic for the “half” allocation associated with each 50-learner token milestone still needs to be written unambiguously before implementation, including whether fractional tokens are allowed.
 - The three-year condition and its start point also need a precise rule.
 - Do not mint, transfer, or spend tokens until the arithmetic, scope of the 100-token threshold, and three-year clock are explicitly resolved. Once defined, token events should be append-only and idempotent.
 
@@ -74,11 +75,11 @@ Add the teacher-introduction / teacher-directory section between “About LangBl
 
 ## Teacher referral offer
 - Each teacher may have a unique referral link.
-- If that link brings 35 unique, eligible learners within a rolling three-week window, the teacher earns a 5% discount on their own teacher content-publishing subscription.
-- Referred learners receive a 3% discount on eligible learner product purchases.
+- Attribute a learner to a teacher when the learner completes registration through that teacher’s unique referral link; a click alone does not count.
+- If 35 unique eligible learners register through that link within a rolling three-week window, the teacher earns a 5% discount on their own teacher content-publishing subscription once per teacher (not repeatedly for every later group of 35).
+- Referred learners may receive a 3% discount on eligible LangBlue products. Each teacher can choose which of their own products are eligible for this offer; product eligibility must be explicit and checked server-side at checkout.
 - These referral discounts do not stack with the all-products discount or the 10% 12-month discount. The checkout must apply the non-stacking rule deterministically and show which discount was applied.
-- Count unique eligible learners server-side; do not award the threshold for repeated clicks, duplicate accounts, self-referrals, or unverified visits. Record the referral window, attribution, eligibility, and discount redemption server-side.
-- The eligible product scope, whether the 35 learners must register or make a qualifying purchase, and whether the teacher’s reward is one-time or repeatable should be specified before implementation; do not assume purchases are required or grant rewards client-side.
+- Count unique eligible registrations server-side; exclude repeated clicks, duplicate accounts, self-referrals, and unverified registrations. Record the referral window, attribution, eligibility, and discount redemption server-side. Do not grant rewards client-side.
 
 ## Humanity
 The verified-institutions directory is out of scope for now. Do not create or show a Humanity institutions section until the owner provides the institutions to list.
