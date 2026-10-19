@@ -15,7 +15,7 @@ The following features are free and must not depend on a paid subscription:
 ### Optional paid content publishing
 A teacher subscription is only for publishing educational posts and content on LangBlue. It is optional; it must not gate the teacher directory, learner connections, class listings, pricing, basic statistics, ranking, or Blue Star.
 - Proposed initial free period: one month, beginning at activation of the content-publishing feature.
-- The previously proposed 3/6/12-month prices may be used only for this publishing entitlement after the owner confirms they remain current.
+- Confirmed publishing-subscription prices (Iranian toman): 3 months = 350,999; 6 months = 650,999; 12 months = 950,999. These prices buy permission to publish/share teacher-created educational content only; they do not buy learner access, learner connections, a teacher profile, or access to students.
 - Expiry disables new paid publishing only. It must not delete the profile, existing published content, connections, metrics, or class listings. Content visibility after expiry requires a separate product decision; default recommendation is to keep existing approved posts visible but prevent creating/editing paid content.
 
 ### Teacher-defined class pricing
@@ -47,8 +47,12 @@ Teachers may select any supported contact methods, such as a work phone number, 
 ### Teacher ranking
 Use aggregate confirmed learner count, verified satisfaction, valid teaching hours and Blue Star status. Keep weights configurable, publish the ranking method, and avoid treating tiny review samples as reliable satisfaction rates. Teaching hours must represent valid educational activity, not simply a page left open.
 
-## Token policy — owner confirmation required before implementation
-The current proposal says 25 tokens per every 50 unique confirmed learners, with half of the effect allocated to the trusted-teachers section, and that the policy takes effect after three years and after each divided section reaches 100 tokens. The exact meaning of “half of the effect,” the two token destinations, whether fractions are allowed, and whether the three-year clock is global or per teacher are not yet sufficiently precise to implement safely. Do not mint, transfer, or spend tokens until those rules are confirmed. Token events should be append-only and idempotent once defined.
+## Token / trust policy — partially clarified; no implementation yet
+- The stated base rule is 25 tokens per 50 unique confirmed learners.
+- The “half” is intended to represent trust between the teacher and the LangBlue platform; the trusted-teachers section is related to that trust concept, not a paid access tier.
+- The owner clarified that the 100-token threshold is derived from the half-allocation associated with each 50-unit token/learner milestone. The precise arithmetic and accounting unit still need to be written unambiguously before implementation (including whether a half-token is allowed and whether the 100-token threshold is per teacher or section).
+- The three-year condition and its start point also need a precise rule.
+- Do not mint, transfer, or spend tokens until the arithmetic, scope of the 100-token threshold, and three-year clock are explicitly resolved. Once defined, token events should be append-only and idempotent.
 
 ## Database and security design (proposed; not yet created)
 Suggested tables:
@@ -64,6 +68,17 @@ Suggested tables:
 - `teacher_token_ledger`: append-only token events, only after the token policy is finalized.
 
 Use the existing central Supabase Auth identity. Keep all new exposed tables under RLS; use server-side validation for entitlements, milestones, ranks, and token events. Never trust editable user metadata or client-supplied token/count fields. Do not place activation/verification secrets in GitHub Pages JavaScript.
+
+## Navigation placement
+Add the teacher-introduction / teacher-directory section between “About LangBlue” and “Language Learning” on the landing page. Do not treat the teacher content-publishing subscription as a fee for being listed in this directory.
+
+## Teacher referral offer
+- Each teacher may have a unique referral link.
+- If that link brings 35 unique, eligible learners within a rolling three-week window, the teacher earns a 5% discount on their own teacher content-publishing subscription.
+- Referred learners receive a 3% discount on eligible learner product purchases.
+- These referral discounts do not stack with the all-products discount or the 10% 12-month discount. The checkout must apply the non-stacking rule deterministically and show which discount was applied.
+- Count unique eligible learners server-side; do not award the threshold for repeated clicks, duplicate accounts, self-referrals, or unverified visits. Record the referral window, attribution, eligibility, and discount redemption server-side.
+- The eligible product scope, whether the 35 learners must register or make a qualifying purchase, and whether the teacher’s reward is one-time or repeatable should be specified before implementation; do not assume purchases are required or grant rewards client-side.
 
 ## Humanity
 The verified-institutions directory is out of scope for now. Do not create or show a Humanity institutions section until the owner provides the institutions to list.
