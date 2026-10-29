@@ -3099,8 +3099,7 @@
                     var types = { noun:'اسم', verb:'فعل', adj:'صفت', other:'سایر' };
                     var html='<html dir="rtl"><head><meta charset="UTF-8"><title>LangBlue - واژگان</title><style>body{font-family:sans-serif;padding:2rem;direction:rtl;}table{width:100%;border-collapse:collapse;margin-top:1rem;}th,td{padding:0.5rem;border:1px solid #ccc;text-align:right;}th{background:#e7effb;}</style></head><body><h1>📚 LangBlue - واژگان</h1><p>تعداد: '+words.length+'</p><table><thead><tr><th>#</th><th>واژه</th><th>ترجمه</th><th>نوع</th></tr></thead><tbody>';
                     for(var i=0;i<words.length;i++){var w=words[i];html+='<tr><td>'+(i+1)+'</td><td>'+escapeHtml(w.word)+'</td><td>'+escapeHtml(w.persian)+'</td><td>'+escapeHtml(types[w.type]||'سایر')+'</td></tr>';}
-                    html+='</tbody></table><div style="margin-top:2rem;color:#7b8ba5;">تولید شده توسط LangBlue</div><script src="../assets/js/langblue-learning-entry.js?v=20261029-1"><\/script>
-</body></html>';
+                    html+='</tbody></table><div style="margin-top:2rem;color:#7b8ba5;">تولید شده توسط LangBlue</div><script src="../assets/js/langblue-learning-entry.js?v=20261029-1"><\/script></body></html>';
                     var win=window.open('','_blank'); if(!win){UI.showToast('پنجره چاپ توسط مرورگر مسدود شد.','warning');return;}
                     win.document.write(html);win.document.close();win.focus();win.print();
                 },
