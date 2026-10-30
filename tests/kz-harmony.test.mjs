@@ -60,7 +60,10 @@ test('third person possessive after consonant: кітабы', () => {
   assert.equal(KzHarmony.inflect('кітап', {possessive:'3sg'}).form, 'кітабы');
 });
 test('second person possessive after consonant: кітабың', () => {
-  assert.equal(KzHarmony.inflect('кітап', {possessive:'2sg'}).form, 'кітапың');
+  assert.equal(KzHarmony.inflect('кітап', {possessive:'2sg'}).form, 'кітабың');
+});
+test('first person possessive voices final p: кітабым', () => {
+  assert.equal(KzHarmony.inflect('кітап', {possessive:'1sg'}).form, 'кітабым');
 });
 test('third person possessive voices final p: кітабы', () => {
   assert.equal(KzHarmony.inflect('кітап', {possessive:'3sg'}).form, 'кітабы');
