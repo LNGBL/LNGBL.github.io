@@ -71,6 +71,11 @@ export const KzHarmony = (() => {
     if (options.plural) {
       const suffix = pluralSuffix(form); form += suffix; chain.push(suffix);
     }
+    if (options.possessive === '3sg') {
+      const alternations = { 'п':'б', 'к':'г', 'қ':'ғ' };
+      const end = lastChar(form);
+      if (alternations[end]) form = form.slice(0, -1) + alternations[end];
+    }
     if (options.possessive) {
       const suffix = possessiveSuffix(form, options.possessive);
       if (suffix) { form += suffix; chain.push(suffix); }
