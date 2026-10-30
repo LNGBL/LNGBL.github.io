@@ -13,7 +13,6 @@
     ghadir:'https://en.wikipedia.org/wiki/Eid_al-Ghadir',
     christmas:'https://en.wikipedia.org/wiki/Christmas',
     blackfriday:'https://en.wikipedia.org/wiki/Black_Friday_(shopping)',
-    halloween:'https://en.wikipedia.org/wiki/Halloween',
     women:'https://en.wikipedia.org/wiki/International_Women%27s_Day',
     men:'https://en.wikipedia.org/wiki/International_Men%27s_Day',
     valentine:'https://en.wikipedia.org/wiki/Valentine%27s_Day'
@@ -35,12 +34,11 @@
   ];
 
   const global=[
-    {key:'christmas',title:'🎄 Christmas',when:d=>d.getMonth()===11&&d.getDate()===25},
-    {key:'blackfriday',title:'🛍️ Black Friday',when:d=>d.getMonth()===10&&d.getDate()===20},
-    {key:'halloween',title:'🎃 Halloween',when:d=>d.getMonth()===9&&d.getDate()===31},
-    {key:'men',title:'♂️ International Men’s Day',when:d=>d.getMonth()===10&&d.getDate()===19},
-    {key:'women',title:'♀️ International Women’s Day',when:d=>d.getMonth()===2&&d.getDate()===8},
-    {key:'valentine',title:'❤️ Valentine’s Day',when:d=>d.getMonth()===1&&d.getDate()===14}
+    {key:'christmas',title:'🎄 کریسمس',when:d=>d.getMonth()===11&&d.getDate()===25},
+    {key:'blackfriday',title:'🛍️ جمعهٔ سیاه',when:d=>d.getMonth()===10&&d.getDate()===20},
+    {key:'men',title:'♂️ روز جهانی مرد',when:d=>d.getMonth()===10&&d.getDate()===19},
+    {key:'women',title:'♀️ روز جهانی زن',when:d=>d.getMonth()===2&&d.getDate()===8},
+    {key:'valentine',title:'❤️ روز ولنتاین',when:d=>d.getMonth()===1&&d.getDate()===14}
   ];
 
   function jalali(d){
@@ -87,9 +85,6 @@
   async function playCeremony(e,d,force=false){
     if(!('Notification' in window) || Notification.permission!=='granted') return;
     const key=ceremonyKey(e,d);
-    const storeKey='lb:ceremony:last';
-    if(!force && localStorage.getItem(storeKey)===key)return;
-    localStorage.setItem(storeKey,key);
 
     const options={
       body:'امروز زمان این مناسبت در LangBlue است.',
@@ -137,9 +132,8 @@
       }
     });
 
-    // Check at load and at every minute while the page is open.
+    // Check when the page loads; subsequent visits may show the ceremony again.
     checkCeremonies(new Date());
-    setInterval(()=>checkCeremonies(new Date()),60000);
   }
 
   function typeText(el,text){
@@ -175,12 +169,11 @@
     const box=document.getElementById('occasionBanner');if(!box)return;
     const j=jalali(now),i=islamic(now);
     const e=iranSolar.find(x=>x.when(j)) || (i&&iranIslamic.find(x=>x.when(i))) || global.find(x=>x.when(now));
-    document.body.classList.remove('theme-halloween','theme-yalda','theme-christmas','theme-valentine','theme-women','theme-men');
+    document.body.classList.remove('theme-yalda','theme-christmas','theme-valentine','theme-women','theme-men');
     if(!e){
       box.innerHTML='<div class="occasion-title">🔷 LangBlue</div><div class="occasion-note">مناسبت‌ها به‌صورت خودکار و در زمان خودشان اعلام می‌شوند.</div>';
       return;
     }
-    if(e.key==='halloween')document.body.classList.add('theme-halloween');
     if(e.key==='yalda')document.body.classList.add('theme-yalda');
     if(e.key==='christmas')document.body.classList.add('theme-christmas');
     if(e.key==='valentine')document.body.classList.add('theme-valentine');
