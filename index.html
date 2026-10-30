@@ -124,7 +124,7 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     .products{padding:70px 0}
     .products-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:1120px;margin:30px auto 0}
     .product-card{position:relative;display:flex;flex-direction:column;min-height:270px;padding:28px;background:var(--glass);border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 45px rgba(0,0,0,.14);backdrop-filter:blur(14px);transition:transform .2s,border-color .2s,box-shadow .2s}
-    .product-card:hover{transform:translateY(-5px);border-color:var(--product-accent,rgba(91,192,255,.36));box-shadow:0 20px 55px rgba(0,0,0,.2)}.product-card{overflow:hidden}.product-card:before{content:"";position:absolute;inset:-40% auto auto -25%;width:190px;height:190px;border-radius:50%;background:var(--product-accent,rgba(91,192,255,.22));filter:blur(34px);opacity:0;transition:opacity .35s,transform .35s;pointer-events:none}.product-card:hover:before{opacity:.34;transform:translate(18px,18px)}.product-card:hover .product-badge{border-color:var(--product-accent,rgba(91,192,255,.45));box-shadow:0 0 18px var(--product-accent,rgba(91,192,255,.18))}.product-card[data-accent="grammar"]{--product-accent:rgba(69,183,200,.45)}.product-card[data-accent="vocabulary"]{--product-accent:rgba(91,192,255,.45)}.product-card[data-accent="deutsch"]{--product-accent:rgba(255,211,93,.42)}.product-card[data-accent="japanese"]{--product-accent:rgba(255,126,180,.42)}.product-card[data-accent="arabic"]{--product-accent:rgba(240,185,90,.42)}
+    .product-card:hover{transform:translateY(-5px);border-color:var(--product-accent,rgba(91,192,255,.36));box-shadow:0 20px 55px rgba(0,0,0,.2)}.product-card{overflow:hidden}.product-card:before{content:"";position:absolute;inset:-40% auto auto -25%;width:190px;height:190px;border-radius:50%;background:var(--product-accent,rgba(91,192,255,.22));filter:blur(34px);opacity:0;transition:opacity .35s,transform .35s;pointer-events:none}.product-card:hover:before{opacity:.34;transform:translate(18px,18px)}.product-card:hover .product-badge{border-color:var(--product-accent,rgba(91,192,255,.45));box-shadow:0 0 18px var(--product-accent,rgba(91,192,255,.18))}.product-card[data-accent="grammar"]{--product-accent:rgba(69,183,200,.45)}.product-card[data-accent="vocabulary"]{--product-accent:rgba(91,192,255,.45)}.product-card[data-accent="deutsch"]{--product-accent:rgba(255,211,93,.42)}.product-card[data-accent="japanese"]{--product-accent:rgba(255,126,180,.42)}.product-card[data-accent="arabic"]{--product-accent:rgba(240,185,90,.42)}.product-card[data-accent="kazakh"]{--product-accent:rgba(134,185,154,.45)}
     .product-badge{display:inline-flex;align-self:flex-start;padding:5px 10px;border-radius:999px;background:rgba(34,158,217,.12);border:1px solid rgba(91,192,255,.24);color:#9de3ff;font-size:11px;font-weight:800;margin-bottom:16px}
     .product-icon{font-size:34px;line-height:1;margin-bottom:14px}
     .product-card h3{margin:0 0 9px;font-size:22px;color:#fff}
@@ -471,7 +471,7 @@ footer{border-color:rgba(244,235,221,.16)}
       <div class="wrap">
         <h2 class="section-title">محصولات LangBlue</h2>
         <p class="section-lead">
-          ابزارهای اصلی LangBlue در کنار یکدیگر قرار گرفته‌اند؛ از گرامر و واژگان تا آلمانی، عربی و ژاپنی، با مسیرهای اختصاصی برای یادگیری و تمرین.
+          ابزارهای اصلی LangBlue در کنار یکدیگر قرار گرفته‌اند؛ از گرامر و واژگان تا آلمانی، عربی، ژاپنی و قزاقی، با مسیرهای اختصاصی برای یادگیری و تمرین.
         </p>
         <div class="products-grid" id="langblue-products-react">
           <article class="product-card" data-accent="grammar">
@@ -524,6 +524,19 @@ footer{border-color:rgba(244,235,221,.16)}
               <li>ثبت واژگان، فلش‌کارت و مرور</li>
             </ul>
             <a class="btn btn-primary" href="pages/Langjp.html">ورود به Japanese ←</a>
+          </article>
+
+          <article class="product-card" data-accent="kazakh">
+            <span class="product-badge">LANGBLUE · KAZAKH</span>
+            <div class="product-icon">🇰🇿</div>
+            <h3>LangBlue Kazakh</h3>
+            <p>محیط تخصصی یادگیری قزاقی با ثبت واژگان، صرف پسوندها، هماهنگی واکه‌ها و مرور فاصله‌دار.</p>
+            <ul class="product-list">
+              <li>واژگان همراه با ریشه و ساخت صرفی</li>
+              <li>ماشین پسوندها و هماهنگی واکه‌ها</li>
+              <li>فلش‌کارت، آواشناسی و آمار خطا</li>
+            </ul>
+            <a class="btn btn-primary" href="pages/LangKz.html">ورود به Kazakh ←</a>
           </article>
 
           <article class="product-card" data-accent="arabic">
@@ -895,6 +908,7 @@ const products = [
   {id:'vocabulary',badge:'LANGBLUE · VOCABULARY',icon:'📚',title:'LangBlue Vocabulary',description:'بخش واژگان LangBlue برای ثبت، سازمان‌دهی، مرور و تمرین لغات و عبارت‌های انگلیسی در کنار یادگیری گرامر.',items:['مدیریت واژگان و عبارت‌ها','مثال و اطلاعات کاربردی','مرور و تمرین واژگان'],href:'pages/vocab.html',cta:'ورود به Vocabulary ←'},
   {id:'deutsch',badge:'LANGBLUE · DEUTSCH',icon:'🇩🇪',title:'LangBlue Deutsch',description:'ابزار یادگیری آلمانی LangBlue برای ثبت واژگان، ترجمه فارسی، تلفظ و تمرین فلش‌کارت با مرور ساختاریافته.',items:['ثبت واژگان آلمانی و ترجمه فارسی','تلفظ و جست‌وجوی سریع','فلش‌کارت و تمرین مرور'],href:'pages/LangBlue-De.html',cta:'ورود به Deutsch ←'},
   {id:'japanese',badge:'LANGBLUE · JAPANESE',icon:'🌸',title:'LangBlue Japanese',description:'محیط یادگیری ژاپنی برای ثبت واژگان، تمرین، فلش‌کارت و دسترسی به جدول سیستماتیک کانا و فونتیک با Romaji و IPA.',items:['Hiragana و Katakana بر اساس 五十音','Romaji و IPA برای کمک به تلفظ','ثبت واژگان، فلش‌کارت و مرور'],href:'pages/Langjp.html',cta:'ورود به Japanese ←'},
+  {id:'langkz',badge:'LANGBLUE · KAZAKH',icon:'🇰🇿',title:'LangBlue Kazakh',description:'محیط تخصصی قزاقی با واژگان ریشه‌محور، صرف پسوندها، هماهنگی واکه‌ها، فلش‌کارت و مرور فاصله‌دار.',items:['واژگان با ریشه و ساخت صرفی','ماشین پسوندها و هماهنگی واکه‌ها','آواشناسی و تحلیل نقاط ضعف'],href:'pages/LangKz.html',cta:'ورود به Kazakh ←'},
   {id:'arabic',badge:'LANGDESERT · ARABIC',icon:'🌵',title:'LangDesert Arabic',description:'ماژول یادگیری عربی LangBlue برای تعیین سطح، یادگیری واژگان و گرامر و تمرین متناسب با سطح A1 تا C2.',items:['تعیین سطح عربی A1 تا C2','واژگان و گرامر سطح‌بندی‌شده','تمرین و تحلیل پیشرفت'],href:'pages/LangDesert.html',cta:'ورود به LangDesert ←'}
 ];
 function ProductCard({p}) {
