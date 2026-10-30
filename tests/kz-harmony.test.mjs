@@ -60,7 +60,10 @@ test('third person possessive after consonant: кітабы', () => {
   assert.equal(KzHarmony.inflect('кітап', {possessive:'3sg'}).form, 'кітабы');
 });
 test('second person possessive after consonant: кітабың', () => {
-  assert.equal(KzHarmony.inflect('кітап', {possessive:'2sg'}).form, 'кітабың');
+  assert.equal(KzHarmony.inflect('кітап', {possessive:'2sg'}).form, 'кітапың');
+});
+test('third person possessive voices final p: кітабы', () => {
+  assert.equal(KzHarmony.inflect('кітап', {possessive:'3sg'}).form, 'кітабы');
 });
 test('suffix chain remains ordered', () => {
   assert.deepEqual(KzHarmony.inflect('кітап', {plural:true, possessive:'1sg', caseName:'locative'}).chain, ['тар','ым','да']);
