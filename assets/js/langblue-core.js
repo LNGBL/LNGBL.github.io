@@ -316,7 +316,8 @@
       languages: {
         vocabulary: { words: [] },
         deutsch: { words: [] },
-        langjp: { words: [] }
+        langjp: { words: [] },
+      langkz: { words: [] }
       },
       settings: { version: '3.0.0' }
     };
@@ -489,7 +490,7 @@
             verifiedAt: Date.now(),
             productIds: Array.isArray(remoteSub.product_ids)
               ? remoteSub.product_ids
-              : (Array.isArray(remoteSub.productIds) ? remoteSub.productIds : ['grammar','vocabulary','deutsch','arabic','langjp']),
+              : (Array.isArray(remoteSub.productIds) ? remoteSub.productIds : ['grammar','vocabulary','deutsch','arabic','langjp','langkz']),
             expiresAt: remoteSub.expires_at || remoteSub.expiresAt || null,
             planId: remoteSub.plan_id || remoteSub.planId || null
           });
