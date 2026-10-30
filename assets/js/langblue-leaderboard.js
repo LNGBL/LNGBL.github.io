@@ -61,8 +61,8 @@
       const {data,error}=await client.rpc('sync_leaderboard',{
         p_points:m.points,p_tokens:m.tokens,p_grammar_score:m.grammarScore,
         p_vocabulary_count:m.vocabularyCount,p_grammar_count:m.grammarCount,
-        p_practice_language:m.langkzMastery>0?'kazakh':null,
-        p_practice_section:m.langkzMastery>0?'langkz':null
+        p_practice_language:m.langkzMastery>0||readJSON(key(KZ_STATE,uid()),{lexemes:[]}).lexemes?.length?'kazakh':null,
+        p_practice_section:m.langkzMastery>0||readJSON(key(KZ_STATE,uid()),{lexemes:[]}).lexemes?.length?'langkz':null
       });
       if(error){console.warn('[LangBlue] leaderboard sync failed:',error.message);return null}
       return data;
