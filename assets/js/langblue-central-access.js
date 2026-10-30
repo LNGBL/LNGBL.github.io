@@ -77,6 +77,7 @@ function productIdForPage(){
   if(p.indexOf('langblue-de')!==-1)return 'deutsch';
   if(p.indexOf('langdesert')!==-1)return 'arabic';
   if(p.indexOf('langjp')!==-1)return 'langjp';
+  if(p.indexOf('langkz')!==-1)return 'langkz';
   return null;
 }
 function hasProductAccess(productId){

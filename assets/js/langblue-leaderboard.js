@@ -7,6 +7,7 @@
   const GRAMMAR_KEY='lb:user:{uid}:grammar:mastery:v1';
   const VOCAB_TOKENS='lb:user:{uid}:LangBlue_tokens';
   const VOCAB_WORDS='lb:user:{uid}:LangBlue_WORDS';
+  const KZ_STATE='lb:user:{uid}:langkz_state_v1';
 
   function session(){
     try{return JSON.parse(localStorage.getItem(USER_SESSION)||'null')}catch(e){return null}
@@ -26,6 +27,10 @@
     const tokensData=readJSON(key(VOCAB_TOKENS,id),{tokens:0});
     const words=readJSON(key(VOCAB_WORDS,id),[]);
     const mastery=readJSON(key(GRAMMAR_KEY,id),{});
+    const kzState=readJSON(key(KZ_STATE,id),{lexemes:[]});
+    const kzLexemes=kzState&&Array.isArray(kzState.lexemes)?kzState.lexemes:[];
+    const langkzCount=kzLexemes.length;
+    const langkzMastery=kzLexemes.reduce((sum,x)=>sum+Math.max(0,Number(x.srs&&x.srs.stage)||0)*5+Math.max(0,Number(x.srs&&x.srs.totalCorrect)||0),0);
     let grammarScore=0, grammarCount=0;
     Object.keys(mastery||{}).forEach(function(k){
       const s=mastery[k]||{};
@@ -34,8 +39,8 @@
     });
     const tokens=Math.max(0,Number(tokensData&&tokensData.tokens)||0);
     const vocabularyCount=Array.isArray(words)?words.length:0;
-    const points=Math.max(0,Math.round(tokens+grammarScore));
-    return {userId:id,username:String(u.username||'').trim(),displayName:String(u.name||u.fullName||u.username||'').trim(),points:Number.isFinite(points)?points:0,tokens:Number.isFinite(tokens)?tokens:0,grammarScore:Number.isFinite(grammarScore)?grammarScore:0,vocabularyCount:Number.isFinite(vocabularyCount)?vocabularyCount:0,grammarCount:Number.isFinite(grammarCount)?grammarCount:0};
+    const points=Math.max(0,Math.round(tokens+grammarScore+langkzMastery));
+    return {userId:id,username:String(u.username||'').trim(),displayName:String(u.name||u.fullName||u.username||'').trim(),points:Number.isFinite(points)?points:0,tokens:Number.isFinite(tokens)?tokens:0,grammarScore:Number.isFinite(grammarScore)?grammarScore:0,langkzMastery:Number.isFinite(langkzMastery)?langkzMastery:0,langkzCount:Number.isFinite(langkzCount)?langkzCount:0,vocabularyCount:Number.isFinite(vocabularyCount)?vocabularyCount:0,grammarCount:Number.isFinite(grammarCount)?grammarCount:0};
   }
 
   async function sync(){
@@ -56,7 +61,9 @@
 
       const {data,error}=await client.rpc('sync_leaderboard',{
         p_points:m.points,p_tokens:m.tokens,p_grammar_score:m.grammarScore,
-        p_vocabulary_count:m.vocabularyCount,p_grammar_count:m.grammarCount
+        p_vocabulary_count:m.vocabularyCount,p_grammar_count:m.grammarCount,
+        p_practice_language:m.langkzCount>0?'kazakh':null,
+        p_practice_section:m.langkzCount>0?'langkz':null
       });
       if(error){console.warn('[LangBlue] leaderboard sync failed:',error.message);return null}
       return data;
