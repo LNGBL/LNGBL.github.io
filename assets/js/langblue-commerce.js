@@ -277,6 +277,8 @@ langjp:{id:'langjp',label:'LangBlue Japanese',icon:'🌸',url:'pages/Langjp.html
 
 langkz:{id:'langkz',label:'LangBlue Kazakh',icon:'🇰🇿',url:'pages/LangKz.html'},
 
+langtj:{id:'langtj',label:'LangBlue Tajik',icon:'🇹🇯',url:'pages/LangTj.html'},
+
 
 
 };
@@ -287,7 +289,7 @@ langkz:{id:'langkz',label:'LangBlue Kazakh',icon:'🇰🇿',url:'pages/LangKz.ht
 
 
 
-var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic','langjp','langkz'];
+var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj'];
 
 
 
