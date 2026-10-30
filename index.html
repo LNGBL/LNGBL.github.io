@@ -538,6 +538,13 @@ footer{border-color:rgba(244,235,221,.16)}
             </ul>
             <a class="btn btn-primary" href="pages/LangKz.html">ورود به Kazakh ←</a>
           </article>
+          <article class="product-card" data-accent="tajik">
+            <span class="product-badge">LANGBLUE · TAJIK</span><div class="product-icon">🇹🇯</div>
+            <h3>LangBlue Tajik</h3>
+            <p>محیط یادگیری تاجیکی با خط سیریلیک، ریشه و ساخت واژه، فلش‌کارت، مرور فاصله‌دار و پل فارسی–تاجیکی.</p>
+            <ul class="product-list"><li>واژگان، ریشه، پیشوند و پسوند</li><li>شش‌مرحلهٔ تسلط و تمرین فلش‌کارت</li><li>آواشناسی و مقایسهٔ فارسی–تاجیکی</li></ul>
+            <a class="btn btn-primary" href="pages/LangTj.html">ورود به Tajik ←</a>
+          </article>
 
           <article class="product-card" data-accent="arabic">
             <span class="product-badge">LANGDESERT · ARABIC</span>
@@ -634,6 +641,7 @@ footer{border-color:rgba(244,235,221,.16)}
                 <small>قزاقی، واژگان، صرف پسوند و هماهنگی واکه‌ها</small>
               </span>
             </label>
+            <label class="receipt-option"><input type="checkbox" value="langtj"><span><strong>🇹🇯 LangBlue Tajik</strong><small>تاجیکی، واژگان سیریلیک، فلش‌کارت و پل فارسی–تاجیکی</small></span></label>
           </div>
         </div>
         <div class="receipt-panel">
@@ -679,7 +687,7 @@ footer{border-color:rgba(244,235,221,.16)}
 <button class="btn btn-primary" type="button" onclick="window.LangBlueCentralAccount&&window.LangBlueCentralAccount.open()">🔐 ورود به حساب و فعال‌سازی کد</button>
               <a class="btn btn-secondary" href="https://t.me/LangBlue" target="_blank" rel="noopener">💬 دریافت راهنمای کد از @LangBlue</a>
             </div>
-            <div class="central-activation-note">کد داخل سایت تولید یا نمایش داده نمی‌شود. پس از دریافت کد، آن را فقط در حساب مرکزی وارد کن؛ همان حساب برای Grammar، Vocabulary، Deutsch، LangDesert و LangBlue Japanese استفاده می‌شود.</div>
+            <div class="central-activation-note">کد داخل سایت تولید یا نمایش داده نمی‌شود. پس از دریافت کد، آن را فقط در حساب مرکزی وارد کن؛ همان حساب برای Grammar، Vocabulary، Deutsch، LangDesert، Japanese، Kazakh و Tajik استفاده می‌شود.</div>
           </div>
         </div>
       </div>
@@ -915,6 +923,7 @@ const products = [
   {id:'deutsch',badge:'LANGBLUE · DEUTSCH',icon:'🇩🇪',title:'LangBlue Deutsch',description:'ابزار یادگیری آلمانی LangBlue برای ثبت واژگان، ترجمه فارسی، تلفظ و تمرین فلش‌کارت با مرور ساختاریافته.',items:['ثبت واژگان آلمانی و ترجمه فارسی','تلفظ و جست‌وجوی سریع','فلش‌کارت و تمرین مرور'],href:'pages/LangBlue-De.html',cta:'ورود به Deutsch ←'},
   {id:'japanese',badge:'LANGBLUE · JAPANESE',icon:'🌸',title:'LangBlue Japanese',description:'محیط یادگیری ژاپنی برای ثبت واژگان، تمرین، فلش‌کارت و دسترسی به جدول سیستماتیک کانا و فونتیک با Romaji و IPA.',items:['Hiragana و Katakana بر اساس 五十音','Romaji و IPA برای کمک به تلفظ','ثبت واژگان، فلش‌کارت و مرور'],href:'pages/Langjp.html',cta:'ورود به Japanese ←'},
   {id:'langkz',badge:'LANGBLUE · KAZAKH',icon:'🇰🇿',title:'LangBlue Kazakh',description:'محیط تخصصی قزاقی با واژگان ریشه‌محور، صرف پسوندها، هماهنگی واکه‌ها، فلش‌کارت و مرور فاصله‌دار.',items:['واژگان با ریشه و ساخت صرفی','ماشین پسوندها و هماهنگی واکه‌ها','آواشناسی و تحلیل نقاط ضعف'],href:'pages/LangKz.html',cta:'ورود به Kazakh ←'},
+  {id:'langtj',badge:'LANGBLUE · TAJIK',icon:'🇹🇯',title:'LangBlue Tajik',description:'یادگیری تاجیکی با واژگان سیریلیک، ریشه و ساخت واژه، فلش‌کارت، مرور فاصله‌دار و پل فارسی–تاجیکی.',items:['واژگان با ریشه و ساخت صرفی','شش‌مرحلهٔ تسلط و فلش‌کارت','آواشناسی و پل فارسی–تاجیکی'],href:'pages/LangTj.html',cta:'ورود به Tajik ←'},
   {id:'arabic',badge:'LANGDESERT · ARABIC',icon:'🌵',title:'LangDesert Arabic',description:'ماژول یادگیری عربی LangBlue برای تعیین سطح، یادگیری واژگان و گرامر و تمرین متناسب با سطح A1 تا C2.',items:['تعیین سطح عربی A1 تا C2','واژگان و گرامر سطح‌بندی‌شده','تمرین و تحلیل پیشرفت'],href:'pages/LangDesert.html',cta:'ورود به LangDesert ←'}
 ];
 function ProductCard({p}) {

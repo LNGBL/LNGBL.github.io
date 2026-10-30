@@ -12,7 +12,7 @@ days:7,
 label:'۷ روز',
 price:70000,
 priceStr:'70,000 T',
-feature:'دسترسی کامل به ۶ محصول LangBlue'
+feature:'دسترسی کامل به ۷ محصول LangBlue'
 },
 
 
@@ -43,7 +43,7 @@ days:90,
 label:'۳ ماه',
 price:900000,
 priceStr:'900,000 T',
-feature:'دسترسی کامل ۶ محصول LangBlue بدون محدودیت'
+feature:'دسترسی کامل ۷ محصول LangBlue بدون محدودیت'
 },
 
 
@@ -54,7 +54,7 @@ days:180,
 label:'۶ ماه',
 price:1800000,
 priceStr:'1,800,000 T',
-feature:'دسترسی کامل اکوسیستم ۶ محصولی LangBlue'
+feature:'دسترسی کامل اکوسیستم ۷ محصولی LangBlue'
 },
 
 
@@ -65,7 +65,7 @@ days:365,
 label:'۱۲ ماه',
 price:3650000,
 priceStr:'3,650,000 T',
-feature:'دسترسی کامل ۶ محصول + مدیریت داده + پرینت اطلاعات'
+feature:'دسترسی کامل ۷ محصول + مدیریت داده + پرینت اطلاعات'
 }
 
 
@@ -277,6 +277,8 @@ langjp:{id:'langjp',label:'LangBlue Japanese',icon:'🌸',url:'pages/Langjp.html
 
 langkz:{id:'langkz',label:'LangBlue Kazakh',icon:'🇰🇿',url:'pages/LangKz.html'},
 
+langtj:{id:'langtj',label:'LangBlue Tajik',icon:'🇹🇯',url:'pages/LangTj.html'},
+
 
 
 };
@@ -287,7 +289,7 @@ langkz:{id:'langkz',label:'LangBlue Kazakh',icon:'🇰🇿',url:'pages/LangKz.ht
 
 
 
-var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic','langjp','langkz'];
+var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj'];
 
 
 
