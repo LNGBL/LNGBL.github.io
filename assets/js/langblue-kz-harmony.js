@@ -31,10 +31,10 @@ export const KzHarmony = (() => {
     const v = lastVowel(root);
     const vowelClass = v && isBack(v) ? 'back' : 'front';
     const end = lastChar(root);
-    const ending = VOICELESS.has(end) ? 't'
-      : (NASAL.has(end) || VOICED_D.has(end)) ? 'd'
-      : SONORANT_L.has(end) || VOWELS.has(end) ? 'l' : 'l';
-    return ending + (vowelClass === 'back' ? 'а' : 'е') + (ending === 'l' ? 'р' : 'р');
+    const ending = VOICELESS.has(end) ? 'т'
+      : (NASAL.has(end) || VOICED_D.has(end)) ? 'д'
+      : SONORANT_L.has(end) || VOWELS.has(end) ? 'л' : 'л';
+    return ending + (vowelClass === 'back' ? 'а' : 'е') + 'р';
   }
   function selectPair(root, back, front) { return harmonyOf(root) === 'back' ? back : front; }
   function possessiveSuffix(stem, person) {
