@@ -30,6 +30,18 @@
 - **Phase C — gradual UI adoption:** apply shared tokens/components to one representative page at a time, run regression tests, then roll out to the remaining products and admin/teacher pages.
 - **Phase D — legal review:** confirm the actual entity/controller, users/markets, vendor terms, retention schedule, and state-specific applicability with qualified counsel.
 
-## Important boundary
+## Implemented in the privacy-first rollout
 
-This audit has not changed production database rows, RLS policies, or active Supabase functions. The raw-IP and event-consent findings remain open until a tested migration and coordinated function rollout are approved.
+- Added `profiles.analytics_consent` with database default `false`. The event collector checks the field server-side before writing any event.
+- Added a compact optional control inside the central account. There is no blocking banner, and the setting does not affect access to learning, account functions, or product pages.
+- Retired IP-based connection enforcement. The function no longer queries an external IP-intelligence provider, no longer classifies VPN/proxy/Tor/hosting connections, and no longer suspends accounts based on connection type. A trusted edge country header may be returned as an approximate hint only; it is not persisted or treated as legal residence.
+- Consolidated activity registry data to one row per account. Earliest registration/first activity, latest activity, maximum recorded active seconds, qualification state, and latest practice metadata were retained. The raw `ip_address` column and per-IP uniqueness constraint were removed.
+- Activity heartbeats now update account-level activity and leaderboard metadata without reading request IP headers.
+
+## Remaining work and limitations
+
+- Historical `behavior_events` remain in place; approve a purpose-specific retention period before scheduling deletion.
+- Supabase database backups and provider request/security logs may have independent retention periods. Review those settings with the hosting provider.
+- Review Supabase DPA, subprocessors, international-transfer terms, and region choice with qualified counsel. This implementation is not a legal compliance certification.
+- The activity registry now measures account-level activity rather than separate per-IP activity. Its consolidation uses the maximum per-IP active-seconds value to avoid double-counting simultaneous devices; the historical per-IP breakdown was intentionally removed.
+
