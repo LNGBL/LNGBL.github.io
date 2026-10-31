@@ -86,3 +86,17 @@ test("IP minimization keeps page-view deduplication to a 24-hour hash window", (
   assert.match(migration, /interval '24 hours'/);
   assert.doesNotMatch(migration, /interval '90 days'/);
 });
+
+test("hourly retention job purges expired landing IP hashes", () => {
+  const migration = readFileSync(new URL("../supabase/migrations/20261031043458_schedule_ip_hash_retention_cleanup.sql", import.meta.url), "utf8");
+  assert.match(migration, /cron\.schedule/);
+  assert.match(migration, /langblue-prune-landing-ip-hashes/);
+  assert.match(migration, /interval '24 hours'/);
+});
+
+test("exam and Android functions no longer write IP-derived fields", () => {
+  const exam = readFileSync(new URL("../supabase/functions/langblue-exam/index.ts", import.meta.url), "utf8");
+  const android = readFileSync(new URL("../supabase/functions/langblue-android-handoff/index.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(exam, /ip_address|cf-connecting-ip|x-forwarded-for/);
+  assert.doesNotMatch(android, /browser_ip_hash|last_ip_hash|app_ip_match|browser_user_agent|cf-connecting-ip|x-forwarded-for/);
+});
