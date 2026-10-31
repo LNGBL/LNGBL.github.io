@@ -14,9 +14,9 @@
   const path=String(location.pathname||'').toLowerCase();
   const defaultLanguage=path.includes('langdesert')?'arabic':path.includes('langblue-de')?'german':path.includes('langjp')?'japanese':path.includes('langkz')?'kazakh':path.includes('langtj')?'tajik':'english';
   const symbols=['iː','ɪ','e','æ','ɑː','ɒ','ɔː','ʊ','uː','ʌ','ə','ɜː','θ','ð','ʃ','ʒ','ŋ','tʃ','dʒ','x','ɣ','q','ʔ','ɾ','ɲ','ɕ','ʑ','ɯ','ø','y','ʁ','ˈ','ˌ','ː','̃','ʰ','ʲ','ˠ','̩','̥'];
-  const key='lb:pronunciation:v1:'+String(window.LangBlueCore?.Auth?.current?.()?.id||'guest');
+  const storageKey=()=> 'lb:pronunciation:v1:'+String(window.LangBlueCore?.Auth?.current?.()?.id||'guest');
   const css=`
-#lbPronLaunch{position:fixed;inset-inline-end:18px;bottom:18px;z-index:99990;border:0;border-radius:999px;padding:12px 16px;background:#123b58;color:#fff;font:700 14px/1.2 inherit;box-shadow:0 8px 28px #0003;cursor:pointer}
+#lbPronLaunch{position:fixed;inset-inline-end:18px;bottom:18px;z-index:99990;border:0;border-radius:999px;padding:12px 16px;background:#123b58;color:#fff;font-family:inherit;font-size:14px;font-weight:700;line-height:1.2;box-shadow:0 8px 28px #0003;cursor:pointer}
 #lbPronPanel{position:fixed;inset-inline-end:18px;bottom:76px;z-index:99991;width:min(390px,calc(100vw - 36px));max-height:min(76vh,680px);overflow:auto;display:none;background:var(--card-bg,#fff);color:var(--text-color,#17212b);border:1px solid var(--border-color,#ccd5dc);border-radius:18px;padding:16px;box-shadow:0 18px 60px #0004;direction:rtl}
 #lbPronPanel.open{display:block}
 #lbPronPanel label{display:block;font-weight:700;font-size:13px;margin:10px 0 5px}
@@ -25,14 +25,14 @@
 #lbPronPanel .lb-pron-symbols{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;direction:ltr}
 #lbPronPanel .lb-pron-symbols button{border:1px solid var(--border-color,#ccd5dc);border-radius:7px;padding:5px 8px;background:transparent;color:inherit;font:18px "Charis SIL","Doulos SIL","Noto Sans",serif;cursor:pointer}
 #lbPronPanel .lb-pron-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-#lbPronPanel .lb-pron-actions button{border:0;border-radius:9px;padding:9px 12px;background:#12658b;color:#fff;font:700 13px inherit;cursor:pointer}
+#lbPronPanel .lb-pron-actions button{border:0;border-radius:9px;padding:9px 12px;background:#12658b;color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
 #lbPronPanel .lb-pron-note{font-size:12px;line-height:1.7;opacity:.78;margin-top:8px}
 #lbPronPanel .lb-pron-saved{font-size:12px;margin-top:8px;min-height:18px}
 .lb-pronunciation-display{display:inline-block;direction:ltr;text-align:left;font:1em/1.5 "Charis SIL","Doulos SIL","Noto Sans","Segoe UI Symbol",serif}
 @media(max-width:520px){#lbPronLaunch{inset-inline-end:12px;bottom:12px}#lbPronPanel{inset-inline-end:12px;bottom:68px}}
 `;
-  function read(){try{return JSON.parse(localStorage.getItem(key)||'{}')}catch(e){return {}}}
-  function write(data){try{localStorage.setItem(key,JSON.stringify(data))}catch(e){}}
+  function read(){try{return JSON.parse(localStorage.getItem(storageKey())||'{}')}catch(e){return {}}}
+  function write(data){try{localStorage.setItem(storageKey(),JSON.stringify(data))}catch(e){}}
   function speak(text,language){
     const value=String(text||'').trim();
     if(!value||!('speechSynthesis' in window)){setStatus('پخش گفتار در این مرورگر پشتیبانی نمی‌شود.');return}
