@@ -40,4 +40,5 @@ $('morphRun').onclick=()=>{$('morphOut').textContent=TjMorph.conjugate($('mroot'
 $('phonRows').innerHTML=TjPhonetics.map((x,i)=>'<tr><td>'+fa(i+1)+'</td>'+x.map(y=>'<td>'+esc(y)+'</td>').join('')+'</tr>').join('');
 $('bridgeRows').innerHTML=TjBridge.cognates.map(x=>'<div class="stat"><b>'+esc(x.tajik)+'</b><div>'+esc(x.persian)+'</div></div>').join('');
 async function init(){const l=local();if(l)state=merge(state,l);state.lexemes=state.lexemes.map(normalize);render();try{$('syncStatus').textContent=await sync()?'حساب مرکزی و صف مرور متصل‌اند.':'ذخیرهٔ محلی فعال است؛ وارد حساب مرکزی شو.'}catch(e){$('syncStatus').textContent='ذخیرهٔ محلی فعال است؛ همگام‌سازی بعداً دوباره تلاش می‌شود.';console.warn(e)}}init();
-</script></body></html>
+</script><script src="../assets/js/langblue-pronunciation.js" defer></script>
+</body></html>
