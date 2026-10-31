@@ -184,7 +184,7 @@
     typeText(box.querySelector('.occasion-title'),e.title);
     box.querySelector('.occasion-note').textContent='امروز زمان این مناسبت است — اعلان LangBlue آماده است.';
     const discountEl=box.querySelector('.occasion-discount');
-    if(discountEl&&shared){discountEl.textContent=shared.discount+'٪ تخفیف جشنواره‌ای برای هر سه محصول';}
+    if(discountEl&&shared){discountEl.textContent=(shared.discount/2)+'٪ تخفیف جشنواره‌ای برای اشتراک ۱۲ماههٔ محصولات LangBlue';}
   }
 
 
