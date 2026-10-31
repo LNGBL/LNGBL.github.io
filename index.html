@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>LangBlue — پلتفرم ساخت و یادگیری گرامر زبان</title>
-  <meta name="description" content="LangBlue یک پلتفرم یادگیری زبان برای گرامر، واژگان و یادگیری آلمانی است؛ با تمرین، فلش‌کارت، مرور و سازمان‌دهی ساختارهای زبانی.">
+  <title>LangBlue — پلتفرم یادگیری زبان و تمرین ساختاریافته</title>
+  <meta name="description" content="LangBlue هفت محصول یادگیری زبان برای گرامر، واژگان، آلمانی، عربی، ژاپنی، قزاقی و تاجیکی دارد؛ با تمرین، فلش‌کارت و مرور در محصولات منتخب.">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="author" content="LangBlue">
   <link rel="canonical" href="https://lngbl.github.io/">
@@ -13,8 +13,8 @@
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="LangBlue — Language Grammar Platform">
-  <meta property="og:description" content="پلتفرم یادگیری زبان برای گرامر، واژگان و ساختارهای زبان با تمرین، فلش‌کارت و مرور.">
+  <meta property="og:title" content="LangBlue — Language Learning Platform">
+  <meta property="og:description" content="هفت محصول یادگیری زبان با ابزارهای گرامر، واژگان، تمرین، فلش‌کارت و مرور در محصولات منتخب.">
   <meta property="og:url" content="https://lngbl.github.io/">
   <meta property="og:site_name" content="LangBlue">
 
@@ -31,7 +31,7 @@
     "@type": "WebSite",
     "name": "LangBlue",
     "url": "https://lngbl.github.io/",
-    "description": "A platform for creating, organizing, practicing, and learning language grammar and language structures.",
+    "description": "A language-learning platform with seven active learning products and product-specific practice and review tools.",
     "inLanguage": ["fa", "en"]
   }
   </script>
@@ -119,6 +119,8 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     .eyebrow-cloud:after{content:"";position:absolute;left:2px;right:2px;bottom:0;height:7px;border-radius:7px;background:var(--blue3);}
     .eyebrow-cloud,.eyebrow-cloud span,.eyebrow-cloud:after{animation:none!important;}
     .products{padding:70px 0}
+    .learning-path-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .learning-path-note{max-width:940px;margin:22px auto 0;padding:14px 18px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035);color:var(--muted);font-size:13px;line-height:1.95}
     .products-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:1120px;margin:30px auto 0}
     .product-card{position:relative;display:flex;flex-direction:column;min-height:270px;padding:28px;background:var(--glass);border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 45px rgba(0,0,0,.14);backdrop-filter:blur(14px);transition:transform .2s,border-color .2s,box-shadow .2s}
     .product-card:hover{transform:translateY(-5px);border-color:var(--product-accent,rgba(91,192,255,.36));box-shadow:0 20px 55px rgba(0,0,0,.2)}.product-card{overflow:hidden}.product-card:before{content:"";position:absolute;inset:-40% auto auto -25%;width:190px;height:190px;border-radius:50%;background:var(--product-accent,rgba(91,192,255,.22));filter:blur(34px);opacity:0;transition:opacity .35s,transform .35s;pointer-events:none}.product-card:hover:before{opacity:.34;transform:translate(18px,18px)}.product-card:hover .product-badge{border-color:var(--product-accent,rgba(91,192,255,.45));box-shadow:0 0 18px var(--product-accent,rgba(91,192,255,.18))}.product-card[data-accent="grammar"]{--product-accent:rgba(69,183,200,.45)}.product-card[data-accent="vocabulary"]{--product-accent:rgba(91,192,255,.45)}.product-card[data-accent="deutsch"]{--product-accent:rgba(255,211,93,.42)}.product-card[data-accent="japanese"]{--product-accent:rgba(255,126,180,.42)}.product-card[data-accent="arabic"]{--product-accent:rgba(240,185,90,.42)}.product-card[data-accent="kazakh"]{--product-accent:rgba(134,185,154,.45)}
@@ -128,8 +130,8 @@ body.theme-mehrgan{background:radial-gradient(circle at 50% 10%,rgba(235,150,70,
     .product-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.9}
     .product-list{margin:16px 0 22px;padding:0 20px 0 0;color:#d9edf3;font-size:13px;line-height:2}
     .product-card .btn{margin-top:auto;align-self:flex-start}
-    @media(max-width:850px){.products-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(max-width:650px){.products-grid{grid-template-columns:1fr}.products{padding:54px 0}}
+    @media(max-width:850px){.products-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.learning-path-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:650px){.products-grid{grid-template-columns:1fr}.products{padding:54px 0}.learning-path-grid{grid-template-columns:1fr}}
     .research{padding:78px 0}
     .seo-vocabulary{padding:64px 0 30px}
     .section-lead{max-width:820px;margin:-8px auto 24px;text-align:center;color:var(--muted);line-height:1.9}
@@ -311,22 +313,155 @@ footer{border-color:rgba(244,235,221,.16)}
   <div class="occasion-note">در حال بررسی مناسبت امروز…</div>
 </div>
 
-<div class="ceremony-control" id="ceremonyControl" aria-live="polite"><button id="enableCeremonies" class="btn btn-secondary" type="button">🔔 فعال‌سازی اعلان مناسبت‌ها</button><span id="ceremonyStatus"></span></div>
-<div class="ceremony-control" id="notificationControl" aria-live="polite"><button id="enableNotifications" class="btn btn-secondary" type="button">🔔 فعال‌سازی اعلان‌های LangBlue</button><span id="notificationStatus"></span></div>
-        <h1>ساختار زبانت را با <strong>LangBlue</strong> بساز، سازمان‌دهی کن و یاد بگیر.</h1>
+
+        <h1>یادگیری زبان را با یک مسیر روشن در <strong>LangBlue</strong> پیش ببر.</h1>
         <p class="hero-lead">
-          LangBlue یک پلتفرم برای ساخت، ثبت، سازمان‌دهی، تمرین و مرور قواعد گرامری و ساختارهای زبان است.
-          هدف آن این است که قواعد پراکنده را به یک مجموعه منظم، قابل بررسی و قابل تمرین تبدیل کند.
+          زبان هدف را از میان هفت محصول فعال انتخاب کن؛ با واژگان و قواعد شروع کن، تمرین‌های موجود را انجام بده و مرورهای بعدی را پیگیری کن.
+          امکانات هر زبان متفاوت است و در صفحهٔ همان محصول توضیح داده شده است.
         </p>
         <div class="actions">
-          <a class="btn btn-primary" href="#products">محصولات LangBlue ←</a>
-          <a class="btn btn-secondary" href="#receipt">ساخت فیش خرید ←</a>
-          <a class="btn btn-secondary" href="#activation">🔑 فعال‌سازی کد</a>
-          <a class="btn btn-secondary" href="pages/exam.html">📝 آزمون سالانه</a>
-          <a class="btn btn-secondary" href="#features">آشنایی با امکانات</a>
+          <a class="btn btn-primary" href="#products">انتخاب زبان و شروع یادگیری ←</a>
+          <a class="btn btn-secondary" href="#learning-path">مشاهدهٔ مسیر یادگیری</a>
         </div>
       </div>
     </section>
+
+<section class="products" id="products">
+      <div class="wrap">
+        <h2 class="section-title">محصولات LangBlue</h2>
+        <p class="section-lead">
+          هفت محصول فعال LangBlue را بر اساس زبان و هدف خود انتخاب کن: Grammar، Vocabulary، Deutsch، LangDesert Arabic، Japanese، Kazakh و Tajik. امکانات و سطح پوشش در هر محصول یکسان نیست.
+        </p>
+        <div class="products-grid" id="langblue-products-react">
+          <article class="product-card" data-accent="grammar">
+            <span class="product-badge">LANGBLUE · GRAMMAR</span>
+            <div class="product-icon">📐</div>
+            <h3>LangBlue Grammar</h3>
+            <p>محیط اصلی LangBlue برای ساخت، ثبت، سازمان‌دهی، تمرین و مرور قواعد گرامری و ساختارهای زبان.</p>
+            <ul class="product-list">
+              <li>ثبت و مدیریت قواعد گرامری</li>
+              <li>فرمول، مثال، یادداشت و سطح</li>
+              <li>فلش‌کارت و تمرین</li>
+            </ul>
+            <a class="btn btn-primary" href="pages/LangBlue-grammer.html">ورود به Grammar ←</a>
+          </article>
+
+          <article class="product-card" data-accent="vocabulary">
+            <span class="product-badge">LANGBLUE · VOCABULARY</span>
+            <div class="product-icon">📚</div>
+            <h3>LangBlue Vocabulary</h3>
+            <p>بخش واژگان LangBlue برای ثبت، سازمان‌دهی، مرور و تمرین لغات و عبارت‌های انگلیسی در کنار یادگیری گرامر.</p>
+            <ul class="product-list">
+              <li>مدیریت واژگان و عبارت‌ها</li>
+              <li>مثال و اطلاعات کاربردی</li>
+              <li>مرور و تمرین واژگان</li>
+            </ul>
+            <a class="btn btn-primary" href="pages/vocab.html">ورود به Vocabulary ←</a>
+          </article>
+
+          <article class="product-card" data-accent="deutsch">
+            <span class="product-badge">LANGBLUE · DEUTSCH</span>
+            <div class="product-icon">🇩🇪</div>
+            <h3>LangBlue Deutsch</h3>
+            <p>ابزار یادگیری آلمانی LangBlue برای ثبت واژگان، ترجمه فارسی، تلفظ و تمرین فلش‌کارت با مرور ساختاریافته.</p>
+            <ul class="product-list">
+              <li>ثبت واژگان آلمانی و ترجمه فارسی</li>
+              <li>تلفظ و جست‌وجوی سریع</li>
+              <li>فلش‌کارت و تمرین مرور</li>
+            </ul>
+            <a class="btn btn-primary" href="pages/LangBlue-De.html">ورود به Deutsch ←</a>
+          </article>
+
+          <article class="product-card" data-accent="japanese">
+            <span class="product-badge">LANGBLUE · JAPANESE</span>
+            <div class="product-icon">🌸</div>
+            <h3>LangBlue Japanese</h3>
+            <p>محیط یادگیری ژاپنی برای ثبت واژگان، تمرین، فلش‌کارت و دسترسی به جدول سیستماتیک کانا و فونتیک با Romaji و IPA.</p>
+            <ul class="product-list">
+              <li>Hiragana و Katakana بر اساس 五十音</li>
+              <li>Romaji و IPA برای کمک به تلفظ</li>
+              <li>ثبت واژگان، فلش‌کارت و مرور</li>
+            </ul>
+            <a class="btn btn-primary" href="pages/Langjp.html">ورود به Japanese ←</a>
+          </article>
+
+          <article class="product-card" data-accent="kazakh">
+            <span class="product-badge">LANGBLUE · KAZAKH</span>
+            <div class="product-icon">🇰🇿</div>
+            <h3>LangBlue Kazakh</h3>
+            <p>محیط تخصصی یادگیری قزاقی با ثبت واژگان، صرف پسوندها، هماهنگی واکه‌ها و مرور فاصله‌دار.</p>
+            <ul class="product-list">
+              <li>واژگان همراه با ریشه و ساخت صرفی</li>
+              <li>تمرین پسوندها و هماهنگی واکه‌ها؛ الگوهای استثنایی نیازمند بازبینی‌اند</li>
+              <li>فلش‌کارت، آواشناسی و آمار خطا</li>
+            </ul>
+            <a class="btn btn-primary" href="pages/LangKz.html">ورود به Kazakh ←</a>
+          </article>
+          <article class="product-card" data-accent="tajik">
+            <span class="product-badge">LANGBLUE · TAJIK</span><div class="product-icon">🇹🇯</div>
+            <h3>LangBlue Tajik</h3>
+            <p>محیط یادگیری تاجیکی با خط سیریلیک، ریشه و ساخت واژه، فلش‌کارت، مرور فاصله‌دار و پل فارسی–تاجیکی.</p>
+            <ul class="product-list"><li>واژگان، ریشه، پیشوند و پسوند</li><li>فلش‌کارت و مرور؛ سطح‌های ۳ تا ۶ شش‌مرحله‌ای هنوز فعال نیستند</li><li>آواشناسی و مقایسهٔ فارسی–تاجیکی</li></ul>
+            <a class="btn btn-primary" href="pages/LangTj.html">ورود به Tajik ←</a>
+          </article>
+
+          <article class="product-card" data-accent="arabic">
+            <span class="product-badge">LANGDESERT · ARABIC</span>
+            <div class="product-icon">🌵</div>
+            <h3>LangDesert Arabic</h3>
+            <p>ماژول یادگیری عربی LangBlue برای تعیین سطح، یادگیری واژگان و گرامر و تمرین متناسب با سطح A1 تا C2.</p>
+            <ul class="product-list">
+              <li>تعیین سطح عربی A1 تا C2</li>
+              <li>واژگان و گرامر سطح‌بندی‌شده</li>
+              <li>تمرین و تحلیل پیشرفت</li>
+            </ul>
+            <a class="btn btn-primary" href="pages/LangDesert.html">ورود به LangDesert ←</a>
+          </article>
+          
+        </div>
+      </div>
+    </section>
+
+<section id="learning-path" aria-labelledby="learning-path-title">
+  <div class="wrap">
+    <div class="eyebrow">LANGBLUE · LEARNING PATH</div>
+    <h2 class="section-title" id="learning-path-title">نقشهٔ مسیر یادگیری (Curriculum)</h2>
+    <p class="section-lead">
+      این نقشه نقطهٔ شروع مشترک است، نه ادعای وجود یک برنامهٔ درسی کامل و یکسان برای همهٔ زبان‌ها.
+      جزئیات هر مسیر به محتوای واقعی همان محصول وابسته است.
+    </p>
+    <div class="workflow learning-path-grid">
+      <article class="step">
+        <span class="step-number">۱</span>
+        <strong>زبان و هدف را انتخاب کن</strong>
+        <small>از میان هفت محصول فعال، یک زبان و یک هدف کوتاه و روشن انتخاب کن.</small>
+      </article>
+      <article class="step">
+        <span class="step-number">۲</span>
+        <strong>نقطهٔ شروع را مشخص کن</strong>
+        <small>در LangDesert تعیین سطح A1 تا C2 وجود دارد؛ در سایر محصولات با اولین واژه یا قاعده شروع کن. تعیین سطح یکپارچه برای همهٔ زبان‌ها هنوز فراهم نیست.</small>
+      </article>
+      <article class="step">
+        <span class="step-number">۳</span>
+        <strong>یاد بگیر و تمرین کن</strong>
+        <small>از ابزارهای همان محصول برای واژگان، قواعد، ساختارها، فلش‌کارت و تمرین‌های موجود استفاده کن.</small>
+      </article>
+      <article class="step">
+        <span class="step-number">۴</span>
+        <strong>مرور و پیشرفت را بررسی کن</strong>
+        <small>موارد دشوار را دوباره تمرین کن و آمار همان محصول را ببین؛ ابزارها و زمان‌بندی مرور بین محصولات متفاوت‌اند.</small>
+      </article>
+    </div>
+    <div class="learning-path-note">
+      <strong>شفافیت دربارهٔ پوشش آموزشی:</strong>
+      گرامر، واژگان، تمرین، مرور و ابزارهای آواشناسی یا تلفظ در محصولات منتخب فعال‌اند.
+      تمرین شنیداری واقعی، مکالمهٔ هدایت‌شده و تصحیح نوشتار هنوز در همهٔ زبان‌ها به‌صورت یکپارچه ارائه نمی‌شوند.
+      در موتور مرور عمومی، فاصلهٔ نخست ۴ ساعت است و فاصله‌های بعدی با بازخورد تنظیم می‌شوند؛ این زمان‌بندی را نباید به همهٔ محصولات تعمیم داد.
+    </div>
+  </div>
+</section>
+
+
 
 <section class="lb-public-stats" id="langblue-stats" aria-label="آمار LangBlue">
   <div class="wrap">
@@ -334,12 +469,15 @@ footer{border-color:rgba(244,235,221,.16)}
     <div class="lb-public-stats-card">
       <div class="lb-stat"><div class="lb-stat-number" id="lbStatViews">—</div><div class="lb-stat-label">بار دیده‌شدن این صفحه</div></div>
       <div class="lb-stat"><div class="lb-stat-number" id="lbStatUsers">—</div><div class="lb-stat-label">حساب کاربری</div></div>
-      <div class="lb-stat"><div class="lb-stat-number" id="lbStatWords">—</div><div class="lb-stat-label">واژه و کلمه</div></div>
+      <div class="lb-stat"><div class="lb-stat-number" id="lbStatWords">—</div><div class="lb-stat-label">واژگان بانک تمرین</div></div>
       <div class="lb-stat"><div class="lb-stat-number" id="lbStatGoogle">—</div><div class="lb-stat-label">ورود با Google</div></div>
     </div>
-    <div class="lb-stat-note">آمار واژه‌ها به‌صورت یکپارچه محاسبه می‌شود و زبان‌ها جداگانه شمرده نمی‌شوند.</div>
+    <div class="lb-stat-note">این عدد واژه‌های یکتای فعال در بانک عمومی تمرین را نشان می‌دهد؛ واژه‌های شخصی کاربران در آن محاسبه نمی‌شوند.</div>
   </div>
 </section>
+<div class="ceremony-control" id="ceremonyControl" aria-live="polite"><button id="enableCeremonies" class="btn btn-secondary" type="button">🔔 فعال‌سازی اعلان مناسبت‌ها</button><span id="ceremonyStatus"></span></div>
+<div class="ceremony-control" id="notificationControl" aria-live="polite"><button id="enableNotifications" class="btn btn-secondary" type="button">🔔 فعال‌سازی اعلان‌های LangBlue</button><span id="notificationStatus"></span></div>
+
     <section id="features">
       <div class="wrap">
         <h2 class="section-title">LangBlue چه کاری انجام می‌دهد؟</h2>
@@ -404,43 +542,6 @@ footer{border-color:rgba(244,235,221,.16)}
 
     <section>
       <div class="wrap">
-        <h2 class="section-title">روند کار در LangBlue</h2>
-        <p class="section-lead">
-          از ثبت اولین قاعده تا تمرین و مرور، فرایند پلتفرم ساده و مرحله‌ای است.
-        </p>
-
-        <div class="workflow">
-          <div class="step">
-            <span class="step-number">۱</span>
-            <strong>حساب بساز</strong>
-            <small>ثبت‌نام بدون ایمیل</small>
-          </div>
-          <div class="step">
-            <span class="step-number">۲</span>
-            <strong>گرامر اضافه کن</strong>
-            <small>فرمول، کاربرد و مثال</small>
-          </div>
-          <div class="step">
-            <span class="step-number">۳</span>
-            <strong>سازمان‌دهی کن</strong>
-            <small>جدول و دسته‌بندی مفهومی</small>
-          </div>
-          <div class="step">
-            <span class="step-number">۴</span>
-            <strong>تمرین کن</strong>
-            <small>تمرین و فلش‌کارت</small>
-          </div>
-          <div class="step">
-            <span class="step-number">۵</span>
-            <strong>مرور و پیشرفت</strong>
-            <small>پیگیری عمق و وضعیت</small>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="wrap">
         <h2 class="section-title">LangBlue برای چه کسانی است؟</h2>
         <div class="audience">
           <div class="card">
@@ -459,103 +560,6 @@ footer{border-color:rgba(244,235,221,.16)}
               <li>از فلش‌کارت و تمرین‌های چهارگزینه‌ای برای مرور و تثبیت مطالب آموزشی استفاده کنند.</li>
             </ul>
           </div>
-        </div>
-      </div>
-    </section>
-
-
-    <section class="products" id="products">
-      <div class="wrap">
-        <h2 class="section-title">محصولات LangBlue</h2>
-        <p class="section-lead">
-          ابزارهای اصلی LangBlue در کنار یکدیگر قرار گرفته‌اند؛ از گرامر و واژگان تا آلمانی، عربی، ژاپنی و قزاقی، با مسیرهای اختصاصی برای یادگیری و تمرین.
-        </p>
-        <div class="products-grid" id="langblue-products-react">
-          <article class="product-card" data-accent="grammar">
-            <span class="product-badge">LANGBLUE · GRAMMAR</span>
-            <div class="product-icon">📐</div>
-            <h3>LangBlue Grammar</h3>
-            <p>محیط اصلی LangBlue برای ساخت، ثبت، سازمان‌دهی، تمرین و مرور قواعد گرامری و ساختارهای زبان.</p>
-            <ul class="product-list">
-              <li>ثبت و مدیریت قواعد گرامری</li>
-              <li>فرمول، مثال، یادداشت و سطح</li>
-              <li>فلش‌کارت و تمرین</li>
-            </ul>
-            <a class="btn btn-primary" href="pages/LangBlue-grammer.html">ورود به Grammar ←</a>
-          </article>
-
-          <article class="product-card" data-accent="vocabulary">
-            <span class="product-badge">LANGBLUE · VOCABULARY</span>
-            <div class="product-icon">📚</div>
-            <h3>LangBlue Vocabulary</h3>
-            <p>بخش واژگان LangBlue برای ثبت، سازمان‌دهی، مرور و تمرین لغات و عبارت‌های انگلیسی در کنار یادگیری گرامر.</p>
-            <ul class="product-list">
-              <li>مدیریت واژگان و عبارت‌ها</li>
-              <li>مثال و اطلاعات کاربردی</li>
-              <li>مرور و تمرین واژگان</li>
-            </ul>
-            <a class="btn btn-primary" href="pages/vocab.html">ورود به Vocabulary ←</a>
-          </article>
-
-          <article class="product-card" data-accent="deutsch">
-            <span class="product-badge">LANGBLUE · DEUTSCH</span>
-            <div class="product-icon">🇩🇪</div>
-            <h3>LangBlue Deutsch</h3>
-            <p>ابزار یادگیری آلمانی LangBlue برای ثبت واژگان، ترجمه فارسی، تلفظ و تمرین فلش‌کارت با مرور ساختاریافته.</p>
-            <ul class="product-list">
-              <li>ثبت واژگان آلمانی و ترجمه فارسی</li>
-              <li>تلفظ و جست‌وجوی سریع</li>
-              <li>فلش‌کارت و تمرین مرور</li>
-            </ul>
-            <a class="btn btn-primary" href="pages/LangBlue-De.html">ورود به Deutsch ←</a>
-          </article>
-
-          <article class="product-card" data-accent="japanese">
-            <span class="product-badge">LANGBLUE · JAPANESE</span>
-            <div class="product-icon">🌸</div>
-            <h3>LangBlue Japanese</h3>
-            <p>محیط یادگیری ژاپنی برای ثبت واژگان، تمرین، فلش‌کارت و دسترسی به جدول سیستماتیک کانا و فونتیک با Romaji و IPA.</p>
-            <ul class="product-list">
-              <li>Hiragana و Katakana بر اساس 五十音</li>
-              <li>Romaji و IPA برای کمک به تلفظ</li>
-              <li>ثبت واژگان، فلش‌کارت و مرور</li>
-            </ul>
-            <a class="btn btn-primary" href="pages/Langjp.html">ورود به Japanese ←</a>
-          </article>
-
-          <article class="product-card" data-accent="kazakh">
-            <span class="product-badge">LANGBLUE · KAZAKH</span>
-            <div class="product-icon">🇰🇿</div>
-            <h3>LangBlue Kazakh</h3>
-            <p>محیط تخصصی یادگیری قزاقی با ثبت واژگان، صرف پسوندها، هماهنگی واکه‌ها و مرور فاصله‌دار.</p>
-            <ul class="product-list">
-              <li>واژگان همراه با ریشه و ساخت صرفی</li>
-              <li>ماشین پسوندها و هماهنگی واکه‌ها</li>
-              <li>فلش‌کارت، آواشناسی و آمار خطا</li>
-            </ul>
-            <a class="btn btn-primary" href="pages/LangKz.html">ورود به Kazakh ←</a>
-          </article>
-          <article class="product-card" data-accent="tajik">
-            <span class="product-badge">LANGBLUE · TAJIK</span><div class="product-icon">🇹🇯</div>
-            <h3>LangBlue Tajik</h3>
-            <p>محیط یادگیری تاجیکی با خط سیریلیک، ریشه و ساخت واژه، فلش‌کارت، مرور فاصله‌دار و پل فارسی–تاجیکی.</p>
-            <ul class="product-list"><li>واژگان، ریشه، پیشوند و پسوند</li><li>شش‌مرحلهٔ تسلط و تمرین فلش‌کارت</li><li>آواشناسی و مقایسهٔ فارسی–تاجیکی</li></ul>
-            <a class="btn btn-primary" href="pages/LangTj.html">ورود به Tajik ←</a>
-          </article>
-
-          <article class="product-card" data-accent="arabic">
-            <span class="product-badge">LANGDESERT · ARABIC</span>
-            <div class="product-icon">🌵</div>
-            <h3>LangDesert Arabic</h3>
-            <p>ماژول یادگیری عربی LangBlue برای تعیین سطح، یادگیری واژگان و گرامر و تمرین متناسب با سطح A1 تا C2.</p>
-            <ul class="product-list">
-              <li>تعیین سطح عربی A1 تا C2</li>
-              <li>واژگان و گرامر سطح‌بندی‌شده</li>
-              <li>تمرین و تحلیل پیشرفت</li>
-            </ul>
-            <a class="btn btn-primary" href="pages/LangDesert.html">ورود به LangDesert ←</a>
-          </article>
-          
         </div>
       </div>
     </section>
@@ -588,7 +592,7 @@ footer{border-color:rgba(244,235,221,.16)}
   <div class="wrap">
     <h2 class="section-title">ساخت فیش خرید LangBlue</h2>
     <p class="section-lead">
-      یک یا چند محصول را انتخاب کن، مدت اشتراک را مشخص کن و فیش درخواست را بساز. اگر هر ۵ محصول را یک‌جا با مدت ۱۲ ماهه انتخاب کنی، ۱۰٪ تخفیف بسته اعمال می‌شود.
+      یک یا چند محصول را انتخاب کن، مدت اشتراک را مشخص کن و فیش درخواست را بساز. اگر هر ۷ محصول را یک‌جا با مدت ۱۲ ماهه انتخاب کنی، ۱۰٪ تخفیف بسته اعمال می‌شود.
       سپس شناسه فیش را برای ادمین LangBlue در تلگرام بفرست. پس از تأیید، کد فعال‌سازی را دریافت می‌کنی و آن را در بخش «فعال‌سازی اشتراک» همین صفحه، داخل حساب مرکزی وارد می‌کنی.
     </p>
     <div class="receipt-builder">
