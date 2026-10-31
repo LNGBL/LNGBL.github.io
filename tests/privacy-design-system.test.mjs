@@ -51,3 +51,38 @@ test("activity function is account-based and does not inspect request IP", () =>
   const fn = readFileSync(new URL("../supabase/functions/langblue-activity/index.ts", import.meta.url), "utf8");
   assert.doesNotMatch(fn, /cf-connecting-ip|x-forwarded-for|x-real-ip|ip_address/);
 });
+
+test("shared visual system is linked across public and learning sections", () => {
+  const pages = [
+    "../index.html",
+    "../pages/LangBlue-grammer.html",
+    "../pages/vocab.html",
+    "../pages/LangBlue-De.html",
+    "../pages/LangDesert.html",
+    "../pages/Langjp.html",
+    "../pages/LangKz.html",
+    "../pages/LangTj.html",
+    "../pages/teacher-network.html",
+    "../pages/teachers.html",
+    "../pages/exam.html",
+    "../pages/community-access.html",
+    "../pages/community-access-admin.html",
+    "../pages/learning-engine.html",
+    "../pages/server-rest.html",
+    "../pages/research.html"
+  ];
+  for (const path of pages) {
+    const html = readFileSync(new URL(path, import.meta.url), "utf8");
+    assert.match(html, /langblue-design-system\.css/, path);
+    assert.match(html, /lb-design-system/, path);
+  }
+});
+
+test("IP minimization keeps page-view deduplication to a 24-hour hash window", () => {
+  const migration = readFileSync(new URL("../supabase/migrations/20261031043352_privacy_ip_hash_retention_and_cleanup.sql", import.meta.url), "utf8");
+  assert.match(migration, /drop column if exists ip_address/);
+  assert.match(migration, /drop column if exists last_ip_hash/);
+  assert.match(migration, /drop column if exists browser_ip_hash/);
+  assert.match(migration, /interval '24 hours'/);
+  assert.doesNotMatch(migration, /interval '90 days'/);
+});
