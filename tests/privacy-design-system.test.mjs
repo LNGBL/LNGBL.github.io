@@ -29,7 +29,7 @@ test("privacy plan records current audit findings and safe rollout constraints",
   assert.match(privacy, /langblue-behavior/);
   assert.match(privacy, /us-west-2/);
   assert.match(privacy, /Fail open/);
-  assert.match(privacy, /has not changed production database rows/);
+  assert.match(privacy, /activity registry data to one row per account/);
 });
 
 test("analytics is opt-in and enforced server-side", () => {
