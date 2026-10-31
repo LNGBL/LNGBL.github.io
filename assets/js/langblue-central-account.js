@@ -88,7 +88,45 @@
     const u=window.LangBlueCore&&window.LangBlueCore.Auth?window.LangBlueCore.Auth.current():null;
     if(u){
       body.innerHTML='<h2 id="lbCentralTitle">حساب مرکزی LangBlue</h2><div class="lb-central-muted">همین حساب برای Grammar، Vocabulary، Deutsch، Japanese، Kazakh، Tajik و LangDesert استفاده می‌شود.</div><div class="lb-central-profile"><div><strong>نام:</strong> '+escapeHtml(u.name||'—')+'</div><div><strong>نام کاربری:</strong> @'+escapeHtml(u.username||'—')+'</div><div><strong>شناسه:</strong> <code>'+escapeHtml(u.id||'—')+'</code></div></div><div class="lb-central-product-links"><a href="/pages/LangBlue-grammer.html">📐 ورود به Grammar</a><a href="/pages/vocab.html">📚 ورود به Vocabulary</a><a href="/pages/LangBlue-De.html">🇩🇪 ورود به Deutsch</a><a href="/pages/LangDesert.html">🏜️ ورود به LangDesert · Arabic</a><a href="/pages/Langjp.html">🌸 ورود به Japanese</a><a href="/pages/LangKz.html">🇰🇿 ورود به Kazakh</a><a href="/pages/LangTj.html">🇹🇯 ورود به Tajik</a><a href="/pages/exam.html">📝 سامانه آزمون سالانه</a></div><div class="lb-central-subscription" style="margin-top:18px;padding:14px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.04)"><strong>🔑 فعال‌سازی اشتراک مرکزی</strong><div class="lb-central-muted" style="margin-top:5px">کد دریافتی از ادمین را فقط اینجا وارد کن؛ فعال‌سازی برای محصولات موجود در همان کد انجام می‌شود.</div><div class="lb-central-field"><label>کد فعال‌سازی</label><input id="lbCentralActivationCode" autocomplete="off" placeholder="کد را وارد کن"></div><div class="lb-central-actions"><button class="btn btn-primary" id="lbCentralActivate">فعال‌سازی</button></div><div class="lb-central-error" id="lbCentralActivationError"></div></div><div style="margin-top:18px;padding:14px;border:1px solid rgba(88,199,232,.24);border-radius:15px;background:rgba(22,138,173,.06)"><strong>📱 درخواست اتصال گوشی</strong><div class="lb-central-muted" style="margin-top:5px">اگر در اپ LangBlue نام کاربری این حساب را وارد کرده‌ای، درخواست گوشی اینجا نمایش داده می‌شود. فقط وقتی دستگاه را می‌شناسی تأیید کن.</div><div id="lbAndroidPairings" style="margin-top:8px"><div class="lb-central-muted">در حال بررسی…</div></div></div><div class="lb-central-actions"><button class="btn btn-primary" id="lbCentralLogout">🚪 خروج از حساب</button><button class="btn btn-secondary" id="lbCentralClose">بستن</button></div><div style="margin-top:18px;padding:12px;border:1px solid rgba(255,120,100,.22);border-radius:14px"><strong style="color:#ffb3a8">حذف حساب و تمام داده‌ها</strong><div class="lb-central-muted" style="margin-top:5px">قبل از حذف، می‌توانی مشخص کنی که چند مورد از واژه‌ها و گرامرهای تو به‌صورت ناشناس برای بانک آزمون باقی بماند.</div><div class="lb-central-actions"><button class="btn btn-secondary" id="lbCentralDeleteAccount">حذف حساب</button></div></div>';            body.querySelector('#lbCentralActivate').onclick=async function(){const input=body.querySelector('#lbCentralActivationCode'),err=body.querySelector('#lbCentralActivationError');const code=(input.value||'').trim();if(!code){err.textContent='کد فعال‌سازی را وارد کن.';return;}const selected=window.LangBlueCommerce?.ALL_PRODUCT_IDS||['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj'];const result=await window.LangBlueCore.subscription.activateAsync(code,selected);if(!result||!result.ok){err.textContent=(result&&result.error)||'فعال‌سازی انجام نشد.';return;}err.style.color='#9be7b4';err.textContent='اشتراک با موفقیت فعال شد.';input.value='';};body.querySelector('#lbCentralLogout').onclick=async function(){await window.LangBlueCore.Auth.logout();setCentralCookie(false);stopAndroidPairingTimer();root.classList.remove('open');renderLandingAccount();};
-      body.querySelector('#lbCentralClose').onclick=()=>{stopAndroidPairingTimer();root.classList.remove('open')};installAndroidPairingApproval(body);body.querySelector('#lbCentralDeleteAccount').onclick=async function(){const keep=confirm('آیا اجازه می‌دهی محتوای آموزشی منتخب تو، بدون نام و شناسه، برای بانک آزمون باقی بماند؟\\n\\nOK = اجازه\\nCancel = حذف کامل محتوای شخصی');const confirmDelete=confirm('حذف حساب برگشت‌پذیر نیست. همه اطلاعات حساب، اشتراک، وضعیت و گزارش‌های شخصی حذف می‌شوند. ادامه می‌دهی؟');if(!confirmDelete)return;const result=await window.LangBlueBackend.invoke('langblue-account-delete',{confirm:true,keep_exam_content:keep});if(!result||!result.ok){alert((result&&result.error)||'حذف حساب انجام نشد.');return;}try{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&/langblue|lb[-_]/i.test(k))localStorage.removeItem(k);}for(let i=sessionStorage.length-1;i>=0;i--){const k=sessionStorage.key(i);if(k&&/langblue|lb[-_]/i.test(k))sessionStorage.removeItem(k);}}catch(e){}try{await window.LangBlueSupabase.getClient().auth.signOut({scope:'global'});}catch(e){}location.href='/?account=deleted';};
+      body.querySelector('#lbCentralClose').onclick=()=>{stopAndroidPairingTimer();root.classList.remove('open')};installAndroidPairingApproval(body);body.querySelector('#lbCentralDeleteAccount').onclick=async function(){
+        const deleteButton=body.querySelector('#lbCentralDeleteAccount');
+        const currentUser=window.LangBlueCore?.Auth?.current?.();
+        if(!currentUser?.id){alert('نشست حساب معتبر نیست؛ دوباره وارد شو.');return;}
+        const keep=confirm('آیا اجازه می‌دهی محتوای آموزشی منتخب تو، بدون نام و شناسه، برای بانک آزمون باقی بماند؟\\n\\nOK = اجازه\\nCancel = حذف کامل محتوای شخصی');
+        const confirmed=confirm('حذف حساب برگشت‌پذیر نیست. همه اطلاعات حساب، اشتراک، وضعیت و گزارش‌های شخصی حذف می‌شوند. ادامه می‌دهی؟');
+        if(!confirmed)return;
+        deleteButton.disabled=true;
+        deleteButton.textContent='در حال حذف فوری حساب…';
+        const result=await window.LangBlueBackend.invoke('langblue-account-delete',{confirm:true,keep_exam_content:keep});
+        if(!result||!result.ok){
+          deleteButton.disabled=false;
+          deleteButton.textContent='حذف حساب';
+          alert((result&&result.error)||'حذف حساب انجام نشد. هیچ موفقیتی ثبت نشده است؛ دوباره تلاش کن یا با پشتیبانی تماس بگیر.');
+          return;
+        }
+        const uid=String(currentUser.id);
+        const username=String(currentUser.username||'').toLowerCase();
+        try{
+          await window.LangBlueCore.Auth.logout();
+          const accounts=window.LangBlueCore.Store.get('accounts',{});
+          if(username&&accounts&&accounts[username]){
+            delete accounts[username];
+            window.LangBlueCore.Store.set('accounts',accounts);
+          }
+          for(let i=localStorage.length-1;i>=0;i--){
+            const key=localStorage.key(i);
+            if(key&&key.startsWith('lb:user:'+uid+':'))localStorage.removeItem(key);
+          }
+          const legacy=localStorage.getItem('langblue_account');
+          if(legacy){try{if(JSON.parse(legacy)?.id===uid)localStorage.removeItem('langblue_account');}catch(e){}}
+          for(let i=sessionStorage.length-1;i>=0;i--){
+            const key=sessionStorage.key(i);
+            if(key&&/langblue|lb[-_]/i.test(key))sessionStorage.removeItem(key);
+          }
+        }catch(e){console.warn('[LangBlue] local account cleanup:',e);}
+        setCentralCookie(false);
+        location.replace('/?account=deleted');
+      };
     }else{
       body.innerHTML=`<h2 id="lbCentralTitle">حساب مرکزی LangBlue</h2><div class="lb-central-muted">یک حساب بساز؛ بعد از آن در هیچ‌کدام از محصولات دوباره ثبت‌نام نمی‌کنی.</div><div class="lb-central-tabs"><button class="btn btn-primary" id="lbCentralRegisterTab">ساخت حساب</button><button class="btn btn-secondary" id="lbCentralLoginTab">ورود</button></div><form id="lbCentralForm">
 <div class="lb-central-field" id="lbCentralNameWrap"><label>نام</label><input id="lbCentralName" autocomplete="name"></div>
