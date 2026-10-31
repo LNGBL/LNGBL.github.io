@@ -47,7 +47,6 @@ Deno.serve(async req=>{
   if(pair.length<32||dk.length<32)return json({ok:false,error:"PAIRING_INPUT_INVALID"},400);
   const ins=await admin.from("android_pairings").insert({
    user_id:user.id,device_key_hash:await sha(dk),
-   browser_user_agent:(req.headers.get("user-agent")||"").slice(0,500),
    device_label:String(body.device_label||"Android device").slice(0,120),
    app_version:String(body.app_version||"").slice(0,30)
   }).select("id,status,expires_at").single();
