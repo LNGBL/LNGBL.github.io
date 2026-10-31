@@ -31,3 +31,23 @@ test("privacy plan records current audit findings and safe rollout constraints",
   assert.match(privacy, /Fail open/);
   assert.match(privacy, /has not changed production database rows/);
 });
+
+test("analytics is opt-in and enforced server-side", () => {
+  const behaviorFunction = readFileSync(new URL("../supabase/functions/langblue-behavior/index.ts", import.meta.url), "utf8");
+  const migration = readFileSync(new URL("../supabase/migrations/20261031042818_privacy_first_data_minimization.sql", import.meta.url), "utf8");
+  assert.match(migration, /analytics_consent boolean not null default false/);
+  assert.match(migration, /drop column if exists ip_address/);
+  assert.match(behaviorFunction, /profile\?\.analytics_consent !== true/);
+  assert.match(behaviorFunction, /ANALYTICS_DISABLED/);
+});
+
+test("connection policy no longer performs IP classification or restrictions", () => {
+  const fn = readFileSync(new URL("../supabase/functions/langblue-connection-policy/index.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(fn, /IP_INTELLIGENCE|api\.ipwho|cf-connecting-ip|x-forwarded-for/);
+  assert.match(fn, /access_restricted_by_ip: false/);
+});
+
+test("activity function is account-based and does not inspect request IP", () => {
+  const fn = readFileSync(new URL("../supabase/functions/langblue-activity/index.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(fn, /cf-connecting-ip|x-forwarded-for|x-real-ip|ip_address/);
+});
