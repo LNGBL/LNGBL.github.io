@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0c1713">
+<meta name="robots" content="noindex,nofollow">
+<title>پیش‌نمایش سیستم طراحی | LangBlue</title>
+<link rel="stylesheet" href="../assets/css/langblue-design-system.css">
+</head>
+<body class="lb-design-system">
+<div id="langblue-design-preview"></div>
+<script type="module">
+import React,{useState}from"https://esm.sh/react@18.3.1";
+import{createRoot}from"https://esm.sh/react-dom@18.3.1/client";
+const h=React.createElement;
+function App(){
+ const [tab,setTab]=useState("overview");
+ const [enabled,setEnabled]=useState(false);
+ const [search,setSearch]=useState("");
+ const sections=[
+  {id:"overview",label:"نمای کلی"},{id:"products",label:"محصولات"},{id:"privacy",label:"حریم خصوصی"},{id:"components",label:"اجزای رابط"}
+ ];
+ const products=[
+  {name:"Grammar",sub:"ساختار و تحلیل دستور",tag:"قاعده‌محور",tone:"lb-chip-green",value:"01"},
+  {name:"Vocabulary",sub:"واژگان، بازیابی و مرور",tag:"مرور هوشمند",tone:"lb-chip-green",value:"02"},
+  {name:"Deutsch",sub:"تمرین زبان آلمانی",tag:"A1 — C2",tone:"",value:"03"},
+  {name:"LangDesert",sub:"یادگیری عربی",tag:"RTL",tone:"",value:"04"},
+  {name:"Japanese",sub:"زبان ژاپنی و آواشناسی",tag:"IPA",tone:"",value:"05"},
+  {name:"Kazakh",sub:"یادگیری قزاقی",tag:"Beta",tone:"",value:"06"},
+  {name:"Tajik",sub:"یادگیری تاجیکی",tag:"Beta",tone:"",value:"07"}
+ ];
+ const filtered=products.filter(p=>(p.name+" "+p.sub).toLowerCase().includes(search.toLowerCase()));
+ return h(React.Fragment,null,
+  h("header",{className:"lb-topbar"},h("div",{className:"lb-shell lb-topbar-inner"},
+   h("a",{className:"lb-brand",href:"/","aria-label":"LangBlue صفحه اصلی"},h("span",{className:"lb-brand-mark"},"L"),"LangBlue",h("span",{className:"lb-chip"},"DESIGN SYSTEM")),
+   h("nav",{className:"lb-nav","aria-label":"بخش‌های پیش‌نمایش"},...sections.map(s=>h("a",{href:"#"+s.id,"aria-current":tab===s.id?"page":undefined,onClick:()=>setTab(s.id),key:s.id},s.label)))
+  )),
+  h("main",{className:"lb-shell"},
+   h("section",{className:"lb-hero",id:"overview"},h("div",{className:"lb-hero-grid"},
+    h("div",null,h("span",{className:"lb-kicker"},"LANGBLUE / SYSTEM 01"),h("h1",null,"یادگیری زبان، با ",h("em",null,"ساختار روشن.")),h("p",{className:"lb-lead"},"یک زبان بصری یکپارچه برای تمام محصولات؛ با کارت‌های عمیق، سلسله‌مراتب خوانا، رنگ‌های هویتی و تعامل‌های آرام. این صفحه فقط پیش‌نمایش است و به تجربهٔ فعلی کاربران دست نمی‌زند."),h("div",{style:{display:"flex",gap:10,flexWrap:"wrap",marginTop:22}},h("a",{className:"lb-btn lb-btn-primary",href:"#products"},"دیدن محصولات"),h("a",{className:"lb-btn",href:"#components"},"اجزای رابط"))),
+    h("aside",{className:"lb-hero-aside"},h("span",{className:"lb-kicker"},"DESIGN PRINCIPLES"),h("strong",null,"Calm power."),h("span",null,"قدرت بصری بدون شلوغی؛ انیمیشن محدود؛ اولویت با سرعت و دسترس‌پذیری."),h("div",{className:"lb-divider"}),h("div",{style:{display:"flex",gap:8,flexWrap:"wrap"}},h("span",{className:"lb-chip lb-chip-green"},"Responsive"),h("span",{className:"lb-chip"},"RTL / LTR"),h("span",{className:"lb-chip"},"Accessible")))
+   )),
+   h("section",{className:"lb-section"},h("div",{className:"lb-section-head"},h("div",null,h("span",{className:"lb-kicker"},"AT A GLANCE"),h("h2",null,"یک سیستم، هفت محصول"))),h("div",{className:"lb-grid"},
+    h("article",{className:"lb-card lb-card-span-4"},h("span",{className:"lb-card-label"},"محصولات فعال"),h("strong",{className:"lb-card-value"},"07"),h("span",{className:"lb-chip lb-chip-green"},"یک حساب مرکزی")),
+    h("article",{className:"lb-card lb-card-span-4"},h("span",{className:"lb-card-label"},"زبان‌های پشتیبانی‌شده"),h("strong",{className:"lb-card-value"},"07"),h("span",{className:"lb-card-note"},"با جهت نوشتار و تایپوگرافی مستقل")),
+    h("article",{className:"lb-card lb-card-span-4"},h("span",{className:"lb-card-label"},"اصل طراحی"),h("strong",{className:"lb-card-value"},"Simple"),h("span",{className:"lb-card-note"},"کمترین اصطکاک برای یادگیرنده"))
+   )),
+   h("section",{className:"lb-section",id:"products"},h("div",{className:"lb-section-head"},h("div",null,h("span",{className:"lb-kicker"},"PRODUCT ECOSYSTEM"),h("h2",null,"محصولات LangBlue")),h("label",{className:"lb-field",style:{minWidth:220}},h("span",null,"جست‌وجوی نمایشی"),h("input",{className:"lb-input",value:search,onChange:e=>setSearch(e.target.value),placeholder:"نام محصول…"}))),
+    h("div",{className:"lb-grid"},...filtered.map(p=>h("article",{className:"lb-card lb-card-span-4",key:p.name},h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},h("span",{className:"lb-chip "+p.tone},p.tag),h("span",{className:"lb-card-note"},p.value)),h("h3",{style:{fontSize:23,margin:"16px 0 4px"}},p.name),h("p",{className:"lb-card-note"},p.sub),h("div",{className:"lb-divider"}),h("a",{className:"lb-btn lb-btn-quiet",href:"#components"},"مشاهدهٔ الگو ←"))))
+   ),
+   h("section",{className:"lb-section",id:"privacy"},h("div",{className:"lb-section-head"},h("div",null,h("span",{className:"lb-kicker"},"PRIVACY BY DESIGN"),h("h2",null,"حریم خصوصی بدون مزاحمت"))),h("div",{className:"lb-grid"},
+    h("article",{className:"lb-card lb-card-span-7"},h("h3",{style:{marginTop:0}},"کنترل‌های اختیاری"),h("p",{className:"lb-card-note"},"نمونهٔ نمایشی؛ تنظیمات واقعی تا زمان اتصال امن به سرور ذخیره نمی‌شوند."),h("div",{className:"lb-divider"}),h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}},h("div",null,h("strong",null,"تحلیل اختیاری محصول"),h("p",{className:"lb-card-note"},"برای بهبود تجربه؛ بدون آن هم همهٔ امکانات اصلی فعال می‌مانند.")),h("button",{className:"lb-btn "+(enabled?"lb-btn-primary":""),type:"button","aria-pressed":enabled,onClick:()=>setEnabled(v=>!v)},enabled?"فعال":"غیرفعال"))),
+    h("article",{className:"lb-card lb-card-span-5"},h("span",{className:"lb-chip lb-chip-green"},"پیش‌فرض پیشنهادی"),h("h3",null,"حداقل داده"),h("ul",{className:"lb-list"},h("li",null,h("span",null,"مکان تقریبی"),h("strong",null,"کشور، نه نشانی")),h("li",null,h("span",null,"تحلیل اختیاری"),h("strong",null,"خاموش")),h("li",null,h("span",null,"مکان نامشخص"),h("strong",null,"بدون محدودیت"))))
+   )),
+   h("section",{className:"lb-section",id:"components"},h("div",{className:"lb-section-head"},h("div",null,h("span",{className:"lb-kicker"},"COMPONENT LIBRARY"),h("h2",null,"اجزای مشترک رابط"))),h("div",{className:"lb-grid"},
+    h("article",{className:"lb-card lb-card-span-6"},h("h3",{style:{marginTop:0}},"دکمه‌ها"),h("div",{style:{display:"flex",gap:9,flexWrap:"wrap"}},h("button",{className:"lb-btn lb-btn-primary"},"اقدام اصلی"),h("button",{className:"lb-btn"},"ثانویه"),h("button",{className:"lb-btn lb-btn-quiet"},"کم‌تأکید"))),
+    h("article",{className:"lb-card lb-card-span-6"},h("h3",{style:{marginTop:0}},"نشان‌ها و وضعیت"),h("div",{style:{display:"flex",gap:9,flexWrap:"wrap"}},h("span",{className:"lb-chip lb-chip-green"},"تأییدشده"),h("span",{className:"lb-chip lb-chip-coral"},"نیازمند بررسی"),h("span",{className:"lb-chip"},"پیش‌نویس"))),
+    h("article",{className:"lb-card lb-card-span-12"},h("div",{className:"lb-section-head"},h("div",null,h("h3",{style:{margin:0}},"فرم و پیشرفت"),h("p",null,"الگوی قابل استفاده برای حساب مرکزی، معلمان و تمرین‌ها."))),h("div",{className:"lb-form-grid"},h("label",{className:"lb-field"},"نام نمایشی",h("input",{className:"lb-input",placeholder:"نام شما"})),h("label",{className:"lb-field"},"زبان رابط",h("select",{className:"lb-input"},h("option",null,"فارسی"),h("option",null,"English"),h("option",null,"Deutsch")))),h("div",{className:"lb-divider"}),h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:8}},h("span",{className:"lb-card-note"},"پیشرفت نمونه"),h("strong",null,"68%")),h("div",{className:"lb-progress","aria-label":"پیشرفت نمونه 68 درصد"},h("span",{"aria-hidden":"true",style:{"--progress":"68%"}})))
+   )),
+   h("div",{className:"lb-callout",style:{margin:"18px 0 46px"}},"این پیش‌نمایش به‌صورت جداگانه ساخته شده است. پس از تأیید، اجزا را مرحله‌به‌مرحله روی لندینگ، حساب مرکزی، صفحات آموزشی، شبکهٔ معلمان و پنل‌های مدیریتی اعمال می‌کنیم.")
+  ),
+  h("footer",{className:"lb-footer"},h("div",{className:"lb-shell"},"LangBlue · Design System Preview · Not linked from the public landing page"))
+ );
+}
+createRoot(document.getElementById("langblue-design-preview")).render(h(App));
+</script>
+</body>
+</html>
