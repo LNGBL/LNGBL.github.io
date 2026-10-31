@@ -39,12 +39,12 @@
 - Activity heartbeats now update account-level activity and leaderboard metadata without reading request IP headers.
 - Removed raw IP storage from exam incident records; incident type, session, account, metadata, and timestamp remain available for security review.
 - Removed Android device/pairing IP-hash columns and the ineffective IP-match comparison. Pairing continues to use device-key hashes, one-time codes, and explicit account approval.
-- Public page-view deduplication retains only a keyed IP hash for the 24-hour deduplication window. Expired hashes are purged after 24 hours; the cumulative page-view counter is preserved.
+- Public page-view deduplication retains only a keyed IP hash for the 24-hour deduplication window. Expired hashes are purged after 24 hours by both request-time cleanup and an hourly database job; the cumulative page-view counter is preserved.
 
 ## Remaining work and limitations
 
 - Historical `behavior_events` remain in place; approve a purpose-specific retention period before scheduling deletion.
-- The public page-view counter still deduplicates by IP for 24 hours, but only a keyed hash is retained for that window; it is not an exact location signal.
+- The public page-view counter still deduplicates by IP for 24 hours, but only a keyed hash is retained for that window; it is not an exact location signal. The hourly cleanup job is named `langblue-prune-landing-ip-hashes`.
 - Supabase database backups and provider request/security logs may have independent retention periods. Review those settings with the hosting provider.
 - Review Supabase DPA, subprocessors, international-transfer terms, and region choice with qualified counsel. This implementation is not a legal compliance certification.
 - The activity registry now measures account-level activity rather than separate per-IP activity. Its consolidation uses the maximum per-IP active-seconds value to avoid double-counting simultaneous devices; the historical per-IP breakdown was intentionally removed.
