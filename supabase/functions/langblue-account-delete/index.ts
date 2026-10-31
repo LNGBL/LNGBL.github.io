@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
   const url = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !serviceKey) return json({ ok: false, error: "SERVER_CONFIGURATION_ERROR" }, 500);
-  const token = (req.headers.get("Authorization") || "").replace(/^Bearer\\s+/i, "").trim();
+  const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "").trim();
   if (!token) return json({ ok: false, error: "AUTH_REQUIRED" }, 401);
 
   const admin = createClient(url, serviceKey, { auth: { autoRefreshToken: false, persistSession: false } });
