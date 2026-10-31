@@ -23,6 +23,22 @@
     }catch(_){ return uuid(); }
   }
 
+  let consentCache = null;
+  async function refreshConsent(){
+    consentCache = null;
+    const sb=window.LangBlueSupabase&&window.LangBlueSupabase.getClient?window.LangBlueSupabase.getClient():null;
+    if(!sb)return false;
+    const {data,error}=await sb.from('profiles').select('analytics_consent').maybeSingle();
+    consentCache=!error&&data&&data.analytics_consent===true;
+    return consentCache;
+  }
+  async function hasConsent(sb){
+    if(consentCache!==null)return consentCache;
+    const {data,error}=await sb.from('profiles').select('analytics_consent').maybeSingle();
+    consentCache=!error&&data&&data.analytics_consent===true;
+    return consentCache;
+  }
+
   async function send(eventName, options){
     const sb=window.LangBlueSupabase && window.LangBlueSupabase.getClient
       ? window.LangBlueSupabase.getClient() : null;
@@ -31,6 +47,7 @@
     const session=await sb.auth.getSession();
     const authSession=session && session.data && session.data.session;
     if(!authSession) return {ok:false,error:'AUTH_REQUIRED'};
+    if(!(await hasConsent(sb))) return {ok:true,skipped:true,reason:'ANALYTICS_DISABLED'};
 
     const opts=options||{};
     const product=typeof opts.productId==='string' && VALID_PRODUCTS.has(opts.productId.toLowerCase())
@@ -120,7 +137,8 @@
     version:'1.0.0',
     sessionId,
     send,
-    pageView
+    pageView,
+    refreshConsent
   };
 
   function inferProduct(){

@@ -6,7 +6,6 @@ const headers={"Access-Control-Allow-Origin":ORIGIN,"Access-Control-Allow-Header
 const json=(x:unknown,s=200)=>new Response(JSON.stringify(x),{status:s,headers});
 async function sha(v:string){const d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v));return Array.from(new Uint8Array(d)).map(x=>x.toString(16).padStart(2,"0")).join("")}
 function makeToken(){const b=new Uint8Array(32);crypto.getRandomValues(b);return Array.from(b).map(x=>x.toString(16).padStart(2,"0")).join("")}
-function ip(req:Request){return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()||req.headers.get("cf-connecting-ip")||""}
 
 Deno.serve(async req=>{
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers});
@@ -47,8 +46,7 @@ Deno.serve(async req=>{
   const pair=String(body.pair_code||"");const dk=String(body.device_key||"");
   if(pair.length<32||dk.length<32)return json({ok:false,error:"PAIRING_INPUT_INVALID"},400);
   const ins=await admin.from("android_pairings").insert({
-   user_id:user.id,device_key_hash:await sha(dk),browser_ip_hash:await sha(ip(req)),
-   browser_user_agent:(req.headers.get("user-agent")||"").slice(0,500),
+   user_id:user.id,device_key_hash:await sha(dk),
    device_label:String(body.device_label||"Android device").slice(0,120),
    app_version:String(body.app_version||"").slice(0,30)
   }).select("id,status,expires_at").single();
@@ -73,15 +71,14 @@ Deno.serve(async req=>{
   if(row.data.consumed_at)return json({ok:false,error:"PAIRING_CONSUMED"},409);
   if(new Date(row.data.expires_at).getTime()<=Date.now())return json({ok:false,error:"PAIRING_EXPIRED"},409);
   if(row.data.status!=="approved")return json({ok:true,status:row.data.status});
-  const deviceIp=await sha(ip(req));const match=!!row.data.browser_ip_hash&&deviceIp===row.data.browser_ip_hash;
   const sub=await admin.from("subscriptions").select("expires_at").eq("user_id",row.data.user_id).eq("status","active").gt("expires_at",new Date().toISOString()).order("expires_at",{ascending:false}).limit(1);
   const expires=sub.data?.[0]?.expires_at||null;
   const raw=makeToken(),hash=await sha(raw);
   const ins=await admin.from("android_handoffs").insert({user_id:row.data.user_id,token_hash:hash});
   if(ins.error)return json({ok:false,error:"SESSION_CREATE_FAILED"},500);
-  await admin.from("android_pairings").update({consumed_at:new Date().toISOString(),app_ip_match:match}).eq("id",id).eq("consumed_at",null);
-  await admin.from("android_devices").upsert({user_id:row.data.user_id,device_key_hash:await sha(dk),device_label:row.data.device_label,platform:"android",app_version:row.data.app_version,last_ip_hash:deviceIp,last_seen_at:new Date().toISOString(),approved_at:new Date().toISOString(),offline_until:new Date(Date.now()+30*86400000).toISOString(),subscription_expires_at:expires,revoked_at:null},{onConflict:"device_key_hash"});
-  return json({ok:true,status:"approved",token:raw,expires_in_days:30,ip_match:match,subscription_expires_at:expires});
+  await admin.from("android_pairings").update({consumed_at:new Date().toISOString()}).eq("id",id).eq("consumed_at",null);
+  await admin.from("android_devices").upsert({user_id:row.data.user_id,device_key_hash:await sha(dk),device_label:row.data.device_label,platform:"android",app_version:row.data.app_version,last_seen_at:new Date().toISOString(),approved_at:new Date().toISOString(),offline_until:new Date(Date.now()+30*86400000).toISOString(),subscription_expires_at:expires,revoked_at:null},{onConflict:"device_key_hash"});
+  return json({ok:true,status:"approved",token:raw,expires_in_days:30,ip_match:null,subscription_expires_at:expires});
  }
 
  const raw=String(body.token||"");
