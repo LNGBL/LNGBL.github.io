@@ -60,7 +60,10 @@ Deno.serve(async (req) => {
   // The verified Auth identity is the single deletion authority. Every user-owned
   // table is FK-linked with ON DELETE CASCADE; Auth deletion cascades in one DB transaction.
   const { error: deleteError } = await admin.auth.admin.deleteUser(user.id);
-  if (deleteError) {\n    console.error("AUTH_DELETE_FAILED", deleteError.message);\n    return json({ ok: false, error: "AUTH_DELETE_FAILED" }, 500);\n  }
+  if (deleteError) {
+    console.error("AUTH_DELETE_FAILED", deleteError.message);
+    return json({ ok: false, error: "AUTH_DELETE_FAILED" }, 500);
+  }
 
   return json({ ok: true, deleted: true, sessions_revoked: true, exam_content_anonymized: keepExamContent });
 });
