@@ -117,4 +117,5 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
 async function init(){const local=readLocal();if(local)state=mergeStates(state,local);state.lexemes=state.lexemes.map(normalizeLexeme);renderPhonetics();renderMorph();renderAll();try{const ok=await syncCloud();$('syncStatus').textContent=ok?'به حساب مرکزی متصل شد؛ داده‌ها و صف مرور همگام‌اند.':'ذخیرهٔ محلی فعال است؛ برای همگام‌سازی وارد حساب مرکزی شو.'}catch(e){$('syncStatus').textContent='ذخیرهٔ محلی فعال است؛ همگام‌سازی ابری بعداً دوباره تلاش می‌شود.';console.warn('[LangBlue KZ] initial sync:',e.message)}}
 init();
 </script>
+<script src="../assets/js/langblue-pronunciation.js" defer></script>
 </body></html>
