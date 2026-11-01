@@ -15,7 +15,7 @@ It creates the product catalog, plans, profiles, hashed activation-code store, s
 ## Edge Functions
 
 - `activate-code`: authenticated users redeem a code; the code is hashed server-side and the subscription is written server-side.
-- `admin-create-code`: admin-only code generation. Set `LANGBLUE_ADMIN_SECRET` as a Supabase secret. The generated plaintext code is returned only to the admin request that created it.
+- `admin-create-code`: admin-only code generation. Requires a valid Supabase session and a matching row in `public.platform_admins`; the generated plaintext code is returned only to the authorized request that created it.\n- `langblue-admin-access`: reports the signed-in account’s central admin status and available management modules.\n- `langblue-community-access`: community-assistance administration is authorized through `public.platform_admins`; ordinary user request/status actions remain scoped to the signed-in user.\n- `langblue-research-dashboard`: research access is authorized through the same central `public.platform_admins` table.
 - `langblue-auth`: username/password bridge that creates/confirms the internal Supabase Auth identity and returns a normal Supabase session; no user email is required.
 
 Required Supabase secrets for `activate-code` are provided automatically by Supabase:
@@ -24,7 +24,7 @@ Required Supabase secrets for `activate-code` are provided automatically by Supa
 - `SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 
-Do not put the service-role key or the admin secret in GitHub Pages or any frontend JavaScript.
+Never place the service-role key or any server secret in GitHub Pages or frontend JavaScript. Admin authorization is checked server-side from the authenticated user ID; a frontend link is only a convenience and is not an authorization boundary.
 
 ## Rollout order
 
