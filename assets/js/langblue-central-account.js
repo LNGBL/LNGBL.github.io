@@ -197,6 +197,16 @@ if(back)location.href=back;
     if(!isLanding())return;injectLandingStyles();const nav=document.querySelector('header .nav');if(!nav)return;
     let btn=document.getElementById('lbCentralAccountButton');if(!btn){btn=document.createElement('button');btn.id='lbCentralAccountButton';btn.className='lb-central-account-btn';nav.appendChild(btn);btn.onclick=openAccount;}
     const u=window.LangBlueCore&&window.LangBlueCore.Auth?window.LangBlueCore.Auth.current():null;btn.textContent=u?'👤 حساب من':'👤 حساب مرکزی';
+    let adminBtn=document.getElementById('lbCentralAdminButton');
+    if(u?.id){
+      const client=window.LangBlueSupabase?.getClient?.();
+      if(client){client.functions.invoke('langblue-admin-access',{body:{}}).then(({data,error})=>{
+        const allowed=!error&&data?.ok&&data.is_admin;
+        let current=document.getElementById('lbCentralAdminButton');
+        if(allowed&&!current){current=document.createElement('a');current.id='lbCentralAdminButton';current.className='lb-central-account-btn';current.href='/pages/admin.html';current.textContent='⚙ مدیریت LangBlue';nav.appendChild(current);}
+        if(!allowed&&current)current.remove();
+      }).catch(()=>{const current=document.getElementById('lbCentralAdminButton');if(current)current.remove();});}
+    }else if(adminBtn)adminBtn.remove();
   }
   async function gateProduct(){
     if(isLanding())return;injectLandingStyles();const s=await hydrate();
