@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>مدیریت مرکزی | LangBlue</title>
+<link rel="stylesheet" href="../assets/css/langblue-theme.css">
+<link rel="stylesheet" href="../assets/css/langblue-design-system.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase-client.js"></script>
+<style>
+body{background:#071521;color:#edf7fa}.wrap{width:min(980px,calc(100% - 28px));margin:32px auto 70px}.panel{background:#0e2233;border:1px solid rgba(255,255,255,.12);border-radius:17px;padding:20px;margin:14px 0}.muted{color:#a9c0c7;font-size:13px;line-height:1.8}.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.link{display:block;text-decoration:none;color:#edf7fa;padding:16px;border:1px solid rgba(255,255,255,.13);border-radius:13px;background:#122c40}.link b{display:block;margin-bottom:5px}.field{display:grid;gap:6px;margin:10px 0}.field input{width:100%;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:#071a29;color:white;font:inherit}.btn{padding:10px 15px;border:0;border-radius:10px;background:#168aad;color:white;font:inherit;font-weight:750;cursor:pointer}.status{padding:12px;border-radius:10px;background:rgba(255,255,255,.06);margin:12px 0}.code{font:700 16px ui-monospace,monospace;word-break:break-all}
+</style>
+</head>
+<body class="lb-design-system"><main class="wrap">
+<header><h1>پنل مدیریت مرکزی LangBlue</h1><p class="muted">این صفحه فقط برای حساب‌های ثبت‌شده در فهرست محرمانهٔ مدیران قابل استفاده است.</p></header>
+<div id="status" class="status" role="status">در حال بررسی دسترسی حساب…</div>
+<section id="admin" hidden>
+<div class="panel"><h2>ابزارهای مدیریتی</h2><div class="links">
+<a class="link" href="/pages/research.html"><b>Research Dashboard</b><span class="muted">تحلیل داده‌های یادگیری و قیف محصول</span></a>
+<a class="link" href="/pages/community-access-admin.html"><b>مدیریت دسترسی منصفانه</b><span class="muted">بررسی، تأیید و رد درخواست‌ها</span></a>
+</div></div>
+<div class="panel"><h2>ساخت کد فعال‌سازی</h2><p class="muted">شناسهٔ طرح و شناسهٔ محصولات را از فهرست تنظیمات تجاری وارد کن. کد فقط یک‌بار در پاسخ سرور ساخته و نمایش داده می‌شود.</p>
+<form id="codeForm">
+<div class="field"><label for="plan">شناسهٔ طرح (plan_id)</label><input id="plan" required maxlength="120"></div>
+<div class="field"><label for="products">شناسهٔ محصولات (با کاما جدا کن)</label><input id="products" required placeholder="grammar,vocabulary" maxlength="1000"></div>
+<div class="field"><label for="uses">حداکثر تعداد استفاده</label><input id="uses" type="number" min="1" max="10000" value="1" required></div>
+<button class="btn" id="create" type="submit">ساخت کد</button>
+</form><div id="codeStatus" class="status" hidden></div>
+</div>
+</section>
+</main>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id),status=$('status'),root=$('admin');
+async function init(){
+ const client=window.LangBlueSupabase?.getClient?.();
+ if(!client){status.textContent='اتصال حساب مرکزی در دسترس نیست.';return}
+ const {data:{session}}=await client.auth.getSession();
+ if(!session){status.textContent='ابتدا با حساب LangBlue Official وارد صفحهٔ اصلی شو.';return}
+ const {data,error}=await client.functions.invoke('langblue-admin-access',{body:{}});
+ if(error||!data?.ok){status.textContent='بررسی دسترسی مدیر ناموفق بود؛ دوباره وارد شو.';return}
+ if(!data.is_admin){status.textContent='این حساب دسترسی مدیریتی ندارد.';return}
+ status.textContent='دسترسی تأیید شد · نقش: '+(data.role==='owner'?'مالک مرکزی':'مدیر');
+ root.hidden=false;
+}
+$('codeForm').addEventListener('submit',async e=>{
+ e.preventDefault();const btn=$('create'),out=$('codeStatus');btn.disabled=true;btn.textContent='در حال ساخت…';out.hidden=false;out.textContent='درخواست در حال بررسی است…';
+ const payload={planId:$('plan').value.trim(),productIds:$('products').value.split(',').map(x=>x.trim()).filter(Boolean),maxUses:Number($('uses').value)};
+ const {data,error}=await window.LangBlueSupabase.getClient().functions.invoke('admin-create-code',{body:payload});
+ if(error||!data?.ok){out.textContent='ساخت کد انجام نشد: '+(data?.error||error?.message||'خطای نامشخص');}
+ else{out.innerHTML='';const label=document.createElement('div');label.textContent='کد فعال‌سازی (همین حالا آن را در محل امن ثبت کن):';const code=document.createElement('div');code.className='code';code.textContent=data.code;const copy=document.createElement('button');copy.className='btn';copy.type='button';copy.textContent='کپی کد';copy.addEventListener('click',()=>navigator.clipboard.writeText(data.code));out.append(label,code,copy);}
+ btn.disabled=false;btn.textContent='ساخت کد';
+});
+init();
+})();
+</script>
+</body></html>
