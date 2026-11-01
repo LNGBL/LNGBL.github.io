@@ -24,7 +24,7 @@ The central administrative identity is stored in the private-access-controlled `
 3. Teachers submit class offers as drafts and request review. Only a central admin can move a reviewed offer to the public `open` state.
 4. Teachers submit educational material as drafts and request review. Only a central admin can publish it.
 5. Learner content contributions remain ineligible for exam use until a central admin approves them.
-6. Decisions are written to `public.admin_workflow_events`, which has RLS enabled and no client-role privileges.
+8. Decisions are written to `public.admin_workflow_events`, which has RLS enabled and no client-role privileges.
 
 The management page is `pages/admin.html`. The teacher submission interface is `pages/teacher-network.html`.
 
