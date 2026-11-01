@@ -3,56 +3,158 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
-<title>مدیریت مرکزی | LangBlue</title>
+<meta name="theme-color" content="#071521">
+<title>مرکز عملیات و اتوماسیون مدیریتی | LangBlue</title>
 <link rel="stylesheet" href="../assets/css/langblue-theme.css">
 <link rel="stylesheet" href="../assets/css/langblue-design-system.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../assets/js/supabase-client.js"></script>
 <style>
-body{background:#071521;color:#edf7fa}.wrap{width:min(980px,calc(100% - 28px));margin:32px auto 70px}.panel{background:#0e2233;border:1px solid rgba(255,255,255,.12);border-radius:17px;padding:20px;margin:14px 0}.muted{color:#a9c0c7;font-size:13px;line-height:1.8}.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.link{display:block;text-decoration:none;color:#edf7fa;padding:16px;border:1px solid rgba(255,255,255,.13);border-radius:13px;background:#122c40}.link b{display:block;margin-bottom:5px}.field{display:grid;gap:6px;margin:10px 0}.field input{width:100%;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:#071a29;color:white;font:inherit}.btn{padding:10px 15px;border:0;border-radius:10px;background:#168aad;color:white;font:inherit;font-weight:750;cursor:pointer}.status{padding:12px;border-radius:10px;background:rgba(255,255,255,.06);margin:12px 0}.code{font:700 16px ui-monospace,monospace;word-break:break-all}
+:root{color-scheme:dark}body{background:#071521;color:#edf7fa;font-family:inherit}.wrap{width:min(1240px,calc(100% - 28px));margin:24px auto 70px}.muted{color:#a9c0c7;font-size:13px;line-height:1.85}.top,.panel,.metric,.item,.nav button{background:#0e2233;border:1px solid rgba(255,255,255,.12);border-radius:15px}.top,.panel{padding:18px;margin:14px 0}.top{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}.top h1{margin:0 0 6px;font-size:clamp(23px,4vw,34px)}.nav{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.nav button,.btn{font:inherit;color:#edf7fa;padding:10px 13px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:#122c40;cursor:pointer}.nav button.active,.btn.primary{background:#126782;border-color:#168aad}.btn.danger{background:#542b35;border-color:#9d5261}.btn:disabled{opacity:.45;cursor:not-allowed}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}.metric{padding:14px}.metric strong{display:block;font-size:27px;margin-top:6px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px}.item{padding:15px;margin:10px 0}.item h3{font-size:17px;margin:0 0 6px}.item p{margin:7px 0}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.field{display:grid;gap:6px;margin:10px 0}.field input,.field textarea,.field select{width:100%;padding:10px;border-radius:9px;border:1px solid rgba(255,255,255,.16);background:#071a29;color:#edf7fa;font:inherit}.field textarea{min-height:62px}.status{padding:11px 13px;border-radius:10px;background:rgba(255,255,255,.06);margin:10px 0}.status.good{border:1px solid #2b806b}.status.warn{border:1px solid #99763a}.status.bad{border:1px solid #98515b}.tag{display:inline-block;padding:3px 8px;border-radius:30px;background:#1b3a4e;color:#c9e8f0;font-size:12px;margin-inline-start:5px}.empty{padding:20px;text-align:center;color:#a9c0c7;border:1px dashed rgba(255,255,255,.16);border-radius:12px}.detail{white-space:pre-wrap;overflow-wrap:anywhere;background:#071a29;padding:10px;border-radius:9px;font-size:12px;max-height:260px;overflow:auto}.section-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.section-head h2{margin:0}.hidden{display:none!important}a{color:#8ed5e8}table{width:100%;border-collapse:collapse}td,th{text-align:right;padding:9px;border-bottom:1px solid rgba(255,255,255,.1);font-size:13px}@media(max-width:640px){.wrap{width:min(100% - 18px,1240px)}.top{align-items:flex-start}.nav button{flex:1 1 42%}}
 </style>
 </head>
-<body class="lb-design-system"><main class="wrap">
-<header><h1>پنل مدیریت مرکزی LangBlue</h1><p class="muted">این صفحه فقط برای حساب‌های ثبت‌شده در فهرست محرمانهٔ مدیران قابل استفاده است.</p></header>
-<div id="status" class="status" role="status">در حال بررسی دسترسی حساب…</div>
-<section id="admin" hidden>
-<div class="panel"><h2>ابزارهای مدیریتی</h2><div class="links">
-<a class="link" href="/pages/research.html"><b>Research Dashboard</b><span class="muted">تحلیل داده‌های یادگیری و قیف محصول</span></a>
-<a class="link" href="/pages/community-access-admin.html"><b>مدیریت دسترسی منصفانه</b><span class="muted">بررسی، تأیید و رد درخواست‌ها</span></a>
-</div></div>
-<div class="panel"><h2>ساخت کد فعال‌سازی</h2><p class="muted">شناسهٔ طرح و شناسهٔ محصولات را از فهرست تنظیمات تجاری وارد کن. کد فقط یک‌بار در پاسخ سرور ساخته و نمایش داده می‌شود.</p>
-<form id="codeForm">
-<div class="field"><label for="plan">شناسهٔ طرح (plan_id)</label><input id="plan" required maxlength="120"></div>
-<div class="field"><label for="products">شناسهٔ محصولات (با کاما جدا کن)</label><input id="products" required placeholder="grammar,vocabulary" maxlength="1000"></div>
-<div class="field"><label for="uses">حداکثر تعداد استفاده</label><input id="uses" type="number" min="1" max="10000" value="1" required></div>
-<button class="btn" id="create" type="submit">ساخت کد</button>
-</form><div id="codeStatus" class="status" hidden></div>
-</div>
+<body class="lb-design-system">
+<main class="wrap">
+<header class="top">
+ <div><div class="muted">LANGBLUE · CENTRAL OPERATIONS</div><h1>مرکز عملیات و اتوماسیون مدیریتی</h1><p class="muted">مدیریت متمرکز تأییدها، انتشار محتوا، دسترسی منصفانه، حساب مدیران و عملیات پلتفرم.</p></div>
+ <div><div id="authStatus" class="status">در حال بررسی هویت مدیریتی…</div><button id="refresh" class="btn primary" type="button" disabled>به‌روزرسانی همهٔ صف‌ها</button></div>
+</header>
+<nav class="nav" id="nav" hidden>
+ <button class="active" data-panel="overview">نمای کلی</button>
+ <button data-panel="approvals">صف تأییدها</button>
+ <button data-panel="management">مدیریت معلمان و انتشار</button>
+ <button data-panel="community">دسترسی منصفانه</button>
+ <button data-panel="codes">کدهای فعال‌سازی</button>
+ <button data-panel="staff" id="staffNav">مدیران</button>
+ <button data-panel="operations">عملیات پلتفرم</button>
+ <button data-panel="audit">گزارش فعالیت‌ها</button>
+</nav>
+
+<section id="panel-overview" class="panel" hidden>
+ <div class="section-head"><h2>نمای کلی</h2><span id="lastUpdated" class="muted">—</span></div>
+ <div id="metrics" class="metrics"></div>
+ <div class="grid" style="margin-top:14px">
+  <div class="item"><h3>چرخهٔ تأیید معلم</h3><p class="muted">ثبت درخواست ← بررسی مدیر ← تأیید یا رد ← انتشار پروفایل عمومی و آغاز دورهٔ آزمایشی آگهی.</p></div>
+  <div class="item"><h3>چرخهٔ انتشار</h3><p class="muted">پیش‌نویس معلم ← ارسال برای بررسی ← تأیید مدیر ← انتشار عمومی. معلم نمی‌تواند مستقیماً محتوای عمومی منتشر کند.</p></div>
+  <div class="item"><h3>اصل امنیت</h3><p class="muted">تمام تصمیم‌های حساس در سرور و با بررسی عضویت در platform_admins انجام می‌شوند؛ کلید مدیریتی در مرورگر قرار نمی‌گیرد.</p></div>
+ </div>
+</section>
+
+<section id="panel-approvals" class="panel" hidden>
+ <div class="section-head"><h2>صف تأییدها</h2><span class="muted">موارد جدید در ابتدا نمایش داده می‌شوند.</span></div>
+ <h3>درخواست تأیید معلم</h3><div id="queueTeachers"></div>
+ <h3>درخواست انتشار کلاس</h3><div id="queueOffers"></div>
+ <h3>محتوای آموزشی معلمان</h3><div id="queueContent"></div>
+ <h3>مشارکت‌های محتوایی کاربران</h3><div id="queueContributions"></div>
+</section>
+
+<section id="panel-management" class="panel" hidden>
+ <div class="section-head"><h2>مدیریت معلمان و انتشار</h2><span class="muted">وضعیت‌های فعال و منتشرشده را نیز می‌توان کنترل کرد.</span></div>
+ <h3>پروفایل معلمان</h3><div id="manageTeachers"></div>
+ <h3>آگهی‌ها و پیشنهادهای کلاس</h3><div id="manageOffers"></div>
+ <h3>محتوای منتشرشده</h3><div id="manageContent"></div>
+</section>
+
+<section id="panel-community" class="panel" hidden>
+ <div class="section-head"><h2>درخواست‌های دسترسی منصفانه</h2><span class="muted">تصمیم‌ها از مسیر امن اختصاصی Supabase انجام می‌شوند.</span></div>
+ <div id="communityQueue"></div>
+</section>
+
+<section id="panel-codes" class="panel" hidden>
+ <h2>ساخت کد فعال‌سازی</h2><p class="muted">کد فقط در پاسخ سرور ساخته و یک‌بار نمایش داده می‌شود. شناسهٔ طرح و محصول را از فهرست تنظیمات تجاری وارد کن.</p>
+ <form id="codeForm">
+  <div class="field"><label for="plan">شناسهٔ طرح (plan_id)</label><input id="plan" required maxlength="120"></div>
+  <div class="field"><label for="products">شناسهٔ محصولات (با کاما جدا کن)</label><input id="products" required placeholder="grammar,vocabulary" maxlength="1000"></div>
+  <div class="field"><label for="uses">حداکثر تعداد استفاده</label><input id="uses" type="number" min="1" max="10000" value="1" required></div>
+  <button class="btn primary" id="createCode" type="submit">ساخت کد</button>
+ </form><div id="codeStatus" class="status hidden"></div>
+</section>
+
+<section id="panel-staff" class="panel" hidden>
+ <h2>مدیریت اعضای تیم</h2><p class="muted">فقط مالک مرکزی می‌تواند مدیر جدید اضافه یا دسترسی مدیر را لغو کند. نقش مالک قابل حذف از این پنل نیست.</p>
+ <form id="staffForm"><div class="field"><label for="staffUsername">نام کاربری حساب موجود</label><input id="staffUsername" placeholder="@username" maxlength="40" required></div><button class="btn primary" type="submit">افزودن مدیر</button></form>
+ <div id="staffList"></div>
+</section>
+
+<section id="panel-operations" class="panel" hidden>
+ <h2>عملیات پلتفرم</h2><p class="muted">وضعیت سیاست Server Rest، پنجره‌های نگهداری Android و نسخه‌های منتشرشده در اینجا نمایش داده می‌شوند. تغییرات زمان‌بندی نگهداری یا انتشار نسخه در این نسخه فقط از مسیر تنظیمات موجود انجام می‌شود.</p>
+ <div id="maintenanceStatus"></div><h3>پنجره‌های نگهداری Android</h3><div id="maintenanceWindows"></div><h3>نسخه‌های برنامه</h3><div id="releases"></div>
+</section>
+
+<section id="panel-audit" class="panel" hidden>
+ <h2>گزارش فعالیت‌های مدیریتی</h2><p class="muted">تصمیم‌های تأیید، رد، تعلیق و تغییر دسترسی مدیران ثبت می‌شوند.</p><div id="auditLog"></div>
 </section>
 </main>
 <script>
 (function(){
 'use strict';
-const $=id=>document.getElementById(id),status=$('status'),root=$('admin');
-async function init(){
- const client=window.LangBlueSupabase?.getClient?.();
- if(!client){status.textContent='اتصال حساب مرکزی در دسترس نیست.';return}
- const {data:{session}}=await client.auth.getSession();
- if(!session){status.textContent='ابتدا با حساب LangBlue Official وارد صفحهٔ اصلی شو.';return}
- const {data,error}=await client.functions.invoke('langblue-admin-access',{body:{}});
- if(error||!data?.ok){status.textContent='بررسی دسترسی مدیر ناموفق بود؛ دوباره وارد شو.';return}
- if(!data.is_admin){status.textContent='این حساب دسترسی مدیریتی ندارد.';return}
- status.textContent='دسترسی تأیید شد · نقش: '+(data.role==='owner'?'مالک مرکزی':'مدیر');
- root.hidden=false;
+const $=id=>document.getElementById(id);
+let client=null,role=null,workflow=null,community=[];
+const areaNames={grammar:'Grammar',vocabulary:'Vocabulary',deutsch:'Deutsch',japanese:'Japanese',langdesert_arabic:'LangDesert Arabic'};
+const statusNames={pending:'در انتظار بررسی',active:'فعال',suspended:'تعلیق‌شده',rejected:'ردشده',draft:'پیش‌نویس',pending_review:'در صف بررسی',open:'منتشرشده',closed:'بسته',published:'منتشرشده',archived:'بایگانی‌شده',approved:'تأییدشده'};
+const accountName=a=>a?(a.name||a.username||'حساب LangBlue')+(a.username?' · @'+a.username:''):'حساب کاربری';
+const setStatus=(msg,kind='')=>{$('authStatus').textContent=msg;$('authStatus').className='status '+kind};
+const empty=msg=>{const d=document.createElement('div');d.className='empty';d.textContent=msg;return d};
+function el(tag,cls,txt){const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n}
+function sectionList(id,rows,renderer,msg){const host=$(id);host.replaceChildren();if(!rows?.length){host.append(empty(msg||'موردی برای نمایش وجود ندارد.'));return}rows.forEach(x=>host.append(renderer(x)))}
+function detailLine(parent,label,value){if(value===null||value===undefined||value==='')return;const p=el('p','muted');const b=el('b','',label+' : ');p.append(b,document.createTextNode(Array.isArray(value)?value.join('، '):String(value)));parent.append(p)}
+function actionButton(label,fn,kind=''){const b=el('button','btn '+kind,label);b.type='button';b.addEventListener('click',fn);return b}
+function noteField(){const f=el('div','field');const t=el('textarea');t.placeholder='یادداشت مدیر (اختیاری؛ برای ثبت دلیل رد یا تعلیق پیشنهاد می‌شود)';f.append(t);return {node:f,input:t}}
+async function callWorkflow(payload){const {data,error}=await client.functions.invoke('langblue-admin-workflow',{body:payload});if(error||!data?.ok)throw new Error(data?.error||error?.message||'درخواست انجام نشد');return data}
+async function decide(type,id,decision,note,button){if(button)button.disabled=true;try{await callWorkflow({action:'decide',entityType:type,id,decision,note});await refreshAll()}catch(e){alert('عملیات انجام نشد: '+e.message);if(button)button.disabled=false}}
+function teacherCard(x,management=false){
+ const card=el('article','item');const title=el('h3','',x.display_name||'درخواست پروفایل معلم');card.append(title,el('span','tag',statusNames[x.status]||x.status),el('span','tag',x.verified?'تأیید هویت شده':'تأییدنشده'));
+ detailLine(card,'حساب',accountName(x.account));detailLine(card,'سن',x.age);detailLine(card,'جنسیت',x.gender);detailLine(card,'زبان‌های تدریس',x.languages);detailLine(card,'حوزه‌ها',(x.product_areas||[]).map(a=>areaNames[a]||a));detailLine(card,'صلاحیت/تجربه',x.qualifications);detailLine(card,'معرفی',x.bio);detailLine(card,'ثبت',new Date(x.created_at).toLocaleString('fa-IR'));
+ if(x.portrait_url){const a=el('a','','مشاهدهٔ تصویر پروفایل');a.href=x.portrait_url;a.target='_blank';a.rel='noopener noreferrer';card.append(a)}
+ const note=noteField();card.append(note.node);const actions=el('div','actions');
+ if(!management){actions.append(actionButton('تأیید و فعال‌سازی',b=>decide('teacher_profile',x.user_id,'approve',note.input.value,b),'primary'),actionButton('رد درخواست',b=>decide('teacher_profile',x.user_id,'reject',note.input.value,b),'danger'))}
+ else if(x.status==='active')actions.append(actionButton('تعلیق پروفایل',b=>decide('teacher_profile',x.user_id,'suspend',note.input.value,b),'danger'));
+ else if(x.status==='suspended')actions.append(actionButton('فعال‌سازی مجدد',b=>decide('teacher_profile',x.user_id,'reactivate',note.input.value,b),'primary'));
+ card.append(actions);return card
 }
-$('codeForm').addEventListener('submit',async e=>{
- e.preventDefault();const btn=$('create'),out=$('codeStatus');btn.disabled=true;btn.textContent='در حال ساخت…';out.hidden=false;out.textContent='درخواست در حال بررسی است…';
- const payload={planId:$('plan').value.trim(),productIds:$('products').value.split(',').map(x=>x.trim()).filter(Boolean),maxUses:Number($('uses').value)};
- const {data,error}=await window.LangBlueSupabase.getClient().functions.invoke('admin-create-code',{body:payload});
- if(error||!data?.ok){out.textContent='ساخت کد انجام نشد: '+(data?.error||error?.message||'خطای نامشخص');}
- else{out.innerHTML='';const label=document.createElement('div');label.textContent='کد فعال‌سازی (همین حالا آن را در محل امن ثبت کن):';const code=document.createElement('div');code.className='code';code.textContent=data.code;const copy=document.createElement('button');copy.className='btn';copy.type='button';copy.textContent='کپی کد';copy.addEventListener('click',()=>navigator.clipboard.writeText(data.code));out.append(label,code,copy);}
- btn.disabled=false;btn.textContent='ساخت کد';
-});
+function offerCard(x,management=false){
+ const card=el('article','item');card.append(el('h3','',x.title||'پیشنهاد کلاس'),el('span','tag',statusNames[x.status]||x.status));
+ detailLine(card,'معلم',accountName(x.account));detailLine(card,'حوزه',areaNames[x.product_area]||x.product_area);detailLine(card,'هزینه',Number(x.price_irt||0).toLocaleString('fa-IR')+' تومان');detailLine(card,'مبنای قیمت',x.price_basis==='whole_group'?'برای کل گروه':'برای هر زبان‌آموز');detailLine(card,'ظرفیت',x.capacity);detailLine(card,'توضیحات',x.description);
+ const note=noteField();card.append(note.node);const actions=el('div','actions');
+ if(!management)actions.append(actionButton('تأیید و انتشار',b=>decide('teacher_offer',x.id,'approve',note.input.value,b),'primary'),actionButton('رد انتشار',b=>decide('teacher_offer',x.id,'reject',note.input.value,b),'danger'));
+ else if(x.status==='open')actions.append(actionButton('بستن آگهی',b=>decide('teacher_offer',x.id,'close',note.input.value,b),'danger'));
+ card.append(actions);return card
+}
+function contentCard(x,management=false){
+ const card=el('article','item');card.append(el('h3','',x.title||'محتوای آموزشی'),el('span','tag',statusNames[x.status]||x.status));
+ detailLine(card,'معلم',accountName(x.account));detailLine(card,'حوزه',areaNames[x.product_area]||x.product_area);detailLine(card,'قیمت',Number(x.price_irt||0).toLocaleString('fa-IR')+' تومان');detailLine(card,'توضیحات',x.description);
+ if(x.content_payload){const d=el('details');const s=el('summary','','پیش‌نمایش محتوای ارسال‌شده');const pre=el('pre','detail',JSON.stringify(x.content_payload,null,2));d.append(s,pre);card.append(d)}
+ const note=noteField();card.append(note.node);const actions=el('div','actions');
+ if(!management)actions.append(actionButton('تأیید و انتشار',b=>decide('teacher_content',x.id,'approve',note.input.value,b),'primary'),actionButton('رد محتوا',b=>decide('teacher_content',x.id,'reject',note.input.value,b),'danger'));
+ else if(x.status==='published')actions.append(actionButton('بایگانی محتوا',b=>decide('teacher_content',x.id,'archive',note.input.value,b),'danger'));
+ card.append(actions);return card
+}
+function contributionCard(x){const card=el('article','item');card.append(el('h3','',x.source_type||'مشارکت محتوایی'),el('span','tag','در انتظار بررسی'));detailLine(card,'ارسال‌کننده',accountName(x.account));detailLine(card,'زبان',x.language);detailLine(card,'سطح',x.language_level);detailLine(card,'رضایت ثبت‌شده',x.consent_snapshot?'بله':'خیر');const d=el('details');d.append(el('summary','','مشاهدهٔ دادهٔ ارسالی'),el('pre','detail',JSON.stringify(x.payload,null,2)));card.append(d);const note=noteField();card.append(note.node);const actions=el('div','actions');actions.append(actionButton('تأیید مشارکت',b=>decide('content_contribution',x.id,'approve',note.input.value,b),'primary'),actionButton('رد مشارکت',b=>decide('content_contribution',x.id,'reject',note.input.value,b),'danger'));card.append(actions);return card}
+function render(){
+ const q=workflow?.queues||{},m=workflow?.management||{};
+ sectionList('queueTeachers',q.teachers, x=>teacherCard(x),'درخواست تأیید معلم وجود ندارد.');
+ sectionList('queueOffers',q.offers,x=>offerCard(x),'درخواست انتشار کلاس وجود ندارد.');
+ sectionList('queueContent',q.content,x=>contentCard(x),'محتوای آموزشی در صف انتشار نیست.');
+ sectionList('queueContributions',q.contributions,x=>contributionCard(x),'مشارکت محتوایی در صف بررسی نیست.');
+ sectionList('manageTeachers',m.teachers,x=>teacherCard(x,true),'پروفایل معلمی ثبت نشده است.');
+ sectionList('manageOffers',m.offers,x=>offerCard(x,true),'آگهی کلاسی ثبت نشده است.');
+ sectionList('manageContent',m.content,x=>contentCard(x,true),'محتوای معلمی ثبت نشده است.');
+ const counts=workflow?.counts||{};const metricItems=[['درخواست معلم',counts.teachers],['انتشار کلاس',counts.offers],['محتوای آموزشی',counts.content],['مشارکت کاربران',counts.contributions],['اتصال‌های در انتظار',counts.pending_connections],['درخواست دسترسی',community.filter(x=>x.status==='pending').length]];
+ $('metrics').replaceChildren();metricItems.forEach(([label,value])=>{const d=el('div','metric');d.append(el('span','muted',label),el('strong','',Number(value||0).toLocaleString('fa-IR')));$('metrics').append(d)});
+ $('lastUpdated').textContent='آخرین همگام‌سازی: '+new Date(workflow.generated_at).toLocaleString('fa-IR');
+ renderCommunity();renderStaff();renderOperations();renderAudit();
+}
+function renderCommunity(){sectionList('communityQueue',community,x=>{const c=el('article','item');c.append(el('h3','',accountName(x.profile)),el('span','tag',statusNames[x.status]||x.status));detailLine(c,'سن اعلام‌شده',x.declared_age);detailLine(c,'توضیح کاربر',x.user_note);detailLine(c,'تاریخ ثبت',new Date(x.created_at).toLocaleString('fa-IR'));const n=noteField();c.append(n.node);const a=el('div','actions');if(x.status==='pending')a.append(actionButton('تأیید درخواست',b=>communityDecision(x.id,'approved',n.input.value,b),'primary'),actionButton('رد درخواست',b=>communityDecision(x.id,'rejected',n.input.value,b),'danger'));detailLine(c,'یادداشت مدیر',x.admin_note);detailLine(c,'اعتبار تا',x.discount_expires_at?new Date(x.discount_expires_at).toLocaleDateString('fa-IR'):'—');c.append(a);return c},'درخواستی ثبت نشده است.')}
+async function communityDecision(id,decision,note,button){button.disabled=true;try{const r=await client.functions.invoke('langblue-community-access',{body:{action:'admin_decide',requestId:id,decision,adminNote:note}});if(r.error||!r.data?.ok)throw new Error(r.data?.error||r.error?.message||'خطا');await refreshAll()}catch(e){alert('ثبت تصمیم انجام نشد: '+e.message);button.disabled=false}}
+function renderStaff(){const host=$('staffList');host.replaceChildren();if(role!=='owner'){$('staffNav').hidden=true;host.append(empty('مدیریت اعضای تیم فقط در اختیار مالک مرکزی است.'));return}const rows=workflow?.staff||[];if(!rows.length){host.append(empty('مدیر دیگری ثبت نشده است.'));return}rows.forEach(x=>{const c=el('article','item');c.append(el('h3','',accountName(x.account)),el('span','tag',x.role==='owner'?'مالک مرکزی':'مدیر'));detailLine(c,'تاریخ اعطا',new Date(x.created_at).toLocaleDateString('fa-IR'));if(x.role==='admin')c.append(actionButton('لغو دسترسی مدیر',async b=>{if(!confirm('دسترسی مدیریتی این حساب لغو شود؟'))return;b.disabled=true;try{await callWorkflow({action:'staff_remove',userId:x.user_id});await refreshAll()}catch(e){alert(e.message);b.disabled=false}},'danger'));host.append(c)})}
+function renderOperations(){const op=workflow?.operations||{},m=op.maintenance||{};const host=$('maintenanceStatus');host.replaceChildren();if(!m.singleton){host.append(empty('اطلاعات سیاست نگهداری در دسترس نیست.'))}else{[['حداقل حساب ثبت‌شده',m.minimum_users],['فاصلهٔ دوره‌ای',m.minimum_interval],['مدت پنجره',m.window_duration],['تاریخ آزمون سالانه',m.annual_exam_date||'ثبت نشده'],['آخرین آزمون',m.last_exam_date||'—'],['پایان پنجرهٔ فعال',m.active_until||'—']].forEach(([k,v])=>{const d=el('div','item');detailLine(d,k,v);host.append(d)})}
+ sectionList('maintenanceWindows',[],()=>null,'پنجره‌های زمان‌بندی‌شدهٔ Android از مسیر وضعیت تفصیلی قابل بارگذاری‌اند.');sectionList('releases',op.releases||[],x=>{const d=el('article','item');d.append(el('h3','',x.version_name+' · '+x.version_code),el('span','tag',x.force_update?'به‌روزرسانی اجباری':'عادی'));detailLine(d,'حداقل نسخه',x.min_version_code);detailLine(d,'یادداشت انتشار',x.release_notes);detailLine(d,'تاریخ',new Date(x.published_at).toLocaleString('fa-IR'));return d},'نسخه‌ای ثبت نشده است.')}
+function renderAudit(){sectionList('auditLog',workflow?.audit||[],x=>{const d=el('article','item');d.append(el('h3','',x.entity_type+' · '+x.action));detailLine(d,'وضعیت',String(x.previous_status||'—')+' ← '+String(x.new_status||'—'));detailLine(d,'یادداشت',x.note);detailLine(d,'زمان',new Date(x.created_at).toLocaleString('fa-IR'));return d},'هنوز رویداد مدیریتی ثبت نشده است.')}
+async function refreshAll(){ $('refresh').disabled=true;try{const [w,c]=await Promise.all([callWorkflow({action:'queue_list'}),client.functions.invoke('langblue-community-access',{body:{action:'admin_list'}})]);if(c.error||!c.data?.ok)throw new Error(c.data?.error||c.error?.message||'COMMUNITY_QUEUE_FAILED');workflow=w;role=w.role;community=c.data.requests||[];render();$('panel-overview').hidden=false;$('nav').hidden=false;$('refresh').disabled=false;}catch(e){setStatus('بارگذاری پنل ناموفق بود: '+e.message,'bad');$('refresh').disabled=false}}
+function showPanel(name){document.querySelectorAll('main section[id^="panel-"]').forEach(s=>s.hidden=s.id!=='panel-'+name);document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.panel===name))}
+async function init(){client=window.LangBlueSupabase?.getClient?.();if(!client){setStatus('اتصال حساب مرکزی در دسترس نیست.','bad');return}const {data:{session}}=await client.auth.getSession();if(!session){setStatus('ابتدا با حساب LangBlue Official وارد صفحهٔ اصلی شو.','warn');return}const {data,error}=await client.functions.invoke('langblue-admin-access',{body:{}});if(error||!data?.ok||!data.is_admin){setStatus('این حساب دسترسی مدیریتی ندارد یا بررسی دسترسی ناموفق بود.','bad');return}role=data.role;setStatus('دسترسی تأیید شد · نقش: '+(role==='owner'?'مالک مرکزی':'مدیر'),'good');$('refresh').disabled=false;$('nav').hidden=false;$('staffNav').hidden=role!=='owner';document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>showPanel(b.dataset.panel)));$('refresh').addEventListener('click',refreshAll);showPanel('overview');await refreshAll()}
+$('codeForm').addEventListener('submit',async e=>{e.preventDefault();const b=$('createCode'),out=$('codeStatus');b.disabled=true;out.classList.remove('hidden');out.textContent='در حال ساخت کد…';try{const {data,error}=await client.functions.invoke('admin-create-code',{body:{planId:$('plan').value.trim(),productIds:$('products').value.split(',').map(x=>x.trim()).filter(Boolean),maxUses:Number($('uses').value)}});if(error||!data?.ok)throw new Error(data?.error||error?.message||'خطا');out.replaceChildren(el('p','muted','کد فعال‌سازی (اکنون آن را در محل امن ثبت کن):'),el('div','detail',data.code),actionButton('کپی کد',()=>navigator.clipboard.writeText(data.code),'primary'));}catch(err){out.textContent='ساخت کد انجام نشد: '+err.message}finally{b.disabled=false}});
+$('staffForm').addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await callWorkflow({action:'staff_add',username:$('staffUsername').value.trim()});$('staffUsername').value='';await refreshAll()}catch(err){alert('افزودن مدیر انجام نشد: '+err.message)}finally{b.disabled=false}});
 init();
 })();
 </script>
