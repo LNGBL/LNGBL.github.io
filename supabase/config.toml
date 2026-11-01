@@ -6,7 +6,7 @@ verify_jwt = true
 [functions.admin-create-code]
 verify_jwt = true
 
-[functions.langblue-auth]
+[functions.langblue-admin-access]\nverify_jwt = true\n\n[functions.langblue-community-access]\nverify_jwt = true\n\n[functions.langblue-research-dashboard]\nverify_jwt = true\n\n[functions.langblue-auth]
 verify_jwt = false
 
 [functions.langblue-android-handoff]
