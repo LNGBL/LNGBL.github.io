@@ -1,37 +1,41 @@
 # LangBlue backend
 
-This directory contains the first backend layer for LangBlue. It is intentionally additive: the existing browser account/subscription flow remains the compatibility path until Supabase Auth and the Edge Functions are deployed and tested.
+This directory documents the Supabase-backed account, learning, teacher, and administration services for LangBlue.
 
-## Database
+## Central administration
 
-Current backend migration:
+The central administrative identity is stored in the private-access-controlled `public.platform_admins` table. The browser never receives a service-role key or a shared administrative secret. Every privileged Edge Function validates the Supabase session and checks the authenticated user ID against this table on the server.
 
-- `supabase/migrations/20260926154258_harden_backend_and_indexes.sql`
+### Edge Functions
 
-The production project already contains the backend tables and redemption function. Keep this migration in version control so the security/index hardening is reproducible.
+- `langblue-admin-access`: returns the authenticated account's central admin status and enabled management modules.
+- `langblue-admin-workflow`: serves the central admin dashboard, teacher-profile review, class-offer publication, teacher-content moderation, learner contribution moderation, admin-team management, operational status, and an audit trail.
+- `langblue-community-access`: handles user assistance requests and central-admin review decisions.
+- `admin-create-code`: creates activation codes after server-side central-admin authorization.
+- `langblue-research-dashboard`: returns protected research dashboard data after central-admin authorization.
+- `activate-code`: redeems activation codes for authenticated users.
+- `langblue-auth`: username/password bridge for the central account.
+- `langblue-android-handoff`: Android device handoff workflow.
 
-It creates the product catalog, plans, profiles, hashed activation-code store, subscriptions, and usage-session tables. Activation codes are never readable by the browser through RLS.
+### Administrative workflows
 
-## Edge Functions
+1. A teacher submits a profile; it remains pending until a central admin approves or rejects it.
+2. Approval activates the profile and synchronizes the public teacher directory through the database trigger. Rejection allows the teacher to revise and resubmit.
+3. Teachers submit class offers as drafts and request review. Only a central admin can move a reviewed offer to the public `open` state.
+4. Teachers submit educational material as drafts and request review. Only a central admin can publish it.
+5. Learner content contributions remain ineligible for exam use until a central admin approves them.
+6. Decisions are written to `public.admin_workflow_events`, which has RLS enabled and no client-role privileges.
 
-- `activate-code`: authenticated users redeem a code; the code is hashed server-side and the subscription is written server-side.
-- `admin-create-code`: admin-only code generation. Requires a valid Supabase session and a matching row in `public.platform_admins`; the generated plaintext code is returned only to the authorized request that created it.\n- `langblue-admin-access`: reports the signed-in account’s central admin status and available management modules.\n- `langblue-community-access`: community-assistance administration is authorized through `public.platform_admins`; ordinary user request/status actions remain scoped to the signed-in user.\n- `langblue-research-dashboard`: research access is authorized through the same central `public.platform_admins` table.
-- `langblue-auth`: username/password bridge that creates/confirms the internal Supabase Auth identity and returns a normal Supabase session; no user email is required.
+The management page is `pages/admin.html`. The teacher submission interface is `pages/teacher-network.html`.
 
-Required Supabase secrets for `activate-code` are provided automatically by Supabase:
+## Security requirements
 
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
+- Never place the Supabase service-role key or any server secret in GitHub Pages or browser JavaScript.
+- Do not treat a hidden frontend link as authorization; the Edge Function performs the actual permission check.
+- Keep public teacher and class views free of authentication UUIDs.
+- Keep RLS enabled and use narrowly scoped policies for user-owned drafts.
+- Privileged workflow state changes are performed by the authenticated, server-authorized Edge Function.
 
-Never place the service-role key or any server secret in GitHub Pages or frontend JavaScript. Admin authorization is checked server-side from the authenticated user ID; a frontend link is only a convenience and is not an authorization boundary.
+## Deployment notes
 
-## Rollout order
-
-1. Apply the SQL migration.
-2. Deploy the two Edge Functions.
-3. Configure the admin secret.
-4. Create a test activation code through `admin-create-code`.
-5. Migrate LangBlue account login to Supabase Auth.
-6. Enable `window.LangBlueBackendConfig.enabled = true` only after authenticated activation has been tested.
-7. Remove the legacy client-side activation-code map.
+The Supabase project configuration declares `verify_jwt = true` for administrative functions. After a database schema change, verify the migration, relevant RLS policies, Edge Function deployments, and Supabase security/performance advisors before considering the work complete.
