@@ -4,7 +4,7 @@ project_id = "ocxeyponzzcvlrvwndji"
 verify_jwt = true
 
 [functions.admin-create-code]
-verify_jwt = false
+verify_jwt = true
 
 [functions.langblue-auth]
 verify_jwt = false
