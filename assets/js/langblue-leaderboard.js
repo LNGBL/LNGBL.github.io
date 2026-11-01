@@ -2,7 +2,7 @@
 (function(window, document){
   'use strict';
 
-  const TABLE='leaderboard';
+  const TABLE='leaderboard_public';
   const USER_SESSION='lb:session';
   const GRAMMAR_KEY='lb:user:{uid}:grammar:mastery:v1';
   const VOCAB_TOKENS='lb:user:{uid}:LangBlue_tokens';
