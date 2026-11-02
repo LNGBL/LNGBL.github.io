@@ -278,7 +278,6 @@ langjp:{id:'langjp',label:'LangBlue Japanese',icon:'🌸',url:'pages/Langjp.html
 langkz:{id:'langkz',label:'LangBlue Kazakh',icon:'🇰🇿',url:'pages/LangKz.html'},
 
 langtj:{id:'langtj',label:'LangBlue Tajik',icon:'🇹🇯',url:'pages/LangTj.html'},
-western:{id:'western',label:'LangBlue Wild West',icon:'🤠',url:'pages/WesternGame.html'},
 
 
 
@@ -290,7 +289,7 @@ western:{id:'western',label:'LangBlue Wild West',icon:'🤠',url:'pages/WesternG
 
 
 
-var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj','western'];
+var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj'];
 
 
 
