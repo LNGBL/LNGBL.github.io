@@ -6,6 +6,7 @@ const read = path => readFileSync(new URL(path, import.meta.url), 'utf8');
 const page = read('../pages/WesternGame.html');
 const game = read('../assets/js/western-game.js');
 const bridge = read('../assets/js/langblue-western-learning-bridge.js');
+const grammarEngine = read('../assets/js/langblue-grammar-engine.js');
 const migration = read('../supabase/migrations/20261102130000_western_access_and_learning_sync.sql');
 const landing = read('../index.html');
 const commerce = read('../assets/js/langblue-commerce.js');
@@ -15,6 +16,7 @@ test('Wild West is a standalone page with separate assets and existing learning 
   assert.match(page, /\.\.\/assets\/js\/western-game\.js/);
   assert.match(page, /langblue-grammar-engine\.js/);
   assert.match(page, /langblue-western-learning-bridge\.js/);
+  assert.match(grammarEngine, /function startPractice\(id\)/);
 });
 
 test('game loads only the signed-in player vocabulary through server RPCs', () => {
@@ -51,4 +53,5 @@ test('landing page contains one independent link to the game outside product car
 test('game scripts parse as JavaScript', () => {
   assert.doesNotThrow(() => new Function(game));
   assert.doesNotThrow(() => new Function(bridge));
+  assert.doesNotThrow(() => new Function(grammarEngine));
 });
