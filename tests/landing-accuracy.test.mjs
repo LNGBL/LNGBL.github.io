@@ -12,6 +12,10 @@ test('landing and checkout expose all seven active products', () => {
   assert.equal((landing.match(/<input type="checkbox" value="/g) || []).length, 7);
   const ids = commerce.match(/var ALL_PRODUCT_IDS=\[([^\]]+)\]/)?.[1] || '';
   assert.equal(ids.split(',').length, 7);
+  assert.doesNotMatch(commerce, /western:/);
+  assert.match(landing, /id="wild-west"/);
+  assert.match(landing, /href="pages\/WesternGame\.html"/);
+  assert.equal((landing.match(/href="pages\/WesternGame\.html"/g)||[]).length,1);
   assert.match(landing, /اگر هر ۷ محصول را یک‌جا با مدت ۱۲ ماهه انتخاب کنی/);
 });
 
