@@ -86,7 +86,7 @@ begin
  elsif p_mode='vocabulary' then
   v_pack:=langblue_internal.western_get_stage_pack(p_stage);
   select e.value into v_item
-  from jsonb_array_elements(v_pack->'personal_words'||v_pack->'shared_words') e(value)
+  from jsonb_array_elements((v_pack->'personal_words') || (v_pack->'shared_words')) e(value)
   order by random() limit 1;
   if v_item is null then raise exception 'NO_VOCABULARY_AVAILABLE'; end if;
   v_answer:=v_item->>'word'; v_source:=coalesce(v_item->>'source','public');
