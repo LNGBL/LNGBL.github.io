@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#25190f">
+<title>LangBlue Wild West · English Adventure</title>
+<meta name="description" content="Explore the frontier, solve English vocabulary and grammar missions, and build your learning streak.">
+<link rel="stylesheet" href="../assets/css/western-game.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase-client.js"></script><script src="../assets/js/langblue-backend.js"></script>
+<script src="../assets/js/langblue-commerce.js"></script><script src="../assets/js/langblue-core.js"></script>
+<script src="../assets/js/langblue-central-account.js"></script><script src="../assets/js/langblue-central-access.js"></script>
+<script defer src="../assets/js/western-game.js"></script>
+</head>
+<body><main class="frontier">
+<header class="topbar"><a class="brand" href="../index.html">LANG<span>BLUE</span><small>WILD WEST</small></a>
+<div class="player-stats"><div><small>GAME TOKENS</small><strong id="tokenCount">0</strong></div><div><small>WIN STREAK</small><strong id="streakCount">0 / 10</strong></div><div><small>TOTAL WINS</small><strong id="winCount">0</strong></div></div>
+<div class="sound-controls"><button id="soundToggle" class="sound-button" type="button" aria-pressed="false">♫ Sound off</button><label for="volumeControl">Volume</label><input id="volumeControl" type="range" min="0" max="0.22" step="0.01" value="0.08"></div></header>
+<section class="hero"><div class="sun"></div><div class="mesa mesa-back"></div><div class="mesa mesa-front"></div><div class="hero-copy"><p class="eyebrow">A LANGBLUE ENGLISH ADVENTURE</p><h1>THE FRONTIER<br><em>IS YOURS TO EXPLORE.</em></h1><p>Discover words. Solve grammar puzzles. Help the frontier town thrive.</p></div><div class="hero-sign">WELCOME<br><span>TRAVELLER</span></div><div class="hero-ground"></div></section>
+<section class="world-layout">
+<aside class="map-panel"><div class="section-heading"><span>01 / THE FRONTIER MAP</span><small>CHOOSE YOUR DESTINATION</small></div>
+<div class="frontier-map" role="navigation" aria-label="Frontier locations"><div class="map-river"></div><div class="map-trail"></div>
+<button class="map-stop active" data-stage="dusty-town"><span>🏘️</span><b>Dusty Town</b><small>Town square</small></button>
+<button class="map-stop" data-stage="railway"><span>🚂</span><b>Railway</b><small>Grammar station</small></button>
+<button class="map-stop" data-stage="gold-mine"><span>⛏️</span><b>Gold Mine</b><small>Word puzzles</small></button>
+<button class="map-stop" data-stage="ranch"><span>🌾</span><b>Ranch</b><small>Build sentences</small></button>
+<button class="map-stop" data-stage="forgotten-canyon"><span>🏜️</span><b>Forgotten Canyon</b><small>Final discoveries</small></button><div class="map-compass">N<br>✦</div></div>
+<div class="map-note">Your map changes as you explore. Every stop is a new English mission.</div></aside>
+<section class="mission-panel"><div class="section-heading"><span>02 / YOUR CURRENT LOCATION</span><small id="stageLabel">DUSTY TOWN</small></div>
+<div class="scene" id="scene"><div class="scene-sky"></div><div class="scene-sun"></div><div class="scene-hills"></div><div class="scene-town"><div class="scene-building building-one"></div><div class="scene-building building-two"></div><div class="scene-building building-three"></div><div class="scene-road"></div></div><div class="scene-caption"><span id="sceneTitle">Dusty Town</span><small id="sceneDescription">A new day begins on the frontier.</small></div></div>
+<div class="mission-actions"><button id="vocabMission" class="primary-action" type="button">📚 Vocabulary mission</button><button id="grammarMission" class="secondary-action" type="button">✎ Grammar mission</button></div>
+<div id="missionBox" class="challenge-box" aria-live="polite"><div class="empty-mission"><span>✦</span><strong>Your next discovery awaits.</strong><p>Choose a mission to begin exploring English.</p></div></div></section></section>
+<section class="word-bank"><div class="section-heading"><span>03 / YOUR STAGE WORDS</span><small>15 PERSONAL + 15 FRONTIER WORDS</small></div>
+<div class="word-columns"><div class="word-group"><h2><span>YOUR NOTEBOOK</span><b id="personalCount">0 / 15</b></h2><p>Words from your LangBlue English account. If your notebook has fewer than 15, the town library fills the gaps with approved words.</p><div id="personalWords" class="word-grid"></div></div>
+<div class="word-group"><h2><span>THE TOWN LIBRARY</span><b id="sharedCount">0 / 15</b></h2><p>Curated English words available to every player. Other players’ private notebooks are never shared.</p><div id="sharedWords" class="word-grid"></div></div></div><p id="wordNotice" class="word-notice"></p></section>
+<footer class="game-footer"><span>LANGBLUE · WILD WEST</span><span>LEARN WITH CURIOSITY. EXPLORE WITH COURAGE.</span><a href="../index.html">Back to LangBlue ↗</a></footer></main>
+<div id="loginNotice" class="overlay" hidden><div class="notice-card"><h2>Welcome to the frontier</h2><p>Sign in to your central LangBlue account to load your learning notebook and save your game progress.</p><a href="../index.html?account=required">Open central account</a></div></div><div id="errorToast" class="toast" role="status" aria-live="polite"></div>
+</body></html>
