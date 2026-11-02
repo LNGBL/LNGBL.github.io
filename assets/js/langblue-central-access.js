@@ -87,6 +87,9 @@ function hasProductAccess(productId){
   if(!s||s.expired)return false;
   const ids=Array.isArray(s.productIds)?s.productIds:(Array.isArray(s.product_ids)?s.product_ids:null);
   if(!productId||!ids||!ids.length)return true;
+  // Wild West is an independent game, not an eighth commercial product.
+  // It inherits access only when the same account has BOTH English learning areas.
+  if(productId==='western')return ids.indexOf('grammar')!==-1&&ids.indexOf('vocabulary')!==-1;
   return ids.indexOf(productId)!==-1;
 }
 function showSubscriptionGate(productId){
