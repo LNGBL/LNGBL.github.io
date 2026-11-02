@@ -207,6 +207,13 @@
     syncRemote();
   }
 
+  function startPractice(id){
+    const tab=document.querySelector('.tab[data-tab="flashcard"]');
+    if(tab)tab.click();
+    window.dispatchEvent(new CustomEvent('langblue:grammar-practice',{detail:{conceptId:String(id||'')}}));
+    return !!tab;
+  }
+
   window.LangBlueGrammarEngine={
     KEY,get,all,review,due,pick,stats,masteryLabel,renderPanel,decorateTable,syncRemote,startPractice
   };
