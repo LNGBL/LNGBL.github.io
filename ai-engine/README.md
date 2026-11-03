@@ -6,8 +6,9 @@ A separate Python service for LangBlue's personalized learning intelligence. The
 
 - FastAPI API with typed request/response schemas.
 - Supabase Auth token verification before any learner-specific operation.
-- Server-only Supabase service-role client; never expose its key to GitHub Pages.
-- Every personal learning-record query is scoped by the verified `auth.users.id`.
+- Personal review retrieval uses the verified learner's JWT and the publishable/anon key, so Postgres RLS is enforced on every read.
+- The learner ID is derived from the verified Supabase Auth session; the browser cannot choose another user's ID.
+- No service-role key is required by this service.
 - OpenAI Responses API adapter, isolated behind a learning-service function.
 - CORS allowlist, bounded input sizes, timeouts, and privacy-safe error logging.
 - A health endpoint that does not disclose configuration or credentials.
@@ -22,7 +23,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 cp .env.example .env
-# Fill the server-side secrets in .env; never commit it.
+# Fill the publishable key and server-side OpenAI key in .env; never commit real secrets.
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -30,10 +31,10 @@ Check `GET /health`. The authenticated tutor endpoint is `POST /v1/coach` with a
 
 ## Important integration notes
 
-1. The browser must send its existing Supabase access token. The API verifies it with Supabase Auth and derives the user ID from the verified token. Do not accept a `user_id` field from the browser.
-2. The service-role key belongs only in the Python host's secret manager. The database query still explicitly filters by the verified user ID as defense in depth.
-3. The first retrieval adapter reads only `learning_review_items`, a table already present in the LangBlue project. It does not assume that grammar/vocabulary content is stored in a new vector table.
-4. The current Supabase project did not report the `vector` extension as installed during initial inspection. Do not run vector SQL or create embeddings until the extension, dimensions, model choice, RLS design, and migration are reviewed.
+1. The browser sends its existing Supabase access token. The API verifies it with Supabase Auth and derives the user ID from the verified session. Do not accept a `user_id` field from the browser.
+2. The retrieval request sends that same verified JWT to PostgREST with the publishable/anon API key. The existing `learning_review_items_owner_all` RLS policy restricts rows to `auth.uid() = user_id`; the service-role key is deliberately not used.
+3. The first retrieval adapter reads only `learning_review_items`, a table already present in the LangBlue project. Its current columns were verified against the live schema. It does not assume that grammar/vocabulary content is stored in a new vector table.
+4. Vector search remains deferred until extension availability, dimensions, model choice, RLS design, and migration are reviewed.
 5. Deploy this service to a Python-capable host (for example, a managed container platform). GitHub Pages cannot run FastAPI. Keep the service URL in frontend configuration, not secrets.
 
 ## Roadmap
