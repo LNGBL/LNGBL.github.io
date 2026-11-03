@@ -52,7 +52,7 @@ async def answer_learning_question(
         anon_key=anon_key,
         limit=context_limit,
     )
-    context = "\\n".join(
+    context = "\n".join(
         f"- Title: {item.get('title') or ''}; Prompt: {item.get('prompt') or ''}; "
         f"Answer: {item.get('answer') or ''}; Product: {item.get('product_id') or ''}; "
         f"Stage: {item.get('stage') if item.get('stage') is not None else ''}"
@@ -77,10 +77,10 @@ async def answer_learning_question(
             {
                 "role": "user",
                 "content": (
-                    f"Requested learning language: {language}\\n"
-                    "Private learner context (reference only):\\n"
-                    f"<context>\\n{context}\\n</context>\\n\\n"
-                    f"Learner question:\\n{question}"
+                    f"Requested learning language: {language}\n"
+                    "Private learner context (reference only):\n"
+                    f"<context>\n{context}\n</context>\n\n"
+                    f"Learner question:\n{question}"
                 ),
             },
         ],
