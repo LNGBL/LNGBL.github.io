@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 import structlog
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from openai import AsyncOpenAI
 from supabase import create_client
@@ -55,7 +55,7 @@ async def health() -> dict[str, str]:
 
 
 @app.post(f"{settings.api_prefix}/coach", response_model=CoachResponse)
-async def coach(payload: CoachRequest, user: Any = __import__("fastapi").Depends(require_user)):
+async def coach(payload: CoachRequest, user: Any = Depends(require_user)):
     llm = app.state.llm
     if llm is None:
         raise HTTPException(status_code=503, detail="AI provider is not configured")
