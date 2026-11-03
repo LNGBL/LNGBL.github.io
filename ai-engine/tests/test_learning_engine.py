@@ -5,35 +5,25 @@ import pytest
 from app.services.learning_engine import answer_learning_question
 
 
-class FakeQuery:
+class FakeResponse:
     def __init__(self, rows):
         self.rows = rows
-        self.filters = []
 
-    def select(self, fields):
-        return self
+    def raise_for_status(self):
+        return None
 
-    def eq(self, key, value):
-        self.filters.append((key, value))
-        return self
-
-    def order(self, key):
-        return self
-
-    def limit(self, value):
-        return self
-
-    def execute(self):
-        return SimpleNamespace(data=self.rows)
+    def json(self):
+        return self.rows
 
 
-class FakeDB:
+class FakeHTTPClient:
     def __init__(self, rows):
-        self.query = FakeQuery(rows)
+        self.rows = rows
+        self.request = None
 
-    def table(self, name):
-        assert name == "learning_review_items"
-        return self.query
+    async def get(self, path, *, params, headers):
+        self.request = {"path": path, "params": params, "headers": headers}
+        return FakeResponse(self.rows)
 
 
 class FakeResponses:
@@ -47,13 +37,17 @@ class FakeLLM:
 
 
 @pytest.mark.asyncio
-async def test_context_query_is_scoped_to_verified_user():
-    db = FakeDB([{"title": "Present perfect", "prompt": "Have you...?", "answer": "Yes"}])
+async def test_context_query_uses_verified_user_token_and_owner_filter():
+    db = FakeHTTPClient(
+        [{"title": "Present perfect", "prompt": "Have you...?", "answer": "Yes"}]
+    )
 
     answer, count = await answer_learning_question(
         db=db,
         llm=FakeLLM(),
         user_id="verified-user-123",
+        access_token="verified-access-token",
+        anon_key="publishable-test-key",
         question="این قاعده را توضیح بده",
         language="en",
         model="test-model",
@@ -62,17 +56,24 @@ async def test_context_query_is_scoped_to_verified_user():
 
     assert answer == "توضیح آزمایشی"
     assert count == 1
-    assert ("user_id", "verified-user-123") in db.query.filters
+    assert db.request["path"] == "learning_review_items"
+    assert db.request["params"]["user_id"] == "eq.verified-user-123"
+    assert db.request["headers"] == {
+        "apikey": "publishable-test-key",
+        "Authorization": "Bearer verified-access-token",
+    }
 
 
 @pytest.mark.asyncio
 async def test_empty_personal_context_is_supported():
-    db = FakeDB([])
+    db = FakeHTTPClient([])
 
     answer, count = await answer_learning_question(
         db=db,
         llm=FakeLLM(),
         user_id="verified-user-456",
+        access_token="another-verified-token",
+        anon_key="publishable-test-key",
         question="What is a noun?",
         language="en",
         model="test-model",
@@ -81,4 +82,4 @@ async def test_empty_personal_context_is_supported():
 
     assert answer
     assert count == 0
-    assert ("user_id", "verified-user-456") in db.query.filters
+    assert db.request["params"]["user_id"] == "eq.verified-user-456"
