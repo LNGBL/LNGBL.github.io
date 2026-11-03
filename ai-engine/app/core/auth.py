@@ -1,4 +1,3 @@
-from collections.abc import Callable
 from typing import Any
 
 from fastapi import Depends, HTTPException, Request, status
