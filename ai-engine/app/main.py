@@ -73,7 +73,10 @@ async def coach(payload: CoachRequest, user: Any = Depends(require_user)):
     except Exception:
         # Do not log prompts, answers, access tokens, or learner records.
         logger.exception("learning_request_failed", user_id=str(user.id))
-        raise HTTPException(status_code=502, detail="The learning assistant is temporarily unavailable")
+        raise HTTPException(
+            status_code=502,
+            detail="The learning assistant is temporarily unavailable",
+        ) from None
 
     return CoachResponse(
         answer=answer,
