@@ -41,7 +41,8 @@ async def answer_learning_question(
         "Use them only when relevant; do not claim they contain facts they do not contain. "
         "If personal records are absent or insufficient, say so and distinguish general "
         "language knowledge from the learner's saved history. Never reveal another user's data. "
-        "Reply in Persian when the learner asks in Persian; otherwise follow the learner's language. "
+        "Reply in Persian when the learner asks in Persian; otherwise follow the learner's "
+        "language. "
         "Prefer a concise explanation and one short practice question."
     )
     response = await llm.responses.create(
@@ -52,7 +53,8 @@ async def answer_learning_question(
                 "role": "user",
                 "content": (
                     f"Requested learning language: {language}\n"
-                    f"Private learner context (reference only):\n<context>\n{context}\n</context>\n\n"
+                    "Private learner context (reference only):\n"
+                    f"<context>\n{context}\n</context>\n\n"
                     f"Learner question:\n{question}"
                 ),
             },
