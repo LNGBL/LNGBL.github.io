@@ -156,7 +156,7 @@ function paymentDecision(id,decision,note,button){
 }
 function renderPayments(){
  const host=$('paymentQueue'),pending=paymentRequests.filter(x=>['pending_admin_review','needs_info'].includes(x.status));
- $('paymentBadge').textContent=String(pending.length).replace(/\\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
+ $('paymentBadge').textContent=pending.length.toLocaleString('fa-IR');
  $('paymentSummary').replaceChildren();
  [['در انتظار بررسی',pending.length],['تأییدشده',paymentRequests.filter(x=>x.status==='approved').length],['ردشده',paymentRequests.filter(x=>x.status==='rejected').length],['کل درخواست‌ها',paymentRequests.length]].forEach(([label,value])=>{const d=el('div','metric');d.append(el('span','muted',label),el('strong','',Number(value).toLocaleString('fa-IR')));$('paymentSummary').append(d)});
  host.replaceChildren();
@@ -197,7 +197,7 @@ function render(){
  const counts=workflow?.counts||{};const metricItems=[['درخواست معلم',counts.teachers],['انتشار کلاس',counts.offers],['محتوای آموزشی',counts.content],['مشارکت کاربران',counts.contributions],['رسیدهای Premium در انتظار',paymentRequests.filter(x=>['pending_admin_review','needs_info'].includes(x.status)).length],['اتصال‌های در انتظار',counts.pending_connections],['درخواست دسترسی',community.filter(x=>x.status==='pending').length]];
  $('metrics').replaceChildren();metricItems.forEach(([label,value])=>{const d=el('div','metric');d.append(el('span','muted',label),el('strong','',Number(value||0).toLocaleString('fa-IR')));$('metrics').append(d)});
  $('lastUpdated').textContent='آخرین همگام‌سازی: '+new Date(workflow.generated_at).toLocaleString('fa-IR');
- renderCommunity();renderStaff();renderOperations();renderAudit();
+ renderCommunity();renderStaff();renderOperations();renderAudit();renderPayments();
 }
 function renderCommunity(){sectionList('communityQueue',community,x=>{const c=el('article','item');c.append(el('h3','',accountName(x.profile)),el('span','tag',statusNames[x.status]||x.status));detailLine(c,'سن اعلام‌شده',x.declared_age);detailLine(c,'توضیح کاربر',x.user_note);detailLine(c,'تاریخ ثبت',new Date(x.created_at).toLocaleString('fa-IR'));const n=noteField();c.append(n.node);const a=el('div','actions');if(x.status==='pending')a.append(actionButton('تأیید درخواست',b=>communityDecision(x.id,'approved',n.input.value,b),'primary'),actionButton('رد درخواست',b=>communityDecision(x.id,'rejected',n.input.value,b),'danger'));detailLine(c,'یادداشت مدیر',x.admin_note);detailLine(c,'اعتبار تا',x.discount_expires_at?new Date(x.discount_expires_at).toLocaleDateString('fa-IR'):'—');c.append(a);return c},'درخواستی ثبت نشده است.')}
 async function communityDecision(id,decision,note,button){button.disabled=true;try{const r=await client.functions.invoke('langblue-community-access',{body:{action:'admin_decide',requestId:id,decision,adminNote:note}});if(r.error||!r.data?.ok)throw new Error(r.data?.error||r.error?.message||'خطا');await refreshAll()}catch(e){alert('ثبت تصمیم انجام نشد: '+e.message);button.disabled=false}}
