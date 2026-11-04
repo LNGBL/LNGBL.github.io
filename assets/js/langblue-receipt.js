@@ -56,7 +56,7 @@
       ACTIVE_GUARDIAN_LINK_REQUIRED:'برای این یادگیرنده، پیوند فعال حساب بزرگسال در LangBlue پیدا نشد.',
       INVALID_PRODUCTS:'فهرست محصولات معتبر نیست.',
       INVALID_PLAN:'مدت انتخاب‌شده معتبر نیست.',
-      REQUEST_SAVE_FAILED:'ثبت درخواست در سرور انجام نشد. کمی بعد دوباره تلاش کن.',
+      REQUEST_SAVE_FAILED:'ثبت درخواست در سرور انجام نشد. کمی بعد دوباره تلاش کن.',\n      REQUEST_HISTORY_LOAD_FAILED:'دریافت وضعیت درخواست‌ها از سرور انجام نشد.',
       SUPABASE_CLIENT_UNAVAILABLE:'ارتباط با سرور در دسترس نیست.'
     };
     return map[code]||'ثبت درخواست انجام نشد. ('+code+')';
@@ -97,34 +97,38 @@
         productIds:order.products.map(function(p){return p.id;}),
         planId:order.plan.id
       });
-      var request=data.request, discount=request.discount_preview||{};
+      var request=data.request;
       output.innerHTML=
         '<div class="receipt-head">'+
-          '<div><strong>LangBlue</strong><br><small>درخواست اشتراک · ثبت‌شده در سرور</small></div>'+
           '<div><strong>'+escapeHtml(request.request_ref)+'</strong><br><small>'+new Date(request.created_at).toLocaleString('fa-IR')+'</small></div>'+
         '</div>'+
-        '<div class="receipt-line"><span>حساب یادگیرنده</span><strong>'+escapeHtml(data.learner.username?'@'+data.learner.username:(data.learner.name||'حساب انتخاب‌شده'))+'</strong></div>'+
         '<div class="receipt-line"><span>محصولات</span><strong>'+escapeHtml(order.products.map(function(p){return p.icon+' '+p.label;}).join('، '))+'</strong></div>'+
         '<div class="receipt-line"><span>مدت درخواستی</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
-        '<div class="receipt-line"><span>پیش‌نمایش تخفیف</span><strong>'+escapeHtml(discount.label||'پس از بررسی مشخص می‌شود')+'</strong></div>'+
-        '<div class="receipt-line"><span>وضعیت</span><strong>در انتظار بررسی ادمین</strong></div>'+
-        '<div class="receipt-line"><span>شناسه یکتای درخواست</span><strong>'+escapeHtml(request.request_ref)+'</strong></div>'+
-        '<div class="receipt-line"><span>هش درخواست (SHA-256)</span><strong style="direction:ltr;word-break:break-all">'+escapeHtml(request.request_hash)+'</strong></div>'+
-        '<div class="receipt-note">این رکورد فقط درخواست اشتراک است؛ پرداخت، رسید بانکی، تأیید وجه یا فعال‌سازی انجام نمی‌دهد. هش برای شناسایی و بررسی یکپارچگی رکورد است و اثبات پرداخت نیست. کد فعال‌سازی در این صفحه ساخته یا نمایش داده نمی‌شود.</div>';
-      var share=document.createElement('a');
-      share.className='btn btn-primary receipt-share';
-      share.href='https://t.me/share/url?url='+encodeURIComponent('https://lngbl.github.io/')+
-        '&text='+encodeURIComponent(
-          'درخواست اشتراک LangBlue\nشناسه: '+request.request_ref+
-          '\nهش درخواست: '+request.request_hash+
-          '\nحساب یادگیرنده: '+(data.learner.username?'@'+data.learner.username:data.learner.name||'حساب مرتبط')+
-          '\nمحصولات: '+order.products.map(function(p){return p.label;}).join('، ')+
-          '\nمدت: '+order.plan.label+
-          '\nپیش‌نمایش: '+(discount.label||'بررسی شود')+
-          '\nوضعیت: در انتظار بررسی ادمین'
-        );
-      share.target='_blank';share.rel='noopener noreferrer';share.textContent='ارسال شناسه و خلاصه درخواست در تلگرام';
-      output.appendChild(share);
+        '<div class="receipt-line"><span>وضعیت</span><strong id="receiptLiveStatus">در انتظار بررسی ادمین</strong></div>'+
+        '<div class="receipt-line receipt-summary-total"><span>مبلغ نهایی</span><strong>پس از بررسی اعلام می‌شود</strong></div>'+
+        '<div class="receipt-note">این فیش فقط «درخواست خرید» است؛ رسید پرداخت نیست و به معنی پرداخت، تأیید وجه یا فعال‌شدن اشتراک نیست. این صفحه هیچ وجه یا اطلاعات بانکی دریافت نمی‌کند. درخواست به‌صورت خودکار در سرور ثبت و در صندوق ادمین قرار گرفت؛ نیازی به ارسال تلگرام یا پیام دستی نیست. وضعیت و نتیجهٔ بررسی را می‌توانی از همین بخش پیگیری کنی. کد فعال‌سازی داخل فیش نمایش داده نمی‌شود و صدور و بررسی آن فقط از مسیر سرور انجام می‌شود.</div>';
+      var tracking=document.createElement('div');
+      tracking.className='receipt-note';
+      tracking.style.marginTop='12px';
+      tracking.innerHTML='<strong>پیگیری خودکار درخواست</strong><div id="receiptAdminUpdate" style="margin:7px 0">درخواست در صف بررسی ادمین قرار دارد.</div>';
+      var refresh=document.createElement('button');
+      refresh.type='button';refresh.className='btn btn-secondary';refresh.textContent='به‌روزرسانی وضعیت از سرور';
+      refresh.addEventListener('click',async function(){
+        refresh.disabled=true;
+        try{
+          var history=await invoke('my_requests');
+          var current=(history.requests||[]).find(function(item){return item.request_ref===request.request_ref;});
+          var target=tracking.querySelector('#receiptAdminUpdate');
+          if(current){
+            var statusLabels={pending_admin_review:'در انتظار بررسی ادمین',needs_info:'نیازمند اطلاعات بیشتر',reviewed:'بررسی‌شده',closed:'بسته‌شده'};
+            target.textContent=(statusLabels[current.status]||current.status)+(current.admin_note?' · '+current.admin_note:'');
+          }else target.textContent='وضعیت فعلی درخواست در دسترس نیست.';
+        }catch(error){
+          tracking.querySelector('#receiptAdminUpdate').textContent=messageFor(error);
+        }finally{refresh.disabled=false;}
+      });
+      tracking.appendChild(refresh);
+      output.appendChild(tracking);
       var print=qs('printReceipt');if(print) print.style.display='inline-flex';
     }catch(error){
       output.innerHTML='<div class="receipt-note">'+escapeHtml(messageFor(error))+'</div>';
