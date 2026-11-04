@@ -36,7 +36,6 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         with:
-          # Pages may remain in updating_pages for longer during propagation.
-          # Allow 20 minutes before canceling the deployment.
-          timeout: 1200000
+          # deploy-pages currently caps timeout at 10 minutes.
+          timeout: 600000
           reporting_interval: 10000
