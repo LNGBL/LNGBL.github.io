@@ -41,7 +41,7 @@
 
 <section id="panel-customers" class="panel" hidden>
  <div class="section-head"><h2>فهرست مشتریان</h2><span id="customerCount" class="muted">—</span></div>
- <p class="muted">نمای حساب‌ها، اشتراک‌ها، دورهٔ آزمایشی، وضعیت نظارت سرپرست و درخواست تخفیف. اطلاعات مالی فقط در صورت وجود سابقهٔ معتبر نمایش داده می‌شود.</p>
+ <p class="muted">نمای ۵۰۰ حساب اخیر، اشتراک‌ها، دورهٔ آزمایشی، وضعیت نظارت سرپرست و درخواست تخفیف. اطلاعات مالی فقط در صورت وجود سابقهٔ معتبر نمایش داده می‌شود.</p>
  <div class="grid"><div class="field"><label for="customerSearch">جست‌وجو با نام یا نام کاربری</label><input id="customerSearch" type="search" placeholder="نام یا @username"></div>
  <div class="field"><label for="customerFilter">فیلتر وضعیت</label><select id="customerFilter"><option value="all">همهٔ حساب‌ها</option><option value="active">اشتراک فعال</option><option value="trial">دورهٔ آزمایشی</option><option value="guardian">دارای سرپرست فعال</option><option value="pending_guardian">در انتظار پاسخ سرپرست</option><option value="discount">درخواست تخفیف</option><option value="expired">بدون دسترسی فعال</option></select></div></div><div id="customerList"></div>
 </section>
@@ -133,14 +133,14 @@ function customerCard(x){
  detailLine(card,'وضعیت سنی','سن احراز نشده؛ وضعیت اعلام‌شدهٔ سرپرست به‌تنهایی اثبات سن نیست');
  detailLine(card,'نظارت سرپرست',guardian?x.guardian_relationships.map(g=>(g.name||'سرپرست')+' (@'+(g.username||'—')+') · '+(g.scopes||[]).join('، ')).join(' | '):pending?'درخواست در انتظار پاسخ':'رابطهٔ فعال ثبت نشده');
  detailLine(card,'احراز مستقل بزرگسال سرپرست',x.guardian_age_assurance_verified?'ثبت شده':'ثبت نشده');
- if(x.discount_request){detailLine(card,'درخواست تخفیف اجتماعی',(statusNames[x.discount_request.status]||x.discount_request.status)+' · سن اعلام‌شده: '+(x.discount_request.declared_age??'—'));detailLine(card,'اعتبار تخفیف',x.discount_request.expires_at?new Date(x.discount_request.expires_at).toLocaleDateString('fa-IR'):'—')}else detailLine(card,'درخواست تخفیف اجتماعی','ثبت نشده');
+ if(x.discount_request){detailLine(card,'درخواست تخفیف اجتماعی',(statusNames[x.discount_request.status]||x.discount_request.status)+' · سن اعلام‌شده: '+(x.discount_request.declared_age??'—'));detailLine(card,'زمان ثبت درخواست',x.discount_request.created_at?new Date(x.discount_request.created_at).toLocaleString('fa-IR'):'—');detailLine(card,'زمان بررسی',x.discount_request.reviewed_at?new Date(x.discount_request.reviewed_at).toLocaleString('fa-IR'):'ثبت نشده');detailLine(card,'اعتبار تخفیف',x.discount_request.expires_at?new Date(x.discount_request.expires_at).toLocaleDateString('fa-IR'):'—')}else detailLine(card,'درخواست تخفیف اجتماعی','ثبت نشده');
  detailLine(card,'پرداخت‌کننده','در دفتر سفارش/پرداخت معتبر ثبت نشده؛ قابل احراز نیست');detailLine(card,'مبلغ پایه و نهایی','دفتر سفارش مالی متصل نیست؛ مبلغی ثبت نشده');
- const d=el('details');d.append(el('summary','','جزئیات درخواست‌های سرپرست'));(x.guardian_requests||[]).forEach(g=>d.append(el('p','muted',(statusNames[g.status]||g.status)+' · '+(g.scopes||[]).join('، ')+' · '+new Date(g.created_at).toLocaleDateString('fa-IR'))));card.append(d);return card;
+ const d=el('details');d.append(el('summary','','جزئیات درخواست‌های سرپرست'));(x.guardian_requests||[]).forEach(g=>d.append(el('p','muted',(g.direction==='learner'?'درخواست برای سرپرست ':'درخواست نظارت بر ')+(g.other_name||'حساب مرتبط')+' (@'+(g.other_username||'—')+') · '+(statusNames[g.status]||g.status)+' · '+(g.scopes||[]).join('، ')+' · '+new Date(g.created_at).toLocaleDateString('fa-IR'))));card.append(d);return card;
 }
 function renderCustomers(){
  const rows=workflow?.customers||[],term=($('customerSearch')?.value||'').trim().toLowerCase(),filter=$('customerFilter')?.value||'all',now=Date.now();
  const filtered=rows.filter(x=>{const subs=x.subscriptions||[],active=subs.some(s=>s.status==='active'&&(!s.expires_at||new Date(s.expires_at).getTime()>now)),trial=!!(x.trial_expires_at&&new Date(x.trial_expires_at).getTime()>now),guardian=(x.guardian_relationships||[]).length>0,pending=(x.guardian_requests||[]).some(g=>g.status==='pending'&&g.expires_at&&new Date(g.expires_at).getTime()>now),discount=!!x.discount_request,text=((x.name||'')+' '+(x.username||'')).toLowerCase();return (!term||text.includes(term))&&(filter==='all'||(filter==='active'&&active)||(filter==='trial'&&trial)||(filter==='guardian'&&guardian)||(filter==='pending_guardian'&&pending)||(filter==='discount'&&discount)||(filter==='expired'&&!active&&!trial));});
- $('customerCount').textContent=filtered.length.toLocaleString('fa-IR')+' از '+rows.length.toLocaleString('fa-IR')+' حساب';sectionList('customerList',filtered,customerCard,'حسابی با این فیلتر پیدا نشد.');
+ $('customerCount').textContent=filtered.length.toLocaleString('fa-IR')+' از آخرین '+rows.length.toLocaleString('fa-IR')+' حساب';sectionList('customerList',filtered,customerCard,'حسابی با این فیلتر پیدا نشد.');
 }
 function render(){
  const q=workflow?.queues||{},m=workflow?.management||{};
@@ -151,7 +151,7 @@ function render(){
  sectionList('manageTeachers',m.teachers,x=>teacherCard(x,true),'پروفایل معلمی ثبت نشده است.');
  sectionList('manageOffers',m.offers,x=>offerCard(x,true),'آگهی کلاسی ثبت نشده است.');
  sectionList('manageContent',m.content,x=>contentCard(x,true),'محتوای معلمی ثبت نشده است.');
- const counts=workflow?.counts||{};const metricItems=[['درخواست معلم',counts.teachers],['انتشار کلاس',counts.offers],['محتوای آموزشی',counts.content],['مشارکت کاربران',counts.contributions],['اتصال‌های در انتظار',counts.pending_connections],['درخواست دسترسی',community.filter(x=>x.status==='pending').length]];
+ const counts=workflow?.counts||{};const metricItems=[['مشتری',counts.customers],['درخواست معلم',counts.teachers],['انتشار کلاس',counts.offers],['محتوای آموزشی',counts.content],['مشارکت کاربران',counts.contributions],['اتصال‌های در انتظار',counts.pending_connections],['درخواست دسترسی',community.filter(x=>x.status==='pending').length]];
  $('metrics').replaceChildren();metricItems.forEach(([label,value])=>{const d=el('div','metric');d.append(el('span','muted',label),el('strong','',Number(value||0).toLocaleString('fa-IR')));$('metrics').append(d)});
  $('lastUpdated').textContent='آخرین همگام‌سازی: '+new Date(workflow.generated_at).toLocaleString('fa-IR');
  renderCommunity();renderCustomers();renderStaff();renderOperations();renderAudit();
