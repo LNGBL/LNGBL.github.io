@@ -101,6 +101,14 @@ Deno.serve(async (req: Request) => {
   }
 
   if (action === "overview") {
+    const now = new Date().toISOString();
+    const [expireLearner, expireGuardian] = await Promise.all([
+      db.from("guardian_consent_requests").update({ status: "expired", responded_at: now })
+        .eq("learner_user_id", uid).eq("status", "pending").lte("expires_at", now),
+      db.from("guardian_consent_requests").update({ status: "expired", responded_at: now })
+        .eq("guardian_user_id", uid).eq("status", "pending").lte("expires_at", now),
+    ]);
+    if (expireLearner.error || expireGuardian.error) return json({ ok: false, error: "EXPIRY_UPDATE_FAILED" }, 500);
     const [pendingForMe, myRequests, relationships, verification] = await Promise.all([
       db.from("guardian_consent_requests")
         .select("id,learner_user_id,requested_scopes,policy_version,created_at,expires_at")
