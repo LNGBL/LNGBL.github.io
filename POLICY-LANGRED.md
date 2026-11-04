@@ -3,6 +3,8 @@
 **Purpose:** Russian-language learning, cultural literacy, vocabulary, grammar, pronunciation, and spaced review.
 
 ## Operating principles
+- GitHub's trade-controls policy distinguishes GitHub.com from GitHub Enterprise Server and GitHub Copilot. Do not interpret restrictions on Copilot or Enterprise Server as a blanket ban on Russian-language learning or all Russian users. Apply restrictions only to the service, party, location, transaction, and end use actually covered by applicable rules.
+- GitHub states that nationality and ethnicity are not used to flag users for sanctions restrictions; the relevant checks concern location, payment history, restricted parties, and applicable legal criteria. See: https://docs.github.com/en/site-policy/other-site-policies/github-and-trade-controls
 - Educational and culturally descriptive content; no political persuasion, war propaganda, or state-affiliated messaging.
 - The Ukrainian flag in the loading screen is a visual reference to the wider Slavic cultural context. The Russian text is a language-learning welcome message, not a political endorsement.
 - No blanket exclusion of Russian speakers or residents based solely on language, nationality, or an approximate IP country.
