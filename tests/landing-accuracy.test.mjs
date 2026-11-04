@@ -6,12 +6,12 @@ const read = (path) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const landing = read('../index.html');
 const commerce = read('../assets/js/langblue-commerce.js');
 
-test('landing and checkout expose all eight active products', () => {
-  assert.equal((landing.match(/<article class="product-card"/g) || []).length, 8);
+test('landing and checkout expose all seven active products', () => {
+  assert.equal((landing.match(/<article class="product-card"/g) || []).length, 7);
   assert.equal((landing.match(/<input type="checkbox" value="/g) || []).length, 8);
   const ids = commerce.match(/var ALL_PRODUCT_IDS=\[([^\]]+)\]/)?.[1] || '';
-  assert.equal(ids.split(',').length, 8);
-  assert.match(landing, /اگر هر ۸ محصول فعال را یک‌جا با مدت ۱۲ ماهه انتخاب کنی/);
+  assert.equal(ids.split(',').length, 7);
+  assert.match(landing, /اگر هر ۷ محصول فعال را یک‌جا با مدت ۱۲ ماهه انتخاب کنی/);
 });
 
 test('the landing page provides one clear first step and a learning path', () => {
