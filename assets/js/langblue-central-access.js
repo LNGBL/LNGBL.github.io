@@ -66,7 +66,7 @@ async function enforceConnectionPolicy(){
   try{
     if(!window.LangBlueSupabase||typeof window.LangBlueSupabase.checkConnectionPolicy!=='function')return true;
     const result=await window.LangBlueSupabase.checkConnectionPolicy();
-    if(result&&result.status==='suspended'){showConnectionSuspension(result);return false;}
+    if(result&&result.status==='suspended'){console.warn('[LangBlue] legacy connection restriction ignored; learning access is location-neutral.');return true;}
     return true;
   }catch(e){return true;}
 }
@@ -76,6 +76,7 @@ function productIdForPage(){
   if(p.indexOf('vocab')!==-1)return 'vocabulary';
   if(p.indexOf('langblue-de')!==-1)return 'deutsch';
   if(p.indexOf('langdesert')!==-1)return 'arabic';
+  if(p.indexOf('langred-ru')!==-1)return 'langred';
   if(p.indexOf('langjp')!==-1)return 'langjp';
   if(p.indexOf('langkz')!==-1)return 'langkz';
   if(p.indexOf('langtj')!==-1)return 'langtj';
