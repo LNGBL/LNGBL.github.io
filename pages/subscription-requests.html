@@ -64,7 +64,7 @@ function render(rows){
    '<div class="line"><span>زمان ثبت</span><strong>'+esc(new Date(r.created_at).toLocaleString('fa-IR'))+'</strong></div>'+
    '<p class="muted">هش یکتای درخواست (SHA-256)</p><div class="hash">'+esc(r.request_hash)+'</div>'+
    (r.admin_note?'<p class="muted">یادداشت قبلی: '+note+'</p>':'')+
-   (['pending_admin_review','needs_info'].includes(r.status)?'<div class="field"><label for="note-'+id+'">نتیجه بررسی / مبلغ نهایی اعلامی (در صورت نیاز)</label><textarea id="note-'+id+'" placeholder="نتیجه بررسی، مبلغ نهایی اعلامی یا اطلاعات موردنیاز…">'+note+'</textarea></div>'+
+   (['pending_admin_review','needs_info'].includes(r.status)?'<div class="field"><label for="note-'+id+'">یادداشت مدیر</label><textarea id="note-'+id+'" placeholder="یادداشت یا اطلاعات موردنیاز…">'+note+'</textarea></div>'+
     '<div class="actions"><button class="btn primary" data-id="'+id+'" data-status="reviewed">ثبت بررسی</button><button class="btn" data-id="'+id+'" data-status="needs_info">درخواست اطلاعات بیشتر</button><button class="btn danger" data-id="'+id+'" data-status="closed">بستن درخواست</button></div>':
     '<p class="muted">این درخواست از صف انتظار خارج شده است.</p>')+
    '</article>';
