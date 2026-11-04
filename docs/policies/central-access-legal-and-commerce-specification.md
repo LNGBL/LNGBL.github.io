@@ -83,7 +83,7 @@ These promotions must not be stacked or combined with the 7% policy by guesswork
 - Store only the account identifiers, consent scope, policy version, status and timestamps needed to operate the relationship. Do not request identity documents by default.
 - Revocation stops future actions that require guardian approval. Existing entitlements and legally required records must be handled under reviewed terms and applicable law.
 - Do not expose a minor's contacts, referral network, purchase history, or family details to other learners.
-- The current guardian policy is documented, but a complete guardian invitation/acceptance/revocation workflow and server-side enforcement must be implemented and tested before it is described as operational.
+- The guardian request/reject/revoke schema and JWT-protected Edge Function are deployed. Acceptance fails closed until a trusted, independent adult age-verification integration records a valid verification. Feature-specific server-side enforcement is not yet wired into all existing product APIs.
 
 ## 6. Consumer information, cancellation and refunds
 
@@ -144,9 +144,12 @@ It must not, in this implementation:
 - [ ] Responsible adult/legal entity and lawful payment provider identified for production.
 - [ ] Current prices, currency, tax treatment and effective date approved.
 - [ ] Legacy 10% community, 10% bundle, festival and older 15% bundle rules reconciled with the 7% policy.
+- [ ] Authoritative paid-order ledger available before 7% discount eligibility can be activated.
 - [ ] Country-specific legal review completed for every market.
 - [ ] Consumer cancellation/refund/renewal terms reviewed and published.
-- [ ] Guardian consent workflow implemented server-side and tested.
+- [x] Guardian consent request/reject/revoke backend deployed with RLS and restricted RPCs.
+- [ ] Trusted independent guardian age-verification integration configured and acceptance tested.
+- [ ] Guardian consent scopes enforced by every feature/API that requires them.
 - [ ] Entitlement/token issuance and redemption are server-authoritative, atomic and audited.
 - [ ] Admin roles and audit logging verified.
 - [ ] Privacy notice, retention periods, account deletion and analytics consent reviewed.
