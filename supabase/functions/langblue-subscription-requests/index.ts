@@ -105,8 +105,11 @@ Deno.serve(async (req) => {
       if (!plan.data || plan.data.days <= 0) return reply({ ok: false, error: "PLAN_UNAVAILABLE" }, 400);
 
       const amountIrt = Number(plan.data.price_irt) * productIds.length;
+      const mime = clean(body.receiptMime, 40);
+      const extensions: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+      const ext = extensions[mime];
+      if (!ext) return reply({ ok: false, error: "INVALID_RECEIPT_TYPE" }, 400);
       const id = crypto.randomUUID();
-      const ext = "jpg";
       const receiptPath = actor.id + "/" + id + "." + ext;
       const requestHash = await hashRequest(id, actor.id);
       const insert = await db.from("subscription_requests").insert({
@@ -130,16 +133,36 @@ Deno.serve(async (req) => {
 
     if (action === "my_requests") {
       const q = await db.from("subscription_requests")
-        .select("request_ref,product_ids,plan_id,amount_irt,status,admin_note,created_at,reviewed_at")
+        .select("request_ref,product_ids,plan_id,amount_irt,status,admin_note,created_at,reviewed_at,receipt_uploaded_at")
         .eq("requester_user_id", actor.id).order("created_at", { ascending: false }).limit(50);
       if (q.error) throw new Error("REQUEST_HISTORY_LOAD_FAILED");
       return reply({ ok: true, requests: q.data || [] });
     }
 
+    if (action === "receipt_uploaded") {
+      const requestId = clean(body.requestId, 64);
+      if (!uuid(requestId)) return reply({ ok: false, error: "INVALID_REQUEST_ID" }, 400);
+      const request = await db.from("subscription_requests")
+        .select("id,requester_user_id,receipt_path,status")
+        .eq("id", requestId).eq("requester_user_id", actor.id).maybeSingle();
+      if (request.error) throw new Error("REQUEST_LOOKUP_FAILED");
+      if (!request.data || !request.data.receipt_path) return reply({ ok: false, error: "REQUEST_NOT_FOUND" }, 404);
+      if (!["pending_admin_review", "needs_info"].includes(request.data.status)) return reply({ ok: false, error: "REQUEST_NOT_PENDING" }, 409);
+      const stored = await db.from("storage.objects").select("id")
+        .eq("bucket_id", BUCKET).eq("name", request.data.receipt_path).maybeSingle();
+      if (stored.error) throw new Error("RECEIPT_LOOKUP_FAILED");
+      if (!stored.data) return reply({ ok: false, error: "RECEIPT_FILE_MISSING" }, 409);
+      const updated = await db.from("subscription_requests")
+        .update({ receipt_uploaded_at: now() }).eq("id", requestId)
+        .eq("requester_user_id", actor.id).select("id,receipt_uploaded_at").single();
+      if (updated.error) throw new Error("RECEIPT_STATUS_SAVE_FAILED");
+      return reply({ ok: true, receipt_uploaded_at: updated.data.receipt_uploaded_at });
+    }
+
     if (action === "admin_list") {
       if (!await isAdmin()) return reply({ ok: false, error: "ADMIN_UNAUTHORIZED" }, 403);
       const q = await db.from("subscription_requests")
-        .select("id,request_ref,request_hash,requester_user_id,learner_user_id,product_ids,plan_id,amount_irt,receipt_path,status,admin_note,created_at,reviewed_at")
+        .select("id,request_ref,request_hash,requester_user_id,learner_user_id,product_ids,plan_id,amount_irt,receipt_path,receipt_uploaded_at,status,admin_note,created_at,reviewed_at")
         .order("created_at", { ascending: false }).limit(150);
       if (q.error) throw new Error("REQUEST_QUEUE_LOAD_FAILED");
       const ids = [...new Set((q.data || []).flatMap((x: any) => [x.requester_user_id, x.learner_user_id]).filter(Boolean))];
@@ -167,6 +190,9 @@ Deno.serve(async (req) => {
       const decision = clean(body.decision, 20);
       const note = clean(body.note, 1000);
       if (!uuid(id) || !["approved", "rejected"].includes(decision)) return reply({ ok: false, error: "INVALID_UPDATE" }, 400);
+      const before = await db.from("subscription_requests").select("status")
+        .eq("id", id).maybeSingle();
+      if (before.error || !before.data) return reply({ ok: false, error: "REQUEST_NOT_FOUND" }, 404);
       const result = await db.rpc("review_subscription_payment", {
         p_request_id: id, p_admin_user_id: actor.id, p_decision: decision, p_note: note || null
       });
@@ -178,7 +204,12 @@ Deno.serve(async (req) => {
         if (message.includes("PLAN_UNAVAILABLE")) return reply({ ok: false, error: "PLAN_UNAVAILABLE" }, 409);
         throw new Error("PAYMENT_REVIEW_FAILED");
       }
-      return reply({ ok: true, result: result.data, entitlement_changed: decision === "approved" });
+      const audit = await db.from("admin_workflow_events").insert({
+        actor_user_id: actor.id, entity_type: "subscription_payment", entity_id: id,
+        action: decision, previous_status: before.data.status, new_status: decision,
+        note: note || null
+      });
+      return reply({ ok: true, result: result.data, entitlement_changed: decision === "approved", audit_logged: !audit.error });
     }
 
     return reply({ ok: false, error: "UNKNOWN_ACTION" }, 400);
