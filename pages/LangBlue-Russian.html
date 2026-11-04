@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LangBlue Russian | آموزش زبان روسی</title>
+<meta name="description" content="آموزش مقدماتی زبان روسی با الفبای سیریلیک، واژگان، تلفظ لاتین و تمرین مرور.">
+<link rel="stylesheet" href="../assets/css/langblue-design-system.css">
+<style>
+:root{--ru-bg:#10251c;--ru-panel:#183528;--ru-line:rgba(220,239,225,.16);--ru-text:#f4f7f1;--ru-muted:#c2d3c6;--ru-accent:#8ec7a1}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#10251c,#1c3a2b);color:var(--ru-text);font-family:system-ui,"Segoe UI",Tahoma,sans-serif;line-height:1.9}
+.wrap{width:min(1080px,calc(100% - 30px));margin:auto}header{padding:18px 0;border-bottom:1px solid var(--ru-line)}.nav{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}.nav a{color:var(--ru-text);text-decoration:none}.brand{font-weight:900;font-size:20px}.nav-links{display:flex;gap:16px;flex-wrap:wrap;font-size:13px}
+.hero{padding:54px 0 34px;text-align:center}.eyebrow{color:var(--ru-accent);font-weight:800;letter-spacing:.08em;font-size:12px}h1{font-size:clamp(34px,6vw,58px);line-height:1.25;margin:8px 0}.lead{max-width:760px;margin:auto;color:var(--ru-muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:24px 0}.panel{background:rgba(24,53,40,.86);border:1px solid var(--ru-line);border-radius:18px;padding:22px}.panel h2{margin-top:0;font-size:21px}.muted{color:var(--ru-muted);font-size:14px}
+.alphabet{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}.letter{border:1px solid var(--ru-line);border-radius:12px;padding:9px 5px;text-align:center;background:rgba(255,255,255,.035)}.letter strong{display:block;font-size:27px;direction:ltr}.letter small{color:var(--ru-muted);font-size:11px}
+.words{display:grid;gap:10px}.word{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:11px;border:1px solid var(--ru-line);border-radius:12px}.word strong{font-size:20px;direction:ltr;display:block;text-align:right}.word small{color:var(--ru-muted)}button,.btn{border:1px solid rgba(142,199,161,.4);border-radius:10px;background:#285b40;color:white;padding:9px 13px;font:inherit;font-weight:750;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.btn-secondary{background:transparent}
+.quiz-q{font-weight:800;margin:12px 0}.answers{display:flex;gap:8px;flex-wrap:wrap}.status{min-height:28px;color:var(--ru-accent);font-size:13px}
+.lesson-list{padding-right:22px;color:var(--ru-muted)}.lesson-list li{margin:7px 0}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.alphabet{grid-template-columns:repeat(4,minmax(0,1fr))}.panel{padding:17px}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="brand" href="/">LangBlue</a><nav class="nav-links"><a href="/#products">محصولات</a><a href="/pages/learning-engine.html">مرور هوشمند</a><a href="/#receipt">فیش و اشتراک</a></nav></div></header>
+<main class="wrap">
+<section class="hero"><div class="eyebrow">LANGBLUE · RUSSIAN</div><h1>روسی را از پایه شروع کن</h1><p class="lead">یک مسیر مقدماتی و بی‌طرف برای آشنایی با خط سیریلیک، صداها و عبارت‌های روزمره. هر واژه را می‌توانی به صف مرور شخصی اضافه کنی.</p></section>
+<div class="grid">
+<section class="panel"><h2>۱. آشنایی با الفبای روسی</h2><p class="muted">روسی با خط سیریلیک نوشته می‌شود. این شش حرف نمونه‌ای برای شروع هستند؛ شکل و صدای بعضی حروف با حروف لاتین مشابه، یکسان نیست.</p>
+<div class="alphabet">
+<div class="letter"><strong>А а</strong><small>a</small></div><div class="letter"><strong>Б б</strong><small>b</small></div><div class="letter"><strong>В в</strong><small>v</small></div><div class="letter"><strong>Г г</strong><small>g</small></div><div class="letter"><strong>Д д</strong><small>d</small></div><div class="letter"><strong>Е е</strong><small>ye / e</small></div>
+<div class="letter"><strong>Ё ё</strong><small>yo</small></div><div class="letter"><strong>Ж ж</strong><small>zh</small></div><div class="letter"><strong>З з</strong><small>z</small></div><div class="letter"><strong>И и</strong><small>i</small></div><div class="letter"><strong>Й й</strong><small>y</small></div><div class="letter"><strong>К к</strong><small>k</small></div>
+</div></section>
+<section class="panel"><h2>۲. واژگان نخستین</h2><p class="muted">تلفظ لاتین در این صفحه راهنمای تقریبی خواندن است، نه جایگزین شنیدن صدای طبیعی.</p>
+<div class="words" id="wordList">
+<div class="word"><div><strong>Привет</strong><small>privet · سلام (غیررسمی)</small></div><button type="button" data-word="Привет" data-translit="privet" data-meaning="سلام، غیررسمی">افزودن به مرور</button></div>
+<div class="word"><div><strong>Спасибо</strong><small>spasibo · متشکرم</small></div><button type="button" data-word="Спасибо" data-translit="spasibo" data-meaning="متشکرم">افزودن به مرور</button></div>
+<div class="word"><div><strong>Да</strong><small>da · بله</small></div><button type="button" data-word="Да" data-translit="da" data-meaning="بله">افزودن به مرور</button></div>
+<div class="word"><div><strong>Нет</strong><small>nyet · نه</small></div><button type="button" data-word="Нет" data-translit="nyet" data-meaning="نه">افزودن به مرور</button></div>
+<div class="word"><div><strong>Пожалуйста</strong><small>pozhaluysta · لطفاً / خواهش می‌کنم</small></div><button type="button" data-word="Пожалуйста" data-translit="pozhaluysta" data-meaning="لطفاً؛ خواهش می‌کنم">افزودن به مرور</button></div>
+</div><p class="status" id="saveStatus" aria-live="polite"></p><a class="btn btn-secondary" href="/pages/learning-engine.html">رفتن به صف مرور ←</a></section>
+<section class="panel"><h2>۳. تمرین کوتاه</h2><p class="quiz-q">معنی «Спасибо» کدام است؟</p><div class="answers"><button type="button" data-answer="wrong">سلام</button><button type="button" data-answer="correct">متشکرم</button><button type="button" data-answer="wrong">نه</button></div><p class="status" id="quizStatus" aria-live="polite"></p></section>
+<section class="panel"><h2>۴. مسیر بعدی</h2><ol class="lesson-list"><li>حروف سیریلیک و تمایز صداها را مرحله‌به‌مرحله یاد بگیر.</li><li>واژگان روزمره را همراه با تلفظ لاتین و مثال ثبت کن.</li><li>عبارت‌های ساده و ضمایر شخصی را تمرین کن.</li><li>واژه‌ها و قواعد را به صف مرور فاصله‌دار اضافه کن.</li></ol><p class="muted">این نسخه، نقطهٔ شروع آموزشی است؛ دورهٔ کامل سطح‌بندی‌شده و بانک گستردهٔ تمرین هنوز به این صفحه اضافه نشده است.</p></section>
+</div>
+</main>
+<script>
+(function(){
+'use strict';
+const KEY='langblue_learning_engine_v1';
+function addReview(item){
+ let items=[];try{const parsed=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(parsed))items=parsed;}catch(_){}
+ if(items.some(x=>x.product==='langru'&&x.title===item.title))return false;
+ const now=Date.now();
+ items.unshift({id:'ru-'+now.toString(36)+'-'+Math.random().toString(36).slice(2,7),title:item.title,product:'langru',prompt:'تلفظ لاتین: '+item.translit,answer:item.meaning,createdAt:now,dueAt:now+4*3600000,stage:0,intervalHours:4,attempts:0,correct:0,misses:0});
+ localStorage.setItem(KEY,JSON.stringify(items));return true;
+}
+document.querySelectorAll('[data-word]').forEach(button=>button.addEventListener('click',()=>{
+ const added=addReview({title:button.dataset.word,translit:button.dataset.translit,meaning:button.dataset.meaning});
+ document.getElementById('saveStatus').textContent=added?'واژه به صف مرور اضافه شد؛ نخستین مرور پس از ۴ ساعت خواهد بود.':'این واژه قبلاً در صف مرور ثبت شده است.';
+}));
+document.querySelectorAll('[data-answer]').forEach(button=>button.addEventListener('click',()=>{
+ document.getElementById('quizStatus').textContent=button.dataset.answer==='correct'?'درست است؛ Спасибо یعنی «متشکرم».':'یک بار دیگر فکر کن و معنی واژه را بررسی کن.';
+}));
+})();
+</script>
+<script src="../assets/js/supabase-client.js"></script>
+<script src="../assets/js/langblue-core.js"></script>
+<script src="../assets/js/langblue-central-access.js?v=20261104-russian"></script>
+</body></html>
