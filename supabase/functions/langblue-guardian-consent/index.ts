@@ -27,7 +27,7 @@ function cleanScopes(value: unknown): string[] {
 }
 
 function safeError(error: unknown) {
-  const code = String((error as { message?: string })?.message || "").toUpperCase();
+  const code = String(typeof error === "string" ? error : ((error as { message?: string })?.message || "")).toUpperCase();
   const known = [
     "INVALID_GUARDIAN", "POLICY_VERSION_MISMATCH", "INVALID_SCOPES",
     "REQUEST_ALREADY_PENDING", "REQUEST_NOT_AVAILABLE",
