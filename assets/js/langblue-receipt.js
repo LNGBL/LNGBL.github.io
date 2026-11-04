@@ -84,6 +84,7 @@
       var upload=await sb.storage.from(BUCKET).uploadToSignedUrl(data.upload.path,data.upload.token,file,{contentType:file.type,upsert:false});
       if(upload.error)throw new Error('RECEIPT_UPLOAD_FAILED');
       var req=data.request;
+      await invoke('receipt_uploaded',{requestId:req.id});
       output.innerHTML='<div class="receipt-head"><strong>'+esc(req.request_ref)+'</strong><small>ثبت شده</small></div>'+
         '<div class="receipt-line"><span>محصولات</span><strong>'+esc(order.products.map(function(p){return p.label;}).join('، '))+'</strong></div>'+
         '<div class="receipt-line"><span>مدت</span><strong>'+esc(order.plan.label)+'</strong></div>'+
