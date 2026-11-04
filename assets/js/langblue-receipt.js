@@ -85,7 +85,7 @@
     var saved={
       id:order.id, createdAt:order.createdAt, planId:order.plan.id,
       productIds:order.products.map(function(p){return p.id;}),
-      total:order.total
+      requestType:'purchase_request', status:'pending_admin_review'
     };
     try{ localStorage.setItem('lb:receipt:last',JSON.stringify(saved)); }catch(e){}
 
@@ -94,14 +94,23 @@
         '<div><strong>LangBlue</strong><br><small>فیش درخواست اشتراک</small></div>'+
         '<div><strong>'+escapeHtml(order.id)+'</strong><br><small>'+new Date(order.createdAt).toLocaleString('fa-IR')+'</small></div>'+
       '</div>'+
+      '<div class="receipt-line"><span>وضعیت درخواست</span><strong>در انتظار بررسی ادمین</strong></div>'+
       order.products.map(function(p){
         return '<div class="receipt-line"><span>'+escapeHtml(p.icon+' '+p.label)+'</span><strong>'+formatPrice(order.plan.finalPrice)+'</strong></div>';
       }).join('')+
       '<div class="receipt-line"><span>مدت اشتراک</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
       (order.communityDiscount ? '<div class="receipt-line"><span>تخفیف اجتماعی</span><strong>'+order.communityDiscount+'٪ (−'+formatPrice(order.communityDiscountAmount)+')</strong></div>' : '')+
       (order.bundleDiscount ? '<div class="receipt-line"><span>تخفیف بسته</span><strong>'+order.bundleDiscount+'٪</strong></div>' : '')+
-      '<div class="receipt-total"><span>مبلغ کل</span><strong>'+formatPrice(order.total)+'</strong></div>'+
-      '<div class="receipt-note">این فیش «درخواست خرید» است و به معنی پرداخت یا فعال‌شدن اشتراک نیست. شناسه فیش را برای ادمین LangBlue در تلگرام ارسال کن. کد فعال‌سازی فقط از مسیر سرور صادر و بررسی می‌شود و داخل فیش نمایش داده نمی‌شود.</div>';
+      '<div class="receipt-total"><span>مبلغ برآوردی درخواست (غیرقابل پرداخت)</span><strong>'+formatPrice(order.total)+'</strong></div>'+
+      '<div class="receipt-note">این فیش فقط «درخواست خرید» است و به معنی پرداخت، تأیید وجه یا فعال‌شدن اشتراک نیست. این صفحه هیچ وجه یا اطلاعات بانکی دریافت نمی‌کند. شناسهٔ فیش را از طریق دکمهٔ تلگرام ارسال کن؛ تلگرام باز می‌شود و باید گفت‌وگوی ادمین را خودت انتخاب و ارسال را تأیید کنی. کد فعال‌سازی داخل فیش وجود ندارد و فقط از مسیر سرور صادر و بررسی می‌شود.</div>';
+    var share=document.createElement('a');
+    share.className='btn btn-primary receipt-share';
+    share.href='https://t.me/share/url?url='+encodeURIComponent('https://lngbl.github.io/')+'&text='+encodeURIComponent('درخواست خرید LangBlue\nشناسه: '+order.id+'\nمحصولات: '+order.products.map(function(p){return p.label;}).join('، ')+'\nمدت: '+order.plan.label+'\nوضعیت: در انتظار بررسی ادمین\nاین پیام درخواست است و رسید پرداخت نیست.');
+    share.target='_blank';
+    share.rel='noopener noreferrer';
+    share.textContent='ارسال شناسهٔ درخواست در تلگرام';
+    share.setAttribute('aria-label','ارسال شناسه درخواست خرید LangBlue از طریق انتخاب گفت‌وگو در تلگرام');
+    output.appendChild(share);
     output.classList.add('show');
     var print=qs('printReceipt'); if(print) print.style.display='inline-flex';
   }
