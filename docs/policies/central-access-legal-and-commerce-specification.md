@@ -111,7 +111,7 @@ No specific refund window, withdrawal waiver, non-refundable term, tax treatment
 - Never collect or store full card numbers, CVV, passwords for payment accounts, or unnecessary bank credentials in LangBlue.
 - Restrict administrator views by role; log sensitive administrative decisions; expose only the minimum account and entitlement details needed for support.
 - Define and publish retention periods. Separate records that must be retained for legal/accounting reasons from ordinary profile and learning data.
-- Account deletion should begin promptly after a verified request. Any legally required records must be minimised, access-restricted, and retained only for the legally required period; do not promise deletion of records that law requires the operator to keep.
+- Account deletion should be carried out immediately after a verified request, without an arbitrary waiting period. Any records that must legally be retained are separated from the active account, minimised, access-restricted, and retained only for the legally required period; do not promise deletion of records that law requires the operator to keep.
 - This specification does not certify compliance with GDPR, US state privacy laws, Iranian law, or any other regime. The responsible operator must obtain advice for each market in which the service is offered.
 
 ## 8. Receipts and administration
