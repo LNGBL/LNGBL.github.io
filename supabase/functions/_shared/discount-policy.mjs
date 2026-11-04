@@ -16,7 +16,9 @@ export function evaluateGuardianDiscountPolicy(evidence) {
   const periodKey = typeof evidence.entitlementPeriodKey === "string"
     ? evidence.entitlementPeriodKey.trim()
     : "";
-  const referral = evidence.qualifyingReferral && periodKey.length > 0 &&
+  const selfReferral = evidence.referrerUserId && evidence.referredUserId &&
+    String(evidence.referrerUserId) === String(evidence.referredUserId);
+  const referral = evidence.qualifyingReferral && !selfReferral && periodKey.length > 0 &&
     !evidence.consumedReferralPeriodKeys.includes(periodKey);
 
   const eligibleBenefits = [];
