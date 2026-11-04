@@ -5,7 +5,7 @@
   const FUNCTION_NAME = 'langblue-behavior';
   const SCHEMA_VERSION = 1;
   const SESSION_KEY = 'lb:behavior:session';
-  const VALID_PRODUCTS = new Set(['grammar','vocabulary','deutsch','arabic','langjp']);
+  const VALID_PRODUCTS = new Set(['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj','langru']);
 
   function uuid(){
     if(window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
@@ -125,6 +125,7 @@
     const path=String(window.location.pathname||'').toLowerCase();
     if(path.includes('langdesert')) return 'arabic';
     if(path.includes('langjp')) return 'japanese';
+    if(path.includes('langblue-russian') || path.includes('langru')) return 'russian';
     const product=inferProduct();
     return product==='deutsch'?'german':(product?'english':null);
   }
@@ -145,6 +146,7 @@
     const path=String(window.location.pathname||'').toLowerCase();
     if(path.includes('langdesert')) return 'arabic';
     if(path.includes('langjp')) return 'langjp';
+    if(path.includes('langblue-russian') || path.includes('langru')) return 'langru';
     if(path.includes('vocab')) return 'vocabulary';
     if(path.includes('grammer') || path.includes('grammar')) return 'grammar';
     if(path.includes('langblue-de') || path.includes('deutsch')) return 'deutsch';
