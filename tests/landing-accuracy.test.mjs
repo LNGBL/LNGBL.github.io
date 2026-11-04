@@ -6,12 +6,11 @@ const read = (path) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const landing = read('../index.html');
 const commerce = read('../assets/js/langblue-commerce.js');
 
-test('landing and checkout expose all seven active products', () => {
+test('landing catalogue and commerce identifiers expose the seven active products', () => {
   assert.equal((landing.match(/<article class="product-card"/g) || []).length, 7);
-  assert.equal((landing.match(/<input type="checkbox" value="/g) || []).length, 7);
   const ids = commerce.match(/var ALL_PRODUCT_IDS=\[([^\]]+)\]/)?.[1] || '';
   assert.equal(ids.split(',').length, 7);
-  assert.match(landing, /اگر هر ۷ محصول فعال را یک‌جا با مدت ۱۲ ماهه انتخاب کنی/);
+  assert.doesNotMatch(landing, /receiptProducts|buildReceipt|langblue-receipt\.js/);
 });
 
 test('the landing page provides one clear first step and a learning path', () => {
@@ -31,4 +30,7 @@ test('landing page contains no push-notification or occasion-banner UI', () => {
   assert.doesNotMatch(landing, /langblue-notifications\.js|langblue-landing-events\.js/);
 });
 
-test('Russian language product is absent from the website catalogue and activation UI', () => {\n  assert.doesNotMatch(landing, /Russian|russian|langru|روسی|Русский/);\n  assert.doesNotMatch(commerce, /Russian|russian|langru|روسی|Русский/);\n});\n
+test('Russian language product is absent from the website catalogue and activation UI', () => {
+  assert.doesNotMatch(landing, /Russian|russian|langru|روسی|Русский/);
+  assert.doesNotMatch(commerce, /Russian|russian|langru|روسی|Русский/);
+});\n
