@@ -100,17 +100,13 @@
       var request=data.request, discount=request.discount_preview||{};
       output.innerHTML=
         '<div class="receipt-head">'+
-          '<div><strong>LangBlue</strong><br><small>درخواست اشتراک · ثبت‌شده در سرور</small></div>'+
           '<div><strong>'+escapeHtml(request.request_ref)+'</strong><br><small>'+new Date(request.created_at).toLocaleString('fa-IR')+'</small></div>'+
         '</div>'+
-        '<div class="receipt-line"><span>حساب یادگیرنده</span><strong>'+escapeHtml(data.learner.username?'@'+data.learner.username:(data.learner.name||'حساب انتخاب‌شده'))+'</strong></div>'+
         '<div class="receipt-line"><span>محصولات</span><strong>'+escapeHtml(order.products.map(function(p){return p.icon+' '+p.label;}).join('، '))+'</strong></div>'+
         '<div class="receipt-line"><span>مدت درخواستی</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
-        '<div class="receipt-line"><span>پیش‌نمایش تخفیف</span><strong>'+escapeHtml(discount.label||'پس از بررسی مشخص می‌شود')+'</strong></div>'+
         '<div class="receipt-line"><span>وضعیت</span><strong>در انتظار بررسی ادمین</strong></div>'+
-        '<div class="receipt-line"><span>شناسه یکتای درخواست</span><strong>'+escapeHtml(request.request_ref)+'</strong></div>'+
-        '<div class="receipt-line"><span>هش درخواست (SHA-256)</span><strong style="direction:ltr;word-break:break-all">'+escapeHtml(request.request_hash)+'</strong></div>'+
-        '<div class="receipt-note">این رکورد فقط درخواست اشتراک است؛ پرداخت، رسید بانکی، تأیید وجه یا فعال‌سازی انجام نمی‌دهد. هش برای شناسایی و بررسی یکپارچگی رکورد است و اثبات پرداخت نیست. کد فعال‌سازی در این صفحه ساخته یا نمایش داده نمی‌شود.</div>';
+        '<div class="receipt-line receipt-summary-total"><span>مبلغ نهایی</span><strong>پس از بررسی اعلام می‌شود</strong></div>'+
+        '<div class="receipt-note">این فیش فقط «درخواست خرید» است؛ رسید پرداخت نیست و به معنی پرداخت، تأیید وجه یا فعال‌شدن اشتراک نیست. این صفحه هیچ وجه یا اطلاعات بانکی دریافت نمی‌کند. شناسه درخواست در سرور ساخته و ثبت می‌شود و ادمین آن را در پنل درخواست‌ها می‌بیند؛ برای اطلاع‌رسانی سریع‌تر می‌توانی خلاصه درخواست را از طریق تلگرام ارسال کنی. کد فعال‌سازی داخل فیش نمایش داده نمی‌شود و صدور و بررسی آن فقط از مسیر سرور انجام می‌شود.</div>';
       var share=document.createElement('a');
       share.className='btn btn-primary receipt-share';
       share.href='https://t.me/share/url?url='+encodeURIComponent('https://lngbl.github.io/')+
@@ -123,7 +119,7 @@
           '\nپیش‌نمایش: '+(discount.label||'بررسی شود')+
           '\nوضعیت: در انتظار بررسی ادمین'
         );
-      share.target='_blank';share.rel='noopener noreferrer';share.textContent='ارسال شناسه و خلاصه درخواست در تلگرام';
+      share.target='_blank';share.rel='noopener noreferrer';share.textContent='ارسال فیش به ادمین در تلگرام';
       output.appendChild(share);
       var print=qs('printReceipt');if(print) print.style.display='inline-flex';
     }catch(error){
