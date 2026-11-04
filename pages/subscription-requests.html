@@ -4,72 +4,82 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#071521">
-<title>تأیید پرداخت Premium | LangBlue</title>
+<title>صندوق درخواست‌های اشتراک | LangBlue</title>
 <link rel="stylesheet" href="../assets/css/langblue-theme.css">
 <link rel="stylesheet" href="../assets/css/langblue-design-system.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../assets/js/supabase-client.js"></script>
 <style>
-:root{color-scheme:dark}body{background:#071521;color:#edf7fa;font-family:inherit}.wrap{width:min(1100px,calc(100% - 24px));margin:24px auto 70px}.panel,.item,.metric{background:#0e2233;border:1px solid rgba(255,255,255,.12);border-radius:15px}.panel{padding:18px;margin:14px 0}.top{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}.muted{color:#a9c0c7;font-size:13px;line-height:1.85}.btn{font:inherit;color:#edf7fa;padding:9px 13px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:#122c40;cursor:pointer;text-decoration:none}.primary{background:#126782;border-color:#168aad}.danger{background:#542b35;border-color:#9d5261}.btn:disabled{opacity:.45;cursor:not-allowed}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:14px 0}.metric{padding:13px}.metric strong{display:block;font-size:25px}.list{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:12px}.item{padding:15px}.item h3{margin:0;font-size:17px}.line{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}.line span{color:#a9c0c7}.line strong{max-width:68%;overflow-wrap:anywhere;text-align:left}.tag{padding:3px 9px;border-radius:20px;background:#1b3a4e;color:#c9e8f0;font-size:12px}.receipt{display:block;width:100%;max-height:340px;object-fit:contain;background:#071a29;border-radius:10px;margin:12px 0}.field{display:grid;gap:6px;margin:10px 0}.field textarea{width:100%;min-height:58px;padding:10px;border-radius:9px;border:1px solid rgba(255,255,255,.16);background:#071a29;color:#edf7fa;font:inherit}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.status{padding:11px 13px;border-radius:10px;background:rgba(255,255,255,.06);margin:10px 0}.empty{padding:22px;text-align:center;color:#a9c0c7;border:1px dashed rgba(255,255,255,.16);border-radius:12px}
+:root{color-scheme:dark}body{background:#071521;color:#edf7fa;font-family:inherit}.wrap{width:min(1180px,calc(100% - 28px));margin:24px auto 70px}.panel,.item,.metric{background:#0e2233;border:1px solid rgba(255,255,255,.12);border-radius:15px}.panel{padding:18px;margin:14px 0}.top{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}.muted{color:#a9c0c7;font-size:13px;line-height:1.85}.btn{font:inherit;color:#edf7fa;padding:9px 13px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:#122c40;cursor:pointer;text-decoration:none}.primary{background:#126782;border-color:#168aad}.danger{background:#542b35;border-color:#9d5261}.btn:disabled{opacity:.45;cursor:not-allowed}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:14px 0}.metric{padding:13px}.metric strong{display:block;font-size:25px}.list{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:12px}.item{padding:15px}.item h3{margin:0 0 8px;font-size:17px}.line{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}.line span{color:#a9c0c7}.line strong{max-width:65%;overflow-wrap:anywhere;text-align:left}.tag{display:inline-block;padding:3px 8px;border-radius:20px;background:#1b3a4e;color:#c9e8f0;font-size:12px}.field{display:grid;gap:6px;margin:10px 0}.field textarea{width:100%;min-height:64px;padding:10px;border-radius:9px;border:1px solid rgba(255,255,255,.16);background:#071a29;color:#edf7fa;font:inherit}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.status{padding:11px 13px;border-radius:10px;background:rgba(255,255,255,.06);margin:10px 0}.empty{padding:22px;text-align:center;color:#a9c0c7;border:1px dashed rgba(255,255,255,.16);border-radius:12px}.hash{direction:ltr;word-break:break-all;font:11px ui-monospace,monospace;color:#b7d8e3}@media(max-width:600px){.wrap{width:calc(100% - 18px)}}
 </style>
 </head>
 <body class="lb-design-system">
 <main class="wrap">
 <header class="panel top">
- <div><div class="muted">LANGBLUE · PREMIUM PAYMENTS</div><h1>تأیید پرداخت‌ها</h1><p class="muted">رسید را بررسی کن؛ تأیید، Premium را مستقیماً برای حساب انتخاب‌شده فعال می‌کند.</p></div>
- <div class="actions"><button class="btn primary" id="refresh">به‌روزرسانی</button><a class="btn" href="/pages/admin.html">مدیریت</a><a class="btn" href="/">صفحه اصلی</a></div>
+ <div><div class="muted">LANGBLUE · ADMIN INBOX</div><h1>صندوق درخواست‌های اشتراک</h1><p class="muted">نمایش درخواست‌های ثبت‌شده، حساب یادگیرنده، محصولات، مدت و پیش‌نمایش تخفیف.</p></div>
+ <div class="actions"><button class="btn primary" id="refresh">به‌روزرسانی صندوق</button><a class="btn" href="/pages/admin.html">بازگشت به مدیریت</a><a class="btn" href="/">صفحه اصلی</a></div>
 </header>
 <div id="status" class="status">در حال بررسی دسترسی مدیریتی…</div>
 <div id="metrics" class="metrics"></div>
-<section class="panel"><div id="requests" class="list"><div class="empty">در حال بارگذاری…</div></div></section>
+<section class="panel">
+ <div class="top"><h2>درخواست‌ها</h2><span class="muted">این پنل هیچ پرداخت یا اشتراکی را تأیید یا فعال نمی‌کند.</span></div>
+ <div id="requests" class="list"><div class="empty">در حال بارگذاری…</div></div>
+</section>
 </main>
 <script>
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const labels={pending_admin_review:'در انتظار بررسی',needs_info:'نیازمند اطلاعات',reviewed:'بررسی‌شده',closed:'بسته‌شده'};
 const products={grammar:'Grammar',vocabulary:'Vocabulary',deutsch:'Deutsch',arabic:'Arabic',langjp:'Japanese',langkz:'Kazakh',langtj:'Tajik'};
 const plans={irt_7d:'۷ روز',irt_14d:'۱۴ روز',irt_21d:'۲۱ روز',irt_3m:'۳ ماه',irt_6m:'۶ ماه',irt_12m:'۱۲ ماه'};
-const labels={pending_admin_review:'در انتظار تأیید',needs_info:'نیازمند بررسی بیشتر',approved:'تأیید و Premium فعال شد',rejected:'رد پرداخت',reviewed:'بررسی‌شده',closed:'بسته‌شده'};
 async function call(action,payload){
  const api=window.LangBlueSupabase,sb=api&&api.getClient&&api.getClient();
  if(!sb)throw new Error('اتصال Supabase در دسترس نیست.');
  const session=await api.getAuthSession();if(!session)throw new Error('ابتدا وارد حساب مدیر شو.');
  const {data,error}=await sb.functions.invoke('langblue-subscription-requests',{body:Object.assign({action},payload||{})});
- if(error&&!data)throw error;if(!data||!data.ok)throw new Error(data&&data.error||'درخواست ناموفق بود.');return data;
+ if(error&&!data)throw error;if(!data||!data.ok)throw new Error(data&&data.error||'درخواست ناموفق بود.');
+ return data;
 }
-function account(x){return x?(x.username?'@'+x.username:(x.name||x.id||'—')):'—';}
+function account(x){return x?(x.username?'@'+x.username:(x.name||x.id||'—')):'حساب نامشخص';}
 function render(rows){
- $('metrics').innerHTML=[['کل درخواست‌ها',rows.length],['در انتظار تصمیم',rows.filter(x=>['pending_admin_review','needs_info'].includes(x.status)).length],['تأییدشده',rows.filter(x=>x.status==='approved').length],['ردشده',rows.filter(x=>x.status==='rejected').length]].map(x=>'<div class="metric"><span class="muted">'+x[0]+'</span><strong>'+x[1]+'</strong></div>').join('');
+ $('metrics').innerHTML=[
+  ['کل درخواست‌ها',rows.length],
+  ['در انتظار بررسی',rows.filter(x=>x.status==='pending_admin_review').length],
+  ['نیازمند اطلاعات',rows.filter(x=>x.status==='needs_info').length],
+  ['بررسی‌شده / بسته',rows.filter(x=>['reviewed','closed'].includes(x.status)).length]
+ ].map(x=>'<div class="metric"><span class="muted">'+x[0]+'</span><strong>'+x[1]+'</strong></div>').join('');
  if(!rows.length){$('requests').innerHTML='<div class="empty">هنوز درخواستی ثبت نشده است.</div>';return;}
  $('requests').innerHTML=rows.map(r=>{
-  const id=esc(r.id),names=(r.product_ids||[]).map(x=>products[x]||x).join('، '),pending=['pending_admin_review','needs_info'].includes(r.status);
-  return '<article class="item"><div class="top"><h3>'+esc(r.request_ref)+'</h3><span class="tag">'+esc(labels[r.status]||r.status)+'</span></div>'+
-   '<div class="line"><span>پرداخت‌کننده</span><strong>'+esc(account(r.requester))+'</strong></div>'+
-   '<div class="line"><span>حساب Premium</span><strong>'+esc(account(r.learner))+'</strong></div>'+
+  const id=esc(r.id),ref=esc(r.request_ref),note=esc(r.admin_note||'');
+  const names=(r.product_ids||[]).map(x=>products[x]||x).join('، ');
+  return '<article class="item">'+
+   '<div class="top"><h3>'+ref+'</h3><span class="tag">'+esc(labels[r.status]||r.status)+'</span></div>'+
+   '<div class="line"><span>حساب درخواست‌دهنده</span><strong>'+esc(account(r.requester))+'</strong></div>'+
+   '<div class="line"><span>حساب یادگیرنده</span><strong>'+esc(account(r.learner))+'</strong></div>'+
    '<div class="line"><span>محصولات</span><strong>'+esc(names)+'</strong></div>'+
    '<div class="line"><span>مدت</span><strong>'+esc(plans[r.plan_id]||r.plan_id)+'</strong></div>'+
-   '<div class="line"><span>مبلغ مورد انتظار</span><strong>'+Number(r.amount_irt||0).toLocaleString("fa-IR")+' تومان</strong></div>'+
-   '<div class="line"><span>زمان ثبت</span><strong>'+esc(new Date(r.created_at).toLocaleString("fa-IR"))+'</strong></div>'+
-   (r.receipt_url?'<a href="'+esc(r.receipt_url)+'" target="_blank" rel="noopener"><img class="receipt" src="'+esc(r.receipt_url)+'" alt="تصویر رسید پرداخت"></a>':'<div class="empty">رسید هنوز بارگذاری نشده است.</div>')+
-   (r.admin_note?'<p class="muted">یادداشت: '+esc(r.admin_note)+'</p>':'')+
-   (pending?'<div class="field"><label for="note-'+id+'">یادداشت (اختیاری)</label><textarea id="note-'+id+'" placeholder="در صورت رد، دلیل را کوتاه بنویس…"></textarea></div>'+
-    '<div class="actions"><button class="btn primary" data-id="'+id+'" data-decision="approved" '+(!r.receipt_url?'disabled':'')+'>تأیید و فعال‌سازی Premium</button><button class="btn danger" data-id="'+id+'" data-decision="rejected">رد پرداخت</button></div>':
-    '<p class="muted">'+(r.status==='approved'?'دسترسی Premium در حساب ثبت شده است.':'این درخواست تعیین تکلیف شده است.')+'</p>')+
+   '<div class="line"><span>پیش‌نمایش تخفیف</span><strong>'+esc(r.discount_preview&&r.discount_preview.label||'—')+'</strong></div>'+
+   '<div class="line"><span>زمان ثبت</span><strong>'+esc(new Date(r.created_at).toLocaleString('fa-IR'))+'</strong></div>'+
+   '<p class="muted">هش یکتای درخواست (SHA-256)</p><div class="hash">'+esc(r.request_hash)+'</div>'+
+   (r.admin_note?'<p class="muted">یادداشت قبلی: '+note+'</p>':'')+
+   (['pending_admin_review','needs_info'].includes(r.status)?'<div class="field"><label for="note-'+id+'">یادداشت مدیر</label><textarea id="note-'+id+'" placeholder="یادداشت یا اطلاعات موردنیاز…">'+note+'</textarea></div>'+
+    '<div class="actions"><button class="btn primary" data-id="'+id+'" data-status="reviewed">ثبت بررسی</button><button class="btn" data-id="'+id+'" data-status="needs_info">درخواست اطلاعات بیشتر</button><button class="btn danger" data-id="'+id+'" data-status="closed">بستن درخواست</button></div>':
+    '<p class="muted">این درخواست از صف انتظار خارج شده است.</p>')+
    '</article>';
  }).join('');
  $('requests').querySelectorAll('button[data-id]').forEach(btn=>btn.addEventListener('click',async()=>{
-  const decision=btn.dataset.decision,id=btn.dataset.id;
-  if(decision==='approved'&&!confirm('واریز را بررسی کرده‌ای و تأیید می‌کنی؟ با تأیید، Premium همین حالا فعال می‌شود.'))return;
   btn.disabled=true;
-  try{await call('admin_update',{id,decision,note:$('note-'+id)?.value||''});$('status').textContent=decision==='approved'?'پرداخت تأیید شد و Premium فعال شد.':'پرداخت رد شد.';await load();}
+  const id=btn.dataset.id,status=btn.dataset.status,note=$('note-'+id)?.value||'';
+  try{await call('admin_update',{id,status,note});$('status').textContent='وضعیت درخواست به‌روزرسانی شد.';await load();}
   catch(e){$('status').textContent='خطا: '+e.message;btn.disabled=false;}
  }));
 }
 async function load(){
  $('status').textContent='در حال دریافت درخواست‌ها…';
- try{const data=await call('admin_list');render(data.requests||[]);$('status').textContent='صندوق پرداخت با دسترسی مدیریتی بارگذاری شد.';}
- catch(e){$('status').textContent='بارگذاری ناموفق: '+e.message;$('requests').innerHTML='<div class="empty">برای مشاهده صندوق، با حساب مدیر وارد شو.</div>';}
+ try{const data=await call('admin_list');render(data.requests||[]);$('status').textContent='صندوق با دسترسی مدیریتی بارگذاری شد.';}
+ catch(e){$('status').textContent='دسترسی یا بارگذاری ناموفق: '+e.message;$('requests').innerHTML='<div class="empty">برای مشاهده صندوق، با حساب دارای نقش مدیر وارد شو.</div>';}
 }
 $('refresh').addEventListener('click',load);load();
 })();
