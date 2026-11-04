@@ -8,7 +8,7 @@ const commerce = read('../assets/js/langblue-commerce.js');
 
 test('landing and checkout expose all seven active products', () => {
   assert.equal((landing.match(/<article class="product-card"/g) || []).length, 7);
-  assert.equal((landing.match(/<input type="checkbox" value="/g) || []).length, 8);
+  assert.equal((landing.match(/<input type="checkbox" value="/g) || []).length, 7);
   const ids = commerce.match(/var ALL_PRODUCT_IDS=\[([^\]]+)\]/)?.[1] || '';
   assert.equal(ids.split(',').length, 7);
   assert.match(landing, /اگر هر ۷ محصول فعال را یک‌جا با مدت ۱۲ ماهه انتخاب کنی/);
