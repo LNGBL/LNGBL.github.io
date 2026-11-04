@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 const migration = readFileSync(new URL("../supabase/migrations/20261104190121_guardian_consent_workflow_foundation.sql", import.meta.url), "utf8");
 const edge = readFileSync(new URL("../supabase/functions/langblue-guardian-consent/index.ts", import.meta.url), "utf8");
 const page = readFileSync(new URL("../pages/guardian-consent.html", import.meta.url), "utf8");
+const controller = readFileSync(new URL("../assets/js/langblue-guardian-consent.js", import.meta.url), "utf8");
 const config = readFileSync(new URL("../supabase/config.toml", import.meta.url), "utf8");
 
 test("guardian tables deny direct browser roles and use RLS", () => {
@@ -26,7 +27,7 @@ test("guardian requests support rejection, cancellation, revocation and fixed sc
   assert.match(edge, /action === "revoke"/);
   assert.match(migration, /learning_progress/);
   assert.match(migration, /research_participation/);
-  assert.match(page, /لغو رضایت/);
+  assert.match(controller, /لغو رضایت/);
   assert.match(page, /نام کاربری فقط یک درخواست می‌سازد/);
 });
 
