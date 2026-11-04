@@ -16,14 +16,14 @@ test("Central Access policy records the latest 7 percent discount rules and lega
   assert.match(policy, /Referral benefit: a qualifying invited learner may receive 7% once/i);
   assert.match(policy, /No stacking/i);
   assert.match(policy, /current commerce code has a 10% discount/i);
-  assert.match(policy, /older\/current-code promotion logic/i);
+  assert.match(policy, /older\/current-code promotion logic/ii);
 });
 
 test("Central Access policy documents activation token and consumer rights controls", () => {
   assert.match(policy, /Consume the token atomically/i);
   assert.match(policy, /cancellation method and effective time/i);
   assert.match(policy, /refund eligibility, timing, method/i);
-  assert.match(policy, /not legal advice/i);
+  assert.match(policy, /not legal advice/ii);
 });
 
 test("Central Access account UI explains server-authoritative access and payment boundary", () => {
