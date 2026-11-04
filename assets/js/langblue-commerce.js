@@ -278,7 +278,6 @@ langjp:{id:'langjp',label:'LangBlue Japanese',icon:'🌸',url:'pages/Langjp.html
 langkz:{id:'langkz',label:'LangBlue Kazakh',icon:'🇰🇿',url:'pages/LangKz.html'},
 
 langtj:{id:'langtj',label:'LangBlue Tajik',icon:'🇹🇯',url:'pages/LangTj.html'},
-langred:{id:'langred',label:'LangRed Russian',icon:'📘',url:'pages/LangRed-Ru.html'},
 
 
 
@@ -290,7 +289,7 @@ langred:{id:'langred',label:'LangRed Russian',icon:'📘',url:'pages/LangRed-Ru.
 
 
 
-var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj','langred'];
+var ALL_PRODUCT_IDS=['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj'];
 
 
 
