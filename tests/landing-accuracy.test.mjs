@@ -11,7 +11,7 @@ test('landing and checkout expose all seven active products', () => {
   assert.equal((landing.match(/<input type="checkbox" value="/g) || []).length, 7);
   const ids = commerce.match(/var ALL_PRODUCT_IDS=\[([^\]]+)\]/)?.[1] || '';
   assert.equal(ids.split(',').length, 7);
-  assert.match(landing, /اگر هر ۷ محصول فعال را یک‌جا با مدت ۱۲ ماهه انتخاب کنی/);
+  assert.match(landing, /هفت محصول فعال LangBlue/);
 });
 
 test('the landing page provides one clear first step and a learning path', () => {
