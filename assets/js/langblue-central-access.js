@@ -70,6 +70,7 @@ function productIdForPage(){
   if(p.indexOf('langjp')!==-1)return 'langjp';
   if(p.indexOf('langkz')!==-1)return 'langkz';
   if(p.indexOf('langtj')!==-1)return 'langtj';
+  if(p.indexOf('langblue-russian')!==-1||p.indexOf('langru')!==-1)return 'langru';
   return null;
 }
 function hasProductAccess(productId){
