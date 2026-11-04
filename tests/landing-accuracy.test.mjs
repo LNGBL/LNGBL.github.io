@@ -33,4 +33,4 @@ test('landing page contains no push-notification or occasion-banner UI', () => {
 test('Russian language product is absent from the website catalogue and activation UI', () => {
   assert.doesNotMatch(landing, /Russian|russian|langru|روسی|Русский/);
   assert.doesNotMatch(commerce, /Russian|russian|langru|روسی|Русский/);
-});\n
+});
