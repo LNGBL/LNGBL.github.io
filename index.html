@@ -583,15 +583,14 @@ footer{border-color:rgba(244,235,221,.16)}
 
 <section class="receipt-section" id="receipt">
   <div class="wrap">
-    <h2 class="section-title">ساخت فیش درخواست خرید LangBlue</h2>
+    <h2 class="section-title">اشتراک Premium LangBlue</h2>
     <p class="section-lead">
-      محصولات موردنظر و مدت دسترسی را انتخاب کن تا یک فیش «درخواست خرید» با شناسهٔ پیگیری بسازی. این فیش فقط ثبت درخواست است؛ به معنی پرداخت، تأیید وجه یا فعال‌شدن اشتراک نیست.
-      مبلغ نهایی و شرایط فروش پس از بررسی اعلام می‌شود. شناسه را با دکمهٔ تلگرام برای ادمین LangBlue بفرست و گفت‌وگوی ادمین را در تلگرام انتخاب کن. کد فعال‌سازی داخل فیش ساخته یا نمایش داده نمی‌شود؛ صدور و بررسی آن فقط از مسیر امن سرور انجام می‌شود.
+      محصولات و مدت دسترسی را انتخاب کن، مبلغ را واریز و تصویر رسید را همین‌جا بارگذاری کن. پس از بررسی و تأیید ادمین، Premium مستقیماً روی همان حساب فعال می‌شود.
     </p>
     <div class="receipt-builder">
       <div class="receipt-grid">
         <div class="receipt-panel">
-          <h3>۱. محصولات موردنظر</h3>
+          <h3>۱. محصولات Premium</h3>
           <div class="receipt-options" id="receiptProducts">
             <label class="receipt-option">
               <input type="checkbox" value="grammar" checked>
@@ -638,7 +637,7 @@ footer{border-color:rgba(244,235,221,.16)}
             <label class="receipt-option"><input type="checkbox" value="langtj"><span><strong>🇹🇯 LangBlue Tajik</strong><small>تاجیکی، واژگان سیریلیک، فلش‌کارت و پل فارسی–تاجیکی</small></span></label></div>
         </div>
         <div class="receipt-panel">
-          <h3>۲. مدت اشتراک روزانه / ماهانه</h3>
+          <h3>۲. مدت اشتراک</h3>
           <select id="receiptPlan" class="receipt-select" aria-label="مدت اشتراک">
             <optgroup label="اشتراک روزانه">
               <option value="irt_7d">۷ روز</option>
@@ -659,11 +658,13 @@ footer{border-color:rgba(244,235,221,.16)}
             <small id="receiptAccountStatus" class="receipt-note" style="display:block;margin-top:7px">ثبت درخواست از حساب بزرگسالِ تأییدشده انجام می‌شود. برای حساب یادگیرندهٔ مرتبط، پیوند فعال بزرگسال لازم است.</small>
           </div>
           <div class="receipt-summary" id="receiptSummary" aria-live="polite"></div>
+          <div class="field" style="margin:16px 0">
+            <label for="receiptImage" style="display:block;margin-bottom:7px;font-weight:700">۳. تصویر رسید واریز</label>
+            <input id="receiptImage" type="file" accept="image/jpeg,image/png,image/webp" class="receipt-select" required>
+            <small class="receipt-note">فقط تصویر JPG، PNG یا WebP تا ۵ مگابایت. رسید در فضای خصوصی ذخیره می‌شود و فقط ادمین مجاز آن را می‌بیند.</small>
+          </div>
           <div class="receipt-actions">
-            <button class="btn btn-primary" id="buildReceipt" type="button">  🧾 ساخت فیش </button>
-            <button class="btn btn-secondary" id="printReceipt" type="button" style="display:none">
-              🖨️ چاپ فیش
-            </button>
+            <button class="btn btn-primary" id="buildReceipt" type="button">ثبت درخواست و ارسال رسید</button>
           </div>
         </div>
       </div>
@@ -671,27 +672,6 @@ footer{border-color:rgba(244,235,221,.16)}
     </div>
   </div>
 </section>
-
-    <section class="central-activation-section" id="activation">
-      <div class="wrap">
-        <div class="central-activation-card">
-          <div class="central-activation-icon">🔑</div>
-          <div class="central-activation-copy">
-            <span class="product-badge">LANGBLUE · CENTRAL ACCESS</span>
-            <h2>فعال‌سازی اشتراک</h2>
-            <p>کد فعال‌سازی فقط در <strong>حساب مرکزی LangBlue</strong> وارد می‌شود. اگر کد را از ادمین دریافت کرده‌ای، از همین‌جا وارد حساب شو و کد را ثبت کن.</p>
-            <div class="central-activation-flow">
-              <span>۱. حساب مرکزی</span><b>←</b><span>۲. دریافت کد از @LangBlue</span><b>←</b><span>۳. وارد کردن کد</span><b>←</b><span>۴. فعال‌شدن محصولات کد</span>
-            </div>
-            <div class="central-activation-actions">
-<button class="btn btn-primary" type="button" onclick="window.LangBlueCentralAccount&&window.LangBlueCentralAccount.open()">🔐 ورود به حساب و فعال‌سازی کد</button>
-              <a class="btn btn-secondary" href="https://t.me/LangBlue" target="_blank" rel="noopener">💬 دریافت راهنمای کد از @LangBlue</a>
-            </div>
-            <div class="central-activation-note">کد داخل سایت تولید یا نمایش داده نمی‌شود. پس از دریافت کد، آن را فقط در حساب مرکزی وارد کن؛ همان حساب برای Grammar، Vocabulary، Deutsch، LangDesert، Japanese، Kazakh و Tajik استفاده می‌شود.</div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <section class="research">
       <div class="wrap">
