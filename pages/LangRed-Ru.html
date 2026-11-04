@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LangRed · Русский язык</title>
+<meta name="description" content="یادگیری ساختاریافته زبان روسی با واژگان، گرامر و مرور فاصله‌دار.">
+<link rel="canonical" href="https://lngbl.github.io/pages/LangRed-Ru.html">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase-client.js?v=20261104-langred"></script>
+<script src="../assets/js/langblue-backend.js"></script>
+<script src="../assets/js/langblue-central-access.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#101b2b;--panel:#182940;--line:#34506a;--gold:#d5b66f;--text:#f3f0e8;--muted:#aab8c7;--blue:#3478b9}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#203b59,var(--bg) 65%);color:var(--text);font-family:system-ui,sans-serif;min-height:100vh}
+#loading{position:fixed;inset:0;z-index:20;background:#101b2b;display:grid;place-items:center;text-align:center;transition:opacity .3s}
+#loading.done{opacity:0;pointer-events:none}.loader-card{padding:32px}.flag{font-size:56px;display:block;margin-bottom:16px}.loader-title{font-size:20px;color:var(--gold);direction:ltr}.loader-sub{color:var(--muted);font-size:13px;margin-top:10px}
+header{padding:28px 18px 20px;text-align:center;border-bottom:1px solid var(--line)}h1{margin:0;color:var(--gold);font-size:clamp(27px,5vw,42px)}header p{color:var(--muted);margin:8px 0 0}
+nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px auto;max-width:980px;padding:0 16px}
+a,.btn{color:var(--gold)}nav a,.btn{border:1px solid var(--line);border-radius:12px;padding:9px 14px;text-decoration:none;background:#16273b;cursor:pointer;font:inherit}
+main{max-width:1000px;margin:0 auto;padding:0 16px 56px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+.panel{background:linear-gradient(160deg,#1c3049,var(--panel));border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0;box-shadow:0 16px 40px #0003}
+h2{font-size:18px;color:var(--gold);margin:0 0 14px}.muted{color:var(--muted);font-size:13px;line-height:1.8}
+label{display:block;color:var(--muted);font-size:13px;margin:10px 0 5px}input,select,textarea{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:#0d1928;color:var(--text);font:inherit}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.primary{background:var(--blue);border-color:var(--blue);color:white}.item{padding:13px;border:1px solid var(--line);border-radius:12px;margin:8px 0;background:#0e1b2a}.ru{font-size:22px;direction:ltr;text-align:left;color:#fff}.ipa{direction:ltr;text-align:left;color:var(--gold);font-size:13px}.pill{font-size:11px;color:var(--muted);border:1px solid var(--line);padding:3px 8px;border-radius:20px}.empty{text-align:center;color:var(--muted);padding:28px}
+@media(max-width:600px){.panel{padding:15px}nav a{flex:1;text-align:center}}
+</style>
+</head>
+<body>
+<div id="loading" role="status" aria-live="polite"><div class="loader-card"><span class="flag" aria-hidden="true">🇺🇦</span><div class="loader-title">Загрузка учебной среды</div><div class="loader-sub">Язык объединяет культуры · فرهنگ، زبان و یادگیری</div></div></div>
+<header><h1>LangRed</h1><p>Русский язык · زبان روسی</p></header>
+<nav><a href="../index.html">بازگشت به LangBlue</a><a href="../?account=required">حساب مرکزی</a><a href="#review">مرور امروز</a></nav>
+<main>
+<div class="panel"><h2>اتصال به هسته مرکزی</h2><div id="connection" class="muted">در حال بررسی حساب و همگام‌سازی…</div><p class="muted">LangRed از حساب مرکزی و فضای ذخیره‌سازی مشترک LangBlue استفاده می‌کند. داده‌های این ماژول در فضای اختصاصی خود نگهداری می‌شوند.</p></div>
+<div class="grid">
+<section class="panel"><h2>افزودن واژه یا قاعده</h2>
+<form id="item-form">
+<label for="kind">نوع محتوا</label><select id="kind"><option value="word">واژه</option><option value="grammar">قاعده گرامری</option></select>
+<label for="ru">روسی (кириллица)</label><input id="ru" required maxlength="160" placeholder="например: книга">
+<label for="ipa">آوانگاری / تلفظ لاتین</label><input id="ipa" maxlength="160" placeholder="kniga · IPA">
+<label for="fa">معنی یا توضیح فارسی</label><input id="fa" required maxlength="500" placeholder="کتاب">
+<label for="example">مثال روسی</label><textarea id="example" rows="2" maxlength="500" placeholder="Это моя книга."></textarea>
+<label for="level">سطح</label><select id="level"><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select>
+<div class="row"><button class="btn primary" type="submit">ذخیره در LangRed</button></div>
+</form></section>
+<section class="panel" id="review"><h2>مرور فاصله‌دار</h2><div id="review-card" class="empty">در حال آماده‌سازی مرور…</div><div class="row"><button id="reveal" class="btn" type="button">نمایش پاسخ</button><button id="remember" class="btn primary" type="button">بلدم</button><button id="again" class="btn" type="button">نیاز به مرور</button></div><p class="muted">فاصله‌های اولیه: ۴ ساعت، ۲۴ ساعت، ۷۲ ساعت، ۷ روز و ۱۴ روز. این برنامه با پاسخ کاربر تنظیم می‌شود.</p></section>
+</div>
+<section class="panel"><h2>دفتر روسی من</h2><div class="row"><span class="pill" id="count">۰ مورد</span><span class="pill" id="due-count">۰ مورد برای مرور</span></div><div id="items"><div class="empty">هنوز محتوایی ثبت نشده است.</div></div></section>
+</main>
+<script type="module" src="../assets/js/langred-core.js?v=20261104-1"></script>
+</body></html>
