@@ -17,13 +17,12 @@
 <main class="wrap">
 <header class="top">
  <div><div class="muted">LANGBLUE · CENTRAL OPERATIONS</div><h1>مرکز عملیات و اتوماسیون مدیریتی</h1><p class="muted">مدیریت متمرکز تأییدها، انتشار محتوا، دسترسی منصفانه، حساب مدیران و عملیات پلتفرم.</p></div>
- <div><div id="authStatus" class="status">در حال بررسی هویت مدیریتی…</div><button id="refresh" class="btn primary" type="button" disabled>به‌روزرسانی همهٔ صف‌ها</button><div class="actions"><a class="btn" href="/pages/research.html">داشبورد پژوهش</a><a class="btn" href="/pages/community-access-admin.html">مدیریت مستقل دسترسی منصفانه</a><a class="btn" href="/pages/teachers.html">فهرست معلمان</a><a class="btn" href="/">صفحهٔ اصلی</a></div></div>
+ <div><div id="authStatus" class="status">در حال بررسی هویت مدیریتی…</div><button id="refresh" class="btn primary" type="button" disabled>به‌روزرسانی همهٔ صف‌ها</button><div class="actions"><a class="btn" href="/pages/research.html">داشبورد پژوهش</a><a class="btn" href="/">صفحهٔ اصلی</a></div></div>
 </header>
 <nav class="nav" id="nav" hidden>
  <button class="active" data-panel="overview">نمای کلی</button>
- <button data-panel="approvals">صف تأییدها</button>
- <button data-panel="management">مدیریت معلمان و انتشار</button>
- <button data-panel="community">دسترسی منصفانه</button>
+ <button data-panel="customers">فهرست مشتریان</button>
+ <button data-panel="management">معلمان و انتشار</button>
  <button data-panel="codes">کدهای فعال‌سازی</button>
  <button data-panel="staff" id="staffNav">مدیران</button>
  <button data-panel="operations">عملیات پلتفرم</button>
@@ -40,24 +39,18 @@
  </div>
 </section>
 
-<section id="panel-approvals" class="panel" hidden>
- <div class="section-head"><h2>صف تأییدها</h2><span class="muted">موارد جدید در ابتدا نمایش داده می‌شوند.</span></div>
- <h3>درخواست تأیید معلم</h3><div id="queueTeachers"></div>
- <h3>درخواست انتشار کلاس</h3><div id="queueOffers"></div>
- <h3>محتوای آموزشی معلمان</h3><div id="queueContent"></div>
- <h3>مشارکت‌های محتوایی کاربران</h3><div id="queueContributions"></div>
+<section id="panel-customers" class="panel" hidden>
+ <div class="section-head"><h2>فهرست مشتریان</h2><span id="customerCount" class="muted">—</span></div>
+ <p class="muted">نمای حساب‌ها، اشتراک‌ها، دورهٔ آزمایشی، وضعیت نظارت سرپرست و درخواست تخفیف. اطلاعات مالی فقط در صورت وجود سابقهٔ معتبر نمایش داده می‌شود.</p>
+ <div class="grid"><div class="field"><label for="customerSearch">جست‌وجو با نام یا نام کاربری</label><input id="customerSearch" type="search" placeholder="نام یا @username"></div>
+ <div class="field"><label for="customerFilter">فیلتر وضعیت</label><select id="customerFilter"><option value="all">همهٔ حساب‌ها</option><option value="active">اشتراک فعال</option><option value="trial">دورهٔ آزمایشی</option><option value="guardian">دارای سرپرست فعال</option><option value="pending_guardian">در انتظار پاسخ سرپرست</option><option value="discount">درخواست تخفیف</option><option value="expired">بدون دسترسی فعال</option></select></div></div><div id="customerList"></div>
 </section>
-
 <section id="panel-management" class="panel" hidden>
- <div class="section-head"><h2>مدیریت معلمان و انتشار</h2><span class="muted">وضعیت‌های فعال و منتشرشده را نیز می‌توان کنترل کرد.</span></div>
- <h3>پروفایل معلمان</h3><div id="manageTeachers"></div>
- <h3>آگهی‌ها و پیشنهادهای کلاس</h3><div id="manageOffers"></div>
- <h3>محتوای منتشرشده</h3><div id="manageContent"></div>
-</section>
-
-<section id="panel-community" class="panel" hidden>
- <div class="section-head"><h2>درخواست‌های دسترسی منصفانه</h2><span class="muted">تصمیم‌ها از مسیر امن اختصاصی Supabase انجام می‌شوند.</span></div>
- <div id="communityQueue"></div>
+ <div class="section-head"><h2>معلمان و انتشار</h2><span class="muted">درخواست کاربر ← بررسی مدیر ← تأیید/رد ← انتشار و اطلاع‌رسانی به درخواست‌دهنده</span></div>
+ <h3>درخواست تأیید معلم</h3><div id="queueTeachers"></div><h3>درخواست انتشار کلاس</h3><div id="queueOffers"></div>
+ <h3>محتوای آموزشی معلمان</h3><div id="queueContent"></div><h3>مشارکت‌های محتوایی کاربران</h3><div id="queueContributions"></div>
+ <h3>درخواست‌های دسترسی منصفانه</h3><div id="communityQueue"></div><h3>پروفایل معلمان</h3><div id="manageTeachers"></div>
+ <h3>آگهی‌ها و پیشنهادهای کلاس</h3><div id="manageOffers"></div><h3>محتوای منتشرشده</h3><div id="manageContent"></div>
 </section>
 
 <section id="panel-codes" class="panel" hidden>
@@ -130,6 +123,25 @@ function contentCard(x,management=false){
  card.append(actions);return card
 }
 function contributionCard(x){const card=el('article','item');card.append(el('h3','',x.source_type||'مشارکت محتوایی'),el('span','tag','در انتظار بررسی'));detailLine(card,'ارسال‌کننده',accountName(x.account));detailLine(card,'زبان',x.language);detailLine(card,'سطح',x.language_level);detailLine(card,'رضایت ثبت‌شده',x.consent_snapshot?'بله':'خیر');const d=el('details');d.append(el('summary','','مشاهدهٔ دادهٔ ارسالی'),el('pre','detail',JSON.stringify(x.payload,null,2)));card.append(d);const note=noteField();card.append(note.node);const actions=el('div','actions');actions.append(actionButton('تأیید مشارکت',b=>decide('content_contribution',x.id,'approve',note.input.value,b),'primary'),actionButton('رد مشارکت',b=>decide('content_contribution',x.id,'reject',note.input.value,b),'danger'));card.append(actions);return card}
+function customerCard(x){
+ const card=el('article','item');card.append(el('h3','',x.name||'کاربر LangBlue'),el('span','tag','@'+(x.username||'بدون نام کاربری')));
+ const now=Date.now(),subs=x.subscriptions||[],active=subs.filter(s=>s.status==='active'&&(!s.expires_at||new Date(s.expires_at).getTime()>now)),trial=!!(x.trial_expires_at&&new Date(x.trial_expires_at).getTime()>now),pending=(x.guardian_requests||[]).some(g=>g.status==='pending'&&g.expires_at&&new Date(g.expires_at).getTime()>now),guardian=(x.guardian_relationships||[]).length>0;
+ [active.length?'اشتراک فعال':null,trial?'دورهٔ آزمایشی فعال':null,guardian?'سرپرست مرتبط':null,pending?'در انتظار پاسخ سرپرست':null].filter(Boolean).forEach(t=>card.append(el('span','tag',t)));
+ detailLine(card,'کشور ثبت‌شده',x.country||'ثبت نشده');detailLine(card,'سطح یادگیری',x.language_level||'ثبت نشده');detailLine(card,'تاریخ ساخت حساب',x.created_at?new Date(x.created_at).toLocaleString('fa-IR'):'—');
+ detailLine(card,'شروع دورهٔ آزمایشی',x.trial_started_at?new Date(x.trial_started_at).toLocaleDateString('fa-IR'):'ثبت نشده');detailLine(card,'پایان دورهٔ آزمایشی',x.trial_expires_at?new Date(x.trial_expires_at).toLocaleDateString('fa-IR'):'ثبت نشده');
+ detailLine(card,'اشتراک‌ها',subs.length?subs.map(s=>(s.plan_id||'پلن نامشخص')+' · '+(s.product_ids||[]).join('، ')+' · '+(statusNames[s.status]||s.status)+' · '+(s.expires_at?new Date(s.expires_at).toLocaleDateString('fa-IR'):'بدون تاریخ پایان')).join(' | '):'سابقه‌ای ثبت نشده');
+ detailLine(card,'وضعیت سنی','سن احراز نشده؛ وضعیت اعلام‌شدهٔ سرپرست به‌تنهایی اثبات سن نیست');
+ detailLine(card,'نظارت سرپرست',guardian?x.guardian_relationships.map(g=>(g.name||'سرپرست')+' (@'+(g.username||'—')+') · '+(g.scopes||[]).join('، ')).join(' | '):pending?'درخواست در انتظار پاسخ':'رابطهٔ فعال ثبت نشده');
+ detailLine(card,'احراز مستقل بزرگسال سرپرست',x.guardian_age_assurance_verified?'ثبت شده':'ثبت نشده');
+ if(x.discount_request){detailLine(card,'درخواست تخفیف اجتماعی',(statusNames[x.discount_request.status]||x.discount_request.status)+' · سن اعلام‌شده: '+(x.discount_request.declared_age??'—'));detailLine(card,'اعتبار تخفیف',x.discount_request.expires_at?new Date(x.discount_request.expires_at).toLocaleDateString('fa-IR'):'—')}else detailLine(card,'درخواست تخفیف اجتماعی','ثبت نشده');
+ detailLine(card,'پرداخت‌کننده','در دفتر سفارش/پرداخت معتبر ثبت نشده؛ قابل احراز نیست');detailLine(card,'مبلغ پایه و نهایی','دفتر سفارش مالی متصل نیست؛ مبلغی ثبت نشده');
+ const d=el('details');d.append(el('summary','','جزئیات درخواست‌های سرپرست'));(x.guardian_requests||[]).forEach(g=>d.append(el('p','muted',(statusNames[g.status]||g.status)+' · '+(g.scopes||[]).join('، ')+' · '+new Date(g.created_at).toLocaleDateString('fa-IR'))));card.append(d);return card;
+}
+function renderCustomers(){
+ const rows=workflow?.customers||[],term=($('customerSearch')?.value||'').trim().toLowerCase(),filter=$('customerFilter')?.value||'all',now=Date.now();
+ const filtered=rows.filter(x=>{const subs=x.subscriptions||[],active=subs.some(s=>s.status==='active'&&(!s.expires_at||new Date(s.expires_at).getTime()>now)),trial=!!(x.trial_expires_at&&new Date(x.trial_expires_at).getTime()>now),guardian=(x.guardian_relationships||[]).length>0,pending=(x.guardian_requests||[]).some(g=>g.status==='pending'&&g.expires_at&&new Date(g.expires_at).getTime()>now),discount=!!x.discount_request,text=((x.name||'')+' '+(x.username||'')).toLowerCase();return (!term||text.includes(term))&&(filter==='all'||(filter==='active'&&active)||(filter==='trial'&&trial)||(filter==='guardian'&&guardian)||(filter==='pending_guardian'&&pending)||(filter==='discount'&&discount)||(filter==='expired'&&!active&&!trial));});
+ $('customerCount').textContent=filtered.length.toLocaleString('fa-IR')+' از '+rows.length.toLocaleString('fa-IR')+' حساب';sectionList('customerList',filtered,customerCard,'حسابی با این فیلتر پیدا نشد.');
+}
 function render(){
  const q=workflow?.queues||{},m=workflow?.management||{};
  sectionList('queueTeachers',q.teachers, x=>teacherCard(x),'درخواست تأیید معلم وجود ندارد.');
@@ -142,7 +154,7 @@ function render(){
  const counts=workflow?.counts||{};const metricItems=[['درخواست معلم',counts.teachers],['انتشار کلاس',counts.offers],['محتوای آموزشی',counts.content],['مشارکت کاربران',counts.contributions],['اتصال‌های در انتظار',counts.pending_connections],['درخواست دسترسی',community.filter(x=>x.status==='pending').length]];
  $('metrics').replaceChildren();metricItems.forEach(([label,value])=>{const d=el('div','metric');d.append(el('span','muted',label),el('strong','',Number(value||0).toLocaleString('fa-IR')));$('metrics').append(d)});
  $('lastUpdated').textContent='آخرین همگام‌سازی: '+new Date(workflow.generated_at).toLocaleString('fa-IR');
- renderCommunity();renderStaff();renderOperations();renderAudit();
+ renderCommunity();renderCustomers();renderStaff();renderOperations();renderAudit();
 }
 function renderCommunity(){sectionList('communityQueue',community,x=>{const c=el('article','item');c.append(el('h3','',accountName(x.profile)),el('span','tag',statusNames[x.status]||x.status));detailLine(c,'سن اعلام‌شده',x.declared_age);detailLine(c,'توضیح کاربر',x.user_note);detailLine(c,'تاریخ ثبت',new Date(x.created_at).toLocaleString('fa-IR'));const n=noteField();c.append(n.node);const a=el('div','actions');if(x.status==='pending')a.append(actionButton('تأیید درخواست',b=>communityDecision(x.id,'approved',n.input.value,b),'primary'),actionButton('رد درخواست',b=>communityDecision(x.id,'rejected',n.input.value,b),'danger'));detailLine(c,'یادداشت مدیر',x.admin_note);detailLine(c,'اعتبار تا',x.discount_expires_at?new Date(x.discount_expires_at).toLocaleDateString('fa-IR'):'—');c.append(a);return c},'درخواستی ثبت نشده است.')}
 async function communityDecision(id,decision,note,button){button.disabled=true;try{const r=await client.functions.invoke('langblue-community-access',{body:{action:'admin_decide',requestId:id,decision,adminNote:note}});if(r.error||!r.data?.ok)throw new Error(r.data?.error||r.error?.message||'خطا');await refreshAll()}catch(e){alert('ثبت تصمیم انجام نشد: '+e.message);button.disabled=false}}
@@ -152,7 +164,7 @@ function renderOperations(){const op=workflow?.operations||{},m=op.maintenance||
 function renderAudit(){sectionList('auditLog',workflow?.audit||[],x=>{const d=el('article','item');d.append(el('h3','',x.entity_type+' · '+x.action));detailLine(d,'وضعیت',String(x.previous_status||'—')+' ← '+String(x.new_status||'—'));detailLine(d,'یادداشت',x.note);detailLine(d,'زمان',new Date(x.created_at).toLocaleString('fa-IR'));return d},'هنوز رویداد مدیریتی ثبت نشده است.')}
 async function refreshAll(){ $('refresh').disabled=true;try{const [w,c,o]=await Promise.all([callWorkflow({action:'queue_list'}),client.functions.invoke('langblue-community-access',{body:{action:'admin_list'}}),callWorkflow({action:'maintenance_status'})]);if(c.error||!c.data?.ok)throw new Error(c.data?.error||c.error?.message||'COMMUNITY_QUEUE_FAILED');workflow=w;workflow.operations={maintenance:o.maintenance,windows:o.windows,releases:o.releases};role=w.role;community=c.data.requests||[];render();$('nav').hidden=false;$('refresh').disabled=false;}catch(e){setStatus('بارگذاری پنل ناموفق بود: '+e.message,'bad');$('refresh').disabled=false}}
 function showPanel(name){document.querySelectorAll('main section[id^="panel-"]').forEach(s=>s.hidden=s.id!=='panel-'+name);document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.panel===name))}
-async function init(){client=window.LangBlueSupabase?.getClient?.();if(!client){setStatus('اتصال حساب مرکزی در دسترس نیست.','bad');return}const {data:{session}}=await client.auth.getSession();if(!session){setStatus('ابتدا با حساب LangBlue Official وارد صفحهٔ اصلی شو.','warn');return}const {data,error}=await client.functions.invoke('langblue-admin-access',{body:{}});if(error||!data?.ok||!data.is_admin){setStatus('این حساب دسترسی مدیریتی ندارد یا بررسی دسترسی ناموفق بود.','bad');return}role=data.role;setStatus('دسترسی تأیید شد · نقش: '+(role==='owner'?'مالک مرکزی':'مدیر'),'good');$('refresh').disabled=false;$('nav').hidden=false;$('staffNav').hidden=role!=='owner';$('staffForm').hidden=role!=='owner';document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>showPanel(b.dataset.panel)));$('refresh').addEventListener('click',refreshAll);showPanel('overview');await refreshAll()}
+async function init(){client=window.LangBlueSupabase?.getClient?.();if(!client){setStatus('اتصال حساب مرکزی در دسترس نیست.','bad');return}const {data:{session}}=await client.auth.getSession();if(!session){setStatus('ابتدا با حساب LangBlue Official وارد صفحهٔ اصلی شو.','warn');return}const {data,error}=await client.functions.invoke('langblue-admin-access',{body:{}});if(error||!data?.ok||!data.is_admin){setStatus('این حساب دسترسی مدیریتی ندارد یا بررسی دسترسی ناموفق بود.','bad');return}role=data.role;setStatus('دسترسی تأیید شد · نقش: '+(role==='owner'?'مالک مرکزی':'مدیر'),'good');$('refresh').disabled=false;$('nav').hidden=false;$('staffNav').hidden=role!=='owner';$('staffForm').hidden=role!=='owner';document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>showPanel(b.dataset.panel)));$('refresh').addEventListener('click',refreshAll);$('customerSearch').addEventListener('input',renderCustomers);$('customerFilter').addEventListener('change',renderCustomers);showPanel('overview');await refreshAll()}
 $('codeForm').addEventListener('submit',async e=>{e.preventDefault();const b=$('createCode'),out=$('codeStatus');b.disabled=true;out.classList.remove('hidden');out.textContent='در حال ساخت کد…';try{const {data,error}=await client.functions.invoke('admin-create-code',{body:{planId:$('plan').value.trim(),productIds:$('products').value.split(',').map(x=>x.trim()).filter(Boolean),maxUses:Number($('uses').value)}});if(error||!data?.ok)throw new Error(data?.error||error?.message||'خطا');out.replaceChildren(el('p','muted','کد فعال‌سازی (اکنون آن را در محل امن ثبت کن):'),el('div','detail',data.code),actionButton('کپی کد',()=>navigator.clipboard.writeText(data.code),'primary'));}catch(err){out.textContent='ساخت کد انجام نشد: '+err.message}finally{b.disabled=false}});
 $('staffForm').addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await callWorkflow({action:'staff_add',username:$('staffUsername').value.trim()});$('staffUsername').value='';await refreshAll()}catch(err){alert('افزودن مدیر انجام نشد: '+err.message)}finally{b.disabled=false}});
 init();
