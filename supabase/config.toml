@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.langblue-android-handoff]
 verify_jwt = false
+
+[functions.langblue-guardian-consent]
+verify_jwt = true
