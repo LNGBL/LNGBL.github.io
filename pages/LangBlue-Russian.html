@@ -44,7 +44,7 @@
 <script>
 (function(){
 'use strict';
-const KEY='langblue_learning_engine_v1';
+const KEY='langblue_learning_engine_v1'; // Shared queue consumed by the central Learning Engine.
 function addReview(item){
  let items=[];try{const parsed=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(parsed))items=parsed;}catch(_){}
  if(items.some(x=>x.product==='langru'&&x.title===item.title))return false;
@@ -61,7 +61,18 @@ document.querySelectorAll('[data-answer]').forEach(button=>button.addEventListen
 }));
 })();
 </script>
-<script src="../assets/js/supabase-client.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase-client.js?v=20261104-russian"></script>
+<script src="../assets/js/langblue-backend.js"></script>
+<script src="../assets/js/langblue-commerce.js"></script>
+<script src="../assets/js/langblue-behavior.js"></script>
 <script src="../assets/js/langblue-core.js"></script>
+<script src="../assets/js/langblue-central-account.js?v=20261104-russian"></script>
 <script src="../assets/js/langblue-central-access.js?v=20261104-russian"></script>
+<script src="../assets/js/langblue-maintenance.js"></script>
+<script src="../assets/js/langblue-seasonal.js"></script>
+<script src="../assets/js/langblue-onboarding.js"></script>
+<script src="../assets/js/langblue-engagement.js"></script>
+<script src="../assets/js/langblue-leaderboard.js"></script>
+<script src="../assets/js/langblue-learning-entry.js"></script>
 </body></html>
