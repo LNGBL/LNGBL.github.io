@@ -64,8 +64,6 @@
       '</div>'+
       '<div class="receipt-line"><span>محصولات</span><strong>'+escapeHtml(order.products.map(function(p){return p.icon+' '+p.label;}).join('، '))+'</strong></div>'+
       '<div class="receipt-line"><span>مدت درخواستی</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
-      '<div class="receipt-line"><span>وضعیت</span><strong>در انتظار بررسی ادمین</strong></div>'+
-      '<div class="receipt-total"><span>مبلغ نهایی</span><strong>پس از بررسی اعلام می‌شود</strong></div>'+
       '<div class="receipt-note">این فیش فقط «درخواست خرید» است؛ رسید پرداخت نیست و به معنی پرداخت، تأیید وجه یا فعال‌شدن اشتراک نیست. این صفحه هیچ وجه یا اطلاعات بانکی دریافت نمی‌کند. شناسه در این مرورگر ساخته می‌شود و تا وقتی پیام تلگرام را ارسال نکنی، ادمین از درخواست باخبر نمی‌شود. کد فعال‌سازی داخل فیش نمایش داده نمی‌شود و صدور و بررسی آن فقط از مسیر سرور انجام می‌شود.</div>';
 
     var share=document.createElement('a');
@@ -75,7 +73,6 @@
         'درخواست خرید LangBlue\nشناسه فیش: '+requestId+
         '\nمحصولات: '+order.products.map(function(p){return p.label;}).join('، ')+
         '\nمدت درخواستی: '+order.plan.label+
-        '\nوضعیت: در انتظار بررسی ادمین'+
         '\nاین پیام درخواست است و رسید پرداخت نیست.'
       );
     share.target='_blank';
