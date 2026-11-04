@@ -101,7 +101,8 @@
       (order.communityDiscount ? '<div class="receipt-line"><span>تخفیف اجتماعی</span><strong>'+order.communityDiscount+'٪ (−'+formatPrice(order.communityDiscountAmount)+')</strong></div>' : '')+
       (order.bundleDiscount ? '<div class="receipt-line"><span>تخفیف بسته</span><strong>'+order.bundleDiscount+'٪</strong></div>' : '')+
       '<div class="receipt-total"><span>مبلغ کل</span><strong>'+formatPrice(order.total)+'</strong></div>'+
-      '<div class="receipt-note">این فیش «درخواست خرید» است و به معنی پرداخت یا فعال‌شدن اشتراک نیست. شناسه فیش را برای ادمین LangBlue در تلگرام ارسال کن. کد فعال‌سازی فقط از مسیر سرور صادر و بررسی می‌شود و داخل فیش نمایش داده نمی‌شود.</div>';
+      '<div class="receipt-note">برای دریافت کد وریفای، شناسهٔ فیش و جزئیات سفارش را برای ادمین LangBlue در تلگرام بفرست. کد را در تلگرام دریافت کن و سپس در حساب مرکزی وارد کن.</div>'+
+      '<div class="receipt-actions"><a class="btn btn-primary" href="https://t.me/LangBlue" target="_blank" rel="noopener">💬 رفتن به تلگرام و دریافت کد وریفای</a></div>';
     output.classList.add('show');
     var print=qs('printReceipt'); if(print) print.style.display='inline-flex';
   }
