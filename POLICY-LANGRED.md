@@ -17,5 +17,6 @@
 ## Implementation status
 - Initial LangRed vocabulary/grammar notebook and spaced-review UI.
 - Shared account integration through the existing LangBlue Supabase client and `user_state`.
+- Russian-language encounters and review history use the central `learning_encounters` table with owner-scoped RLS.
 - Local fallback if a learner is signed out or synchronization is unavailable.
 - Legal compliance is not certified by this document.
