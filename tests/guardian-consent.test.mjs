@@ -18,7 +18,6 @@ test("guardian acceptance requires separate verified adult status", () => {
   assert.match(migration, /GUARDIAN_AGE_VERIFICATION_REQUIRED/);
   assert.match(migration, /guardian_age_verifications/);
   assert.match(edge, /GUARDIAN_AGE_VERIFICATION_REQUIRED/);
-  assert.match(edge, /verify_jwt/); // configured separately below
   assert.match(config, /\[functions\.langblue-guardian-consent\][\s\S]*?verify_jwt = true/);
 });
 
