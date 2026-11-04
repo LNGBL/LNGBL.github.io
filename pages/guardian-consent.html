@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>رضایت سرپرست | LangBlue</title>
+<link rel="stylesheet" href="../assets/css/langblue-design-system.css">
+<link rel="stylesheet" href="../assets/css/langblue-theme.css">
+<style>
+body{background:#071827;color:#edf5f7;font-family:inherit}
+.guardian-shell{width:min(900px,calc(100% - 28px));margin:36px auto 80px}
+.guardian-head,.guardian-panel{border:1px solid rgba(255,255,255,.12);border-radius:20px;background:rgba(12,36,54,.94);padding:22px;margin-bottom:16px}
+.guardian-head h1{margin:0 0 8px;font-size:clamp(24px,4vw,34px)}
+.guardian-panel h2{font-size:19px;margin:0 0 10px}
+.muted{color:#a9c0c7;font-size:13px;line-height:1.9}
+.guardian-field{display:grid;gap:7px;margin:14px 0}
+.guardian-field input[type=text]{width:100%;padding:12px;border-radius:11px;border:1px solid rgba(255,255,255,.2);background:#061522;color:#fff;font:inherit}
+.scope-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:9px;margin:12px 0}
+.scope-choice{display:flex;gap:8px;align-items:flex-start;padding:11px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.035)}
+.guardian-check{display:flex;gap:9px;align-items:flex-start;margin:14px 0;line-height:1.8}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.primary,.secondary{padding:10px 15px;border-radius:10px;border:1px solid transparent;font:inherit;font-weight:700;cursor:pointer}
+.primary{background:#168aad;color:#fff}.secondary{background:transparent;color:#dce9ed;border-color:rgba(255,255,255,.2)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.consent-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.consent-item:last-child{border-bottom:0}.consent-item ul{margin:6px 0;padding-right:18px;color:#c6d8dd;font-size:13px}
+.notice{padding:12px;border-radius:12px;background:rgba(22,138,173,.09);border:1px solid rgba(22,138,173,.3);line-height:1.9}
+#guardianMessage{padding:12px;border-radius:12px;margin:12px 0}#guardianMessage[data-type=error]{background:rgba(180,60,60,.15);color:#ffc5c5}#guardianMessage[data-type=success]{background:rgba(60,150,100,.15);color:#c8f5d8}
+[hidden]{display:none!important}
+@media(max-width:620px){.consent-item{align-items:flex-start;flex-direction:column}.guardian-shell{margin-top:16px}.guardian-head,.guardian-panel{padding:17px}}
+</style>
+</head>
+<body>
+<main class="guardian-shell">
+<header class="guardian-head">
+  <a href="../" style="color:#80d6ef;text-decoration:none;font-weight:800">← LangBlue</a>
+  <h1>رضایت و پیوند سرپرست</h1>
+  <p class="muted">این صفحه برای ثبت و مدیریت رضایت سرپرست است. واردکردن نام کاربری فقط یک درخواست می‌سازد و به‌معنای رضایت نیست. سرپرست باید وارد حساب خودش شود و دامنهٔ درخواست را صریحاً بپذیرد.</p>
+</header>
+<section id="loginRequired" class="guardian-panel" hidden>
+  <h2>ابتدا وارد حساب مرکزی شو</h2>
+  <p class="muted">برای مدیریت درخواست رضایت، ورود به حساب LangBlue لازم است.</p>
+  <a class="primary" href="../?account=required" style="display:inline-block;text-decoration:none">ورود به حساب مرکزی</a>
+</section>
+<div id="guardianApp" hidden>
+  <div id="guardianMessage" role="status" aria-live="polite" hidden></div>
+  <section class="guardian-panel">
+    <h2>ارسال درخواست به سرپرست</h2>
+    <p class="muted">فقط اگر زیر ۱۸ سال هستی از این بخش استفاده کن. هیچ تاریخ تولد، مدرک هویتی، شماره تماس یا نشانی‌ای در این فرم درخواست نمی‌شود.</p>
+    <form id="guardianRequestForm">
+      <label class="guardian-check"><input id="minorDeclaration" type="checkbox" required> تأیید می‌کنم که زیر ۱۸ سال هستم و می‌خواهم درخواست رضایت را برای سرپرست قانونی خود ارسال کنم.</label>
+      <div class="guardian-field">
+        <label for="guardianUsername">نام کاربری حساب سرپرست</label>
+        <input id="guardianUsername" type="text" minlength="3" maxlength="80" autocomplete="off" required placeholder="نام کاربری سرپرست">
+      </div>
+      <p class="muted">سرپرست باید خودش وارد حساب شود. درخواست فقط در همین صفحه برای او نمایش داده می‌شود و اعلان بیرون از LangBlue ارسال نمی‌شود.</p>
+      <div class="scope-grid">
+        <label class="scope-choice"><input type="checkbox" name="guardianScope" value="account_support" checked> کمک به مدیریت حساب</label>
+        <label class="scope-choice"><input type="checkbox" name="guardianScope" value="learning_progress"> مشاهدهٔ پیشرفت آموزشی</label>
+        <label class="scope-choice"><input type="checkbox" name="guardianScope" value="community_features"> ویژگی‌های اجتماعی و گروهی</label>
+        <label class="scope-choice"><input type="checkbox" name="guardianScope" value="research_participation"> مشارکت اختیاری در پژوهش</label>
+      </div>
+      <button id="sendGuardianRequest" class="primary" type="submit">ارسال درخواست رضایت</button>
+    </form>
+  </section>
+  <section class="guardian-panel">
+    <h2>درخواست‌های دریافتی برای این حساب</h2>
+    <div id="guardianVerificationNotice" class="notice muted">برای پذیرش درخواست، وضعیت بزرگسال‌بودن سرپرست باید از مسیر مستقل و معتبر تأیید شده باشد. این اتصال هنوز پیکربندی نشده است؛ بنابراین پذیرش فعلاً بسته است. رد درخواست همچنان ممکن است.</div>
+    <div id="guardianVerificationOk" class="notice muted" hidden>وضعیت تأیید سرپرست معتبر است. درخواست‌ها را با توجه به دامنهٔ نمایش‌داده‌شده بررسی کن.</div>
+    <div id="pendingForMe" style="margin-top:12px"><p class="muted">در حال بارگذاری…</p></div>
+  </section>
+  <section class="guardian-panel">
+    <h2>درخواست‌هایی که فرستاده‌ای</h2>
+    <div id="myRequests"><p class="muted">در حال بارگذاری…</p></div>
+  </section>
+  <section class="guardian-panel">
+    <h2>پیوندهای سرپرستی</h2>
+    <p class="muted">هر یک از دو طرف می‌تواند رضایت فعال را لغو کند. پس از لغو، عملیات وابسته به آن دامنه نباید ادامه پیدا کند.</p>
+    <div id="relationships"><p class="muted">در حال بارگذاری…</p></div>
+  </section>
+  <footer class="muted">نسخهٔ متن رضایت: <span id="policyVersion">—</span>. این گردش‌کار به‌تنهایی تأیید حقوقی یا احراز هویت سرپرست محسوب نمی‌شود.</footer>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase-client.js"></script>
+<script src="../assets/js/langblue-backend.js"></script>
+<script src="../assets/js/langblue-core.js"></script>
+<script src="../assets/js/langblue-guardian-consent.js"></script>
+</body>
+</html>
