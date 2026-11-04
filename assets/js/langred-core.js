@@ -17,6 +17,22 @@ async function load(){
  } else items=local;
  localWrite(); await save(); render();
 }
+async function recordEncounter(item, eventName, extra={}){
+ const api=window.LangBlueSupabase;
+ try{
+   const sb=api?.getClient?.(),session=await api?.getAuthSession?.();
+   if(!sb||!session?.user?.id)return;
+   const {error}=await sb.from('learning_encounters').insert({
+     user_id:session.user.id,language:'russian',product_id:'langred',
+     context_id:'langred_'+eventName,concept_key:item.id,
+     source_type:eventName==='review'?'review':(item.kind==='grammar'?'grammar':'word'),
+     source_ref:item.id,context_payload:{kind:item.kind,level:item.level,event:eventName,...extra},
+     encountered_at:new Date().toISOString(),
+     next_reencounter_at:item.nextReviewAt||null
+   });
+   if(error)console.warn('[LangRed] central learning event not saved',error.message);
+ }catch(e){console.warn('[LangRed] central learning event deferred',e)}
+}
 async function save(){
  localWrite();
  const api=window.LangBlueSupabase;
@@ -39,12 +55,12 @@ function review(success){
  current.intervalIndex=success?Math.min(idx+1,intervals.length-1):0;
  const delay=success?intervals[current.intervalIndex]:4*60*60*1000;
  current.nextReviewAt=new Date(Date.now()+delay).toISOString();current.updatedAt=new Date().toISOString();
- save().then(render);
+ recordEncounter(current,'review',{grade:success?'remembered':'retry',intervalIndex:current.intervalIndex}).finally(()=>save().then(render));
 }
 $('item-form').addEventListener('submit',async e=>{
  e.preventDefault();const ru=$('ru').value.trim(),fa=$('fa').value.trim();if(!ru||!fa)return;
  items.push({id:crypto.randomUUID(),kind:$('kind').value,ru,fa,ipa:$('ipa').value.trim(),example:$('example').value.trim(),level:$('level').value,intervalIndex:0,nextReviewAt:new Date(Date.now()+4*60*60*1000).toISOString(),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
- e.target.reset();await save();render();
+ const created=items[items.length-1];e.target.reset();await recordEncounter(created,'created');await save();render();
 });
 $('reveal').addEventListener('click',()=>{revealed=true;showReview()});
 $('remember').addEventListener('click',()=>review(true));$('again').addEventListener('click',()=>review(false));
