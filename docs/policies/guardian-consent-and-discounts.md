@@ -1,85 +1,33 @@
-# LangBlue — Guardian Consent and Discount Policy (Design Specification)
+# LangBlue — Guardian and 7% Discount Policy
 
-**Status:** Product and compliance design only. This document does not authorize or implement payment collection, bank transfers, receipt handling, or financial activation.
+**Status:** Product policy only. This PR does not implement payments, bank transfers, receipt uploads, or purchase activation.
 
-## 1. Scope and principles
+## Guardian approval
 
-This policy covers accounts identified as under 18, guardian supervision, referral attribution, and promotional discount eligibility. Before launch, the operator must obtain jurisdiction-specific legal review and use a lawful payment provider operated by an appropriately responsible adult or legal entity.
+- A user under 18 may enter a parent/legal guardian's LangBlue username to send an invitation.
+- The link stays **pending** until the guardian signs in to their own account and explicitly accepts.
+- Before acceptance, show what the guardian can view, what approval covers, and how to revoke it.
+- A username entry or referral link is never proof of consent.
+- Revocation stops future actions that require guardian approval. Handle existing entitlements and legally required records under the published terms and applicable law.
+- Collect only the account identifiers, consent scope, policy version, status, and timestamps needed to operate the link. Do not collect identity documents by default.
 
-Core principles:
-- Best interests and safety of the minor.
-- Clear, informed, affirmative guardian consent where required.
-- Data minimisation, purpose limitation, access control, and retention limits.
-- No public display of a minor's age, guardian identity, or purchase information.
-- No dark patterns, pressure, or penalty for declining consent.
-- A referral relationship must not be represented as parental consent or proof of payment.
+## Discount rules
 
-## 2. Guardian connection
+- **First purchase:** 7% may be used once on the account's first eligible purchase.
+- **Referral:** a qualifying invited user may receive 7% once for each exact premium entitlement period, such as 7 days or 12 months. It does not repeat on every transaction in that period or renew automatically.
+- **No stacking:** one order can receive only one 7% benefit. If both rules qualify, apply one and explain which rule was selected.
+- A failed or abandoned order does not use the benefit. Production eligibility must be confirmed by the authorised payment process; this PR does not build that process.
+- Do not allow self-referrals, fabricated accounts, coercive invitations, or public exposure of a minor's contacts/referral network.
 
-1. The minor may enter a LangBlue username belonging to a parent or legal guardian.
-2. Entering a username creates only a **pending invitation**; it does not establish consent or supervision.
-3. The guardian must sign in to their own account and explicitly accept the connection after seeing:
-   - the minor account being linked;
-   - what supervision means;
-   - what account and purchase metadata the guardian can see;
-   - how to revoke the connection.
-4. Store a minimal consent record: guardian account ID, minor account ID, consent scope, policy version, timestamp, and status. Do not store identity documents unless a reviewed legal requirement makes them necessary.
-5. The guardian can revoke consent. Revocation stops future guardian-dependent purchases and discounts; it must not erase lawful audit records or improperly remove already-paid entitlements.
-6. If no guardian account exists, keep the status as **guardian confirmation required**. Do not infer consent from a checkbox entered by the minor alone.
+## Privacy and administration
 
-## 3. First-purchase discount
+- Minors and guardians should see only the information needed for their own linked accounts and accepted consent scope.
+- Admin access must be role-restricted and logged. Show only account identifiers, guardian-link state, consent status, promotion type/period, and the minimum purchase status needed for support.
+- Never expose card numbers, payment credentials, identity documents, or unrelated family information in the dashboard.
+- Keep consent and discount decision records only for a documented, legally reviewed retention period.
 
-- A verified eligible minor account may receive **7% off one first eligible purchase**.
-- Eligibility is account-based and consumed only after the relevant purchase is confirmed by the authorised payment process. A draft order, abandoned checkout, or rejected payment must not consume it.
-- The first-purchase benefit cannot be transferred, sold, stacked with another 7% promotion, or reissued by changing a referral link.
-- If the first order is cancelled/refunded, eligibility restoration must follow a documented refund and consumer-rights policy; it must not be decided ad hoc.
+## Before any production launch
 
-## 4. Referral discount
+The responsible operator must obtain jurisdiction-specific legal review for age/guardian consent, privacy, consumer rights, cancellation/refunds, and payment-provider requirements. Production payments must be operated by an appropriately responsible adult or legal entity through a lawful payment provider.
 
-- A qualifying referred account may receive **7% at most once per premium subscription period**.
-- A period is the exact entitlement interval purchased, such as 7 days or 12 months. The eligibility key should be unique to the account and that entitlement period, not merely the calendar month.
-- For each period, record whether the referral discount was reserved, consumed, released after a failed/cancelled order, or voided for abuse.
-- The same period cannot receive the referral discount more than once, even if multiple referral links or network members are involved.
-- A referral discount does not repeat on every transaction during the same entitlement period and does not automatically renew with the subscription.
-- Referral attribution must be transparent. Do not reward self-referrals, fabricated accounts, coercive invitations, or undisclosed spam.
-- A referral network must not expose the minor's contacts or social graph to other users. Show only the minimum information necessary to explain eligibility.
-
-## 5. Non-stacking rule
-
-Only one 7% benefit may apply to a single order:
-- first-purchase discount, or
-- referral discount for the relevant premium period.
-
-Never add the two together. If both appear eligible, show the selected rule and the reason the other was not applied before the user proceeds.
-
-## 6. Admin access and audit
-
-Administrators should see only role-appropriate information:
-- account identifier and eligibility state;
-- guardian connection state and guardian account identifier;
-- consent timestamp and policy version;
-- discount type, period identifier, percentage, and eligibility outcome;
-- purchase status supplied by the authorised payment provider.
-
-Do not expose full payment credentials, card numbers, identity documents, or unrelated family information in the admin dashboard. Log privileged access and changes. Keep an append-only event history for consent and discount decisions, with a retention schedule approved for the applicable jurisdiction.
-
-## 7. User-facing disclosures
-
-Before a guardian accepts, explain in plain language:
-- what is being approved;
-- what the guardian can see and manage;
-- whether approval is required for purchases;
-- how to withdraw consent and contact support.
-
-Before applying a discount, show the original price, the 7% reduction, the final price, the promotion type, and the one-use/period limitation.
-
-## 8. Safety, privacy, and legal review gates
-
-Do not enable production purchases for an under-18 account until:
-- the operator has confirmed the applicable age and consent rules for each target country;
-- the guardian's authority and consent flow have been reviewed;
-- privacy notice, terms, refund/cancellation policy, and retention schedule have been reviewed;
-- a lawful payment provider and responsible adult/legal entity operate the payment process;
-- access controls, audit logs, and data deletion/retention handling have been tested.
-
-This is a product-design checklist, not legal advice or a certification of compliance with GDPR, consumer law, or any other law.
+This is a product-design policy, not legal advice or a claim of GDPR or other legal compliance.
