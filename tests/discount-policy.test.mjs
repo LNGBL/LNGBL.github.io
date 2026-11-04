@@ -50,3 +50,15 @@ test("first purchase and referral never stack", () => {
 test("untrusted or incomplete purchase evidence fails closed", () => {
   assert.equal(evaluateGuardianDiscountPolicy({ ...trusted, verifiedPaidOrderCount: "0" }).status, "blocked");
 });
+
+test("self-referral is never eligible", () => {
+  const result = evaluateGuardianDiscountPolicy({
+    ...trusted,
+    verifiedPaidOrderCount: 1,
+    firstPurchaseBenefitConsumed: true,
+    qualifyingReferral: true,
+    referrerUserId: "same-user",
+    referredUserId: "same-user",
+  });
+  assert.equal(result.status, "not_eligible");
+});
