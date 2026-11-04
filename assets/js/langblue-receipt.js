@@ -1,5 +1,5 @@
-/* LangBlue Landing Receipt Builder
-   Purchase-request receipt only. Activation is handled by Supabase Edge Functions.
+/* LangBlue purchase-request slip.
+   This is a non-payment request slip. It does not create or activate an entitlement.
 */
 (function(window){
   'use strict';
@@ -14,14 +14,10 @@
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
       .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
   }
-  function formatPrice(value){
-    return Number(value || 0).toLocaleString('en-US') + ' T';
-  }
   function buildId(){
-    return 'LB-' + Date.now().toString(36).toUpperCase() + '-' +
+    return 'LB-REQ-' + Date.now().toString(36).toUpperCase() + '-' +
       Math.random().toString(36).slice(2,7).toUpperCase();
   }
-
   function getOrder(){
     var commerce=window.LangBlueCommerce;
     if(!commerce || typeof commerce.buildOrder!=='function') return null;
@@ -30,102 +26,85 @@
     if(!ids.length || !planId) return null;
     return commerce.buildOrder(ids,planId,new Date());
   }
-
-  async function getDiscountedOrder(){
-    var order=getOrder();
-    if(!order) return null;
-    var client=window.LangBlueSupabase&&window.LangBlueSupabase.getClient?window.LangBlueSupabase.getClient():null;
-    if(!client) return order;
-    try{
-      var result=await client.functions.invoke('langblue-community-access',{body:{action:'status'}});
-      var request=result&&result.data&&result.data.request;
-      if(!result.error&&request&&request.status==='approved'&&request.discount_active===true){
-        var originalSubtotal=order.subtotal;
-        order.originalSubtotal=originalSubtotal;
-        order.plan=Object.assign({},order.plan);
-        order.plan.finalPrice=Math.round(Number(order.plan.finalPrice)*0.9);
-        order.plan.finalPriceStr=formatPrice(order.plan.finalPrice);
-        order.subtotal=order.plan.finalPrice*order.quantity;
-        order.communityDiscount=10;
-        order.communityDiscountAmount=originalSubtotal-order.subtotal;
-        order.total=Math.round(order.subtotal*(100-(order.bundleDiscount||0))/100);
-        order.totalStr=formatPrice(order.total);
-      }
-    }catch(e){console.warn('[LangBlue] community discount status unavailable',e)}
-    return order;
-  }
-
-  async function renderSummary(){
+  function renderSummary(){
     var box=qs('receiptSummary');
     if(!box) return;
-    var order=await getDiscountedOrder();
+    var order=getOrder();
     if(!order){
       box.innerHTML='<div class="receipt-summary-row"><span>وضعیت</span><strong>حداقل یک محصول را انتخاب کن.</strong></div>';
       return;
     }
-    var discount=order.bundleDiscount || 0;
     box.innerHTML=
-      '<div class="receipt-summary-row"><span>محصولات</span><strong>'+escapeHtml(order.products.map(function(p){return p.label;}).join('، '))+'</strong></div>'+
-      '<div class="receipt-summary-row"><span>مدت</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
-      '<div class="receipt-summary-row"><span>جمع اولیه</span><strong>'+formatPrice(order.communityDiscount?order.originalSubtotal:order.subtotal)+'</strong></div>'+
-      (order.communityDiscount ? '<div class="receipt-summary-row"><span>تخفیف اجتماعی</span><strong>'+order.communityDiscount+'٪ (−'+formatPrice(order.communityDiscountAmount)+')</strong></div>' : '')+
-      (discount ? '<div class="receipt-summary-row"><span>تخفیف بسته</span><strong>'+discount+'٪</strong></div>' : '')+
-      '<div class="receipt-summary-row receipt-summary-total"><span>مبلغ فیش</span><strong>'+formatPrice(order.total)+'</strong></div>';
+      '<div class="receipt-summary-row"><span>محصولات انتخاب‌شده</span><strong>'+escapeHtml(order.products.map(function(p){return p.label;}).join('، '))+'</strong></div>'+
+      '<div class="receipt-summary-row"><span>مدت درخواستی</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
+      '<div class="receipt-summary-row receipt-summary-total"><span>مبلغ و شرایط نهایی</span><strong>پس از بررسی ادمین اعلام می‌شود</strong></div>';
   }
-
-  async function renderReceipt(){
+  function renderReceipt(){
     var output=qs('receiptOutput');
     if(!output) return;
-    var order=await getDiscountedOrder();
+    var order=getOrder();
     if(!order){
       alert('حداقل یک محصول را انتخاب کن.');
       return;
     }
-    if(!order.id) order.id=buildId();
+    var requestId=buildId();
+    var createdAt=Date.now();
+    var productIds=order.products.map(function(p){return p.id;});
     var saved={
-      id:order.id, createdAt:order.createdAt, planId:order.plan.id,
-      productIds:order.products.map(function(p){return p.id;}),
-      requestType:'purchase_request', status:'pending_admin_review'
+      id:requestId,createdAt:createdAt,planId:order.plan.id,
+      productIds:productIds,requestType:'purchase_request',
+      status:'pending_admin_review'
     };
-    try{ localStorage.setItem('lb:receipt:last',JSON.stringify(saved)); }catch(e){}
+    try{localStorage.setItem('lb:purchase-request:last',JSON.stringify(saved));}catch(e){}
 
     output.innerHTML=
       '<div class="receipt-head">'+
-        '<div><strong>LangBlue</strong><br><small>فیش درخواست اشتراک</small></div>'+
-        '<div><strong>'+escapeHtml(order.id)+'</strong><br><small>'+new Date(order.createdAt).toLocaleString('fa-IR')+'</small></div>'+
+        '<div><strong>LangBlue</strong><br><small>فیش درخواست خرید — غیرمالی</small></div>'+
+        '<div><strong>'+escapeHtml(requestId)+'</strong><br><small>'+new Date(createdAt).toLocaleString('fa-IR')+'</small></div>'+
       '</div>'+
-      '<div class="receipt-line"><span>وضعیت درخواست</span><strong>در انتظار بررسی ادمین</strong></div>'+
-      order.products.map(function(p){
-        return '<div class="receipt-line"><span>'+escapeHtml(p.icon+' '+p.label)+'</span><strong>'+formatPrice(order.plan.finalPrice)+'</strong></div>';
-      }).join('')+
-      '<div class="receipt-line"><span>مدت اشتراک</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
-      (order.communityDiscount ? '<div class="receipt-line"><span>تخفیف اجتماعی</span><strong>'+order.communityDiscount+'٪ (−'+formatPrice(order.communityDiscountAmount)+')</strong></div>' : '')+
-      (order.bundleDiscount ? '<div class="receipt-line"><span>تخفیف بسته</span><strong>'+order.bundleDiscount+'٪</strong></div>' : '')+
-      '<div class="receipt-total"><span>مبلغ برآوردی درخواست (غیرقابل پرداخت)</span><strong>'+formatPrice(order.total)+'</strong></div>'+
-      '<div class="receipt-note">این فیش فقط «درخواست خرید» است و به معنی پرداخت، تأیید وجه یا فعال‌شدن اشتراک نیست. این صفحه هیچ وجه یا اطلاعات بانکی دریافت نمی‌کند. شناسهٔ فیش را از طریق دکمهٔ تلگرام ارسال کن؛ تلگرام باز می‌شود و باید گفت‌وگوی ادمین را خودت انتخاب و ارسال را تأیید کنی. کد فعال‌سازی داخل فیش وجود ندارد و فقط از مسیر سرور صادر و بررسی می‌شود.</div>';
+      '<div class="receipt-line"><span>محصولات</span><strong>'+escapeHtml(order.products.map(function(p){return p.icon+' '+p.label;}).join('، '))+'</strong></div>'+
+      '<div class="receipt-line"><span>مدت درخواستی</span><strong>'+escapeHtml(order.plan.label)+'</strong></div>'+
+      '<div class="receipt-line"><span>وضعیت</span><strong>در انتظار بررسی ادمین</strong></div>'+
+      '<div class="receipt-total"><span>مبلغ نهایی</span><strong>پس از بررسی اعلام می‌شود</strong></div>'+
+      '<div class="receipt-note">این فیش فقط «درخواست خرید» است؛ رسید پرداخت نیست و به معنی پرداخت، تأیید وجه یا فعال‌شدن اشتراک نیست. این صفحه هیچ وجه یا اطلاعات بانکی دریافت نمی‌کند. شناسه در این مرورگر ساخته می‌شود و تا وقتی پیام تلگرام را ارسال نکنی، ادمین از درخواست باخبر نمی‌شود. کد فعال‌سازی داخل فیش نمایش داده نمی‌شود و صدور و بررسی آن فقط از مسیر سرور انجام می‌شود.</div>';
+
     var share=document.createElement('a');
     share.className='btn btn-primary receipt-share';
-    share.href='https://t.me/share/url?url='+encodeURIComponent('https://lngbl.github.io/')+'&text='+encodeURIComponent('درخواست خرید LangBlue\nشناسه: '+order.id+'\nمحصولات: '+order.products.map(function(p){return p.label;}).join('، ')+'\nمدت: '+order.plan.label+'\nوضعیت: در انتظار بررسی ادمین\nاین پیام درخواست است و رسید پرداخت نیست.');
+    share.href='https://t.me/share/url?url='+encodeURIComponent('https://lngbl.github.io/')+
+      '&text='+encodeURIComponent(
+        'درخواست خرید LangBlue\nشناسه فیش: '+requestId+
+        '\nمحصولات: '+order.products.map(function(p){return p.label;}).join('، ')+
+        '\nمدت درخواستی: '+order.plan.label+
+        '\nوضعیت: در انتظار بررسی ادمین'+
+        '\nاین پیام درخواست است و رسید پرداخت نیست.'
+      );
     share.target='_blank';
     share.rel='noopener noreferrer';
-    share.textContent='ارسال شناسهٔ درخواست در تلگرام';
-    share.setAttribute('aria-label','ارسال شناسه درخواست خرید LangBlue از طریق انتخاب گفت‌وگو در تلگرام');
+    share.textContent='ارسال شناسهٔ فیش در تلگرام';
+    share.setAttribute('aria-label','ارسال شناسه فیش درخواست خرید از طریق انتخاب گفت‌وگو در تلگرام');
     output.appendChild(share);
     output.classList.add('show');
-    var print=qs('printReceipt'); if(print) print.style.display='inline-flex';
+    var print=qs('printReceipt');
+    if(print) print.style.display='inline-flex';
   }
-
   function init(){
     var build=qs('buildReceipt');
     var print=qs('printReceipt');
     if(!build) return;
-    document.querySelectorAll('#receiptProducts input[type="checkbox"]').forEach(function(input){input.addEventListener('change',renderSummary);});
+    document.querySelectorAll('#receiptProducts input[type="checkbox"]').forEach(function(input){
+      input.addEventListener('change',renderSummary);
+    });
     if(qs('receiptPlan')) qs('receiptPlan').addEventListener('change',renderSummary);
     build.addEventListener('click',renderReceipt);
     if(print) print.addEventListener('click',function(){window.print();});
     renderSummary();
   }
-
-  window.LangBlueReceipt={selectedProducts:selectedProducts,getOrder:getOrder,renderSummary:renderSummary,renderReceipt:renderReceipt};
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+  window.LangBlueReceipt={
+    selectedProducts:selectedProducts,
+    getOrder:getOrder,
+    renderSummary:renderSummary,
+    renderReceipt:renderReceipt
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
 })(window);
