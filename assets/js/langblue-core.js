@@ -318,8 +318,7 @@
         deutsch: { words: [] },
         langjp: { words: [] },
       langkz: { words: [] },
-        langtj: { words: [] },
-        langru: { words: [] }
+        langtj: { words: [] }
       },
       settings: { version: '3.0.0' }
     };
@@ -492,7 +491,7 @@
             verifiedAt: Date.now(),
             productIds: Array.isArray(remoteSub.product_ids)
               ? remoteSub.product_ids
-              : (Array.isArray(remoteSub.productIds) ? remoteSub.productIds : ['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj','langru']),
+              : (Array.isArray(remoteSub.productIds) ? remoteSub.productIds : ['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj']),
             expiresAt: remoteSub.expires_at || remoteSub.expiresAt || null,
             planId: remoteSub.plan_id || remoteSub.planId || null
           });
@@ -543,7 +542,7 @@
           const row=data[0];
           storage.set('subscription',Object.assign({},row,{
             planId:row.plan_id,
-            productIds:Array.isArray(row.product_ids)?row.product_ids:['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj','langru'],
+            productIds:Array.isArray(row.product_ids)?row.product_ids:['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj'],
             expiresAt:row.expires_at,
             verifiedByCode:row.plan_id!=='trial_48h',
             trial:row.plan_id==='trial_48h'
