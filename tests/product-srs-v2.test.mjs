@@ -22,7 +22,8 @@ test('Vocabulary SRS uses elapsed-time scheduling and strict due queues', () => 
   assert.match(vocab, /stabilityHours/);
   assert.match(vocab, /nextReview=now\+old\.intervalHours\*3600000/);
   assert.match(vocab, /return words\.filter\(function\(word\).*nextReview/);
-  assert.doesNotMatch(vocab, /Number\.MAX_SAFE_INTEGER/);
+  assert.match(vocab, /MAX_SAFE_INTEGER\/2/);
+  assert.match(vocab, /x\.interval==='every_2_visits'/);
   assert.doesNotMatch(vocab, /var exploratory = AdaptiveBrain\.rank/);
 });
 
