@@ -1900,8 +1900,16 @@
                     old.interval='daily';old.word=word;old.persian=persian;data[key]=old;this.saveData(data);return old;
                 },
                 getDueWords:function(words){
-                    var data=this.getData(),now=Date.now();
-                    return words.filter(function(word){var x=data[word.word+'|'+word.persian];return !x||Number(x.nextReview||0)<=now;});
+                    var data=this.getData(),now=Date.now(),relearn=4*60*60*1000;
+                    return words.filter(function(word){
+                        var x=data[word.word+'|'+word.persian];
+                        if(!x)return true;
+                        // Legacy every-two-visits records used MAX_SAFE_INTEGER and must be migrated.
+                        if(x.interval==='every_2_visits'||Number(x.nextReview)>=Number.MAX_SAFE_INTEGER/2){
+                            return now-Number(x.lastReviewed||0)>=relearn;
+                        }
+                        return Number(x.nextReview||0)<=now;
+                    });
                 },
                 recordVisit:function(){var visits=Storage.get(KEYS.FLASHCARD_VISITS,0)+1;Storage.set(KEYS.FLASHCARD_VISITS,visits);return visits;},
                 getWordStatus:function(word,persian){return this.getData()[word+'|'+persian]||null;},
