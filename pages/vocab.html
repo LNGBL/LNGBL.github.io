@@ -2543,18 +2543,8 @@
                         if (!seen[dueId]) { seen[dueId]=true; selected.push(priorityDue[k]); }
                     }
 
-                    if (selected.length < 12) {
-                        var remaining = [];
-                        for (var m = 0; m < eligible.length; m++) {
-                            var id = eligible[m].word + '|' + eligible[m].persian;
-                            if (!seen[id]) remaining.push(eligible[m]);
-                        }
-                        var exploratory = AdaptiveBrain.rank(remaining, 'flashcard', remaining.length);
-                        for (var n = 0; n < exploratory.length && selected.length < 12; n++) {
-                            var eid = exploratory[n].word + '|' + exploratory[n].persian;
-                            if (!seen[eid]) { seen[eid]=true; selected.push(exploratory[n]); }
-                        }
-                    }
+                    // SRS queue is strict: never pull a not-yet-due item merely to fill the session.
+                    // New items remain eligible through getDueWords; only scheduled reviews are delayed.
 
                     return AdaptiveBrain.rank(selected, 'flashcard', selected.length);
                 },
