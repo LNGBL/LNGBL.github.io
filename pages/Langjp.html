@@ -1005,13 +1005,7 @@ function startFlashSession() {
   const due = getDueWords(words).filter(w => !session.practicedIds.includes(w.id));
 
   if (due.length === 0) {
-    // اگر لغت due نبود، از همه لغات (به جز تمرین‌شده‌های امروز) انتخاب کن
-    const remaining = words.filter(w => !session.practicedIds.includes(w.id));
-    if (remaining.length === 0) {
-      renderFlashResult('<div class="notice notice-ok">🎉 تمرین امروز کامل شد! فردا برگرد.</div>');
-      return;
-    }
-    nextFlash(remaining[0], words);
+    renderFlashResult('<div class="notice notice-ok">🎉 موردی برای مرور در این لحظه سررسید نشده است. زمان‌بندی مرور بعدی را رعایت کن و بعداً برگرد.</div>');
     return;
   }
 
