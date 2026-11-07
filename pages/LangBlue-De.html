@@ -748,7 +748,7 @@ var Words={
     return {version:6,exportedAt:new Date().toISOString(),
             user:Auth.current()?{name:Auth.current().name,email:Auth.current().email}:null,
             words:this.all(),cycle:Cycle.load(),memory48:Memory48.load(),
-            sextant:Sextant.load(),invoices:Invoice.list()};
+            sextant:Sextant.load(),srs:DeutschSRS.all(),invoices:Invoice.list()};
   },
   import:function(data){
     if(!data||typeof data!=="object")throw new Error("فایل نامعتبر است");
@@ -767,6 +767,7 @@ var Words={
       added++;
     });
     this.save(cur);
+    if(data.srs&&typeof data.srs==="object")LS.set(_scope("deutsch_srs_v2"),Object.assign({},DeutschSRS.all(),data.srs));
     return added;
   }
 };
