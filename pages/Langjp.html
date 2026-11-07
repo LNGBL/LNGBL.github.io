@@ -695,34 +695,6 @@ function applyAnswerResult(w,isCorrect) {
   w.updatedAt=t;
 }
 
-function evaluateWeeklyResult(w) {
-  // correctCount در session جاری (که در review ذخیره شده)
-  const c = w.correctCount;
-
-  if (c >= 7) {
-    // عالی → 48 ساعت بعد تکرار، اما در state mastered
-    w.stage = 'mastered';
-    w.nextReviewAt = now() + 48 * HOUR;
-    w.correctCount = 0;
-    w.weeklyDaysDone = 0;
-  } else if (c >= 5) {
-    // متوسط → هر 24 ساعت یکبار به مدت یک هفته دیگر
-    w.stage = 'learning';
-    w.weeklyStart = now();
-    w.weeklyDaysDone = 0;
-    w.nextReviewAt = now() + DAY;
-    w.correctCount = 0;
-  } else {
-    // ضعیف (<5) → ۴۸ ساعت تمرین مداوم، سپس مرحله بعد
-    w.stage = 'learning';
-    w.hardUntil = now() + 48 * HOUR;
-    w.hardSessions = 0;
-    w.nextReviewAt = now() + HOUR; // هر ساعت تمرین سخت
-    w.correctCount = 0;
-    w.weeklyDaysDone = 0;
-  }
-}
-
 /* ---------- UI Rendering ---------- */
 const pages = {
   add: document.getElementById('page-add'),
