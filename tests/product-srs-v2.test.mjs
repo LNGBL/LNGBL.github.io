@@ -21,7 +21,8 @@ test('Grammar SRS models stability, difficulty and retrievability', () => {
 test('Vocabulary SRS uses elapsed-time scheduling and strict due queues', () => {
   assert.match(vocab, /stabilityHours/);
   assert.match(vocab, /nextReview=now\+old\.intervalHours\*3600000/);
-  assert.match(vocab, /return words\.filter\(function\(word\).*nextReview/);
+  assert.match(vocab, /getDueWords:function\(words\)/);
+  assert.match(vocab, /Number\(x\.nextReview\|\|0\)<=now/);
   assert.match(vocab, /MAX_SAFE_INTEGER\/2/);
   assert.match(vocab, /x\.interval==='every_2_visits'/);
   assert.doesNotMatch(vocab, /var exploratory = AdaptiveBrain\.rank/);
