@@ -2118,14 +2118,10 @@
                 update: function(word, persian, status) {
                     var data = this.getAll();
                     var key = word + '|' + persian;
-                    data[key] = {
-                        word: word,
-                        persian: persian,
-                        status: status,
-                        lastReview: Date.now(),
-                        reviewCount: (data[key] ? data[key].reviewCount : 0) + 1,
-                        isForgotten: false
-                    };
+                    data[key] = Object.assign({},data[key]||{},{
+                        word:word,persian:persian,status:status,lastReview:Date.now(),
+                        reviewCount:(Number(data[key]&&data[key].reviewCount)||0)+1,isForgotten:false
+                    });
                     this.saveAll(data);
                 },
 
