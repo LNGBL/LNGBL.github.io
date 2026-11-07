@@ -748,7 +748,7 @@ var Words={
     return {version:6,exportedAt:new Date().toISOString(),
             user:Auth.current()?{name:Auth.current().name,email:Auth.current().email}:null,
             words:this.all(),cycle:Cycle.load(),memory48:Memory48.load(),
-            sextant:Sextant.load(),invoices:Invoice.list()};
+            sextant:Sextant.load(),srs:DeutschSRS.all(),invoices:Invoice.list()};
   },
   import:function(data){
     if(!data||typeof data!=="object")throw new Error("فایل نامعتبر است");
@@ -767,6 +767,7 @@ var Words={
       added++;
     });
     this.save(cur);
+    if(data.srs&&typeof data.srs==="object")LS.set(_scope("deutsch_srs_v2"),Object.assign({},DeutschSRS.all(),data.srs));
     return added;
   }
 };
@@ -787,10 +788,24 @@ function _buildQ(correct,pool,n){
   return {stemDe:correct.de,stemType:correct.type,stickers:correct.stickers,
           correctId:correct.id,options:opts,correctIndex:ci};
 }
+var DeutschSRS={
+  key:function(){return _scope("deutsch_srs_v2");},
+  all:function(){return LS.get(this.key(),{});},
+  get:function(id){var a=this.all();return a[id]||{stage:0,stabilityHours:4,difficulty:5,lapses:0,nextReviewAt:0,correct:0,wrong:0};},
+  due:function(id,now){var s=this.get(id);return Number(s.nextReviewAt||0)<=(now||Date.now());},
+  review:function(id,ok,mode){
+    var a=this.all(),s=this.get(id),t=Date.now(),elapsed=Math.max(0,(t-Number(s.lastReviewedAt||0))/3600000),stability=Math.max(.5,Number(s.stabilityHours)||4),retrieval=elapsed>0?Math.exp(Math.log(.9)*elapsed/stability):1;
+    var modeFactor=mode==="sextant"?.88:1;
+    s.correct=Number(s.correct||0)+(ok?1:0);s.wrong=Number(s.wrong||0)+(ok?0:1);s.lapses=Number(s.lapses||0)+(ok?0:1);
+    if(ok){s.stage=Math.min(6,(Number(s.stage)||0)+1);s.difficulty=Math.max(1,(Number(s.difficulty)||5)-.12);s.stabilityHours=Math.min(24*180,stability*(1.3+(1-retrieval)*.7)*modeFactor*(.8+(10-s.difficulty)*.03));s.intervalHours=Math.max(4,s.stabilityHours*.9);}
+    else{s.stage=Math.max(0,(Number(s.stage)||0)-2);s.difficulty=Math.min(10,(Number(s.difficulty)||5)+.7);s.stabilityHours=Math.max(.5,stability*(retrieval<.55?.25:.4));s.intervalHours=Math.max(.5,Math.min(4,s.stabilityHours*.25));}
+    s.lastReviewedAt=t;s.nextReviewAt=t+s.intervalHours*3600000;s.lastRating=ok?"good":"again";a[id]=s;LS.set(this.key(),a);return s;
+  }
+};
 function _pickNormal(now){
   now=now||Date.now();
   var all=Words.all();if(all.length<4)return null;
-  var e=all.filter(function(w){return Memory48.canUse(w.id,now);});
+  var e=all.filter(function(w){return Memory48.canUse(w.id,now)&&DeutschSRS.due(w.id,now);});
   if(!e.length)return null;
   e.sort(function(a,b){return (a.seenCount-b.seenCount)||(a.createdAt-b.createdAt);});
   return e[0];
@@ -798,7 +813,7 @@ function _pickNormal(now){
 function _pickSext(now){
   now=now||Date.now();
   var all=Words.all();if(all.length<4)return null;
-  var e=all.filter(function(w){return Memory48.canUse(w.id,now)&&!Sextant.usedInCurrent(w.id,now);});
+  var e=all.filter(function(w){return Memory48.canUse(w.id,now)&&DeutschSRS.due(w.id,now)&&!Sextant.usedInCurrent(w.id,now);});
   if(!e.length)return null;
   e.sort(function(a,b){return (a.seenCount-b.seenCount)||(a.createdAt-b.createdAt);});
   return e[0];
@@ -1146,6 +1161,7 @@ function _answerQuestion(idx){
   try{Cycle.consume();}catch(e){}
   Memory48.register(q.correctId);
   if(_state.mode==="sextant")Sextant.register(q.correctId);
+  DeutschSRS.review(q.correctId,ok,_state.mode);
   Words.markSeen(q.correctId);
   _renderStats();
   setTimeout(function(){_state.currentQuestion=null;_renderFlash();},1400);

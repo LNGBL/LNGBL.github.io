@@ -1878,158 +1878,45 @@
 
             var RepetitionSystem = {
                 STORAGE_KEY: KEYS.REPETITION_DATA,
-
-                getData: function() {
-                    return Storage.get(this.STORAGE_KEY, {});
+                getData:function(){return Storage.get(this.STORAGE_KEY,{});},
+                saveData:function(data){Storage.set(this.STORAGE_KEY,data);},
+                recordCorrect:function(word,persian){
+                    var data=this.getData(),key=word+'|'+persian,old=data[key]||{},now=Date.now();
+                    var stability=Math.max(.5,Number(old.stabilityHours)||4),elapsed=Math.max(0,(now-Number(old.lastReviewed||0))/3600000);
+                    var retrievability=elapsed>0?Math.exp(Math.log(.9)*elapsed/stability):1;
+                    old.correctCount=(Number(old.correctCount)||0)+1;old.difficulty=Math.max(1,(Number(old.difficulty)||5)-.12);
+                    old.stabilityHours=Math.min(24*180,stability*(1.28+(1-retrievability)*.72)*(.8+(10-old.difficulty)*.03));
+                    old.intervalHours=Math.max(4,old.stabilityHours*.9);old.lastReviewed=now;old.nextReview=now+old.intervalHours*3600000;
+                    old.interval=old.intervalHours>=48?'48h':old.intervalHours>=24?'24h':'daily';old.lapses=Number(old.lapses)||0;
+                    old.word=word;old.persian=persian;data[key]=old;this.saveData(data);return old;
                 },
-
-                saveData: function(data) {
-                    Storage.set(this.STORAGE_KEY, data);
+                recordWrong:function(word,persian){
+                    var data=this.getData(),key=word+'|'+persian,old=data[key]||{},now=Date.now();
+                    var stability=Math.max(.5,Number(old.stabilityHours)||4),elapsed=Math.max(0,(now-Number(old.lastReviewed||0))/3600000);
+                    var retrievability=elapsed>0?Math.exp(Math.log(.9)*elapsed/stability):1;
+                    old.correctCount=Math.max(0,(Number(old.correctCount)||0)-1);old.lapses=(Number(old.lapses)||0)+1;
+                    old.difficulty=Math.min(10,(Number(old.difficulty)||5)+.7);old.stabilityHours=Math.max(.5,stability*(retrievability<.55?.25:.4));
+                    old.intervalHours=Math.max(.5,Math.min(4,old.stabilityHours*.25));old.lastReviewed=now;old.nextReview=now+old.intervalHours*3600000;
+                    old.interval='daily';old.word=word;old.persian=persian;data[key]=old;this.saveData(data);return old;
                 },
-
-                // ===== ثبت پاسخ درست =====
-                recordCorrect: function(word, persian) {
-                    var data = this.getData();
-                    var key = word + '|' + persian;
-
-                    if (!data[key]) {
-                        data[key] = {
-                            word: word,
-                            persian: persian,
-                            correctCount: 0,
-                            lastReviewed: Date.now(),
-                            nextReview: Date.now(),
-                            interval: 'daily'
-                        };
-                    }
-
-                    data[key].correctCount++;
-                    data[key].lastReviewed = Date.now();
-
-                    // ===== تعیین بازه بعدی بر اساس تعداد تایید =====
-                    if (data[key].correctCount >= 5) {
-                        data[key].interval = '48h';
-                        data[key].nextReview = Date.now() + (48 * 60 * 60 * 1000);
-                    } else if (data[key].correctCount >= 3) {
-                        data[key].interval = '24h';
-                        data[key].nextReview = Date.now() + (24 * 60 * 60 * 1000);
-                    } else {
-                        data[key].interval = 'every_2_visits';
-                        data[key].nextReview = Number.MAX_SAFE_INTEGER;
-                    }
-
-                    this.saveData(data);
-                    return data[key];
-                },
-
-                // ===== ثبت پاسخ اشتباه =====
-                recordWrong: function(word, persian) {
-                    var data = this.getData();
-                    var key = word + '|' + persian;
-
-                    if (!data[key]) {
-                        data[key] = {
-                            word: word,
-                            persian: persian,
-                            correctCount: 0,
-                            lastReviewed: Date.now(),
-                            nextReview: Date.now(),
-                            interval: 'daily'
-                        };
-                    }
-
-                    if (data[key].correctCount > 0) {
-                        data[key].correctCount--;
-                    }
-
-                    data[key].lastReviewed = Date.now();
-                    data[key].interval = 'daily';
-                    data[key].nextReview = Date.now();
-
-                    this.saveData(data);
-                    return data[key];
-                },
-
-                // ===== دریافت کلماتی که زمان مرورشان رسیده =====
-                getDueWords: function(words) {
-                    var data = this.getData();
-                    var now = Date.now();
-                    var dueWords = [];
-
-                    for (var i = 0; i < words.length; i++) {
-                        var word = words[i];
-                        var key = word.word + '|' + word.persian;
-                        var repData = data[key];
-
-                        if (!repData) {
-                            dueWords.push(word);
-                            continue;
+                getDueWords:function(words){
+                    var data=this.getData(),now=Date.now(),relearn=4*60*60*1000;
+                    return words.filter(function(word){
+                        var x=data[word.word+'|'+word.persian];
+                        if(!x)return true;
+                        // Legacy every-two-visits records used MAX_SAFE_INTEGER and must be migrated.
+                        if(x.interval==='every_2_visits'||Number(x.nextReview)>=Number.MAX_SAFE_INTEGER/2){
+                            return now-Number(x.lastReviewed||0)>=relearn;
                         }
-
-                        if (repData.interval === 'every_2_visits') {
-                            var visits = Storage.get(KEYS.FLASHCARD_VISITS, 0);
-                            if (visits > 0 && visits % 2 === 0) dueWords.push(word);
-                            continue;
-                        }
-
-                        if (repData.nextReview <= now) {
-                            dueWords.push(word);
-                            continue;
-                        }
-                    }
-
-                    return dueWords;
+                        return Number(x.nextReview||0)<=now;
+                    });
                 },
-
-                // ===== ثبت ورود به فلش‌کارت =====
-                recordVisit: function() {
-                    var visits = Storage.get(KEYS.FLASHCARD_VISITS, 0);
-                    visits++;
-                    Storage.set(KEYS.FLASHCARD_VISITS, visits);
-                    return visits;
-                },
-
-                // ===== دریافت وضعیت یک کلمه =====
-                getWordStatus: function(word, persian) {
-                    var data = this.getData();
-                    var key = word + '|' + persian;
-                    return data[key] || null;
-                },
-
-                // ===== نمایش وضعیت در جدول =====
-                getStatusLabel: function(word, persian) {
-                    var status = this.getWordStatus(word, persian);
-                    if (!status) return '🆕 جدید';
-
-                    var labels = {
-                        'daily': '📅 روزانه',
-                        '24h': '⏰ ۲۴ ساعت',
-                        '48h': '⏰ ۴۸ ساعت',
-                        'every_2_visits': '🔄 هر ۲ بار'
-                    };
-
-                    return labels[status.interval] || '📅 روزانه';
-                },
-
-                getStatusClass: function(word, persian) {
-                    var status = this.getWordStatus(word, persian);
-                    if (!status) return 'daily';
-                    var map = {
-                        'daily': 'daily',
-                        '24h': 'h24',
-                        '48h': 'h48',
-                        'every_2_visits': 'every2'
-                    };
-                    return map[status.interval] || 'daily';
-                },
-
-                // ===== پاک کردن داده =====
-                clear: function() {
-                    Storage.remove(this.STORAGE_KEY);
-                    Storage.remove(KEYS.FLASHCARD_VISITS);
-                }
+                recordVisit:function(){var visits=Storage.get(KEYS.FLASHCARD_VISITS,0)+1;Storage.set(KEYS.FLASHCARD_VISITS,visits);return visits;},
+                getWordStatus:function(word,persian){return this.getData()[word+'|'+persian]||null;},
+                getStatusLabel:function(word,persian){var s=this.getWordStatus(word,persian);if(!s)return '🆕 جدید';return '⏱ '+Math.round(Number(s.intervalHours)||4)+'h';},
+                getStatusClass:function(word,persian){var s=this.getWordStatus(word,persian);return !s||Number(s.nextReview||0)<=Date.now()?'daily':'h24';},
+                clear:function(){Storage.remove(this.STORAGE_KEY);Storage.remove(KEYS.FLASHCARD_VISITS);}
             };
-
             // ================================================================
             // BACKUP MANAGER (خلاصه‌شده)
             // ================================================================
@@ -2239,25 +2126,32 @@
                 update: function(word, persian, status) {
                     var data = this.getAll();
                     var key = word + '|' + persian;
-                    data[key] = {
-                        word: word,
-                        persian: persian,
-                        status: status,
-                        lastReview: Date.now(),
-                        reviewCount: (data[key] ? data[key].reviewCount : 0) + 1,
-                        isForgotten: false
-                    };
+                    data[key] = Object.assign({},data[key]||{},{
+                        word:word,persian:persian,status:status,lastReview:Date.now(),
+                        reviewCount:(Number(data[key]&&data[key].reviewCount)||0)+1,isForgotten:false
+                    });
                     this.saveAll(data);
                 },
 
                 recordOutcome: function(word, persian, correct) {
-                    var rep = RepetitionSystem.getWordStatus(word, persian);
-                    if (!correct) {
-                        this.update(word, persian, 'review');
-                        return;
+                    var data=this.getAll(), key=word+'|'+persian, old=data[key]||{};
+                    var rep=RepetitionSystem.getWordStatus(word,persian), now=Date.now();
+                    var count=Number(rep&&rep.correctCount)||0, stage=Math.max(0,Number(old.stage)||0);
+                    var ease=Math.max(1.25,Math.min(2.8,Number(old.ease)||2.25));
+                    var interval=Number(old.intervalHours)||4, lapses=Number(old.lapses)||0;
+                    if(correct){
+                        stage=Math.min(6,stage+1);
+                        ease=Math.min(2.8,ease+(count>=4?0.08:0.025));
+                        interval=stage===1?12:stage===2?36:stage===3?96:stage===4?240:stage===5?480:Math.min(24*120,Math.max(720,interval*ease));
+                    }else{
+                        stage=Math.max(0,stage-2);ease=Math.max(1.25,ease-0.18);lapses++;
+                        interval=lapses===1?1:Math.min(4,Math.max(0.5,interval*0.12));
                     }
-                    var count = rep && Number(rep.correctCount) || 0;
-                    this.update(word, persian, count >= 5 ? 'mastered' : 'learning');
+                    data[key]=Object.assign({},old,{word:word,persian:persian,status:!correct?'review':stage>=5?'mastered':'learning',
+                        stage:stage,ease:ease,lapses:lapses,intervalHours:interval,lastReview:now,nextReviewAt:now+interval*3600000,
+                        reviewCount:(Number(old.reviewCount)||0)+1,correctCount:(Number(old.correctCount)||0)+(correct?1:0),
+                        wrongCount:(Number(old.wrongCount)||0)+(correct?0:1),isForgotten:false});
+                    this.saveAll(data);
                 },
 
                 getStats: function() {
@@ -2653,18 +2547,8 @@
                         if (!seen[dueId]) { seen[dueId]=true; selected.push(priorityDue[k]); }
                     }
 
-                    if (selected.length < 12) {
-                        var remaining = [];
-                        for (var m = 0; m < eligible.length; m++) {
-                            var id = eligible[m].word + '|' + eligible[m].persian;
-                            if (!seen[id]) remaining.push(eligible[m]);
-                        }
-                        var exploratory = AdaptiveBrain.rank(remaining, 'flashcard', remaining.length);
-                        for (var n = 0; n < exploratory.length && selected.length < 12; n++) {
-                            var eid = exploratory[n].word + '|' + exploratory[n].persian;
-                            if (!seen[eid]) { seen[eid]=true; selected.push(exploratory[n]); }
-                        }
-                    }
+                    // SRS queue is strict: never pull a not-yet-due item merely to fill the session.
+                    // New items remain eligible through getDueWords; only scheduled reviews are delayed.
 
                     return AdaptiveBrain.rank(selected, 'flashcard', selected.length);
                 },

@@ -650,27 +650,17 @@ function ensureWordDefaults(w) {
   if (w.hardUntil === undefined) w.hardUntil = 0;
   if (w.hardSessions === undefined) w.hardSessions = 0;
   if (w.createdAt === undefined) w.createdAt = now();
+  if (w.difficulty === undefined) w.difficulty = 5;
+  if (w.stabilityHours === undefined) w.stabilityHours = 0.5;
+  if (w.intervalHours === undefined) w.intervalHours = 4;
+  if (w.lapses === undefined) w.lapses = 0;
   return w;
 }
 
 function isDue(w) {
-  const t = now();
-  if (w.stage === 'mastered') {
-    return t >= w.nextReviewAt;
-  }
-  if (w.stage === 'new') return true;
-  if (w.stage === 'learning') {
-    // چرخه 24 ساعته هفتگی
-    if (w.weeklyStart && w.weeklyDaysDone < 7) {
-      // اگر 24 ساعت از آخرین تمرین گذشته باشد
-      return t - w.lastPracticeAt >= DAY;
-    }
-    return true;
-  }
-  if (w.stage === 'review') {
-    return t >= w.nextReviewAt;
-  }
-  return true;
+  const t=now();
+  if(w.stage==='new') return true;
+  return Number(w.nextReviewAt||0)<=t;
 }
 
 function getDueWords(words) {
@@ -684,79 +674,25 @@ function getDueWords(words) {
 }
 
 /* ---------- Apply Answer Result (منطق تثبیت) ---------- */
-function applyAnswerResult(w, isCorrect) {
-  w.lastPracticeAt = now();
-
-  if (isCorrect) {
-    w.correctCount++;
-    w.totalCorrect++;
-  } else {
-    w.totalWrong++;
+function applyAnswerResult(w,isCorrect) {
+  const t=now(), elapsed=Math.max(0,(t-Number(w.lastPracticeAt||0))/3600000);
+  const oldStability=Math.max(0.5,Number(w.stabilityHours)||Math.max(4,Number(w.intervalHours)||4));
+  const retrievability=elapsed>0?Math.exp(Math.log(0.9)*elapsed/oldStability):1;
+  w.lastPracticeAt=t;w.totalCorrect=Number(w.totalCorrect||0)+(isCorrect?1:0);w.totalWrong=Number(w.totalWrong||0)+(isCorrect?0:1);
+  w.difficulty=Math.max(1,Math.min(10,(Number(w.difficulty)||5)+(isCorrect?-0.12:0.75)));
+  if(isCorrect){
+    w.correctCount=Number(w.correctCount||0)+1;
+    w.stabilityHours=Math.min(24*240,oldStability*(1.25+(1-retrievability)*0.75+(w.difficulty<4?0.15:0)));
+    w.stage=w.stabilityHours>=720?'mastered':w.stabilityHours>=72?'review':'learning';
+    w.intervalHours=Math.max(4,w.stabilityHours*0.88);
+  }else{
+    w.correctCount=0;w.lapses=Number(w.lapses||0)+1;
+    w.stabilityHours=Math.max(0.5,oldStability*(retrievability<0.55?0.25:0.4));
+    w.stage='learning';w.intervalHours=Math.max(1,Math.min(4,w.stabilityHours*0.3));
   }
-
-  // حالت جدید: بعد از اولین پاسخ
-  if (w.stage === 'new') {
-    w.stage = 'learning';
-    w.correctCount = isCorrect ? 1 : 0;
-    w.weeklyStart = now();
-    w.weeklyDaysDone = 0;
-    w.nextReviewAt = now() + DAY;
-    return;
-  }
-
-  // در حالت learning: چرخه 24h هفتگی
-  if (w.stage === 'learning') {
-    // اگر امروز جواب داد، روز جدید را ثبت کن
-    if (w.lastPracticeAt - (w.weeklyStart || 0) > 0) {
-      // شمارش روزها بر اساس فاصله از شروع
-    }
-    if (isCorrect) {
-      // روز موفق
-    }
-    // بررسی پایان هفته
-    if (w.weeklyDaysDone >= 6) {
-      // هفته تمام شد → بر اساس تعداد درست تصمیم بگیر
-      evaluateWeeklyResult(w);
-    } else {
-      w.weeklyDaysDone++;
-      w.nextReviewAt = now() + DAY;
-    }
-    return;
-  }
-
-  // در حالت review: تعیین سرنوشت بر اساس correctCount جاری
-  if (w.stage === 'review') {
-    evaluateWeeklyResult(w);
-    return;
-  }
-}
-
-function evaluateWeeklyResult(w) {
-  // correctCount در session جاری (که در review ذخیره شده)
-  const c = w.correctCount;
-
-  if (c >= 7) {
-    // عالی → 48 ساعت بعد تکرار، اما در state mastered
-    w.stage = 'mastered';
-    w.nextReviewAt = now() + 48 * HOUR;
-    w.correctCount = 0;
-    w.weeklyDaysDone = 0;
-  } else if (c >= 5) {
-    // متوسط → هر 24 ساعت یکبار به مدت یک هفته دیگر
-    w.stage = 'learning';
-    w.weeklyStart = now();
-    w.weeklyDaysDone = 0;
-    w.nextReviewAt = now() + DAY;
-    w.correctCount = 0;
-  } else {
-    // ضعیف (<5) → ۴۸ ساعت تمرین مداوم، سپس مرحله بعد
-    w.stage = 'learning';
-    w.hardUntil = now() + 48 * HOUR;
-    w.hardSessions = 0;
-    w.nextReviewAt = now() + HOUR; // هر ساعت تمرین سخت
-    w.correctCount = 0;
-    w.weeklyDaysDone = 0;
-  }
+  w.nextReviewAt=t+w.intervalHours*3600000;w.weeklyStart=w.weeklyStart||t;
+  w.lastReviewDay=new Date(t).toISOString().slice(0,10);
+  w.updatedAt=t;
 }
 
 /* ---------- UI Rendering ---------- */
@@ -1041,13 +977,7 @@ function startFlashSession() {
   const due = getDueWords(words).filter(w => !session.practicedIds.includes(w.id));
 
   if (due.length === 0) {
-    // اگر لغت due نبود، از همه لغات (به جز تمرین‌شده‌های امروز) انتخاب کن
-    const remaining = words.filter(w => !session.practicedIds.includes(w.id));
-    if (remaining.length === 0) {
-      renderFlashResult('<div class="notice notice-ok">🎉 تمرین امروز کامل شد! فردا برگرد.</div>');
-      return;
-    }
-    nextFlash(remaining[0], words);
+    renderFlashResult('<div class="notice notice-ok">🎉 موردی برای مرور در این لحظه سررسید نشده است. زمان‌بندی مرور بعدی را رعایت کن و بعداً برگرد.</div>');
     return;
   }
 

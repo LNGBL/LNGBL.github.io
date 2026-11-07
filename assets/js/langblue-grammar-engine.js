@@ -15,7 +15,7 @@
 
   function blank(){
     return {score:0,streak:0,reps:0,lapses:0,correct:0,wrong:0,total:0,
-      intervalDays:0,nextReviewAt:now(),lastReviewedAt:null,ease:2.3};
+      intervalDays:0,nextReviewAt:now(),lastReviewedAt:null,ease:2.3,difficulty:5,stabilityHours:0.5,lastRating:null};
   }
 
   function all(){
@@ -69,38 +69,31 @@
   }
 
   function review(id,correct,meta){
-    const data=all();
-    const s=Object.assign(blank(),data[id]||{});
-    const elapsed=s.lastReviewedAt ? Math.max(0,now()-s.lastReviewedAt) : 0;
-    const seconds=Number(meta&&meta.responseSeconds||0);
-    const hint=!!(meta&&meta.hint);
-    const quality=correct ? (hint?3:(seconds>0 && seconds<=6?5:4)) : 1;
-
-    s.total++;
+    const data=all(), t=now(), s=Object.assign(blank(),data[id]||{});
+    const elapsedHours=s.lastReviewedAt?Math.max(0,(t-s.lastReviewedAt)/3600000):0;
+    const seconds=Number(meta&&meta.responseSeconds||0), hint=!!(meta&&meta.hint);
+    const quality=!correct?1:(hint?3:(seconds>0&&seconds<3?5:seconds>18?3:4));
+    const oldStability=Math.max(0.25,Number(s.stabilityHours)||Math.max(0.5,(s.intervalDays||0)*24||0.5));
+    const retrievability=elapsedHours>0?Math.exp(Math.log(0.9)*elapsedHours/oldStability):1;
+    s.total=(s.total||0)+1;
     if(correct){
-      s.correct++;
-      s.streak++;
-      s.reps++;
-      s.lapses=Math.max(0,s.lapses-1);
-      s.ease=clamp(s.ease + (quality>=5?0.08:0.03),1.3,2.8);
-      const base=[0.5,1,3,7,14,30,60][Math.min(s.reps,6)];
-      s.intervalDays=clamp(Math.max(base,s.intervalDays*s.ease),0.25,120);
-      const gain=quality>=5?12:(quality>=4?9:6);
-      s.score=clamp(s.score+gain+(s.streak>=3?2:0),0,100);
+      s.correct=(s.correct||0)+1;s.streak=(s.streak||0)+1;s.reps=(s.reps||0)+1;
+      s.lapses=Math.max(0,(s.lapses||0)-0.15);
+      s.difficulty=clamp((Number(s.difficulty)||5)-(quality===5?0.35:quality===4?0.12:0.02),1,10);
+      const recallGain=Math.max(0.25,1.15+(1-retrievability)*0.9+(quality-3)*0.16);
+      const difficultyPenalty=0.72+(10-s.difficulty)*0.055;
+      s.stabilityHours=clamp(oldStability*recallGain*difficultyPenalty,0.5,24*180);
+      s.score=clamp((s.score||0)+(quality===5?13:quality===4?10:6)+(s.streak>=3?2:0),0,100);
     }else{
-      s.wrong++;
-      s.streak=0;
-      s.lapses++;
-      s.ease=clamp(s.ease-0.12,1.3,2.8);
-      s.intervalDays=0.08;
-      s.score=clamp(s.score-15,0,100);
+      s.wrong=(s.wrong||0)+1;s.streak=0;s.lapses=(s.lapses||0)+1;
+      s.difficulty=clamp((Number(s.difficulty)||5)+0.7,1,10);
+      s.stabilityHours=clamp(oldStability*(retrievability<0.55?0.28:0.42),0.25,oldStability);
+      s.score=clamp((s.score||0)-Math.min(22,12+Math.round((10-s.difficulty)*0.8)),0,100);
     }
-
-    s.lastReviewedAt=now();
-    s.nextReviewAt=now()+s.intervalDays*dayMs();
-    data[id]=s;
-    save(data,true);
-    return s;
+    const relearnHours=correct?null:Math.max(0.25,Math.min(4,s.stabilityHours*0.18));
+    const intervalHours=correct?clamp(s.stabilityHours*Math.max(0.65,Math.min(1.45,0.9+(quality-3)*0.13)),0.5,24*180):relearnHours;
+    s.intervalDays=intervalHours/24;s.lastRating=quality;s.lastReviewedAt=t;s.nextReviewAt=t+intervalHours*3600000;
+    data[id]=s;save(data,true);return s;
   }
 
   function due(id){
@@ -118,7 +111,7 @@
   function pick(ids){
     const candidates=(ids||[]).map(id=>({id,s:get(id)}));
     const dueItems=candidates.filter(x=>x.s.nextReviewAt<=now());
-    const pool=dueItems.length?dueItems:candidates;
+    const pool=dueItems;
     pool.sort((a,b)=>{
       if(a.s.score!==b.s.score)return a.s.score-b.s.score;
       return Number(a.s.nextReviewAt||0)-Number(b.s.nextReviewAt||0);
