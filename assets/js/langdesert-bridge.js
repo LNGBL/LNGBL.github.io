@@ -18,8 +18,11 @@ async function sync(){
  try{
   const words=window.getWords?window.getWords():[],verbs=window.getVerbs?window.getVerbs():[];
   const state=await window.LangBlueSupabase.getUserState()||{};
-  state.langDesert={version:3,level:level(),words,verbs,updatedAt:new Date().toISOString()};
-  await window.LangBlueSupabase.saveUserState(state);
+  const remote=state.langDesert||{};
+  const mergeItems=(a,b)=>{const map=new Map();[...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])].forEach(x=>{const id=String(x.id||x.word||x.root||'');const old=map.get(id);if(!old||Number(x.updatedAt||x.lastReviewedAt||0)>=Number(old.updatedAt||old.lastReviewedAt||0))map.set(id,x)});return [...map.values()]};
+  const payload={version:4,level:level(),words:mergeItems(remote.words,words),verbs:mergeItems(remote.verbs,verbs),updatedAt:new Date().toISOString()};
+  if(typeof window.LangBlueSupabase.mergeUserState==='function')await window.LangBlueSupabase.mergeUserState({langDesert:payload});
+  else {state.langDesert=payload;await window.LangBlueSupabase.saveUserState(state);}
 
   const client=window.LangBlueSupabase.getClient?.();
   if(!client)return;

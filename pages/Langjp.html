@@ -557,17 +557,15 @@ async function syncLangjpState() {
   try {
     const sb = window.LangBlueSupabase;
     if (!sb || typeof sb.getUserState !== 'function') return;
-    const state = await sb.getUserState();
+    const state = await sb.getUserState() || {};
     if (!state && !sb.localUserId()) return;
-    const next = Object.assign({}, state || {}, {
-      langjp: {
-        version: 1,
-        words: loadWords(),
-        session: loadSession(),
-        updatedAt: new Date().toISOString()
-      }
-    });
-    await sb.saveUserState(next);
+    const remoteWords = Array.isArray(state.langjp?.words) ? state.langjp.words : [];
+    const byId = new Map();
+    [...remoteWords, ...loadWords()].forEach(w => { const old=byId.get(String(w.id)); const stamp=x=>Math.max(Number(x.lastPracticeAt||0),Number(x.nextReviewAt||0),Number(x.createdAt||0)); if(!old||stamp(w)>=stamp(old))byId.set(String(w.id),w); });
+    const payload = { version: 2, words: [...byId.values()], session: loadSession(), updatedAt: new Date().toISOString() };
+    const store = centralStorage(); if(store) store.set(STORAGE_KEY,payload.words); else localStorage.setItem(STORAGE_KEY,JSON.stringify(payload.words));
+    if(typeof sb.mergeUserState==='function') await sb.mergeUserState({langjp:payload});
+    else await sb.saveUserState(Object.assign({},state,{langjp:payload}));
   } catch (e) {
     console.warn('[Langjp] remote sync skipped:', e);
   }
