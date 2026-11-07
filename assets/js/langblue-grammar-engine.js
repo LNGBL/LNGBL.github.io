@@ -111,7 +111,7 @@
   function pick(ids){
     const candidates=(ids||[]).map(id=>({id,s:get(id)}));
     const dueItems=candidates.filter(x=>x.s.nextReviewAt<=now());
-    const pool=dueItems.length?dueItems:candidates;
+    const pool=dueItems;
     pool.sort((a,b)=>{
       if(a.s.score!==b.s.score)return a.s.score-b.s.score;
       return Number(a.s.nextReviewAt||0)-Number(b.s.nextReviewAt||0);
