@@ -2119,9 +2119,20 @@
             // SRS
             // ================================================================
 
+            var srsCloudTimer = null;
             var SRS = {
                 getAll: function() { return Storage.get(KEYS.SRS, {}); },
-                saveAll: function(data) { Storage.set(KEYS.SRS, data); },
+                saveAll: function(data) { Storage.set(KEYS.SRS, data); clearTimeout(srsCloudTimer); srsCloudTimer=setTimeout(function(){SRS.syncRemote();},700); },
+                syncRemote: async function() {
+                    var backend=window.LangBlueSupabase;
+                    if(!backend||!backend.getAuthSession||!backend.mergeUserState)return false;
+                    var session=await backend.getAuthSession(); if(!session||!session.user)return false;
+                    var state=await backend.getUserState()||{}, remote=state.srs_vocabulary_v2||{}, local=this.getAll(), merged={};
+                    Object.keys(remote).concat(Object.keys(local)).forEach(function(k){var a=remote[k],b=local[k];merged[k]=!a?b:!b?a:(Number(b.lastReview||b.lastReviewedAt||0)>=Number(a.lastReview||a.lastReviewedAt||0)?b:a);});
+                    Storage.set(KEYS.SRS,merged);
+                    await backend.mergeUserState({srs_vocabulary_v2:merged});
+                    return true;
+                },
 
                 update: function(word, persian, status) {
                     var data = this.getAll();
@@ -4250,6 +4261,7 @@
                 // داده‌ها فقط برای تعیین وضعیت حساب/سقف رایگان بارگذاری می‌شوند؛
                 // تا قبل از ورود، رابط اصلی Vocabulary همچنان کاملاً مخفی است.
                 Core.load();
+                SRS.syncRemote().catch(function(e){console.warn('[LangBlue Vocabulary] SRS cloud sync skipped:',e);});
                 setTimeout(function(){Core.syncCentralWords(true);},1000);
                 setInterval(function(){Core.syncCentralWords(false);},15000);
 
