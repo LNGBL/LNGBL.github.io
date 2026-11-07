@@ -788,9 +788,12 @@ function _buildQ(correct,pool,n){
   return {stemDe:correct.de,stemType:correct.type,stickers:correct.stickers,
           correctId:correct.id,options:opts,correctIndex:ci};
 }
+var deutschSrsSyncTimer=null;
 var DeutschSRS={
   key:function(){return _scope("deutsch_srs_v2");},
   all:function(){return LS.get(this.key(),{});},
+  scheduleSync:function(){clearTimeout(deutschSrsSyncTimer);deutschSrsSyncTimer=setTimeout(function(){DeutschSRS.syncRemote().catch(function(e){console.warn('[LangBlue Deutsch] SRS sync skipped:',e);});},700);},
+  syncRemote:async function(){var sb=window.LangBlueSupabase;if(!sb?.getAuthSession||!sb?.mergeUserState)return false;var session=await sb.getAuthSession();if(!session?.user)return false;var state=await sb.getUserState()||{},remote=state.srs_deutsch_v2||{},local=this.all(),merged={};Object.keys(remote).concat(Object.keys(local)).forEach(function(id){var a=remote[id],b=local[id];merged[id]=!a?b:!b?a:(Number(b.lastReviewedAt||0)>=Number(a.lastReviewedAt||0)?b:a);});LS.set(this.key(),merged);await sb.mergeUserState({srs_deutsch_v2:merged});return true;},
   get:function(id){var a=this.all();return a[id]||{stage:0,stabilityHours:4,difficulty:5,lapses:0,nextReviewAt:0,correct:0,wrong:0};},
   due:function(id,now){var s=this.get(id);return Number(s.nextReviewAt||0)<=(now||Date.now());},
   review:function(id,ok,mode){
@@ -799,7 +802,7 @@ var DeutschSRS={
     s.correct=Number(s.correct||0)+(ok?1:0);s.wrong=Number(s.wrong||0)+(ok?0:1);s.lapses=Number(s.lapses||0)+(ok?0:1);
     if(ok){s.stage=Math.min(6,(Number(s.stage)||0)+1);s.difficulty=Math.max(1,(Number(s.difficulty)||5)-.12);s.stabilityHours=Math.min(24*180,stability*(1.3+(1-retrieval)*.7)*modeFactor*(.8+(10-s.difficulty)*.03));s.intervalHours=Math.max(4,s.stabilityHours*.9);}
     else{s.stage=Math.max(0,(Number(s.stage)||0)-2);s.difficulty=Math.min(10,(Number(s.difficulty)||5)+.7);s.stabilityHours=Math.max(.5,stability*(retrieval<.55?.25:.4));s.intervalHours=Math.max(.5,Math.min(4,s.stabilityHours*.25));}
-    s.lastReviewedAt=t;s.nextReviewAt=t+s.intervalHours*3600000;s.lastRating=ok?"good":"again";a[id]=s;LS.set(this.key(),a);return s;
+    s.lastReviewedAt=t;s.nextReviewAt=t+s.intervalHours*3600000;s.lastRating=ok?"good":"again";a[id]=s;LS.set(this.key(),a);this.scheduleSync();return s;
   }
 };
 function _pickNormal(now){
@@ -1497,6 +1500,7 @@ function _init(){
     window.speechSynthesis.getVoices();
   }
   var u=Auth.current();
+  DeutschSRS.syncRemote().catch(function(e){console.warn('[LangBlue Deutsch] initial SRS sync skipped:',e);});
   if(!u){_openSignup();_renderTable();_renderStats();_renderFlash();}
   else{_renderHeader();_renderSextLock();_renderTable();_renderStats();_renderFlash();}
 
