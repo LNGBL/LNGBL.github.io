@@ -50,9 +50,8 @@
         const merged=merge(local,remote[KEY]);
         store().set(KEY,merged);
       }
-      const state=Object.assign({},remote||{});
-      state[KEY]=all();
-      await sb.saveUserState(state);
+      if(typeof sb.mergeUserState==='function') await sb.mergeUserState({[KEY]:all()});
+      else { const state=Object.assign({},remote||{}); state[KEY]=all(); await sb.saveUserState(state); }
       store().set(SYNC_KEY,now());
     }catch(e){ console.warn('[LangBlue] Grammar mastery sync failed:',e); }
   }
