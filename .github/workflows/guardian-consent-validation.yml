@@ -30,12 +30,11 @@ jobs:
           python3 - <<'PY'
           import pathlib, re
           html = pathlib.Path("pages/guardian-subscription-consents.html").read_text(encoding="utf-8")
-          scripts = re.findall(r"<script\\b[^>]*>([\\s\\S]*?)</script>", html, re.I)
+          scripts = re.findall(r"<script\b[^>]*>([\s\S]*?)</script>", html, re.I)
           inline_scripts = [script for script in scripts if script.strip()]
           if not inline_scripts:
               raise SystemExit("No inline script found")
           pathlib.Path("/tmp/guardian-admin.js").write_text(inline_scripts[-1], encoding="utf-8")
-          pathlib.Path("/tmp/guardian-admin.js").write_text(scripts[-1], encoding="utf-8")
           PY
           node --check /tmp/guardian-admin.js
       - name: Type-check guardian consent Edge Function
