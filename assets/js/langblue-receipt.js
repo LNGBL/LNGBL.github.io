@@ -101,10 +101,79 @@
       (order.communityDiscount ? '<div class="receipt-line"><span>تخفیف اجتماعی</span><strong>'+order.communityDiscount+'٪ (−'+formatPrice(order.communityDiscountAmount)+')</strong></div>' : '')+
       (order.bundleDiscount ? '<div class="receipt-line"><span>تخفیف بسته</span><strong>'+order.bundleDiscount+'٪</strong></div>' : '')+
       '<div class="receipt-total"><span>مبلغ کل</span><strong>'+formatPrice(order.total)+'</strong></div>'+
-      '<div class="receipt-note">برای دریافت کد وریفای، شناسهٔ فیش و جزئیات سفارش را برای ادمین LangBlue در تلگرام بفرست. کد را در تلگرام دریافت کن و سپس در حساب مرکزی وارد کن.</div>'+
-      '<div class="receipt-actions"><a class="btn btn-primary" href="https://t.me/LangBlue" target="_blank" rel="noopener">💬 رفتن به تلگرام و دریافت کد وریفای</a></div>';
+      '<div class="receipt-note">برای بررسی پرداخت، تصویر رسید را از همین بخش ارسال کن. پس از تأیید مدیر، اشتراک مستقیماً روی حساب یادگیرنده فعال می‌شود و نیازی به کد وریفای نیست. شمارهٔ کامل کارت بانکی درخواست یا ذخیره نمی‌شود.</div>'+
+      '<div class="receipt-panel" id="lbReceiptSubmit" style="margin-top:16px;padding:16px;border:1px solid rgba(196,168,130,.28);border-radius:12px">'+
+        '<h3>ارسال رسید برای بررسی</h3>'+
+        '<label for="lbReceiptLearner">حساب یادگیرنده</label><select id="lbReceiptLearner" class="receipt-select"><option value="">در حال دریافت حساب‌ها…</option></select>'+
+        '<label for="lbReceiptFile" style="display:block;margin-top:10px">تصویر رسید (JPG، PNG یا WebP؛ حداکثر ۵ مگابایت)</label><input id="lbReceiptFile" type="file" accept="image/jpeg,image/png,image/webp" style="display:block;margin:8px 0">'+
+        '<div class="receipt-note">مبلغ اعلام‌شده: '+formatPrice(order.total)+' · مدیر مبلغ و تصویر رسید را پیش از فعال‌سازی تطبیق می‌دهد.</div>'+
+        '<button class="btn btn-primary" id="lbSubmitReceipt" type="button">ارسال رسید و ثبت درخواست</button>'+
+        '<p id="lbReceiptSubmitStatus" class="receipt-note" role="status" aria-live="polite"></p>'+
+      '</div>';
     output.classList.add('show');
     var print=qs('printReceipt'); if(print) print.style.display='inline-flex';
+    setupReceiptSubmission(order);
+  }
+
+  async function setupReceiptSubmission(order){
+    var client=window.LangBlueSupabase&&window.LangBlueSupabase.getClient?window.LangBlueSupabase.getClient():null;
+    var select=qs('lbReceiptLearner'),button=qs('lbSubmitReceipt'),status=qs('lbReceiptSubmitStatus');
+    if(!client||!select||!button||!status)return;
+    try{
+      var linked=await client.functions.invoke('langblue-subscription-requests',{body:{action:'linked_learners'}});
+      if(linked.error||!linked.data||!linked.data.ok){
+        select.innerHTML='<option value="">حساب سرپرست تأییدشده لازم است</option>';
+        status.textContent=linked.data&&linked.data.error==='ADULT_VERIFICATION_REQUIRED'
+          ? 'برای ثبت درخواست، سرپرستِ دارای تأیید سنی باید وارد حساب شود.'
+          : 'دریافت حساب‌های مجاز ممکن نشد: '+(linked.data&&linked.data.error||'خطا');
+        button.disabled=true;
+        return;
+      }
+      select.innerHTML=(linked.data.learners||[]).map(function(x){
+        var label=x.is_self?'حساب خودم':(x.name||x.username||'حساب یادگیرنده');
+        if(x.username)label+=' · @'+x.username;
+        return '<option value="'+escapeHtml(x.user_id)+'">'+escapeHtml(label)+'</option>';
+      }).join('');
+      if(!select.options.length){status.textContent='حساب یادگیرندهٔ مجازی برای این سرپرست پیدا نشد.';button.disabled=true;return;}
+    }catch(e){
+      status.textContent='اتصال به حساب مرکزی ناموفق بود.';
+      button.disabled=true;
+      return;
+    }
+    button.addEventListener('click',async function(){
+      button.disabled=true;
+      status.textContent='در حال بارگذاری و ثبت رسید…';
+      try{
+        var sessionResult=await client.auth.getSession();
+        var session=sessionResult&&sessionResult.data&&sessionResult.data.session;
+        if(!session)throw new Error('ابتدا وارد حساب مرکزی شوید.');
+        var file=qs('lbReceiptFile')&&qs('lbReceiptFile').files[0];
+        if(!file)throw new Error('تصویر رسید را انتخاب کنید.');
+        if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024)
+          throw new Error('فقط تصویر JPG، PNG یا WebP تا سقف ۵ مگابایت پذیرفته می‌شود.');
+        var ext=file.type==='image/jpeg'?'jpg':file.type==='image/png'?'png':'webp';
+        var path=session.user.id+'/'+crypto.randomUUID()+'.'+ext;
+        var uploaded=await client.storage.from('langblue-payment-receipts').upload(path,file,{upsert:false,contentType:file.type});
+        if(uploaded.error)throw new Error('بارگذاری تصویر رسید انجام نشد.');
+        var created=await client.functions.invoke('langblue-subscription-requests',{body:{
+          action:'create',
+          learnerUserId:select.value,
+          productIds:order.products.map(function(p){return p.id;}),
+          planId:order.plan.id,
+          receiptPath:path,
+          amountIrt:Math.round(Number(order.total))
+        }});
+        if(created.error||!created.data||!created.data.ok)
+          throw new Error(created.data&&created.data.error==='ADULT_VERIFICATION_REQUIRED'
+            ? 'ثبت درخواست باید توسط سرپرستِ دارای تأیید سنی انجام شود.'
+            : created.data&&created.data.error||'ثبت درخواست ناموفق بود.');
+        status.textContent='رسید ثبت شد. شناسه پیگیری: '+(created.data.request.request_ref||'ثبت‌شده')+' · پس از تأیید مدیر، اشتراک مستقیماً فعال می‌شود.';
+        button.textContent='رسید ثبت شد';
+      }catch(e){
+        status.textContent=e.message||'خطا در ثبت رسید';
+        button.disabled=false;
+      }
+    });
   }
 
   function init(){
