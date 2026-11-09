@@ -193,10 +193,25 @@
           if(consentStatus)consentStatus.textContent='رضایت صوتی والد توسط مدیر تأیید شده است. اکنون می‌توانید رسید پرداخت را ارسال کنید.';
         }else if(result.data.found&&result.data.reviewStatus==='pending_admin_review'){
           if(consentStatus)consentStatus.textContent='فایل صوتی ثبت شده و در انتظار بررسی مدیر است. تا زمان تأیید، امکان ارسال رسید و فعال‌سازی وجود ندارد.';
+          if(submitConsent)submitConsent.disabled=true;
+          if(familyName)familyName.disabled=true;
+          if(decision)decision.disabled=true;
+          if(notice)notice.disabled=true;
+          if(startRecord)startRecord.disabled=true;
         }else if(result.data.found&&result.data.decision==='declined'){
           if(consentStatus)consentStatus.textContent='عدم رضایت ثبت شده است؛ درخواست پرداخت و فعال‌سازی برای این انتخاب انجام نمی‌شود.';
+          if(submitConsent)submitConsent.disabled=true;
+          if(familyName)familyName.disabled=true;
+          if(decision)decision.disabled=true;
+          if(notice)notice.disabled=true;
+          if(startRecord)startRecord.disabled=true;
         }else if(result.data.found&&result.data.reviewStatus==='rejected'){
           if(consentStatus)consentStatus.textContent='رضایت صوتی تأیید نشد. در صورت نیاز، سرپرست می‌تواند پس از بررسی موضوع، فایل تازه‌ای ثبت کند.';
+          if(submitConsent){submitConsent.disabled=true;submitConsent.textContent='ثبت رضایت تازه پس از ضبط صدا';}
+          if(familyName)familyName.disabled=false;
+          if(decision)decision.disabled=false;
+          if(notice)notice.disabled=false;
+          if(startRecord)startRecord.disabled=false;
         }else{
           if(consentStatus)consentStatus.textContent='برای این حساب یادگیرنده، ابتدا باید سرپرست رضایت خود را با پیام صوتی ثبت کند.';
         }
@@ -287,7 +302,7 @@
         var mime=recordedBlob.type||'audio/webm';
         var ext=mime.indexOf('mp4')>=0?'m4a':mime.indexOf('ogg')>=0?'ogg':mime.indexOf('mpeg')>=0?'mp3':mime.indexOf('wav')>=0?'wav':'webm';
         var path=session.user.id+'/'+crypto.randomUUID()+'.'+ext;
-        var uploaded=await client.storage.from('langblue-guardian-consent-audio').upload(path,recordedBlob,{upsert:false,contentType:mime});
+        var uploaded=await client.storage.from('langblue-guardian-consent-audio').upload(path,recordedBlob,{upsert:false,contentType:mime.split(';')[0]});
         if(uploaded.error)throw new Error('بارگذاری فایل صوتی انجام نشد.');
         var submitted=await client.functions.invoke('langblue-guardian-subscription-consent',{body:{
           action:'submit',
