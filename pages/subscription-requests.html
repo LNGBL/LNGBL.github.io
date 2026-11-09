@@ -16,13 +16,13 @@
 <body class="lb-design-system">
 <main class="wrap">
 <header class="panel top">
- <div><div class="muted">LANGBLUE · ADMIN INBOX</div><h1>صندوق درخواست‌های اشتراک</h1><p class="muted">نمایش درخواست‌های ثبت‌شده، حساب یادگیرنده، محصولات، مدت و پیش‌نمایش تخفیف.</p></div>
+ <div><div class="muted">LANGBLUE · ADMIN INBOX</div><h1>صندوق درخواست‌های اشتراک</h1><p class="muted">نمایش رسیدها و بررسی پرداخت. با تأیید مدیر، اشتراک مستقیماً برای حساب یادگیرنده فعال می‌شود.</p></div>
  <div class="actions"><button class="btn primary" id="refresh">به‌روزرسانی صندوق</button><a class="btn" href="/pages/admin.html">بازگشت به مدیریت</a><a class="btn" href="/">صفحه اصلی</a></div>
 </header>
 <div id="status" class="status">در حال بررسی دسترسی مدیریتی…</div>
 <div id="metrics" class="metrics"></div>
 <section class="panel">
- <div class="top"><h2>درخواست‌ها</h2><span class="muted">این پنل هیچ پرداخت یا اشتراکی را تأیید یا فعال نمی‌کند.</span></div>
+ <div class="top"><h2>درخواست‌ها</h2><span class="muted">تأیید پرداخت، اشتراک را مستقیماً فعال می‌کند.</span></div>
  <div id="requests" class="list"><div class="empty">در حال بارگذاری…</div></div>
 </section>
 </main>
@@ -31,7 +31,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const labels={pending_admin_review:'در انتظار بررسی',needs_info:'نیازمند اطلاعات',reviewed:'بررسی‌شده',closed:'بسته‌شده'};
+const labels={pending_admin_review:'در انتظار بررسی پرداخت',needs_info:'نیازمند اطلاعات',reviewed:'بررسی‌شده',closed:'بسته‌شده',approved:'تأیید و فعال شد',rejected:'رد شد'};
 const products={grammar:'Grammar',vocabulary:'Vocabulary',deutsch:'Deutsch',arabic:'Arabic',langjp:'Japanese',langkz:'Kazakh',langtj:'Tajik'};
 const plans={irt_7d:'۷ روز',irt_14d:'۱۴ روز',irt_21d:'۲۱ روز',irt_3m:'۳ ماه',irt_6m:'۶ ماه',irt_12m:'۱۲ ماه'};
 async function call(action,payload){
@@ -48,7 +48,7 @@ function render(rows){
   ['کل درخواست‌ها',rows.length],
   ['در انتظار بررسی',rows.filter(x=>x.status==='pending_admin_review').length],
   ['نیازمند اطلاعات',rows.filter(x=>x.status==='needs_info').length],
-  ['بررسی‌شده / بسته',rows.filter(x=>['reviewed','closed'].includes(x.status)).length]
+  ['تأییدشده / ردشده',rows.filter(x=>['approved','rejected'].includes(x.status)).length]
  ].map(x=>'<div class="metric"><span class="muted">'+x[0]+'</span><strong>'+x[1]+'</strong></div>').join('');
  if(!rows.length){$('requests').innerHTML='<div class="empty">هنوز درخواستی ثبت نشده است.</div>';return;}
  $('requests').innerHTML=rows.map(r=>{
@@ -60,13 +60,14 @@ function render(rows){
    '<div class="line"><span>حساب یادگیرنده</span><strong>'+esc(account(r.learner))+'</strong></div>'+
    '<div class="line"><span>محصولات</span><strong>'+esc(names)+'</strong></div>'+
    '<div class="line"><span>مدت</span><strong>'+esc(plans[r.plan_id]||r.plan_id)+'</strong></div>'+
-   '<div class="line"><span>پیش‌نمایش تخفیف</span><strong>'+esc(r.discount_preview&&r.discount_preview.label||'—')+'</strong></div>'+
+   '<div class="line"><span>مبلغ اعلام‌شده</span><strong>'+Number(r.amount_irt||0).toLocaleString('fa-IR')+' تومان</strong></div>'+
    '<div class="line"><span>زمان ثبت</span><strong>'+esc(new Date(r.created_at).toLocaleString('fa-IR'))+'</strong></div>'+
+   (r.receipt_url?'<div class="field"><label>تصویر رسید (لینک موقت و خصوصی)</label><a href="'+esc(r.receipt_url)+'" target="_blank" rel="noopener noreferrer"><img src="'+esc(r.receipt_url)+'" alt="تصویر رسید پرداخت" style="display:block;max-width:100%;max-height:280px;object-fit:contain;border-radius:10px;margin-top:8px"></a></div>':'<p class="muted">تصویر رسید در دسترس نیست.</p>')+
    '<p class="muted">هش یکتای درخواست (SHA-256)</p><div class="hash">'+esc(r.request_hash)+'</div>'+
    (r.admin_note?'<p class="muted">یادداشت قبلی: '+note+'</p>':'')+
    (['pending_admin_review','needs_info'].includes(r.status)?'<div class="field"><label for="note-'+id+'">یادداشت مدیر</label><textarea id="note-'+id+'" placeholder="یادداشت یا اطلاعات موردنیاز…">'+note+'</textarea></div>'+
-    '<div class="actions"><button class="btn primary" data-id="'+id+'" data-status="reviewed">ثبت بررسی</button><button class="btn" data-id="'+id+'" data-status="needs_info">درخواست اطلاعات بیشتر</button><button class="btn danger" data-id="'+id+'" data-status="closed">بستن درخواست</button></div>':
-    '<p class="muted">این درخواست از صف انتظار خارج شده است.</p>')+
+    '<div class="actions"><button class="btn primary" data-id="'+id+'" data-status="approved">تأیید پرداخت و فعال‌سازی مستقیم</button><button class="btn danger" data-id="'+id+'" data-status="rejected">رد پرداخت</button><button class="btn" data-id="'+id+'" data-status="needs_info">درخواست اطلاعات بیشتر</button></div>':
+    '<p class="muted">این درخواست تعیین تکلیف شده است.</p>')+
    '</article>';
  }).join('');
  $('requests').querySelectorAll('button[data-id]').forEach(btn=>btn.addEventListener('click',async()=>{
