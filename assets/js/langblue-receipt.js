@@ -191,6 +191,11 @@
         if(result.data.approved){
           approvedConsentId=result.data.consentId;
           if(consentStatus)consentStatus.textContent='رضایت صوتی والد توسط مدیر تأیید شده است. اکنون می‌توانید رسید پرداخت را ارسال کنید.';
+          if(submitConsent)submitConsent.disabled=true;
+          if(familyName)familyName.disabled=true;
+          if(decision)decision.disabled=true;
+          if(notice)notice.disabled=true;
+          if(startRecord)startRecord.disabled=true;
         }else if(result.data.found&&result.data.reviewStatus==='pending_admin_review'){
           if(consentStatus)consentStatus.textContent='فایل صوتی ثبت شده و در انتظار بررسی مدیر است. تا زمان تأیید، امکان ارسال رسید و فعال‌سازی وجود ندارد.';
           if(submitConsent)submitConsent.disabled=true;
