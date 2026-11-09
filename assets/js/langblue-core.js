@@ -546,6 +546,8 @@
             productIds:Array.isArray(row.product_ids)?row.product_ids:['grammar','vocabulary','deutsch','arabic','langjp','langkz','langtj','langru'],
             expiresAt:row.expires_at,
             verifiedByCode:row.plan_id!=='trial_48h',
+            verifiedByAdmin:row.plan_id!=='trial_48h',
+            verifiedAt:row.created_at ? new Date(row.created_at).getTime() : new Date(row.starts_at).getTime(),
             trial:row.plan_id==='trial_48h'
           }));
         }else{

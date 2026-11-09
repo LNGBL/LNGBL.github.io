@@ -3000,12 +3000,11 @@
                     win.document.write(html);win.document.close();win.focus();win.print();
                 },
                 require:function(action){
-                    // اشتراک Grammar و Vocabulary مشترک است. اگر اشتراک قدیمی قبل از ثبت
-                    // verifiedByCode ساخته شده باشد، used_codes نشان می‌دهد که کد واقعاً وریفای شده است.
+                    // اشتراک مرکزی پس از تأیید مدیر مستقیم فعال می‌شود؛ کدهای قدیمی نیز برای سازگاری پشتیبانی می‌شوند.
                     var sub=this.current();
                     var verified=!!(sub && sub.verifiedByCode && sub.verifiedAt);
                     if(verified) return true;
-                    UI.showToast('🔒 برای استفاده از PDF و بررسی نقاط ضعف، ابتدا اشتراک تهیه کنید و کد وریفای دریافت‌شده را در بخش «فعال‌سازی اشتراک» وارد کنید.','warning');
+                    UI.showToast('🔒 برای استفاده از PDF و بررسی نقاط ضعف، درخواست اشتراک را در صفحه اصلی ثبت کن و پس از تأیید مدیر دوباره تلاش کن.','warning');
                     return false;
                 },
                 continuePending:function(){
