@@ -16,8 +16,8 @@ jobs:
   syntax:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
       - uses: denoland/setup-deno@v2
@@ -38,6 +38,6 @@ jobs:
           PY
           node --check /tmp/guardian-admin.js
       - name: Type-check guardian consent Edge Function
-        run: deno check supabase/functions/langblue-guardian-subscription-consent/index.ts
+        run: deno check --node-modules-dir=auto supabase/functions/langblue-guardian-subscription-consent/index.ts
       - name: Type-check subscription request Edge Function
-        run: deno check supabase/functions/langblue-subscription-requests/index.ts
+        run: deno check --node-modules-dir=auto supabase/functions/langblue-subscription-requests/index.ts
