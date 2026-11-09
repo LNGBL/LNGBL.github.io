@@ -104,7 +104,7 @@
       '<div class="receipt-note">برای بررسی پرداخت، تصویر رسید را از همین بخش ارسال کن. پس از تأیید مدیر، اشتراک مستقیماً روی حساب یادگیرنده فعال می‌شود و نیازی به کد وریفای نیست. شمارهٔ کامل کارت بانکی درخواست یا ذخیره نمی‌شود.</div>'+
       '<div class="receipt-panel" id="lbReceiptSubmit" style="margin-top:16px;padding:16px;border:1px solid rgba(196,168,130,.28);border-radius:12px">'+
         '<h3>ارسال رسید برای بررسی</h3>'+
-        '<label for="lbReceiptLearner">حساب یادگیرنده</label><select id="lbReceiptLearner" class="receipt-select"><option value="">در حال دریافت حساب‌ها…</option></select>'+
+        '<label for="lbReceiptLearner">حساب مقصد</label><select id="lbReceiptLearner" class="receipt-select"><option value="">در حال دریافت حساب‌ها…</option></select>'+
         '<section id="lbGuardianConsentPanel" hidden style="margin-top:14px;padding:14px;border:1px solid rgba(196,168,130,.32);border-radius:10px">'+
           '<h3>رضایت والد یا سرپرست قانونی</h3>'+
           '<p class="receipt-note">برای حساب یادگیرنده‌ای که به این سرپرست متصل است، ابتدا باید والد یا سرپرستِ تأییدشده پیام صوتی رضایت یا عدم رضایت را ثبت کند. مدیر LangBlue محتوا را بررسی می‌کند. تا تأیید رضایت، پرداخت و فعال‌سازی ممکن نیست.</p>'+
@@ -229,9 +229,9 @@
     try{
       var linked=await client.functions.invoke('langblue-subscription-requests',{body:{action:'linked_learners'}});
       if(linked.error||!linked.data||!linked.data.ok){
-        select.innerHTML='<option value="">حساب سرپرست تأییدشده لازم است</option>';
+        select.innerHTML='<option value="">حساب در دسترس نیست</option>';
         status.textContent=linked.data&&linked.data.error==='ADULT_VERIFICATION_REQUIRED'
-          ? 'برای ثبت درخواست، والد یا سرپرستِ دارای تأیید سنی باید وارد حساب شود.'
+          ? 'برای دریافت حساب‌های مجاز، ابتدا وضعیت ورود و دسترسی حساب را بررسی کنید.'
           : 'دریافت حساب‌های مجاز ممکن نشد: '+(linked.data&&linked.data.error||'خطا');
         button.disabled=true;
         return;
