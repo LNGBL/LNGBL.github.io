@@ -139,7 +139,8 @@ Deno.serve(async (req) => {
           .gt("retention_until", now())
           .maybeSingle();
         if (consent.error) throw new Error("GUARDIAN_CONSENT_LOOKUP_FAILED");
-        const exactProducts = consent.data &&
+        if (!consent.data) return reply({ ok: false, error: "GUARDIAN_CONSENT_REQUIRED" }, 409);
+        const exactProducts =
           JSON.stringify([...(consent.data.product_ids || [])].sort()) === JSON.stringify([...productIds].sort());
         if (!exactProducts) return reply({ ok: false, error: "GUARDIAN_CONSENT_REQUIRED" }, 409);
         guardianConsentId = consent.data.id;
