@@ -2,6 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const ORIGIN = "https://lngbl.github.io";
+const BUCKET = "langblue-payment-receipts";
 const HEADERS = {
   "Access-Control-Allow-Origin": ORIGIN,
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -96,12 +97,18 @@ Deno.serve(async (req) => {
     if (action === "create") {
       if (!await adultVerified()) return reply({ ok: false, error: "ADULT_VERIFICATION_REQUIRED" }, 403);
       const learnerId = clean(body.learnerUserId, 64);
+      const receiptPath = clean(body.receiptPath, 300);
+      const amountIrt = Number(body.amountIrt);
       if (!uuid(learnerId)) return reply({ ok: false, error: "INVALID_LEARNER_ACCOUNT" }, 400);
       const productIds = Array.isArray(body.productIds) ? [...new Set(body.productIds.map((x) => clean(x, 30)))] : [];
       const planId = clean(body.planId, 30);
       if (!productIds.length || productIds.length > 7 || productIds.some((x) => !PRODUCTS.has(x)))
         return reply({ ok: false, error: "INVALID_PRODUCTS" }, 400);
       if (!PLANS.has(planId)) return reply({ ok: false, error: "INVALID_PLAN" }, 400);
+      if (!Number.isSafeInteger(amountIrt) || amountIrt <= 0 || amountIrt > 1000000000)
+        return reply({ ok: false, error: "INVALID_DECLARED_AMOUNT" }, 400);
+      if (!receiptPath.startsWith(actor.id + "/") || !/^[0-9a-f-]{36}\.(jpg|jpeg|png|webp)$/i.test(receiptPath.slice(actor.id.length + 1)))
+        return reply({ ok: false, error: "INVALID_RECEIPT_PATH" }, 400);
 
       if (learnerId !== actor.id) {
         const relation = await db.from("guardian_relationships")
@@ -117,12 +124,17 @@ Deno.serve(async (req) => {
       const learnerProfile = await profileFor(learnerId);
       if (!learnerProfile) return reply({ ok: false, error: "LEARNER_ACCOUNT_NOT_FOUND" }, 404);
 
+      const file = await db.storage.from(BUCKET).list(actor.id, { search: receiptPath.slice(actor.id.length + 1), limit: 10 });
+      const fileName = receiptPath.slice(actor.id.length + 1);
+      if (file.error || !(file.data || []).some((x: any) => x.name === fileName))
+        return reply({ ok: false, error: "RECEIPT_FILE_MISSING" }, 400);
+
       const allProducts = PRODUCTS.size === productIds.length && [...PRODUCTS].every((x) => productIds.includes(x));
       const discountPreview = {
         kind: planId === "irt_12m" && allProducts ? "annual_all_products_bundle_review" : "no_discount_preview",
         label: planId === "irt_12m" && allProducts
           ? "قابل بررسی برای تخفیف بستهٔ ۱۲ماههٔ همهٔ محصولات"
-          : "تخفیف احتمالی در صورت وجود، جداگانه بررسی می‌شود",
+          : "مبلغ اعلام‌شده با تصویر رسید توسط مدیر تطبیق داده می‌شود",
         binding: false
       };
 
@@ -136,15 +148,18 @@ Deno.serve(async (req) => {
         product_ids: productIds,
         plan_id: planId,
         discount_preview: discountPreview,
+        amount_irt: amountIrt,
+        receipt_path: receiptPath,
+        receipt_uploaded_at: now(),
         status: "pending_admin_review"
-      }).select("id,request_ref,request_hash,product_ids,plan_id,discount_preview,status,created_at").single();
+      }).select("id,request_ref,request_hash,product_ids,plan_id,amount_irt,discount_preview,status,created_at").single();
       if (insert.error) throw new Error("REQUEST_SAVE_FAILED");
       return reply({ ok: true, request: insert.data, learner: learnerProfile, entitlement_changed: false });
     }
 
     if (action === "my_requests") {
       const q = await db.from("subscription_requests")
-        .select("request_ref,product_ids,plan_id,status,admin_note,created_at,reviewed_at")
+        .select("request_ref,product_ids,plan_id,amount_irt,status,admin_note,created_at,reviewed_at")
         .eq("requester_user_id", actor.id)
         .order("created_at", { ascending: false }).limit(50);
       if (q.error) throw new Error("REQUEST_HISTORY_LOAD_FAILED");
@@ -156,7 +171,7 @@ Deno.serve(async (req) => {
       if (!grant) return reply({ ok: false, error: "ADMIN_UNAUTHORIZED" }, 403);
       if (action === "admin_list") {
         const q = await db.from("subscription_requests")
-          .select("id,request_ref,request_hash,requester_user_id,learner_user_id,product_ids,plan_id,discount_preview,status,admin_note,created_at,reviewed_at")
+          .select("id,request_ref,request_hash,requester_user_id,learner_user_id,product_ids,plan_id,amount_irt,receipt_path,discount_preview,status,admin_note,created_at,reviewed_at")
           .order("created_at", { ascending: false }).limit(150);
         if (q.error) throw new Error("REQUEST_QUEUE_LOAD_FAILED");
         const ids = [...new Set((q.data || []).flatMap((x: any) => [x.requester_user_id, x.learner_user_id]).filter(Boolean))];
@@ -165,15 +180,48 @@ Deno.serve(async (req) => {
           : { data: [], error: null };
         if (profiles.error) throw new Error("REQUEST_ACCOUNT_LOOKUP_FAILED");
         const map = new Map((profiles.data || []).map((x: any) => [x.id, x]));
-        return reply({ ok: true, requests: (q.data || []).map((x: any) => ({
-          ...x, requester: map.get(x.requester_user_id) || null, learner: map.get(x.learner_user_id) || null
-        })) });
+        const requests = await Promise.all((q.data || []).map(async (x: any) => {
+          const signed = x.receipt_path
+            ? await db.storage.from(BUCKET).createSignedUrl(x.receipt_path, 300)
+            : { data: null, error: null };
+          return {
+            ...x,
+            receipt_url: signed.data?.signedUrl || null,
+            requester: map.get(x.requester_user_id) || null,
+            learner: map.get(x.learner_user_id) || null
+          };
+        }));
+        return reply({ ok: true, requests });
       }
 
       const id = clean(body.id, 64);
       const status = clean(body.status, 40);
       const note = clean(body.note, 1000);
-      if (!uuid(id) || !["needs_info", "reviewed", "closed"].includes(status))
+      if (!uuid(id)) return reply({ ok: false, error: "INVALID_UPDATE" }, 400);
+
+      if (status === "approved" || status === "rejected") {
+        const decision = await db.rpc("review_subscription_payment", {
+          p_request_id: id,
+          p_admin_user_id: actor.id,
+          p_decision: status,
+          p_note: note || null
+        });
+        if (decision.error) {
+          const message = String(decision.error.message || "");
+          if (message.includes("RECEIPT_REQUIRED")) return reply({ ok: false, error: "RECEIPT_REQUIRED" }, 409);
+          if (message.includes("RECEIPT_FILE_MISSING")) return reply({ ok: false, error: "RECEIPT_FILE_MISSING" }, 409);
+          if (message.includes("PLAN_UNAVAILABLE")) return reply({ ok: false, error: "PLAN_UNAVAILABLE" }, 409);
+          if (message.includes("REQUEST_NOT_PENDING")) return reply({ ok: false, error: "REQUEST_NOT_PENDING" }, 409);
+          throw new Error("PAYMENT_REVIEW_FAILED");
+        }
+        return reply({
+          ok: true,
+          request: decision.data,
+          entitlement_changed: status === "approved"
+        });
+      }
+
+      if (!["needs_info", "reviewed", "closed"].includes(status))
         return reply({ ok: false, error: "INVALID_UPDATE" }, 400);
       const update = await db.from("subscription_requests").update({
         status, admin_note: note || null, reviewed_by: actor.id, reviewed_at: now(), updated_at: now()
