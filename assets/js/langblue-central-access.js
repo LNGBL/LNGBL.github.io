@@ -22,7 +22,7 @@ function hidePricing(){
 function centralNotice(host){
   if(!host||host.dataset.lbCentralNotice)return;
   host.dataset.lbCentralNotice='1';
-  host.innerHTML='<div style="padding:16px;border:1px solid rgba(22,138,173,.28);border-radius:14px;background:rgba(22,138,173,.06);line-height:1.9"><strong>🔐 مرجع واحد برای اشتراک LangBlue</strong><div style="margin-top:6px;color:var(--muted,#68757a)">قیمت‌گذاری و فعال‌سازی داخل Grammar، Vocabulary و Deutsch حذف شده است. وضعیت اشتراک فقط از حساب مرکزی بررسی می‌شود.</div><a href="'+centralUrl()+'" style="display:inline-flex;margin-top:12px;padding:9px 14px;border-radius:10px;background:#168AAD;color:#fff;text-decoration:none;font-weight:800">ورود به حساب مرکزی و فعال‌سازی</a></div>';
+  host.innerHTML='<div style="padding:16px;border:1px solid rgba(22,138,173,.28);border-radius:14px;background:rgba(22,138,173,.06);line-height:1.9"><strong>🔐 مرجع واحد برای اشتراک LangBlue</strong><div style="margin-top:6px;color:var(--muted,#68757a)">قیمت‌گذاری و ثبت رسید در صفحه اصلی انجام می‌شود. پس از بررسی مدیر، اشتراک مستقیماً فعال و وضعیت آن از حساب مرکزی خوانده می‌شود.</div><a href="'+centralUrl()+'" style="display:inline-flex;margin-top:12px;padding:9px 14px;border-radius:10px;background:#168AAD;color:#fff;text-decoration:none;font-weight:800">ورود به حساب مرکزی و مشاهده اشتراک</a></div>';
 }
 function patchGrammar(){
   hidePricing();
