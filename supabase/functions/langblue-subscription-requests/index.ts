@@ -169,6 +169,7 @@ Deno.serve(async (req) => {
     if (action === "admin_list" || action === "admin_update") {
       const grant = await admin();
       if (!grant) return reply({ ok: false, error: "ADMIN_UNAUTHORIZED" }, 403);
+      if (!await adultVerified()) return reply({ ok: false, error: "ADULT_VERIFICATION_REQUIRED" }, 403);
       if (action === "admin_list") {
         const q = await db.from("subscription_requests")
           .select("id,request_ref,request_hash,requester_user_id,learner_user_id,product_ids,plan_id,amount_irt,receipt_path,discount_preview,status,admin_note,created_at,reviewed_at")
