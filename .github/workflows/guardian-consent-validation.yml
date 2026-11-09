@@ -1,0 +1,42 @@
+name: Guardian consent syntax checks
+
+on:
+  pull_request:
+    paths:
+      - "assets/js/langblue-receipt.js"
+      - "pages/guardian-subscription-consents.html"
+      - "supabase/functions/langblue-guardian-subscription-consent/**"
+      - "supabase/functions/langblue-subscription-requests/**"
+      - "supabase/migrations/**"
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check browser receipt JavaScript
+        run: node --check assets/js/langblue-receipt.js
+      - name: Check inline admin page JavaScript
+        run: |
+          python3 - <<'PY'
+          import pathlib, re
+          html = pathlib.Path("pages/guardian-subscription-consents.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script(?:\\s[^>]*)?>([\\s\\S]*?)</script>", html, re.I)
+          if not scripts:
+              raise SystemExit("No inline script found")
+          pathlib.Path("/tmp/guardian-admin.js").write_text(scripts[-1], encoding="utf-8")
+          PY
+          node --check /tmp/guardian-admin.js
+      - name: Type-check guardian consent Edge Function
+        run: deno check supabase/functions/langblue-guardian-subscription-consent/index.ts
+      - name: Type-check subscription request Edge Function
+        run: deno check supabase/functions/langblue-subscription-requests/index.ts
