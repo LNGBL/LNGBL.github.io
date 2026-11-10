@@ -104,7 +104,7 @@
       '<div class="receipt-note">برای بررسی پرداخت، تصویر رسید را از همین بخش ارسال کن. پس از تأیید مدیر، اشتراک مستقیماً روی حساب یادگیرنده فعال می‌شود و نیازی به کد وریفای نیست. شمارهٔ کامل کارت بانکی درخواست یا ذخیره نمی‌شود.</div>'+
       '<div class="receipt-panel" id="lbReceiptSubmit" style="margin-top:16px;padding:16px;border:1px solid rgba(196,168,130,.28);border-radius:12px">'+
         '<h3>ارسال رسید برای بررسی</h3>'+
-        '<label for="lbReceiptLearner">حساب مقصد</label><select id="lbReceiptLearner" class="receipt-select"><option value="">در حال دریافت حساب‌ها…</option></select>'+
+        '<input id="lbReceiptLearner" type="hidden" value=""><div id="lbReceiptLearnerChoices" class="receipt-account-choices" role="group" aria-label="انتخاب حساب مقصد"><p class="receipt-note">در حال دریافت حساب‌های مرتبط…</p></div>'+
         '<section id="lbGuardianConsentPanel" hidden style="margin-top:14px;padding:14px;border:1px solid rgba(196,168,130,.32);border-radius:10px">'+
           '<h3>رضایت والد یا سرپرست قانونی</h3>'+
           '<p class="receipt-note">برای حساب یادگیرنده‌ای که به این سرپرست متصل است، ابتدا باید والد یا سرپرستِ تأییدشده پیام صوتی رضایت یا عدم رضایت را ثبت کند. مدیر LangBlue محتوا را بررسی می‌کند. تا تأیید رضایت، پرداخت و فعال‌سازی ممکن نیست.</p>'+
@@ -147,13 +147,25 @@
     var recorder=null,stream=null,chunks=[],recordedBlob=null,approvedConsentId=null;
     var learnerRows=[];
 
+    function selectedLearner(){
+      return learnerRows.find(function(row){return row.user_id===select.value;})||null;
+    }
     function guardianSelected(){
-      var option=select.options[select.selectedIndex];
-      return !!option && option.dataset.self!=='true';
+      var learner=selectedLearner();
+      return !!learner && learner.is_self!==true;
     }
     function learnerUsername(){
-      var option=select.options[select.selectedIndex];
-      return option&&option.dataset.username ? '@'+option.dataset.username : 'حساب انتخاب‌شده';
+      var learner=selectedLearner();
+      return learner&&learner.username ? '@'+learner.username : 'حساب خودم';
+    }
+    function renderLearnerChoices(){
+      var host=qs('lbReceiptLearnerChoices');
+      if(!host)return;
+      host.innerHTML=learnerRows.map(function(row){
+        var label=row.is_self?'حساب خودم':(row.name||row.username||'حساب یادگیرنده');
+        if(row.username)label+=' · @'+row.username;
+        return '<button type="button" class="receipt-account-choice'+(row.user_id===select.value?' is-selected':'')+'" data-learner-id="'+escapeHtml(row.user_id)+'" aria-pressed="'+(row.user_id===select.value?'true':'false')+'">'+escapeHtml(label)+'</button>';
+      }).join('');
     }
     function updateStatement(){
       if(!statement)return;
@@ -229,21 +241,32 @@
     try{
       var linked=await client.functions.invoke('langblue-subscription-requests',{body:{action:'linked_learners'}});
       if(linked.error||!linked.data||!linked.data.ok){
-        select.innerHTML='<option value="">حساب در دسترس نیست</option>';
-        status.textContent=linked.data&&linked.data.error==='ADULT_VERIFICATION_REQUIRED'
-          ? 'برای دریافت حساب‌های مجاز، ابتدا وضعیت ورود و دسترسی حساب را بررسی کنید.'
-          : 'دریافت حساب‌های مجاز ممکن نشد: '+(linked.data&&linked.data.error||'خطا');
+        var serverError=linked.data&&linked.data.error||'';
+        if(!serverError&&linked.error&&linked.error.context&&typeof linked.error.context.clone==='function'){
+          try{var errorBody=await linked.error.context.clone().json();serverError=errorBody&&errorBody.error||'';}catch(e){}
+        }
+        var choices=qs('lbReceiptLearnerChoices');
+        if(choices)choices.innerHTML='<p class="receipt-note">حساب مقصد در دسترس نیست.</p>';
+        status.textContent=serverError==='ADULT_VERIFICATION_REQUIRED'
+          ? 'برای ادامه، باید سرپرست قانونی با حساب خودش وارد شود و تأیید سنی معتبر داشته باشد.'
+          : serverError==='ORIGIN_NOT_ALLOWED'||serverError==='REQUEST_NOT_ALLOWED'
+            ? 'درخواست از دامنهٔ مجاز ارسال نشده است. صفحه را از https://lngbl.github.io باز کنید.'
+            : 'دریافت حساب‌ها با خطای دسترسی (403) یا خطای ارتباطی روبه‌رو شد. اگر سرپرست وارد شده، تأیید سنی و اتصال حساب‌ها باید بررسی شود.';
         button.disabled=true;
         return;
       }
       learnerRows=linked.data.learners||[];
-      select.innerHTML=learnerRows.map(function(x){
-        var label=x.is_self?'حساب خودم':(x.name||x.username||'حساب یادگیرنده');
-        if(x.username)label+=' · @'+x.username;
-        return '<option data-self="'+(x.is_self?'true':'false')+'" data-username="'+escapeHtml(x.username||'')+'" value="'+escapeHtml(x.user_id)+'">'+escapeHtml(label)+'</option>';
-      }).join('');
-      if(!select.options.length){status.textContent='حساب یادگیرندهٔ مجازی برای این سرپرست پیدا نشد.';button.disabled=true;return;}
-      select.addEventListener('change',lookupConsent);
+      if(!learnerRows.length){status.textContent='حسابی برای این درخواست پیدا نشد.';button.disabled=true;return;}
+      select.value=learnerRows[0].user_id;
+      renderLearnerChoices();
+      var choices=qs('lbReceiptLearnerChoices');
+      if(choices)choices.addEventListener('click',function(event){
+        var target=event.target.closest('[data-learner-id]');
+        if(!target)return;
+        select.value=target.getAttribute('data-learner-id');
+        renderLearnerChoices();
+        lookupConsent();
+      });
       if(familyName)familyName.addEventListener('input',updateStatement);
       if(decision)decision.addEventListener('change',function(){recordedBlob=null;if(audioPreview){audioPreview.removeAttribute('src');audioPreview.hidden=true;}updateStatement();});
       updateStatement();
