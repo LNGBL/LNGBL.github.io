@@ -34,14 +34,22 @@ Deno.serve(async (req: Request) => {
   if (!url || !anon || !service) return reply({ ok: false, error: "SERVER_CONFIGURATION_ERROR" }, 500);
 
   const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "").trim();
-  if (!token) return reply({ ok: false, error: "AUTH_REQUIRED" }, 401);
-  const isServiceCall = token === service;
+  const apiKey = (req.headers.get("apikey") || "").trim();
+  let configuredSecretKeys: Record<string, string> = {};
+  try {
+    configuredSecretKeys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}");
+  } catch {
+    return reply({ ok: false, error: "SERVER_CONFIGURATION_ERROR" }, 500);
+  }
+  const isSecretApiCall = Object.values(configuredSecretKeys).some((key) => key && key === apiKey);
+  const isServiceCall = token === service || isSecretApiCall;
   const origin = req.headers.get("Origin");
   if (origin !== ORIGIN && !(isServiceCall && !origin))
     return reply({ ok: false, error: "REQUEST_NOT_ALLOWED" }, 403);
   let body: Record<string, unknown>;
   try { body = await req.json(); } catch { return reply({ ok: false, error: "INVALID_JSON" }, 400); }
   const action = clean(body.action, 50);
+  if (!isServiceCall && !token) return reply({ ok: false, error: "AUTH_REQUIRED" }, 401);
   if (isServiceCall && !["scheduled_cleanup","scheduled_annual_report"].includes(action))
     return reply({ ok: false, error: "SERVICE_ACTION_NOT_ALLOWED" }, 403);
   const auth = createClient(url, anon, { auth: { persistSession: false, autoRefreshToken: false } });
