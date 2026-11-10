@@ -370,7 +370,7 @@
             : created.data&&created.data.error==='GUARDIAN_CONSENT_REQUIRED'
               ? 'رضایت صوتی تأییدشده برای همین محصول، مدت و مبلغ لازم است.'
               : created.data&&created.data.error||'ثبت درخواست ناموفق بود.');
-        status.textContent='رسید ثبت شد. شناسه پیگیری: '+(created.data.request.request_ref||'ثبت‌شده')+' · پس از تأیید مدیر، اشتراک مستقیماً فعال می‌شود.';
+        status.textContent='درخواست شما در صندوق مرکزی اتوماسیون مدیریتی LangBlue ثبت شد. شناسه پیگیری: '+(created.data.request.request_ref||'ثبت‌شده')+' · مدیر از همان پنل مرکزی رسید را بررسی می‌کند و پس از تأیید، اشتراک مستقیماً فعال می‌شود.';
         button.textContent='رسید ثبت شد';
       }catch(e){
         status.textContent=e.message||'خطا در ثبت رسید';
