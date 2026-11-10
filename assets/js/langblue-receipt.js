@@ -164,7 +164,7 @@
       host.innerHTML=learnerRows.map(function(row){
         var label=row.is_self?'حساب خودم':(row.name||row.username||'حساب یادگیرنده');
         if(row.username)label+=' · @'+row.username;
-        return '<button type="button" class="receipt-account-choice'+(row.user_id===select.value?' is-selected':'')+'" data-learner-id="'+escapeHtml(row.user_id)+'" aria-pressed="'+(row.user_id===select.value?'true':'false')+'">'+escapeHtml(label)+'</button>';
+        return '<button type="button" class="receipt-account-choice'+(row.user_id===select.value?' is-selected':'')+'" data-learner-id="'+escapeHtml(row.user_id)+'" aria-pressed="'+(row.user_id===select.value?'true':'false')+'" style="display:block;width:100%;text-align:right;margin:6px 0;padding:11px 13px;border:1px solid '+(row.user_id===select.value?'#b89568':'rgba(196,168,130,.28)')+';border-radius:9px;background:'+(row.user_id===select.value?'rgba(184,149,104,.14)':'transparent')+';color:inherit;cursor:pointer">'+escapeHtml(label)+'</button>';
       }).join('');
     }
     function updateStatement(){
