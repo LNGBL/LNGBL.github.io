@@ -1,0 +1,30 @@
+name: LangBlue annual guardian consent PDF
+
+on:
+  schedule:
+    - cron: "37 0 1 1 *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  annual-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate previous calendar year's guardian consent PDF
+        env:
+          SUPABASE_URL: https://ocxeyponzzcvlrvwndji.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::error::Add the SUPABASE_SERVICE_ROLE_KEY repository secret before enabling annual PDF generation."
+            exit 1
+          fi
+          YEAR=$(( $(date -u +%Y) - 1 ))
+          curl --fail --silent --show-error \
+            "$SUPABASE_URL/functions/v1/langblue-guardian-subscription-consent" \
+            -X POST \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            --data "{\"action\":\"scheduled_annual_report\",\"year\":$YEAR}"

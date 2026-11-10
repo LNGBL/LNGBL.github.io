@@ -1,0 +1,29 @@
+name: LangBlue guardian audio retention cleanup
+
+on:
+  schedule:
+    - cron: "23 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete guardian audio whose retention period ended
+        env:
+          SUPABASE_URL: https://ocxeyponzzcvlrvwndji.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::error::Add the SUPABASE_SERVICE_ROLE_KEY repository secret before enabling scheduled retention cleanup."
+            exit 1
+          fi
+          curl --fail --silent --show-error \
+            "$SUPABASE_URL/functions/v1/langblue-guardian-subscription-consent" \
+            -X POST \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            --data '{"action":"scheduled_cleanup"}'

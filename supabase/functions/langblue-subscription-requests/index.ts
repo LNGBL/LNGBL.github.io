@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
       const receiptPath = clean(body.receiptPath, 300);
       const amountIrt = Number(body.amountIrt);
       if (!uuid(learnerId)) return reply({ ok: false, error: "INVALID_LEARNER_ACCOUNT" }, 400);
-      const productIds = Array.isArray(body.productIds) ? [...new Set(body.productIds.map((x) => clean(x, 30)))] : [];
+      const productIds = Array.isArray(body.productIds) ? [...new Set(body.productIds.map((x) => clean(x, 30)))].sort() : [];
       const planId = clean(body.planId, 30);
       if (!productIds.length || productIds.length > 7 || productIds.some((x) => !PRODUCTS.has(x)))
         return reply({ ok: false, error: "INVALID_PRODUCTS" }, 400);
@@ -121,6 +121,31 @@ Deno.serve(async (req) => {
         if (relation.error) throw new Error("GUARDIAN_RELATIONSHIP_LOOKUP_FAILED");
         if (!relation.data) return reply({ ok: false, error: "ACTIVE_GUARDIAN_LINK_REQUIRED" }, 403);
       }
+      let guardianConsentId: string | null = null;
+      if (learnerId !== actor.id) {
+        const consentId = clean(body.guardianConsentId, 64);
+        if (!uuid(consentId)) return reply({ ok: false, error: "GUARDIAN_CONSENT_REQUIRED" }, 409);
+        const consent = await db.from("subscription_guardian_consents")
+          .select("id,product_ids")
+          .eq("id", consentId)
+          .eq("guardian_user_id", actor.id)
+          .eq("learner_user_id", learnerId)
+          .eq("decision", "consent")
+          .eq("review_status", "approved")
+          .eq("plan_id", planId)
+          .eq("amount_irt", amountIrt)
+          .contains("product_ids", productIds)
+          .is("audio_deleted_at", null)
+          .gt("retention_until", now())
+          .maybeSingle();
+        if (consent.error) throw new Error("GUARDIAN_CONSENT_LOOKUP_FAILED");
+        if (!consent.data) return reply({ ok: false, error: "GUARDIAN_CONSENT_REQUIRED" }, 409);
+        const exactProducts =
+          JSON.stringify([...(consent.data.product_ids || [])].sort()) === JSON.stringify([...productIds].sort());
+        if (!exactProducts) return reply({ ok: false, error: "GUARDIAN_CONSENT_REQUIRED" }, 409);
+        guardianConsentId = consent.data.id;
+      }
+
       const learnerProfile = await profileFor(learnerId);
       if (!learnerProfile) return reply({ ok: false, error: "LEARNER_ACCOUNT_NOT_FOUND" }, 404);
 
@@ -151,6 +176,7 @@ Deno.serve(async (req) => {
         amount_irt: amountIrt,
         receipt_path: receiptPath,
         receipt_uploaded_at: now(),
+        guardian_consent_id: guardianConsentId,
         status: "pending_admin_review"
       }).select("id,request_ref,request_hash,product_ids,plan_id,amount_irt,discount_preview,status,created_at").single();
       if (insert.error) throw new Error("REQUEST_SAVE_FAILED");
@@ -212,6 +238,7 @@ Deno.serve(async (req) => {
           if (message.includes("RECEIPT_REQUIRED")) return reply({ ok: false, error: "RECEIPT_REQUIRED" }, 409);
           if (message.includes("RECEIPT_FILE_MISSING")) return reply({ ok: false, error: "RECEIPT_FILE_MISSING" }, 409);
           if (message.includes("PLAN_UNAVAILABLE")) return reply({ ok: false, error: "PLAN_UNAVAILABLE" }, 409);
+          if (message.includes("GUARDIAN_CONSENT_REQUIRED")) return reply({ ok: false, error: "GUARDIAN_CONSENT_REQUIRED" }, 409);
           if (message.includes("REQUEST_NOT_PENDING")) return reply({ ok: false, error: "REQUEST_NOT_PENDING" }, 409);
           throw new Error("PAYMENT_REVIEW_FAILED");
         }

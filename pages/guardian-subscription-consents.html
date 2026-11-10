@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>بررسی رضایت والدین | LangBlue</title>
+<link rel="stylesheet" href="../assets/css/langblue-theme.css">
+<link rel="stylesheet" href="../assets/css/langblue-design-system.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase-client.js"></script>
+<style>
+:root{color-scheme:dark}body{background:#071521;color:#edf7fa;font-family:inherit}.wrap{width:min(1240px,calc(100% - 28px));margin:24px auto 70px}.panel,.item,.metric{background:#0e2233;border:1px solid rgba(255,255,255,.12);border-radius:15px}.panel{padding:18px;margin:14px 0}.top{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}.muted{color:#a9c0c7;font-size:13px;line-height:1.85}.btn{font:inherit;color:#edf7fa;padding:9px 13px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:#122c40;cursor:pointer;text-decoration:none}.primary{background:#126782;border-color:#168aad}.danger{background:#542b35;border-color:#9d5261}.btn:disabled{opacity:.45;cursor:not-allowed}.list{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}.item{padding:15px}.item h3{margin:0 0 8px;font-size:17px}.line{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}.line span{color:#a9c0c7}.line strong{max-width:68%;overflow-wrap:anywhere;text-align:left}.tag{display:inline-block;padding:3px 8px;border-radius:20px;background:#1b3a4e;color:#c9e8f0;font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.status{padding:11px 13px;border-radius:10px;background:rgba(255,255,255,.06);margin:10px 0}.empty{padding:22px;text-align:center;color:#a9c0c7;border:1px dashed rgba(255,255,255,.16);border-radius:12px}.hash{direction:ltr;word-break:break-all;font:11px ui-monospace,monospace;color:#b7d8e3}audio{width:100%;margin-top:10px}.reports a{color:#9ed8e9}@media(max-width:600px){.wrap{width:calc(100% - 18px)}}
+</style>
+</head>
+<body class="lb-design-system">
+<main class="wrap">
+<header class="panel top">
+ <div><div class="muted">LANGBLUE · GUARDIAN CONSENT REVIEW</div><h1>بررسی پیام‌های صوتی رضایت والدین</h1><p class="muted">فایل‌های صوتی فقط با لینک موقت و برای مدیر مجاز نمایش داده می‌شوند. تأیید رضایت، پیش‌نیاز ارسال رسید و فعال‌سازی اشتراک برای حساب یادگیرنده متصل است.</p></div>
+ <div class="actions"><button class="btn primary" id="refresh">به‌روزرسانی</button><a class="btn" href="/pages/subscription-requests.html">صندوق رسیدهای پرداخت</a><a class="btn" href="/pages/admin.html">مدیریت</a></div>
+</header>
+<div id="status" class="status">در حال بررسی دسترسی مدیریتی…</div>
+<section class="panel">
+ <div class="top"><h2>درخواست‌های رضایت</h2><span class="muted">فقط موارد در انتظار بررسی قابل تعیین وضعیت هستند.</span></div>
+ <div id="consents" class="list"><div class="empty">در حال بارگذاری…</div></div>
+</section>
+<section class="panel">
+ <div class="top"><div><h2>گزارش سالانه</h2><p class="muted">گزارش شامل شناسه پرونده، نام کاربری‌ها، نتیجه و تاریخ بررسی است؛ فایل صوتی در گزارش قرار نمی‌گیرد.</p></div>
+ <div class="actions"><select id="reportYear" class="btn"></select><button class="btn primary" id="makeReport">ساخت گزارش چاپی / PDF</button></div></div>
+ <div id="reports" class="reports muted">در حال دریافت فهرست گزارش‌های ذخیره‌شده…</div>
+</section>
+</main>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const products={grammar:'Grammar',vocabulary:'Vocabulary',deutsch:'Deutsch',arabic:'Arabic',langjp:'Japanese',langkz:'Kazakh',langtj:'Tajik'};
+const plans={irt_7d:'۷ روز',irt_14d:'۱۴ روز',irt_21d:'۲۱ روز',irt_3m:'۳ ماه',irt_6m:'۶ ماه',irt_12m:'۱۲ ماه'};
+const labels={pending_admin_review:'در انتظار بررسی',approved:'تأیید شد',rejected:'رد شد',acknowledged:'عدم رضایت ثبت شد'};
+async function call(action,payload){
+ const api=window.LangBlueSupabase,sb=api&&api.getClient&&api.getClient();
+ if(!sb)throw new Error('اتصال Supabase در دسترس نیست.');
+ const session=await api.getAuthSession();if(!session)throw new Error('ابتدا وارد حساب مدیر شوید.');
+ const {data,error}=await sb.functions.invoke('langblue-guardian-subscription-consent',{body:Object.assign({action},payload||{})});
+ if(error&&!data)throw error;if(!data||!data.ok)throw new Error(data&&data.error||'درخواست ناموفق بود.');
+ return data;
+}
+function render(rows){
+ if(!rows.length){$('consents').innerHTML='<div class="empty">درخواستی برای نمایش وجود ندارد.</div>';return;}
+ $('consents').innerHTML=rows.map(r=>{
+  const id=esc(r.id),decision=r.decision==='consent'?'اعلام رضایت':'اعلام عدم رضایت';
+  const names=(r.product_ids||[]).map(x=>products[x]||x).join('، ');
+  const audio=r.audio_url&&!r.audio_deleted_at?'<audio controls preload="none" src="'+esc(r.audio_url)+'"></audio>':'<p class="muted">فایل صوتی حذف شده یا در دسترس نیست.</p>';
+  let actions='';
+  if(r.review_status==='pending_admin_review'){
+   actions='<div class="actions">'+
+    (r.decision==='consent'?'<button class="btn primary" data-id="'+id+'" data-status="approved">تأیید رضایت والد</button>':'<button class="btn" data-id="'+id+'" data-status="acknowledged">ثبت عدم رضایت</button>')+
+    '<button class="btn danger" data-id="'+id+'" data-status="rejected">رد محتوا</button></div>';
+  }
+  return '<article class="item">'+
+   '<div class="top"><h3>پرونده '+esc(r.id.slice(0,8))+'</h3><span class="tag">'+esc(labels[r.review_status]||r.review_status)+'</span></div>'+
+   '<div class="line"><span>یادگیرنده</span><strong>'+esc(r.learner&&r.learner.username?'@'+r.learner.username:r.learner_user_id)+'</strong></div>'+
+   '<div class="line"><span>والد/سرپرست</span><strong>'+esc(r.guardian&&r.guardian.username?'@'+r.guardian.username:r.guardian_user_id)+'</strong></div>'+
+   '<div class="line"><span>نتیجه صوتی</span><strong>'+decision+'</strong></div>'+
+   '<div class="line"><span>محصولات</span><strong>'+esc(names)+'</strong></div>'+
+   '<div class="line"><span>مدت / مبلغ</span><strong>'+esc(plans[r.plan_id]||r.plan_id)+' · '+Number(r.amount_irt||0).toLocaleString('fa-IR')+' تومان</strong></div>'+
+   '<div class="line"><span>زمان ثبت</span><strong>'+esc(new Date(r.created_at).toLocaleString('fa-IR'))+'</strong></div>'+
+   (r.reviewed_at?'<div class="line"><span>زمان بررسی</span><strong>'+esc(new Date(r.reviewed_at).toLocaleString('fa-IR'))+'</strong></div>':'')+
+   (r.retention_until?'<div class="line"><span>موعد حذف فایل صوتی</span><strong>'+esc(new Date(r.retention_until).toLocaleDateString('fa-IR'))+'</strong></div>':'')+
+   audio+actions+'</article>';
+ }).join('');
+ $('consents').querySelectorAll('button[data-id]').forEach(btn=>btn.addEventListener('click',async()=>{
+  btn.disabled=true;
+  try{await call('admin_review',{id:btn.dataset.id,status:btn.dataset.status});$('status').textContent='تصمیم ثبت شد.';await load();}
+  catch(e){$('status').textContent='خطا: '+e.message;btn.disabled=false;}
+ }));
+}
+async function loadReports(){
+ try{
+  const data=await call('admin_reports');
+  $('reports').innerHTML=(data.reports||[]).length?(data.reports||[]).map(r=>'<div class="line"><span>گزارش سال '+esc(r.report_year)+' · '+Number(r.record_count||0)+' پرونده</span><strong>'+(r.url?'<a href="'+esc(r.url)+'" target="_blank" rel="noopener noreferrer">مشاهده PDF</a>':'لینک موقت در دسترس نیست')+'</strong></div>').join(''):'هنوز گزارش سالانهٔ ذخیره‌شده‌ای وجود ندارد.';
+ }catch(e){$('reports').textContent='فهرست گزارش‌ها بارگذاری نشد: '+e.message;}
+}
+async function load(){
+ $('status').textContent='در حال دریافت پرونده‌ها…';
+ try{const data=await call('admin_list');render(data.consents||[]);$('status').textContent='صندوق رضایت والدین بارگذاری شد.';await loadReports();}
+ catch(e){$('status').textContent='دسترسی یا بارگذاری ناموفق: '+e.message;$('consents').innerHTML='<div class="empty">برای مشاهده صندوق، با حساب دارای نقش مدیر و تأیید سنی وارد شوید.</div>';}
+}
+function printReport(data,win){
+ const rows=(data.rows||[]).map(r=>'<tr><td>'+esc(r.consent_ref.slice(0,8))+'</td><td>'+esc(r.learner_username)+'</td><td>'+esc(r.guardian_username)+'</td><td>'+esc(r.decision)+'</td><td>'+esc(r.review_status)+'</td><td>'+esc(new Date(r.submitted_at).toLocaleString('fa-IR'))+'</td><td>'+esc((r.products||[]).join('، ')+' / '+r.plan_id)+'</td><td>'+esc(r.reviewer_username)+'</td></tr>').join('');
+ win.document.write('<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>گزارش رضایت والدین '+data.year+'</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#17232a}h1{font-size:20px}p{color:#555}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #bbb;padding:6px;text-align:right;overflow-wrap:anywhere}th{background:#eaf0f2}@media print{button{display:none}}</style></head><body><h1>LangBlue — گزارش سالانه رضایت والدین</h1><p>سال: '+data.year+' | زمان تولید: '+esc(new Date(data.generatedAt).toLocaleString('fa-IR'))+' | تعداد پرونده‌های تعیین‌تکلیف‌شده: '+data.total+'</p><p>این گزارش شامل فرادادهٔ تصمیم‌هاست و فایل‌های صوتی در آن درج نشده‌اند.</p><table><thead><tr><th>شناسه</th><th>یادگیرنده</th><th>والد</th><th>اعلام</th><th>وضعیت بررسی</th><th>زمان ثبت</th><th>محصول / طرح</th><th>بررسی‌کننده</th></tr></thead><tbody>'+rows+'</tbody></table><script>window.onload=function(){window.print();};<\/script></body></html>');
+ win.document.close();
+}
+$('makeReport').addEventListener('click',async()=>{
+ const year=Number($('reportYear').value),win=window.open('','_blank');
+ if(!win){$('status').textContent='برای ساخت گزارش، اجازه بازشدن پنجره جدید را بدهید.';return;}
+ $('makeReport').disabled=true;
+ try{const data=await call('admin_annual_report',{year});printReport(data,win);$('status').textContent='گزارش آماده است؛ در پنجره چاپ گزینه ذخیره به‌صورت PDF را انتخاب کنید.';}
+ catch(e){win.close();$('status').textContent='ساخت گزارش ناموفق بود: '+e.message;}
+ finally{$('makeReport').disabled=false;}
+});
+$('refresh').addEventListener('click',load);
+const current=new Date().getUTCFullYear();
+for(let y=current;y>=current-5;y--){const o=document.createElement('option');o.value=String(y);o.textContent=String(y);$('reportYear').appendChild(o);}
+(async()=>{try{const cleanup=await call('admin_cleanup');$('status').textContent='پاک‌سازی فایل‌های صوتی سررسیدشده: '+cleanup.deleted+' فایل.';}catch(e){$('status').textContent='بررسی دسترسی مدیریتی یا پاک‌سازی انجام نشد: '+e.message;}await load();})();
+})();
+</script>
+</body></html>

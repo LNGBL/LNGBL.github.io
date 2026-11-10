@@ -1,0 +1,76 @@
+name: Guardian consent syntax checks
+
+on:
+  pull_request:
+    paths:
+      - "assets/js/langblue-receipt.js"
+      - "pages/guardian-subscription-consents.html"
+      - "pages/admin.html"
+      - ".github/workflows/guardian-audio-retention.yml"
+      - ".github/workflows/guardian-annual-report.yml"
+      - "supabase/config.toml"
+      - "supabase/functions/langblue-guardian-subscription-consent/**"
+      - "supabase/functions/langblue-subscription-requests/**"
+      - "supabase/migrations/**"
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check browser receipt JavaScript
+        run: node --check assets/js/langblue-receipt.js
+      - name: Check inline admin page JavaScript
+        run: |
+          python3 - <<'PY'
+          import pathlib, re
+          for source, target in [
+              ("pages/guardian-subscription-consents.html", "/tmp/guardian-standalone.js"),
+              ("pages/admin.html", "/tmp/langblue-central-admin.js"),
+          ]:
+              html = pathlib.Path(source).read_text(encoding="utf-8")
+              scripts = re.findall(r"<script\b[^>]*>([\s\S]*?)</script>", html, re.I)
+              inline_scripts = [script for script in scripts if script.strip()]
+              if not inline_scripts:
+                  raise SystemExit(f"No inline script found in {source}")
+              pathlib.Path(target).write_text(inline_scripts[-1], encoding="utf-8")
+          PY
+          node --check /tmp/guardian-standalone.js
+          node --check /tmp/langblue-central-admin.js
+      - name: Verify scheduled secret-key request wiring
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          function = pathlib.Path("supabase/functions/langblue-guardian-subscription-consent/index.ts").read_text()
+          config = pathlib.Path("supabase/config.toml").read_text()
+          for workflow in [".github/workflows/guardian-audio-retention.yml", ".github/workflows/guardian-annual-report.yml"]:
+              text = pathlib.Path(workflow).read_text()
+              if 'Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY' in text:
+                  raise SystemExit(f"New API key must not be sent as a bearer token: {workflow}")
+              if 'apikey: $SUPABASE_SERVICE_ROLE_KEY' not in text:
+                  raise SystemExit(f"Missing apikey header: {workflow}")
+          if 'SUPABASE_SECRET_KEYS' not in function:
+              raise SystemExit("Edge Function does not validate project secret API keys")
+          if '[functions.langblue-guardian-subscription-consent]' not in config or 'verify_jwt = false' not in config:
+              raise SystemExit("Guardian automation must disable platform JWT verification and authorize API keys in the handler")
+          admin = pathlib.Path("pages/admin.html").read_text()
+          for marker in ['panel-guardian-consents', 'panel-subscription-requests', 'admin_list']:
+              if marker not in admin:
+                  raise SystemExit(f"Central admin integration missing: {marker}")
+          landing = pathlib.Path("assets/js/langblue-receipt.js").read_text()
+          if 'صندوق مرکزی اتوماسیون مدیریتی' not in landing:
+              raise SystemExit("Landing receipt confirmation is not connected to the central queue")
+          PY
+      - name: Type-check guardian consent Edge Function
+        run: deno check --node-modules-dir=auto supabase/functions/langblue-guardian-subscription-consent/index.ts
+      - name: Type-check subscription request Edge Function
+        run: deno check --node-modules-dir=auto supabase/functions/langblue-subscription-requests/index.ts
