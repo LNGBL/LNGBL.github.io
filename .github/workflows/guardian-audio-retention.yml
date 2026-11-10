@@ -24,7 +24,6 @@ jobs:
           curl --fail --silent --show-error \
             "$SUPABASE_URL/functions/v1/langblue-guardian-subscription-consent" \
             -X POST \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
             -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
             -H "Content-Type: application/json" \
             --data '{"action":"scheduled_cleanup"}'
