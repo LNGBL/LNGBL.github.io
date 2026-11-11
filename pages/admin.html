@@ -241,7 +241,7 @@ async function edgeErrorCode(result){
 }
 function protectedQueueMessage(code){
  if(code==='ADULT_VERIFICATION_REQUIRED'||code==='ADMIN_UNAUTHORIZED')
-  return 'این صف فقط برای مدیرِ دارای تأیید بزرگسالیِ معتبر قابل دسترسی است. ورود مدیریتی به‌تنهایی کافی نیست؛ این محدودیت برای حفاظت از پرونده‌های کاربران زیر ۱۸ سال حفظ شده است.';
+  return 'این صف فقط برای مدیرِ دارای تأیید بزرگسالیِ معتبر و فعال قابل دسترسی است. داشتن نقش مالک یا مدیر و ورود به حساب، جایگزین احراز سن نیست. تا ثبت تأیید واقعی از مسیر رسمی احراز LangBlue، اطلاعات این صف عمداً بارگذاری نمی‌شود و محدودیت امنیتی قابل دور زدن نیست.';
  if(code==='AUTH_REQUIRED')return 'نشست ورود معتبر نیست؛ دوباره وارد حساب LangBlue شو.';
  return 'بارگذاری این صف انجام نشد: '+code;
 }
@@ -267,7 +267,7 @@ async function refreshAll(){ $('refresh').disabled=true;try{
  $('guardianMakeReport').disabled=!!guardianCode;$('guardianCleanup').disabled=!!guardianCode;
  $('nav').hidden=false;$('refresh').disabled=false;
  const blocked=!!guardianCode||!!subscriptionCode;
- setStatus(blocked?'پنل مرکزی بارگذاری شد؛ بعضی صف‌های حساس به تأیید بزرگسالی معتبر نیاز دارند.':'همهٔ بخش‌های پنل مرکزی بارگذاری شدند.',blocked?'warn':'good');
+ setStatus(blocked?'پنل مرکزی بارگذاری شد؛ صف‌های حساس تا تکمیل احراز بزرگسالیِ معتبر قفل هستند.':'همهٔ بخش‌های پنل مرکزی بارگذاری شدند.',blocked?'warn':'good');
  }catch(e){setStatus('بارگذاری پنل ناموفق بود: '+e.message,'bad');$('guardianStatus').textContent='خطا در بارگذاری: '+e.message;$('subscriptionStatus').textContent='خطا در بارگذاری: '+e.message;$('refresh').disabled=false}}
 function showPanel(name){document.querySelectorAll('main section[id^="panel-"]').forEach(s=>s.hidden=s.id!=='panel-'+name);document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.panel===name))}
 async function init(){client=window.LangBlueSupabase?.getClient?.();if(!client){setStatus('اتصال حساب مرکزی در دسترس نیست.','bad');return}const {data:{session}}=await client.auth.getSession();if(!session){setStatus('ابتدا با حساب LangBlue Official وارد صفحهٔ اصلی شو.','warn');return}const {data,error}=await client.functions.invoke('langblue-admin-access',{body:{}});if(error||!data?.ok||!data.is_admin){setStatus('این حساب دسترسی مدیریتی ندارد یا بررسی دسترسی ناموفق بود.','bad');return}role=data.role;setStatus('دسترسی تأیید شد · نقش: '+(role==='owner'?'مالک مرکزی':'مدیر'),'good');$('refresh').disabled=false;$('nav').hidden=false;$('staffNav').hidden=role!=='owner';$('staffForm').hidden=role!=='owner';document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>showPanel(b.dataset.panel)));$('refresh').addEventListener('click',refreshAll);
