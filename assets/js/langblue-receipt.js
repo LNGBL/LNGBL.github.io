@@ -168,12 +168,12 @@
       var learner=selectedLearner();
       var accountName=learner ? (learner.is_self ? 'حساب خودم' : (learner.name||'حساب یادگیرنده')) : 'حساب کاربری';
       host.textContent=
-        'سلام. من درخواست فعال‌سازی اشتراک LangBlue را دارم.\\n'+
-        'شناسه درخواست: '+order.id+'\\n'+
-        'حساب کاربری: '+accountName+' ('+learnerUsername()+')\\n'+
-        'محصول(ها): '+order.products.map(function(p){return p.label;}).join('، ')+'\\n'+
-        'مدت اشتراک: '+order.plan.label+'\\n'+
-        'مبلغ قابل پرداخت: '+formatPrice(order.total)+'\\n'+
+        'سلام. من درخواست فعال‌سازی اشتراک LangBlue را دارم.\n'+
+        'شناسه درخواست: '+order.id+'\n'+
+        'حساب کاربری: '+accountName+' ('+learnerUsername()+')\n'+
+        'محصول(ها): '+order.products.map(function(p){return p.label;}).join('، ')+'\n'+
+        'مدت اشتراک: '+order.plan.label+'\n'+
+        'مبلغ قابل پرداخت: '+formatPrice(order.total)+'\n'+
         'لطفاً شماره کارت را برای واریز ارسال کنید. پس از پرداخت، تصویر رسید بانکی را در همین گفت‌وگو می‌فرستم.';
     }
     function renderLearnerChoices(){
