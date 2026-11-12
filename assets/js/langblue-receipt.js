@@ -101,7 +101,7 @@
       (order.communityDiscount ? '<div class="receipt-line"><span>تخفیف اجتماعی</span><strong>'+order.communityDiscount+'٪ (−'+formatPrice(order.communityDiscountAmount)+')</strong></div>' : '')+
       (order.bundleDiscount ? '<div class="receipt-line"><span>تخفیف بسته</span><strong>'+order.bundleDiscount+'٪</strong></div>' : '')+
       '<div class="receipt-total"><span>مبلغ کل</span><strong>'+formatPrice(order.total)+'</strong></div>'+
-      '<div class="receipt-note">از همین فیش یک عکس یا اسکرین‌شات بگیر و نگه دار. سپس برای دریافت شماره کارت به تلگرام مدیر برو؛ بعد از پرداخت، عکس این فیش و عکس رسید بانکی پرداخت را هر دو برای مدیر ارسال کن. فعال‌سازی پس از بررسی دستی پرداخت انجام می‌شود.</div>'+
+      '<div class="receipt-note">در ادامه متن آماده درخواست اشتراک نمایش داده می‌شود. ابتدا آن را کپی کن و در دایرکت تلگرام برای مدیر بفرست. شماره کارت را از مدیر دریافت کن؛ پس از پرداخت، تصویر رسید بانکی را همراه همین متن برای مدیر ارسال کن. پس از بررسی دستی، کد وریفای مخصوص درخواستت را دریافت می‌کنی.</div>'+
       '<div class="receipt-panel" id="lbReceiptSubmit" style="margin-top:16px;padding:16px;border:1px solid rgba(196,168,130,.28);border-radius:12px">'+
         '<h3>ارسال رسید برای بررسی</h3>'+
         '<input id="lbReceiptLearner" type="hidden" value=""><div id="lbReceiptLearnerChoices" class="receipt-account-choices" role="group" aria-label="انتخاب حساب مقصد"><p class="receipt-note">در حال دریافت حساب‌های مرتبط…</p></div>'+
@@ -118,8 +118,13 @@
           '<p id="lbGuardianConsentStatus" class="receipt-note" role="status" aria-live="polite"></p>'+
         '</section>'+
         '<div id="lbReceiptPaymentPanel" style="margin-top:12px">'+
-          '<div class="receipt-note">مبلغ انتخاب‌شده: '+formatPrice(order.total)+' · ابتدا عکس فیش را ذخیره کن؛ شماره کارت را از مدیر در تلگرام بگیر و پس از پرداخت، هر دو تصویر را برای او بفرست.</div>'+
-          '<button class="btn btn-primary" id="lbSubmitReceipt" type="button">دریافت شماره کارت</button>'+
+          '<h3>متن درخواست برای ارسال به مدیر</h3>'+
+          '<pre id="lbReceiptRequestText" class="receipt-note" dir="rtl" style="white-space:pre-wrap;padding:12px;border:1px solid rgba(196,168,130,.28);border-radius:10px;background:rgba(0,0,0,.12)"></pre>'+
+          '<div class="actions" style="display:flex;gap:8px;flex-wrap:wrap">'+
+            '<button class="btn" id="lbCopyRequestText" type="button">کپی متن درخواست</button>'+
+            '<button class="btn btn-primary" id="lbSubmitReceipt" type="button">رفتن به دایرکت تلگرام</button>'+
+          '</div>'+
+          '<p class="receipt-note">در تلگرام، متن کپی‌شده را برای مدیر بفرست. شماره کارت را از او بگیر و پس از پرداخت، تصویر رسید بانکی را در همان گفت‌وگو ارسال کن.</p>'+
         '</div>'+
         '<p id="lbReceiptSubmitStatus" class="receipt-note" role="status" aria-live="polite"></p>'+
       '</div>';
@@ -156,6 +161,20 @@
     function learnerUsername(){
       var learner=selectedLearner();
       return learner&&learner.username ? '@'+learner.username : 'حساب خودم';
+    }
+    function updatePaymentRequestText(){
+      var host=qs('lbReceiptRequestText');
+      if(!host)return;
+      var learner=selectedLearner();
+      var accountName=learner ? (learner.is_self ? 'حساب خودم' : (learner.name||'حساب یادگیرنده')) : 'حساب کاربری';
+      host.textContent=
+        'سلام. من درخواست فعال‌سازی اشتراک LangBlue را دارم.\\n'+
+        'شناسه درخواست: '+order.id+'\\n'+
+        'حساب کاربری: '+accountName+' ('+learnerUsername()+')\\n'+
+        'محصول(ها): '+order.products.map(function(p){return p.label;}).join('، ')+'\\n'+
+        'مدت اشتراک: '+order.plan.label+'\\n'+
+        'مبلغ قابل پرداخت: '+formatPrice(order.total)+'\\n'+
+        'لطفاً شماره کارت را برای واریز ارسال کنید. پس از پرداخت، تصویر رسید بانکی را در همین گفت‌وگو می‌فرستم.';
     }
     function renderLearnerChoices(){
       var host=qs('lbReceiptLearnerChoices');
@@ -258,12 +277,25 @@
       if(!learnerRows.length){status.textContent='حسابی برای این درخواست پیدا نشد.';button.disabled=true;return;}
       select.value=learnerRows[0].user_id;
       renderLearnerChoices();
+      updatePaymentRequestText();
+      var copyButton=qs('lbCopyRequestText');
+      if(copyButton)copyButton.addEventListener('click',async function(){
+        var requestText=qs('lbReceiptRequestText');
+        if(!requestText)return;
+        try{
+          await navigator.clipboard.writeText(requestText.textContent);
+          status.textContent='متن درخواست کپی شد. آن را در دایرکت تلگرام برای مدیر بفرست.';
+        }catch(e){
+          status.textContent='کپی خودکار ممکن نشد؛ متن نمایش‌داده‌شده را انتخاب و کپی کن.';
+        }
+      });
       var choices=qs('lbReceiptLearnerChoices');
       if(choices)choices.addEventListener('click',function(event){
         var target=event.target.closest('[data-learner-id]');
         if(!target)return;
         select.value=target.getAttribute('data-learner-id');
         renderLearnerChoices();
+        updatePaymentRequestText();
         lookupConsent();
       });
       if(familyName)familyName.addEventListener('input',updateStatement);
@@ -363,7 +395,7 @@
         return;
       }
       window.open('https://t.me/LangBlue','_blank','noopener,noreferrer');
-      status.textContent='در تلگرام شماره کارت را از مدیر دریافت کن. پس از پرداخت، عکس فیش LangBlue و عکس رسید بانکی پرداخت را هر دو در همان گفت‌وگو برای مدیر بفرست. فعال‌سازی فقط پس از بررسی دستی پرداخت انجام می‌شود.';
+      status.textContent='متن درخواست را در دایرکت برای مدیر بفرست، شماره کارت را دریافت کن و پس از پرداخت تصویر رسید بانکی را در همان گفت‌وگو ارسال کن. مدیر پس از بررسی پرداخت، کد وریفای مخصوص درخواست را صادر می‌کند.';
     });;
   }
 
