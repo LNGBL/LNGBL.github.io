@@ -67,9 +67,10 @@ jobs:
               if marker not in admin:
                   raise SystemExit(f"Central admin integration missing: {marker}")
           landing = pathlib.Path("assets/js/langblue-receipt.js").read_text()
-          # Landing payments are intentionally manual: the learner sends both
-          # receipt images to the administrator in Telegram. Do not create a
-          # central subscription-request queue record or upload files here.
+          # Landing payments are intentionally manual: the learner copies the
+          # prepared request text, contacts the administrator in Telegram,
+          # and sends the bank receipt image there. Do not create a central
+          # payment-request queue record or upload payment files here.
           for marker in ["lbReceiptRequestText", "lbCopyRequestText", "https://t.me/LangBlue", "کد وریفای مخصوص درخواست", "تصویر رسید بانکی"]:
               if marker not in landing:
                   raise SystemExit(f"Landing manual payment flow is missing: {marker}")
