@@ -101,7 +101,7 @@
       (order.communityDiscount ? '<div class="receipt-line"><span>تخفیف اجتماعی</span><strong>'+order.communityDiscount+'٪ (−'+formatPrice(order.communityDiscountAmount)+')</strong></div>' : '')+
       (order.bundleDiscount ? '<div class="receipt-line"><span>تخفیف بسته</span><strong>'+order.bundleDiscount+'٪</strong></div>' : '')+
       '<div class="receipt-total"><span>مبلغ کل</span><strong>'+formatPrice(order.total)+'</strong></div>'+
-      '<div class="receipt-note">از همین فیش یک عکس یا اسکرین‌شات بگیر و نگه دار. سپس برای دریافت شماره کارت به تلگرام مدیر برو؛ بعد از پرداخت، عکس این فیش و عکس رسید بانکی پرداخت را هر دو برای مدیر ارسال کن. فعال‌سازی پس از بررسی دستی پرداخت انجام می‌شود.</div>'+
+      '<div class="receipt-note">از همین فیش یک عکس یا اسکرین‌شات بگیر و نگه دار. سپس از طریق «ارتباط مستقیم» با مدیر LangBlue در تلگرام تماس بگیر؛ بعد از پرداخت، عکس این فیش و عکس رسید بانکی پرداخت را هر دو برای مدیر ارسال کن. فعال‌سازی پس از بررسی دستی پرداخت انجام می‌شود.</div>'+
       '<div class="receipt-panel" id="lbReceiptSubmit" style="margin-top:16px;padding:16px;border:1px solid rgba(196,168,130,.28);border-radius:12px">'+
         '<h3>ارسال رسید برای بررسی</h3>'+
         '<input id="lbReceiptLearner" type="hidden" value=""><div id="lbReceiptLearnerChoices" class="receipt-account-choices" role="group" aria-label="انتخاب حساب مقصد"><p class="receipt-note">در حال دریافت حساب‌های مرتبط…</p></div>'+
@@ -118,8 +118,8 @@
           '<p id="lbGuardianConsentStatus" class="receipt-note" role="status" aria-live="polite"></p>'+
         '</section>'+
         '<div id="lbReceiptPaymentPanel" style="margin-top:12px">'+
-          '<div class="receipt-note">مبلغ انتخاب‌شده: '+formatPrice(order.total)+' · ابتدا عکس فیش را ذخیره کن؛ شماره کارت را از مدیر در تلگرام بگیر و پس از پرداخت، هر دو تصویر را برای او بفرست.</div>'+
-          '<button class="btn btn-primary" id="lbSubmitReceipt" type="button">دریافت شماره کارت</button>'+
+          '<div class="receipt-note">مبلغ انتخاب‌شده: '+formatPrice(order.total)+' · ابتدا عکس فیش را ذخیره کن؛ از طریق ارتباط مستقیم با مدیر در تلگرام، اطلاعات پرداخت را دریافت کن و پس از پرداخت، هر دو تصویر را برای او بفرست.</div>'+
+          '<a class="btn btn-primary" id="lbSubmitReceipt" href="https://t.me/LangBlue" target="_blank" rel="noopener noreferrer">ارتباط مستقیم</a>'+
         '</div>'+
         '<p id="lbReceiptSubmitStatus" class="receipt-note" role="status" aria-live="polite"></p>'+
       '</div>';
@@ -362,8 +362,7 @@
         status.textContent='برای حساب یادگیرنده، ابتدا باید رضایت سرپرست برای همین انتخاب تأیید شود.';
         return;
       }
-      window.open('https://t.me/LangBlue','_blank','noopener,noreferrer');
-      status.textContent='در تلگرام شماره کارت را از مدیر دریافت کن. پس از پرداخت، عکس فیش LangBlue و عکس رسید بانکی پرداخت را هر دو در همان گفت‌وگو برای مدیر بفرست. فعال‌سازی فقط پس از بررسی دستی پرداخت انجام می‌شود.';
+      status.textContent='از طریق لینک ارتباط مستقیم وارد تلگرام مدیر شو. پس از پرداخت، عکس فیش LangBlue و عکس رسید بانکی پرداخت را هر دو در همان گفت‌وگو برای مدیر بفرست. فعال‌سازی فقط پس از بررسی دستی پرداخت انجام می‌شود.';
     });;
   }
 
