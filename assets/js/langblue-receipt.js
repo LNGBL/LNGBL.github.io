@@ -101,7 +101,7 @@
       (order.communityDiscount ? '<div class="receipt-line"><span>تخفیف اجتماعی</span><strong>'+order.communityDiscount+'٪ (−'+formatPrice(order.communityDiscountAmount)+')</strong></div>' : '')+
       (order.bundleDiscount ? '<div class="receipt-line"><span>تخفیف بسته</span><strong>'+order.bundleDiscount+'٪</strong></div>' : '')+
       '<div class="receipt-total"><span>مبلغ کل</span><strong>'+formatPrice(order.total)+'</strong></div>'+
-      '<div class="receipt-note">برای بررسی پرداخت، تصویر رسید را از همین بخش ارسال کن. پس از تأیید مدیر، اشتراک مستقیماً روی حساب یادگیرنده فعال می‌شود و نیازی به کد وریفای نیست. شمارهٔ کامل کارت بانکی درخواست یا ذخیره نمی‌شود.</div>'+
+      '<div class="receipt-note">از همین فیش یک عکس یا اسکرین‌شات بگیر و نگه دار. سپس برای دریافت شماره کارت به تلگرام مدیر برو؛ بعد از پرداخت، عکس این فیش و عکس رسید بانکی پرداخت را هر دو برای مدیر ارسال کن. فعال‌سازی پس از بررسی دستی پرداخت انجام می‌شود.</div>'+
       '<div class="receipt-panel" id="lbReceiptSubmit" style="margin-top:16px;padding:16px;border:1px solid rgba(196,168,130,.28);border-radius:12px">'+
         '<h3>ارسال رسید برای بررسی</h3>'+
         '<input id="lbReceiptLearner" type="hidden" value=""><div id="lbReceiptLearnerChoices" class="receipt-account-choices" role="group" aria-label="انتخاب حساب مقصد"><p class="receipt-note">در حال دریافت حساب‌های مرتبط…</p></div>'+
@@ -118,9 +118,8 @@
           '<p id="lbGuardianConsentStatus" class="receipt-note" role="status" aria-live="polite"></p>'+
         '</section>'+
         '<div id="lbReceiptPaymentPanel" style="margin-top:12px">'+
-          '<label for="lbReceiptFile" style="display:block;margin-top:10px">تصویر رسید (JPG، PNG یا WebP؛ حداکثر ۵ مگابایت)</label><input id="lbReceiptFile" type="file" accept="image/jpeg,image/png,image/webp" style="display:block;margin:8px 0">'+
-          '<div class="receipt-note">مبلغ اعلام‌شده: '+formatPrice(order.total)+' · مدیر مبلغ و تصویر رسید را پیش از فعال‌سازی تطبیق می‌دهد.</div>'+
-          '<button class="btn btn-primary" id="lbSubmitReceipt" type="button">ارسال رسید و ثبت درخواست</button>'+
+          '<div class="receipt-note">مبلغ انتخاب‌شده: '+formatPrice(order.total)+' · ابتدا عکس فیش را ذخیره کن؛ شماره کارت را از مدیر در تلگرام بگیر و پس از پرداخت، هر دو تصویر را برای او بفرست.</div>'+
+          '<button class="btn btn-primary" id="lbSubmitReceipt" type="button">دریافت شماره کارت</button>'+
         '</div>'+
         '<p id="lbReceiptSubmitStatus" class="receipt-note" role="status" aria-live="polite"></p>'+
       '</div>';
@@ -358,48 +357,14 @@
       }
     });
 
-    button.addEventListener('click',async function(){
-      button.disabled=true;
-      status.textContent='در حال بارگذاری و ثبت رسید…';
-      try{
-        if(guardianSelected()&&!approvedConsentId){
-          await lookupConsent();
-          if(!approvedConsentId)throw new Error('ابتدا باید رضایت صوتی والد توسط مدیر تأیید شود.');
-        }
-        var sessionResult=await client.auth.getSession();
-        var session=sessionResult&&sessionResult.data&&sessionResult.data.session;
-        if(!session)throw new Error('ابتدا وارد حساب مرکزی شوید.');
-        var file=qs('lbReceiptFile')&&qs('lbReceiptFile').files[0];
-        if(!file)throw new Error('تصویر رسید را انتخاب کنید.');
-        if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024)
-          throw new Error('فقط تصویر JPG، PNG یا WebP تا سقف ۵ مگابایت پذیرفته می‌شود.');
-        var ext=file.type==='image/jpeg'?'jpg':file.type==='image/png'?'png':'webp';
-        var path=session.user.id+'/'+crypto.randomUUID()+'.'+ext;
-        var uploaded=await client.storage.from('langblue-payment-receipts').upload(path,file,{upsert:false,contentType:file.type});
-        if(uploaded.error)throw new Error('بارگذاری تصویر رسید انجام نشد.');
-        var payload={
-          action:'create',
-          learnerUserId:select.value,
-          productIds:order.products.map(function(p){return p.id;}),
-          planId:order.plan.id,
-          receiptPath:path,
-          amountIrt:Math.round(Number(order.total))
-        };
-        if(guardianSelected())payload.guardianConsentId=approvedConsentId;
-        var created=await client.functions.invoke('langblue-subscription-requests',{body:payload});
-        if(created.error||!created.data||!created.data.ok)
-          throw new Error(created.data&&created.data.error==='ADULT_VERIFICATION_REQUIRED'
-            ? 'ثبت درخواست باید توسط والد/سرپرستِ دارای تأیید سنی انجام شود.'
-            : created.data&&created.data.error==='GUARDIAN_CONSENT_REQUIRED'
-              ? 'رضایت صوتی تأییدشده برای همین محصول، مدت و مبلغ لازم است.'
-              : created.data&&created.data.error||'ثبت درخواست ناموفق بود.');
-        status.textContent='درخواست شما در صندوق مرکزی اتوماسیون مدیریتی LangBlue ثبت شد. شناسه پیگیری: '+(created.data.request.request_ref||'ثبت‌شده')+' · مدیر از همان پنل مرکزی رسید را بررسی می‌کند و پس از تأیید، اشتراک مستقیماً فعال می‌شود.';
-        button.textContent='رسید ثبت شد';
-      }catch(e){
-        status.textContent=e.message||'خطا در ثبت رسید';
-        button.disabled=false;
+    button.addEventListener('click',function(){
+      if(guardianSelected()&&!approvedConsentId){
+        status.textContent='برای حساب یادگیرنده، ابتدا باید رضایت سرپرست برای همین انتخاب تأیید شود.';
+        return;
       }
-    });
+      window.open('https://t.me/LangBlue','_blank','noopener,noreferrer');
+      status.textContent='در تلگرام شماره کارت را از مدیر دریافت کن. پس از پرداخت، عکس فیش LangBlue و عکس رسید بانکی پرداخت را هر دو در همان گفت‌وگو برای مدیر بفرست. فعال‌سازی فقط پس از بررسی دستی پرداخت انجام می‌شود.';
+    });;
   }
 
   function init(){

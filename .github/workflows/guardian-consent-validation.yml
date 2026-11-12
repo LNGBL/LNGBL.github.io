@@ -67,8 +67,15 @@ jobs:
               if marker not in admin:
                   raise SystemExit(f"Central admin integration missing: {marker}")
           landing = pathlib.Path("assets/js/langblue-receipt.js").read_text()
-          if 'صندوق مرکزی اتوماسیون مدیریتی' not in landing:
-              raise SystemExit("Landing receipt confirmation is not connected to the central queue")
+          # Landing payments are intentionally manual: the learner sends both
+          # receipt images to the administrator in Telegram. Do not create a
+          # central subscription-request queue record or upload files here.
+          for marker in ["دریافت شماره کارت", "https://t.me/LangBlue", "عکس فیش LangBlue", "عکس رسید بانکی پرداخت"]:
+              if marker not in landing:
+                  raise SystemExit(f"Landing manual payment flow is missing: {marker}")
+          for forbidden in ["action:'create'", "langblue-payment-receipts"]:
+              if forbidden in landing:
+                  raise SystemExit(f"Landing must not create or upload a central payment request: {forbidden}")
           PY
       - name: Type-check guardian consent Edge Function
         run: deno check --node-modules-dir=auto supabase/functions/langblue-guardian-subscription-consent/index.ts
