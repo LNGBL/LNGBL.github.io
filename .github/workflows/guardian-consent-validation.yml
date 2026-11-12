@@ -70,12 +70,12 @@ jobs:
           # Landing payments are intentionally manual: the learner sends both
           # receipt images to the administrator in Telegram. Do not create a
           # central subscription-request queue record or upload files here.
-          for marker in ["دریافت شماره کارت", "https://t.me/LangBlue", "عکس فیش LangBlue", "عکس رسید بانکی پرداخت"]:
+          for marker in ["lbReceiptRequestText", "lbCopyRequestText", "https://t.me/LangBlue", "کد وریفای مخصوص درخواست", "تصویر رسید بانکی"]:
               if marker not in landing:
                   raise SystemExit(f"Landing manual payment flow is missing: {marker}")
-          for forbidden in ["action:'create'", "langblue-payment-receipts"]:
+          for forbidden in ["action:'create'", "langblue-payment-receipts", "عکس فیش LangBlue"]:
               if forbidden in landing:
-                  raise SystemExit(f"Landing must not create or upload a central payment request: {forbidden}")
+                  raise SystemExit(f"Landing must not create a central payment request or require a second receipt image: {forbidden}")
           PY
       - name: Type-check guardian consent Edge Function
         run: deno check --node-modules-dir=auto supabase/functions/langblue-guardian-subscription-consent/index.ts
