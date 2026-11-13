@@ -531,13 +531,26 @@
       try{
         const client = sb.getClient();
         if(!client) return this.current();
-        const {data,error}=await client
-          .from('subscriptions')
-          .select('id,plan_id,product_ids,status,starts_at,expires_at,created_at,updated_at')
-          .eq('status','active')
-          .gt('expires_at',new Date().toISOString())
-          .order('expires_at',{ascending:false})
-          .limit(1);
+        // A slow or disconnected network must not leave product startup waiting forever.
+        const controller = typeof AbortController === 'function' ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
+        let result;
+        try {
+          let request = client
+            .from('subscriptions')
+            .select('id,plan_id,product_ids,status,starts_at,expires_at,created_at,updated_at')
+            .eq('status','active')
+            .gt('expires_at',new Date().toISOString())
+            .order('expires_at',{ascending:false})
+            .limit(1);
+          if(controller && typeof request.abortSignal === 'function'){
+            request = request.abortSignal(controller.signal);
+          }
+          result = await request;
+        } finally {
+          if(timeoutId !== null) clearTimeout(timeoutId);
+        }
+        const {data,error}=result;
         if(error) throw error;
         if(data&&data[0]){
           const row=data[0];
