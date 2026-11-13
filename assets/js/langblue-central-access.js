@@ -53,13 +53,15 @@ function patchVocab(){
   }
   const gatePlans=document.getElementById('vocabGatePlans');if(gatePlans)centralNotice(gatePlans);
 }
-async function enforceConnectionPolicy(){
+function enforceConnectionPolicy(){
   try{
-    if(!window.LangBlueSupabase||typeof window.LangBlueSupabase.checkConnectionPolicy!=='function')return true;
-    const result=await window.LangBlueSupabase.checkConnectionPolicy();
-    if(result&&result.status==='suspended'){console.warn('[LangBlue] legacy connection restriction ignored; learning access is location-neutral.');return true;}
-    return true;
-  }catch(e){return true;}
+    if(window.LangBlueSupabase&&typeof window.LangBlueSupabase.checkConnectionPolicy==='function'){
+      // This endpoint only normalizes legacy metadata; it never gates learning access.
+      // Run it in the background so network latency cannot delay the product screen.
+      window.LangBlueSupabase.checkConnectionPolicy().catch(()=>{});
+    }
+  }catch(e){}
+  return true;
 }
 function productIdForPage(){
   const p=location.pathname.toLowerCase();
