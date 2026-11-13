@@ -39,8 +39,10 @@ async function invokeAuth(action, username, password, profile){
       });
       if(error)return {ok:false,error:error.message||'SESSION_SETUP_FAILED'};
     }
-    const policy = await checkConnectionPolicy();
-    return Object.assign({},data,{connection_policy:policy});
+    // Connection-policy maintenance is not an authentication gate.
+    // Do not make the user wait for this secondary request after a successful login.
+    checkConnectionPolicy().catch(()=>{});
+    return data;
   }catch(error){
     return {ok:false,error:error.message||'BACKEND_AUTH_FAILED'};
   }
