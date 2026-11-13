@@ -58,18 +58,15 @@ Deno.serve(async (req) => {
   const { data: { user } } = await userClient.auth.getUser();
   if (!user) return json({ ok: false, error: "AUTH_REQUIRED" }, 401);
 
+  const { data: maintenance } = await admin.rpc("is_langblue_maintenance_window");
+  if (maintenance === true) return json({ ok: false, error: "SERVER_MAINTENANCE" }, 503);
+
   const body = await req.json().catch(() => ({}));
   const code = String(body.code || "").trim();
-  const requested = Array.isArray(body.productIds)
-    ? Array.from(new Set(body.productIds.map(String).filter(Boolean)))
-    : [];
-
   if (!code) return json({ ok: false, error: "CODE_REQUIRED" }, 400);
 
   const hash = await sha256(code);
 
-  // Read-only lookup: do not consume the code here.
-  // Actual redemption is performed atomically by redeem_activation_code().
   const { data: row, error: lookupError } = await admin
     .from("activation_codes")
     .select("id,plan_id,product_ids,max_uses,uses,active,expires_at")
@@ -86,19 +83,14 @@ Deno.serve(async (req) => {
     return json({ ok: false, error: "INVALID_OR_USED_CODE" }, 400);
   }
 
+  // Central policy: activation always applies to the full code entitlement.
   const products = Array.from(new Set((row.product_ids || []).map(String)));
-  const selected = requested.length
-    ? requested.filter((p) => products.includes(p))
-    : products;
+  if (!products.length) return json({ ok: false, error: "PRODUCT_NOT_INCLUDED" }, 403);
 
-  if (!selected.length) return json({ ok: false, error: "PRODUCT_NOT_INCLUDED" }, 403);
-
-  // The database function locks the code row and writes the subscription
-  // before incrementing usage, so a failed redemption cannot leave a consumed code.
   const { data: redeemed, error: redeemError } = await admin.rpc("redeem_activation_code", {
     p_user_id: user.id,
     p_code_hash: hash,
-    p_product_ids: selected,
+    p_product_ids: products,
   });
 
   if (redeemError) {
@@ -113,11 +105,10 @@ Deno.serve(async (req) => {
   const subscription = redeemed.subscription;
   const plan = redeemed.plan;
 
-  // The plan was validated and returned by the same database transaction
-  // that created the subscription and consumed the code. Avoid a second
-  // lookup that could fail after the code has already been redeemed.
-  if (!plan || plan.id !== subscription.plan_id) {
-    console.error("Activation RPC returned an incomplete plan payload");
+  // The database transaction already validated and returned this plan.
+  // Avoid a second lookup that could fail after the code has been consumed.
+  if (!subscription || !plan || plan.id !== subscription.plan_id) {
+    console.error("Activation RPC returned an incomplete subscription or plan payload");
     return json({ ok: false, error: "PLAN_NOT_FOUND" }, 500);
   }
 
