@@ -101,9 +101,8 @@ function enforceProductAccess(){
 async function init(){
   // Server Rest is not a client-side gate; server-side policy remains authoritative.
   await refreshSubscription();
-  if(!(await enforceConnectionPolicy()))return;
+  enforceConnectionPolicy();
   patchGrammar();patchGerman();patchVocab();enforceProductAccess();
-  setInterval(enforceConnectionPolicy,300000);
   setTimeout(function(){hidePricing();if(window.PaidAccess&&window.PaidAccess.refreshButtons)window.PaidAccess.refreshButtons();},300);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
