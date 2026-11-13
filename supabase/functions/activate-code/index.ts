@@ -111,14 +111,15 @@ Deno.serve(async (req) => {
   }
 
   const subscription = redeemed.subscription;
-  const { data: plan, error: planError } = await admin
-    .from("plans")
-    .select("id,label,days,months,price_irt")
-    .eq("id", subscription.plan_id)
-    .eq("active", true)
-    .single();
+  const plan = redeemed.plan;
 
-  if (planError || !plan) return json({ ok: false, error: "PLAN_NOT_FOUND" }, 500);
+  // The plan was validated and returned by the same database transaction
+  // that created the subscription and consumed the code. Avoid a second
+  // lookup that could fail after the code has already been redeemed.
+  if (!plan || plan.id !== subscription.plan_id) {
+    console.error("Activation RPC returned an incomplete plan payload");
+    return json({ ok: false, error: "PLAN_NOT_FOUND" }, 500);
+  }
 
   return json({
     ok: true,
