@@ -16,13 +16,18 @@ async function sha256(value: string) {
 
 function publicActivationError(code: unknown) {
   const safe = String(code || "").trim().toUpperCase();
+  if (["INVALID_CODE", "CODE_INACTIVE", "CODE_ALREADY_USED", "CODE_EXPIRED"].includes(safe)) {
+    return "INVALID_OR_USED_CODE";
+  }
+  if (["PLAN_UNAVAILABLE", "INVALID_PLAN"].includes(safe)) {
+    return "PLAN_NOT_FOUND";
+  }
   const allowed = new Set([
     "AUTH_REQUIRED",
     "CODE_REQUIRED",
     "INVALID_OR_USED_CODE",
     "PRODUCT_NOT_INCLUDED",
     "SERVER_MAINTENANCE",
-    "CODE_LOOKUP_FAILED",
     "ACTIVATION_FAILED",
     "PLAN_NOT_FOUND",
   ]);
@@ -67,30 +72,12 @@ Deno.serve(async (req) => {
 
   const hash = await sha256(code);
 
-  const { data: row, error: lookupError } = await admin
-    .from("activation_codes")
-    .select("id,plan_id,product_ids,max_uses,uses,active,expires_at")
-    .eq("code_hash", hash)
-    .maybeSingle();
-
-  if (lookupError) {
-    console.error("Activation code lookup failed:", lookupError);
-    return json({ ok: false, error: "CODE_LOOKUP_FAILED" }, 500);
-  }
-
-  if (!row || !row.active || Number(row.uses || 0) >= Number(row.max_uses || 1) ||
-      (row.expires_at && new Date(row.expires_at) <= new Date())) {
-    return json({ ok: false, error: "INVALID_OR_USED_CODE" }, 400);
-  }
-
-  // Central policy: activation always applies to the full code entitlement.
-  const products = Array.from(new Set((row.product_ids || []).map(String)));
-  if (!products.length) return json({ ok: false, error: "PRODUCT_NOT_INCLUDED" }, 403);
-
+  // The database RPC locks, validates, and redeems the code atomically.
+  // An empty product list means the complete central entitlement on that code.
   const { data: redeemed, error: redeemError } = await admin.rpc("redeem_activation_code", {
     p_user_id: user.id,
     p_code_hash: hash,
-    p_product_ids: products,
+    p_product_ids: [],
   });
 
   if (redeemError) {
@@ -105,8 +92,8 @@ Deno.serve(async (req) => {
   const subscription = redeemed.subscription;
   const plan = redeemed.plan;
 
-  // The database transaction already validated and returned this plan.
-  // Avoid a second lookup that could fail after the code has been consumed.
+  // The database transaction already validated and returned the plan.
+  // No follow-up read can fail after the code has been consumed.
   if (!subscription || !plan || plan.id !== subscription.plan_id) {
     console.error("Activation RPC returned an incomplete subscription or plan payload");
     return json({ ok: false, error: "PLAN_NOT_FOUND" }, 500);
