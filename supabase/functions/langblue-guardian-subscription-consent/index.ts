@@ -91,6 +91,28 @@ Deno.serve(async (req: Request) => {
   };
 
   try {
+    if (action === "linked_learners") {
+      if (!await adultVerified()) return reply({ ok: false, error: "ADULT_VERIFICATION_REQUIRED" }, 403);
+      const links = await db.from("guardian_relationships")
+        .select("learner_user_id")
+        .eq("guardian_user_id", actor.id)
+        .eq("status", "active")
+        .contains("scopes", ["account_support"]);
+      if (links.error) throw new Error("GUARDIAN_LINKS_LOOKUP_FAILED");
+      const ids = [...new Set((links.data || []).map((x: any) => x.learner_user_id).filter(Boolean))];
+      const selfMap = await profilesFor([actor.id]);
+      const self = selfMap.get(actor.id) || {};
+      const learners = [{ user_id: actor.id, ...self, is_self: true }];
+      if (ids.length) {
+        const map = await profilesFor(ids);
+        for (const id of ids) {
+          const row = map.get(id);
+          if (row) learners.push({ user_id: id, username: row.username, name: row.name, is_self: false });
+        }
+      }
+      return reply({ ok: true, learners });
+    }
+
     if (action === "submit") {
       if (!await adultVerified()) return reply({ ok: false, error: "ADULT_VERIFICATION_REQUIRED" }, 403);
       const learnerId = clean(body.learnerUserId, 64);

@@ -10,7 +10,6 @@ on:
       - ".github/workflows/guardian-annual-report.yml"
       - "supabase/config.toml"
       - "supabase/functions/langblue-guardian-subscription-consent/**"
-      - "supabase/functions/langblue-subscription-requests/**"
       - "supabase/migrations/**"
 
 permissions:
@@ -63,7 +62,7 @@ jobs:
           if '[functions.langblue-guardian-subscription-consent]' not in config or 'verify_jwt = false' not in config:
               raise SystemExit("Guardian automation must disable platform JWT verification and authorize API keys in the handler")
           admin = pathlib.Path("pages/admin.html").read_text()
-          for marker in ['panel-guardian-consents', 'panel-subscription-requests', 'admin_list']:
+          for marker in ['panel-guardian-consents', 'admin_list']:
               if marker not in admin:
                   raise SystemExit(f"Central admin integration missing: {marker}")
           landing = pathlib.Path("assets/js/langblue-receipt.js").read_text()
@@ -80,5 +79,3 @@ jobs:
           PY
       - name: Type-check guardian consent Edge Function
         run: deno check --node-modules-dir=auto supabase/functions/langblue-guardian-subscription-consent/index.ts
-      - name: Type-check subscription request Edge Function
-        run: deno check --node-modules-dir=auto supabase/functions/langblue-subscription-requests/index.ts

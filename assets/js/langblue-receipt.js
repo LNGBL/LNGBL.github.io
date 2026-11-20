@@ -257,7 +257,7 @@
     }
 
     try{
-      var linked=await client.functions.invoke('langblue-subscription-requests',{body:{action:'linked_learners'}});
+      var linked=await client.functions.invoke('langblue-guardian-subscription-consent',{body:{action:'linked_learners'}});
       if(linked.error||!linked.data||!linked.data.ok){
         var serverError=linked.data&&linked.data.error||'';
         if(!serverError&&linked.error&&linked.error.context&&typeof linked.error.context.clone==='function'){
