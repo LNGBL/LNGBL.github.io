@@ -17,7 +17,7 @@
 <main class="wrap">
 <header class="top">
  <div><div class="muted">LANGBLUE · CENTRAL OPERATIONS</div><h1>مرکز عملیات و اتوماسیون مدیریتی</h1><p class="muted">مدیریت متمرکز تأییدها، انتشار محتوا، دسترسی منصفانه، حساب مدیران و عملیات پلتفرم.</p></div>
- <div><div id="authStatus" class="status">در حال بررسی هویت مدیریتی…</div><button id="refresh" class="btn primary" type="button" disabled>به‌روزرسانی همهٔ صف‌ها</button><div class="actions"><a class="btn" href="/pages/subscription-requests.html">صندوق درخواست‌های اشتراک</a><a class="btn" href="/pages/research.html">داشبورد پژوهش</a><a class="btn" href="/pages/community-access-admin.html">مدیریت مستقل دسترسی منصفانه</a><a class="btn" href="/pages/teachers.html">فهرست معلمان</a><a class="btn" href="/">صفحهٔ اصلی</a></div></div>
+ <div><div id="authStatus" class="status">در حال بررسی هویت مدیریتی…</div><button id="refresh" class="btn primary" type="button" disabled>به‌روزرسانی همهٔ صف‌ها</button><div class="actions"><a class="btn" href="/pages/research.html">داشبورد پژوهش</a><a class="btn" href="/pages/community-access-admin.html">مدیریت مستقل دسترسی منصفانه</a><a class="btn" href="/pages/teachers.html">فهرست معلمان</a><a class="btn" href="/">صفحهٔ اصلی</a></div></div>
 </header>
 <nav class="nav" id="nav" hidden>
  <button class="active" data-panel="overview">نمای کلی</button>
@@ -28,7 +28,6 @@
  <button data-panel="staff" id="staffNav">مدیران</button>
  <button data-panel="operations">عملیات پلتفرم</button>
  <button data-panel="guardian-consents">رضایت سرپرست</button>
- <button data-panel="subscription-requests">درخواست‌های لندینگ</button>
  <button data-panel="audit">گزارش فعالیت‌ها</button>
 </nav>
 
@@ -94,19 +93,12 @@
  <h3>گزارش‌های ذخیره‌شده</h3><div id="guardianReports"></div>
  <h3>پرونده‌های رضایت</h3><div id="guardianQueue"></div>
 </section>
-<section id="panel-subscription-requests" class="panel" hidden>
- <div class="section-head"><h2>صندوق مرکزی درخواست‌های لندینگ</h2><span class="muted">رسیدهایی که کاربران در صفحهٔ اصلی LangBlue ثبت کرده‌اند، در همین صف بررسی می‌شوند.</span></div>
- <div id="subscriptionStatus" class="status">برای بارگذاری، «به‌روزرسانی همهٔ صف‌ها» را بزن.</div>
- <div id="subscriptionMetrics" class="metrics"></div>
- <div id="subscriptionQueue"></div>
-</section>
-
 </main>
 <script>
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-let client=null,role=null,workflow=null,community=[],guardianConsents=[],guardianReports=[],subscriptionRequests=[];
+let client=null,role=null,workflow=null,community=[],guardianConsents=[],guardianReports=[];
 const areaNames={grammar:'Grammar',vocabulary:'Vocabulary',deutsch:'Deutsch',japanese:'Japanese',langdesert_arabic:'LangDesert Arabic'};
 const statusNames={pending:'در انتظار بررسی',active:'فعال',suspended:'تعلیق‌شده',rejected:'ردشده',draft:'پیش‌نویس',pending_review:'در صف بررسی',open:'منتشرشده',closed:'بسته',published:'منتشرشده',archived:'بایگانی‌شده',approved:'تأییدشده'};
 const accountName=a=>a?(a.name||a.username||'حساب LangBlue')+(a.username?' · @'+a.username:''):'حساب کاربری';
@@ -188,30 +180,6 @@ function renderGuardianReports(){
  if(!guardianReports.length){host.append(empty('گزارش ذخیره‌شده‌ای وجود ندارد.'));return;}
  guardianReports.forEach(r=>{const c=el('article','item');c.append(el('strong','', 'گزارش سال '+r.report_year+' · '+Number(r.record_count||0).toLocaleString('fa-IR')+' پرونده'));if(r.url){const a=el('a','','دریافت PDF (لینک موقت)');a.href=r.url;a.target='_blank';a.rel='noopener noreferrer';c.append(a);}host.append(c);});
 }
-function renderSubscriptionRequests(){
- const host=$('subscriptionQueue');host.replaceChildren();
- const pending=subscriptionRequests.filter(x=>x.status==='pending_admin_review').length;
- const needs=subscriptionRequests.filter(x=>x.status==='needs_info').length;
- $('subscriptionMetrics').replaceChildren();
- [['کل درخواست‌ها',subscriptionRequests.length],['در انتظار بررسی',pending],['نیازمند اطلاعات',needs],['تعیین‌تکلیف‌شده',subscriptionRequests.filter(x=>['approved','rejected','closed','reviewed'].includes(x.status)).length]].forEach(([k,v])=>{const d=el('div','metric');d.append(el('span','muted',k),el('strong','',Number(v).toLocaleString('fa-IR')));$('subscriptionMetrics').append(d);});
- if(!subscriptionRequests.length){host.append(empty('هنوز درخواستی از لندینگ ثبت نشده است.'));return;}
- subscriptionRequests.forEach(r=>{
-  const c=el('article','item');c.append(el('h3','',r.request_ref||String(r.id).slice(0,8)),el('span','tag',requestStatusNames[r.status]||r.status));
-  detailLine(c,'درخواست‌دهنده',accountName(r.requester));detailLine(c,'حساب مقصد',accountName(r.learner));
-  detailLine(c,'محصولات',(r.product_ids||[]).map(x=>productNames[x]||x));
-  detailLine(c,'مدت / مبلغ',(planNames[r.plan_id]||r.plan_id)+' · '+Number(r.amount_irt||0).toLocaleString('fa-IR')+' تومان');
-  detailLine(c,'ثبت',new Date(r.created_at).toLocaleString('fa-IR'));
-  if(r.receipt_url){const a=el('a','','مشاهدهٔ رسید خصوصی');a.href=r.receipt_url;a.target='_blank';a.rel='noopener noreferrer';c.append(a);const img=el('img');img.src=r.receipt_url;img.alt='تصویر رسید پرداخت';img.loading='lazy';img.style.cssText='display:block;max-width:100%;max-height:240px;object-fit:contain;border-radius:9px;margin-top:8px';c.append(img);}else c.append(el('p','muted','تصویر رسید در دسترس نیست.'));
-  detailLine(c,'یادداشت قبلی',r.admin_note||'—');
-  if(['pending_admin_review','needs_info'].includes(r.status)){
-   const note=noteField();note.input.value=r.admin_note||'';c.append(note.node);const a=el('div','actions');
-   [['تأیید پرداخت و فعال‌سازی','approved','primary'],['رد پرداخت','rejected','danger'],['درخواست اطلاعات بیشتر','needs_info','']].forEach(([label,status,kind])=>a.append(actionButton(label,async b=>{b.disabled=true;try{await invokeAdmin('langblue-subscription-requests',{action:'admin_update',id:r.id,status,note:note.input.value});$('subscriptionStatus').textContent=status==='approved'?'پرداخت تأیید شد و فعال‌سازی از مسیر مرکزی انجام شد.':'وضعیت درخواست به‌روزرسانی شد.';await refreshAll();}catch(e){$('subscriptionStatus').textContent='خطا: '+e.message;b.disabled=false}},kind)));
-   c.append(a);
-  }
-  host.append(c);
- });
-}
-
 function render(){
  const q=workflow?.queues||{},m=workflow?.management||{};
  sectionList('queueTeachers',q.teachers, x=>teacherCard(x),'درخواست تأیید معلم وجود ندارد.');
@@ -224,7 +192,7 @@ function render(){
  const counts=workflow?.counts||{};const metricItems=[['درخواست معلم',counts.teachers],['انتشار کلاس',counts.offers],['محتوای آموزشی',counts.content],['مشارکت کاربران',counts.contributions],['اتصال‌های در انتظار',counts.pending_connections],['درخواست دسترسی',community.filter(x=>x.status==='pending').length]];
  $('metrics').replaceChildren();metricItems.forEach(([label,value])=>{const d=el('div','metric');d.append(el('span','muted',label),el('strong','',Number(value||0).toLocaleString('fa-IR')));$('metrics').append(d)});
  $('lastUpdated').textContent='آخرین همگام‌سازی: '+new Date(workflow.generated_at).toLocaleString('fa-IR');
- renderCommunity();renderStaff();renderOperations();renderAudit();renderGuardianConsents();renderGuardianReports();renderSubscriptionRequests();
+ renderCommunity();renderStaff();renderOperations();renderAudit();renderGuardianConsents();renderGuardianReports();
 }
 function renderCommunity(){sectionList('communityQueue',community,x=>{const c=el('article','item');c.append(el('h3','',accountName(x.profile)),el('span','tag',statusNames[x.status]||x.status));detailLine(c,'سن اعلام‌شده',x.declared_age);detailLine(c,'توضیح کاربر',x.user_note);detailLine(c,'تاریخ ثبت',new Date(x.created_at).toLocaleString('fa-IR'));const n=noteField();c.append(n.node);const a=el('div','actions');if(x.status==='pending')a.append(actionButton('تأیید درخواست',b=>communityDecision(x.id,'approved',n.input.value,b),'primary'),actionButton('رد درخواست',b=>communityDecision(x.id,'rejected',n.input.value,b),'danger'));detailLine(c,'یادداشت مدیر',x.admin_note);detailLine(c,'اعتبار تا',x.discount_expires_at?new Date(x.discount_expires_at).toLocaleDateString('fa-IR'):'—');c.append(a);return c},'درخواستی ثبت نشده است.')}
 async function communityDecision(id,decision,note,button){button.disabled=true;try{const r=await client.functions.invoke('langblue-community-access',{body:{action:'admin_decide',requestId:id,decision,adminNote:note}});if(r.error||!r.data?.ok)throw new Error(r.data?.error||r.error?.message||'خطا');await refreshAll()}catch(e){alert('ثبت تصمیم انجام نشد: '+e.message);button.disabled=false}}
@@ -246,29 +214,25 @@ function protectedQueueMessage(code){
  return 'بارگذاری این صف انجام نشد: '+code;
 }
 async function refreshAll(){ $('refresh').disabled=true;try{
- const [w,c,o,g,q,rr]=await Promise.all([
+ const [w,c,o,g,rr]=await Promise.all([
   callWorkflow({action:'queue_list'}),
   client.functions.invoke('langblue-community-access',{body:{action:'admin_list'}}),
   callWorkflow({action:'maintenance_status'}),
   client.functions.invoke('langblue-guardian-subscription-consent',{body:{action:'admin_list'}}),
-  client.functions.invoke('langblue-subscription-requests',{body:{action:'admin_list'}}),
   client.functions.invoke('langblue-guardian-subscription-consent',{body:{action:'admin_reports'}})
  ]);
  if(c.error||!c.data?.ok)throw new Error(c.data?.error||c.error?.message||'COMMUNITY_QUEUE_FAILED');
  workflow=w;workflow.operations={maintenance:o.maintenance,windows:o.windows,releases:o.releases};role=w.role;community=c.data.requests||[];
  const guardianCode=(g.error||!g.data?.ok)?await edgeErrorCode(g):'';
- const subscriptionCode=(q.error||!q.data?.ok)?await edgeErrorCode(q):'';
  guardianConsents=guardianCode?[]:(g.data.consents||[]);
- subscriptionRequests=subscriptionCode?[]:(q.data.requests||[]);
  guardianReports=(!guardianCode&&rr.data?.ok)?(rr.data.reports||[]):[];
  render();
  $('guardianStatus').textContent=guardianCode?protectedQueueMessage(guardianCode):'صندوق رضایت سرپرست همگام‌سازی شد.';
- $('subscriptionStatus').textContent=subscriptionCode?protectedQueueMessage(subscriptionCode):'درخواست‌های ثبت‌شده از لندینگ همگام‌سازی شدند.';
  $('guardianMakeReport').disabled=!!guardianCode;$('guardianCleanup').disabled=!!guardianCode;
  $('nav').hidden=false;$('refresh').disabled=false;
- const blocked=!!guardianCode||!!subscriptionCode;
+ const blocked=!!guardianCode;
  setStatus(blocked?'پنل مرکزی بارگذاری شد؛ صف‌های حساس تا تکمیل احراز بزرگسالیِ معتبر قفل هستند.':'همهٔ بخش‌های پنل مرکزی بارگذاری شدند.',blocked?'warn':'good');
- }catch(e){setStatus('بارگذاری پنل ناموفق بود: '+e.message,'bad');$('guardianStatus').textContent='خطا در بارگذاری: '+e.message;$('subscriptionStatus').textContent='خطا در بارگذاری: '+e.message;$('refresh').disabled=false}}
+ }catch(e){setStatus('بارگذاری پنل ناموفق بود: '+e.message,'bad');$('guardianStatus').textContent='خطا در بارگذاری: '+e.message;$('refresh').disabled=false}}
 function showPanel(name){document.querySelectorAll('main section[id^="panel-"]').forEach(s=>s.hidden=s.id!=='panel-'+name);document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.panel===name))}
 async function init(){client=window.LangBlueSupabase?.getClient?.();if(!client){setStatus('اتصال حساب مرکزی در دسترس نیست.','bad');return}const {data:{session}}=await client.auth.getSession();if(!session){setStatus('ابتدا با حساب LangBlue Official وارد صفحهٔ اصلی شو.','warn');return}const {data,error}=await client.functions.invoke('langblue-admin-access',{body:{}});if(error||!data?.ok||!data.is_admin){setStatus('این حساب دسترسی مدیریتی ندارد یا بررسی دسترسی ناموفق بود.','bad');return}role=data.role;setStatus('دسترسی تأیید شد · نقش: '+(role==='owner'?'مالک مرکزی':'مدیر'),'good');$('refresh').disabled=false;$('nav').hidden=false;$('staffNav').hidden=role!=='owner';$('staffForm').hidden=role!=='owner';document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>showPanel(b.dataset.panel)));$('refresh').addEventListener('click',refreshAll);
  const yearSelect=$('guardianReportYear');for(let y=new Date().getUTCFullYear();y>=new Date().getUTCFullYear()-5;y--){const opt=document.createElement('option');opt.value=String(y);opt.textContent=String(y);yearSelect.append(opt);}
